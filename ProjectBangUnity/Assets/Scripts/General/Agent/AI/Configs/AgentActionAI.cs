@@ -65,11 +65,6 @@ namespace Bang
             actions.Add(a);  // --  Add to Actions Group
 
 
-            //a = new FireAtAttackTarget()
-            //{
-            //    name = "FireAtAttackTarget"
-            //};
-            //actions.Add(a);         // --------------- Add
 
 
             // ---- New Scorers Group ----

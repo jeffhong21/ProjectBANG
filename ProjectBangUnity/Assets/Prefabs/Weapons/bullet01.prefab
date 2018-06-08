@@ -455,5 +455,4 @@ MonoBehaviour:
   _lifeDuration: 2
   _spawnLocation: {x: 0, y: 0, z: 0}
   _maxRange: 50
-  _velocity: 50
-  hitVfx: {fileID: 198444631259220202, guid: 69e5544af4a7b4cd6ae33513e78a694e, type: 2}
+  _velocity: 96

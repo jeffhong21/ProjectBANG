@@ -38,12 +38,6 @@
 
 
 
-            //a = new RandomWander()
-            //{
-            //    name = "RandomWander",
-            //};
-            //actions.Add(a);  // --  Add to Actions Group
-
             // ---- New Action ----
             a = new MoveToBestPosition()
             {
@@ -62,6 +56,7 @@
             };
             actions.Add(a);  // --  Add to Actions Group
 
+
             // ---- New Scorers Group ----
             scorers = new List<IScorer>();
             // ---- New Scorer ----
@@ -69,14 +64,7 @@
             scorers.Add(scorer);  // --  Add to Scorers Group
             allScorers.Add(scorers.ToArray());
 
-            //scorers = new List<IScorer>();
-            //scorer = new HasEnemies() { score = 15 };
-            //scorers.Add(scorer);         // --------------- Add
-            //allScorers.Add(scorers.ToArray());
 
-            //// ---- New Qualifier ----
-            //q = new CompositeScoreQualifier();
-            //qualifiers.Add(q);
 
             // ---- New Qualifier ----
             q = new CompositeScoreQualifier();

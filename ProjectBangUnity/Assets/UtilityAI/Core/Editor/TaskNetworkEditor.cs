@@ -227,7 +227,7 @@
                         {
                             Delete(index);
                         }
-                        var results = AssetDatabase.FindAssets("t:UtilityAIAsset", new string[]{AiManager.StorageFolder} );
+                        var results = AssetDatabase.FindAssets("t:UtilityAIAsset", new string[]{AIManager.StorageFolder} );
                         foreach(string guid in results){
                             AssetDatabase.DeleteAsset(AssetDatabase.GUIDToAssetPath(guid));
                         }

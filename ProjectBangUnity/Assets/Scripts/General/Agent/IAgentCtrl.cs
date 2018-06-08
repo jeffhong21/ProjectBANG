@@ -4,7 +4,9 @@ namespace Bang
 
     public interface IAgentCtrl
     {
-        
+
+
+
         void MoveTo(Vector3 destination);
 
 

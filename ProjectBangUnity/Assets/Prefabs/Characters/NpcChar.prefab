@@ -121,7 +121,6 @@ GameObject:
   - component: {fileID: 114720206722545972}
   - component: {fileID: 114547873525375904}
   - component: {fileID: 114061504493827786}
-  - component: {fileID: 114312480742818488}
   m_Layer: 10
   m_Name: NpcChar
   m_TagString: Actor
@@ -1810,9 +1809,9 @@ Rigidbody:
   m_Drag: 0
   m_AngularDrag: 0.05
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 116
   m_CollisionDetection: 0
 --- !u!95 &95859117713158742
 Animator:
@@ -1863,17 +1862,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _context:
     _sampledPositions: []
---- !u!114 &114312480742818488
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d6b23fc83c8b3417089d77fd33d51b98, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114547873525375904
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1885,8 +1873,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecfcf8be752b8446e8a91a3d07241665, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  drawGUI: 0
-  drawGizmo: 0
+  drawGUI: 1
+  drawGizmo: 1
   sphereSize: 0.25
   sphereAlpha: 0.5
 --- !u!114 &114558835538233468
@@ -1904,7 +1892,7 @@ MonoBehaviour:
   navType: 0
   _moveSpeed: 6
   _acceleration: 6
-  _angularAcceleration: 40
+  _angularSpeed: 270
   _arrivalDistance: 1
   _agent: {fileID: 0}
 --- !u!114 &114720206722545972
@@ -1920,7 +1908,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   aiConfigs: []
   _clients:
-  - _ai:
+  - contextProvider: {fileID: 114193328531158472}
+    _ai:
       jsonData: "{\n  \"$id\": \"1\",\n  \"id\": \"56729c76-e031-4ca4-820a-7282efbf5a7b\",\n
         \ \"qualifiers\": [\n    {\n      \"$id\": \"2\",\n      \"$type\": \"UtilityAI.CompositeScoreQualifier,
         Assembly-CSharp\",\n      \"action\": {\n        \"$id\": \"3\",\n        \"$type\":
@@ -1948,9 +1937,9 @@ MonoBehaviour:
     _intervalMax: 1
     _startDelayMin: 0
     _startDelayMax: 0
-    contextProvider: {fileID: 114193328531158472}
     debugClient: 0
-  - _ai:
+  - contextProvider: {fileID: 114193328531158472}
+    _ai:
       jsonData: "{\n  \"$id\": \"1\",\n  \"id\": \"9001b69b-f737-49b8-8af6-b62de600ef33\",\n
         \ \"qualifiers\": [\n    {\n      \"$id\": \"2\",\n      \"$type\": \"UtilityAI.CompositeScoreQualifier,
         Assembly-CSharp\",\n      \"action\": {\n        \"$id\": \"3\",\n        \"$type\":
@@ -1990,9 +1979,9 @@ MonoBehaviour:
     _intervalMax: 0.5
     _startDelayMin: 0
     _startDelayMax: 0
-    contextProvider: {fileID: 114193328531158472}
     debugClient: 0
-  - _ai:
+  - contextProvider: {fileID: 114193328531158472}
+    _ai:
       jsonData: "{\n  \"$id\": \"1\",\n  \"id\": \"f0817c81-2713-4588-ba6c-f1052334923a\",\n
         \ \"qualifiers\": [\n    {\n      \"$id\": \"2\",\n      \"$type\": \"UtilityAI.CompositeScoreQualifier,
         Assembly-CSharp\",\n      \"action\": {\n        \"$id\": \"3\",\n        \"$type\":
@@ -2033,7 +2022,6 @@ MonoBehaviour:
     _intervalMax: 1
     _startDelayMin: 0
     _startDelayMax: 0
-    contextProvider: {fileID: 114193328531158472}
     debugClient: 0
   _hasStarted: 0
   debugNextIntervalTime: 0
@@ -2056,7 +2044,7 @@ MonoBehaviour:
   _currentHealth: 0
   _isDead: 0
   _equippedFirearm: {fileID: 0}
-  _YFocusOffset: 0.75
+  _yFocusOffset: 0.75
   sinkSpeed: 2.5
   _fireSpeed: 1
   _aimAccuracy: 3
@@ -2076,7 +2064,6 @@ MonoBehaviour:
   _rightHand: {fileID: 4781103747589800}
   _mainRenderer:
   - {fileID: 137629596905926438}
-  _hitVfx: {fileID: 198940867824742104, guid: df0fdb87a369846ec81d9d434628f897, type: 2}
 --- !u!136 &136658996750469874
 CapsuleCollider:
   m_ObjectHideFlags: 1

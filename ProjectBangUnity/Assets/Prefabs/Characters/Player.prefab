@@ -1575,7 +1575,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1737790555669700}
   m_LocalRotation: {x: -0.49999985, y: 0.5, z: -0.5, w: 0.5000002}
-  m_LocalPosition: {x: 0.075168274, y: 0.033739686, z: 0.000026359046}
+  m_LocalPosition: {x: 0.134, y: 0.034, z: -0.06}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4894783996685124}
@@ -1806,7 +1806,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!95 &95859117713158742
 Animator:
@@ -1845,7 +1845,7 @@ MonoBehaviour:
   _dashDistance: 3
   _crosshairs: {fileID: 114826101891483204, guid: 7db2964c8ec8b44fcb79a8d7e2ffb41d,
     type: 2}
-  useRawInput: 0
+  useRawInput: 1
   drawAimLine: 0
   aimLineColor: {r: 1, g: 0.7413453, b: 0, a: 1}
   displayCursorPosition: 0
@@ -1867,7 +1867,6 @@ MonoBehaviour:
   _rightHand: {fileID: 4781103747589800}
   _mainRenderer:
   - {fileID: 137022341486526484}
-  _hitVfx: {fileID: 198940867824742104, guid: df0fdb87a369846ec81d9d434628f897, type: 2}
 --- !u!114 &114941810916507612
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1895,7 +1894,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.5
+  m_Radius: 0.25
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}

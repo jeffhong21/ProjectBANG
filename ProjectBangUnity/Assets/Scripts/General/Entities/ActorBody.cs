@@ -14,8 +14,7 @@ namespace Bang
         private Transform _rightHand;
         [SerializeField, Tooltip("Main renderer")]
         private SkinnedMeshRenderer[] _mainRenderer;
-        [SerializeField, Tooltip("Particle System when hit")]
-        private ParticleSystem _hitVfx;
+
 
 
 
@@ -41,10 +40,6 @@ namespace Bang
             get { return _mainRenderer; }
         }
 
-
-        public ParticleSystem HitVfx{
-            get { return _hitVfx; }
-        }
 
 
 		private void Awake()

@@ -15,8 +15,7 @@ namespace Bang
         protected float _maxRange = 50f;
         [SerializeField, Tooltip("TEMP")]
         protected float _velocity = 100f;
-        [SerializeField]
-        protected ParticleSystem hitVfx;
+
 
 
 
@@ -84,9 +83,8 @@ namespace Bang
             }
 
 
-            if (c.gameObject.layer == LayerMask.NameToLayer("WorldObjects") && hitVfx != null)
+            if (c.gameObject.layer == LayerMask.NameToLayer("WorldObjects"))
             {
-                //Destroy(Instantiate(hitVfx.gameObject, hitPoint, Quaternion.FromToRotation(Vector3.forward, -transform.forward)), hitVfx.main.duration);
                 //PoolManager.instance.Spawn(PoolTypes.VFX, hitPoint, Quaternion.FromToRotation(Vector3.forward, -transform.forward));
                 ParticlePoolManager.instance.SpawnParticleSystem(ParticlesType.ImpactHit, hitPoint, Quaternion.FromToRotation(Vector3.forward, -transform.forward));
             }

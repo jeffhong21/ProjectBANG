@@ -94,7 +94,7 @@
             Type type = typeof(T);
             //  Gets all custom Types in this assembly and adds it to a list.
             //var optionTypes = Assembly.GetAssembly(type).GetTypes()
-                                      //.Where(t => t.IsClass && t.Namespace == typeof(AiManager).Namespace)
+                                      //.Where(t => t.IsClass && t.Namespace == typeof(AIManager).Namespace)
                                       //.ToList();
             var optionTypes = Assembly.GetAssembly(type).GetTypes()
                                       .Where(t => t.IsClass).ToList();

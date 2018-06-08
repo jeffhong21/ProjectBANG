@@ -46,13 +46,6 @@ namespace Bang
             };
             actions.Add(a);  // --  Add to Actions Group
 
-            //// ---- New Action ----
-            //a = new SetBestAttackTarget()
-            //{
-            //    name = "SetBestAttackTarget",
-            //    scorers = new List<IOptionScorer<IHasHealth>>() { new EnemyProximityToSelf() }
-            //};
-            //actions.Add(a);  // --  Add to Actions Group
 
             // ---- New Scorers Group ----
             scorers = new List<IScorer>();
@@ -61,26 +54,12 @@ namespace Bang
             scorers.Add(scorer);  // --  Add to Scorers Group
             allScorers.Add(scorers.ToArray());
 
-            //// ---- New Scorers ----
-            //scorers = new List<IScorer>();
-            //scorer = new HasEnemies() { score = 10 };
-            //scorers.Add(scorer); 
-            //allScorers.Add(scorers.ToArray());  // --  Add to Scorers Group
-
-            //// ---- New Scorers ----
-            //scorers = new List<IScorer>();
-            //scorer = new HasEnemiesInRange() { score = 15 };
-            //scorers.Add(scorer);
-            //allScorers.Add(scorers.ToArray()); // --  Add to Scorers Group
 
             // ---- New Qualifier ----
             q = new CompositeScoreQualifier();
             qualifiers.Add(q);
 
-            //q = new CompositeScoreQualifier();
-            //qualifiers.Add(q);
-            //q = new CompositeScoreQualifier();
-            //qualifiers.Add(q);
+
 
             rs.defaultQualifier.action = new ScanForEntities()
             {

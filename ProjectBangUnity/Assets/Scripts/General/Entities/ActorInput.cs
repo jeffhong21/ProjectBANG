@@ -46,6 +46,7 @@
             //if(isMoving == false) PlayWalkAnimation();
 
             PlayLocomotionAnimation();
+            animator.SetBool("IsMoving", isMoving);
         }
 
         private void PlayLocomotionAnimation()

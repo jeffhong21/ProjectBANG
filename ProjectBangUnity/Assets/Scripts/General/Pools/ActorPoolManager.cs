@@ -11,14 +11,22 @@
         private static readonly int poolTypeLength = Enum.GetNames(typeof(ActorTypes)).Length;
 
         //  Name of the gameObject the pooled objects are parented too.
-        public static string managerHostName = "ActorPools";
+        public static string managerHostName = "[ActorsPool]";
         public static string poolHostName = "{0}Pool";
 
+        //public string poolNName;
         [SerializeField]
         private ActorPoolSetup[] _poolSetup = new ActorPoolSetup[poolTypeLength];
         // Key is the tag or type of the pool, Value is the Pool of objects.
         //private Dictionary<string, PoolBase<IPooled>> _pools;
         private Dictionary<ActorTypes, PoolBase<IPooled>> _pools;
+
+        [SerializeField, Tooltip("If checked, manager will group pool types under separate groups, else it will just group under the host manager.")]
+        private bool worldIsGroup;
+        [SerializeField, Tooltip("If checked, manager will group everything under world.")]
+        private bool groupPoolTypes;
+
+
 
         public static int playerCount = 1;
         private List<IEntity> _players;
@@ -27,8 +35,7 @@
             get { return _players; }
         }
 
-        [SerializeField, Tooltip("If checked, manager will group pool types under separate groups, else it will just group under the manager.")]
-        private bool groupPoolTypes;
+
 
         protected override void Awake()
         {
@@ -41,7 +48,7 @@
 
             //note -> can be reduced to one-level transform hierarchy for performance
             GameObject managerHost = new GameObject(managerHostName);
-            managerHost.transform.SetParent(this.transform);
+            if(worldIsGroup = false) managerHost.transform.SetParent(this.transform);
 
             for (int i = 0; i < _poolSetup.Length; i++)
             {

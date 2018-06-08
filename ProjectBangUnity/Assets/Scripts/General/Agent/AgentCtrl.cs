@@ -6,20 +6,26 @@ namespace Bang
 
     using UtilityAI;
 
-    public class AgentCtrl : ActorCtrl, IAgentCtrl,IHasFirearm
+
+    /// <summary>
+    /// Agent Controller has methods that the agent can perform.
+    /// </summary>
+    public class AgentCtrl : ActorCtrl, IAgentCtrl, IHasFirearm
     {
-        [Header("----- Agent Stas -----")]
-        [SerializeField, Tooltip("Agents accuracy range.")]
+        [Header("----- Shooting Stas -----")]
+        [SerializeField, Tooltip("Agents fire speed.")]
         protected float _fireSpeed = 1f;
         [SerializeField, Tooltip("Agents accuracy range.")]
         protected float _aimAccuracy = 3f;
+        float fireWeaponAttackTime;
+        float fireWeaponCoolDown;
+
 
         AgentInput _agentInput;
         IHasHealth _attackAtarget;
         IAIContext _context;
 
-        float fireWeaponAttackTime;
-        float fireWeaponCoolDown;
+
 
         public AgentInput agentInput
         {
@@ -29,7 +35,6 @@ namespace Bang
 
         public float aimAccuracy{
             get { return _aimAccuracy; }
-            set { _aimAccuracy = value; }
         }
 
 
@@ -86,22 +91,17 @@ namespace Bang
             if(Time.time > fireWeaponCoolDown)
             {
                 fireWeaponCoolDown = Time.time + _fireSpeed;
-
                 //target = UnityEngine.Random.insideUnitSphere * aimAccuracy;
                 target.y = equippedFirearm == null ? YFocusOffset : equippedFirearm.projectileSpawn.position.y; ;
-
-
-
-                //Debug.LogFormat("Taget Vector:  {0} | AimTarget Vector: {1}", target, aimTarget);
                 equippedFirearm.Shoot(target);
             }
-
         }
 
 
 
         public virtual void MoveTo(Vector3 destination)
         {
+            destination.y = 0;
             agentInput.MoveTo(destination);
         }
 
@@ -110,6 +110,7 @@ namespace Bang
         {
             agentInput.StopWalking();
         }
+
 
 
 

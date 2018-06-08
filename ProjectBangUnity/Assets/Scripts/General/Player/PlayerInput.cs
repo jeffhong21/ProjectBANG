@@ -198,9 +198,6 @@
                 playerVelocity = moveInput.normalized * moveSpeed * Time.deltaTime;
                 this.transform.position += playerVelocity;
             }
-
-
-
         }
 
 
@@ -240,10 +237,6 @@
                 dashStartPosition = transform.position;
             }
         }
-
-
-
-
 
 
         protected void Reload()

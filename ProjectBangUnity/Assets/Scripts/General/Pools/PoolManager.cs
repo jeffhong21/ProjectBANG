@@ -11,7 +11,7 @@
         private static readonly int poolTypeLength = Enum.GetNames(typeof(PoolTypes)).Length;
 
         //  Name of the gameObject the pooled objects are parented too.
-        public static string managerHostName = "EntityPools";
+        public static string managerHostName = "EntityPool";
         public static string poolHostName = "{0}Pool";
 
         [SerializeField]

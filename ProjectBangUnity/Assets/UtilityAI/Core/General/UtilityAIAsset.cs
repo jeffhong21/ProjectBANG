@@ -28,7 +28,7 @@
   //      ///<returns></returns>
   //      public UtilityAIAsset CreateAsset(string aiId, string aiName, bool isMockAI = false)
   //      {
-  //          string dir = AiManager.StorageFolder;
+  //          string dir = AIManager.StorageFolder;
   //          string assetDir = AssetDatabase.GenerateUniqueAssetPath(dir + "/" + aiName + ".asset");
   //          aiName = Path.GetFileNameWithoutExtension(assetDir);
 
@@ -138,7 +138,7 @@
         {
             UtilityAIAsset asset = ScriptableObject.CreateInstance<UtilityAIAsset>();
 
-            string assetDir = AssetDatabase.GenerateUniqueAssetPath(AiManager.StorageFolder + "/" + aiName + ".asset");
+            string assetDir = AssetDatabase.GenerateUniqueAssetPath(AIManager.StorageFolder + "/" + aiName + ".asset");
 
 
             asset.friendlyName = Path.GetFileNameWithoutExtension(assetDir);

@@ -20,40 +20,91 @@
     [Serializable]
     public class UtilityAIClient
     {
+        //  ContextProvider from BANG.
+        [SerializeField]
+        [HideInInspector]
+        private Bang.AIContextProvider contextProvider;
+
         [SerializeField]
         private UtilityAI _ai;
-        public UtilityAI ai{ get{return _ai;} set{ _ai = value;} }
-
-
         [SerializeField]
         private UtilityAIClientState _state;
-        public UtilityAIClientState state { get { return _state; } protected set { _state = value; } }
+
 
         [SerializeField]
         private float _intervalMin;
-        public float intervalMin { get { return _intervalMin; } set { _intervalMin = value; } }
         [SerializeField]
         private float _intervalMax;
-        public float intervalMax { get { return _intervalMax; } set { _intervalMax = value; } }
         [SerializeField]
         private float _startDelayMin;
-        public float startDelayMin { get { return _startDelayMin; } set { _startDelayMin = value; } }
         [SerializeField]
         private float _startDelayMax;
-        public float startDelayMax { get { return _startDelayMax; } set { _startDelayMax = value; } }
-
-        //  ContextProvider from BANG.
-        [SerializeField] [HideInInspector]
-        private Bang.AIContextProvider contextProvider;
 
 
-        public IAction activeAction { get; protected set; }
-        public bool debugClient;
+
+        public UtilityAI ai{ 
+            get{
+                return _ai;
+            }
+            set{ _ai = value;
+            }
+        }
+
+        public UtilityAIClientState state{ 
+            get{
+                return _state; 
+            }
+            protected set{
+                _state = value;
+            }
+        }
+
+        public float intervalMin { 
+            get{ 
+                return _intervalMin; 
+            } 
+            set{ 
+                _intervalMin = value; 
+            }
+        }
+
+        public float intervalMax{
+            get{
+                return _intervalMax; 
+            } 
+            set {
+                _intervalMax = value; 
+            }
+        }
+
+        public float startDelayMin{
+            get{
+                return _startDelayMin;
+            } 
+            set{
+                _startDelayMin = value;
+            }
+        }
+
+        public float startDelayMax{
+            get{
+                return _startDelayMax;
+            } 
+            set{
+                _startDelayMax = value;
+            }
+        }
 
 
+        public IAction activeAction
+        {
+            get; 
+            protected set;
+        }
 
 
         //  For Debuging.
+        public bool debugClient;
         public Dictionary<IQualifier, float> selectorResults;
 
 
@@ -177,9 +228,6 @@
 
 
 
-
-
-
         protected virtual void OnStart()
         {
 
@@ -199,6 +247,8 @@
         {
 
         }
+
+
 
 
 

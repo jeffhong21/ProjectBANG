@@ -58,7 +58,7 @@ MonoBehaviour:
     prefab: {fileID: 1082194431870132, guid: 69e5544af4a7b4cd6ae33513e78a694e, type: 2}
     initialInstanceCount: 18
   - type: 1
-    prefab: {fileID: 1455996475726842, guid: df0fdb87a369846ec81d9d434628f897, type: 2}
+    prefab: {fileID: 166404, guid: 1b9f66cb9bb3047649bf932337e6b03a, type: 2}
     initialInstanceCount: 18
 --- !u!114 &114363392651108178
 MonoBehaviour:
@@ -90,4 +90,5 @@ MonoBehaviour:
   - type: 0
     prefab: {fileID: 1141768220188808, guid: 50aafa2cd0ecc4fa5883caf500b0fc8a, type: 2}
     initialInstanceCount: 10
+  worldIsGroup: 1
   groupPoolTypes: 0

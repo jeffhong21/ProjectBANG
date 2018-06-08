@@ -66,7 +66,9 @@ namespace Bang
             t.position = position;
             t.rotation = rotation;
 
+
             entity.gameObject.SetActive(true);
+
             return entity;
         }
 

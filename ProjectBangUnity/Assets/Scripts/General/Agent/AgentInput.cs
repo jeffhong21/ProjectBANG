@@ -43,17 +43,14 @@
 
         public float acceleration{
             get { return _acceleration; }
-            set { _acceleration = value; }
         }
 
         public float angularSpeed{
             get { return _angularSpeed; }
-            set { _angularSpeed = value; }
         }
 
         public float arrivalDistance{
             get { return _arrivalDistance; }
-            set { _arrivalDistance = value; }
         }
 
         public NavMeshAgent agent{
@@ -76,7 +73,6 @@
             base.Awake();
 
             if (_agent == null) _agent = GetComponent<NavMeshAgent>();
-
         }
 
 
@@ -117,17 +113,17 @@
 
         public virtual void MoveTo(Vector3 destination)
         {
-            isMoving = true;
+            isMoving = true;  //  Used for the animator
             agent.isStopped = false;
             agent.SetDestination(destination);
-            //Debug.LogFormat("Agent setting destination to:  {0} | {1}", destination, Time.time);
+            Debug.LogFormat("Agent setting destination to:  {0} | {1}\nBaseOffset is:  {2}", destination, Time.time, agent.baseOffset);
+
         }
 
 
         public virtual void StopWalking()
         {
-            isMoving = false;
-            //_anim.SetBool("IsWalking", false);
+            isMoving = false;  //  Used for the animator
             agent.isStopped = true;
 
         }

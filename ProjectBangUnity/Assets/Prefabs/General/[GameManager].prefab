@@ -65,7 +65,7 @@ MonoBehaviour:
       type: 2}
     playerInstance: {fileID: 0}
     startingHealth: 4
-  _defaultWeapon: {fileID: 114720006860519354, guid: eedaddd9c24274499a33e4a426a83f9a,
+  _defaultWeapon: {fileID: 114922952180561708, guid: d1ee3bcc0eb744f5cae6cb1a5e6fe2e0,
     type: 2}
 --- !u!114 &114107020904691694
 MonoBehaviour:
