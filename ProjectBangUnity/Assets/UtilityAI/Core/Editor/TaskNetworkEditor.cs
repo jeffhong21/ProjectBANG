@@ -15,29 +15,28 @@
         SerializedObject taskNetworkSO;
         IContextProvider contextProvider;
 
-        //  Currently selected Client.  Used for the Editor tab.
-        UtilityAIAsset activeClient;
-        SerializedObject activeClientSO;
-        GenericMenu clientList;
+
+
+
 
         bool showDefaultInspector, showDeleteAssetOption;
         bool debugEditorFoldout = true;
-        string selectorConfigInfo;
 
 
-        bool displayContextProviderName = true;
+
+        bool displayContextProviderName = false;
 
 
         void OnEnable()
         {
             taskNetwork = target as TaskNetworkComponent;
-            taskNetworkSO = new SerializedObject(taskNetwork);
+
+            if(taskNetworkSO == null)
+                taskNetworkSO = new SerializedObject(taskNetwork);
+            
             contextProvider = taskNetwork.GetComponent<IContextProvider>();
 
-            //UpdateClientList();
 
-            //selectorConfigInfo = activeClient != null ? DebugEditorUtilities.SelectorConfig(activeClient.configuration.selector) : "No Selected Selector";
-            selectorConfigInfo = activeClient != null ? DebugEditorUtilities.SelectorConfig(activeClient.configuration.rootSelector) : "No Selected Selector";
         }
 
 
@@ -49,38 +48,112 @@
         }
 
 
-        public void Delete(int index){
-            activeClient = null;
-            taskNetwork.clients.RemoveAt(index);
-            //taskNetwork.assets.RemoveAt(index);
+        public void Delete(int idx)
+        {
+
+            taskNetwork.aiConfigs = ShrinkArray(taskNetwork.aiConfigs, idx);
 
             EditorUtility.SetDirty(target);
             Repaint();
         }
 
 
-        public void DoAddNew(UtilityAIAsset aiAsset)
+        public void DoAddNew(AIStorage[] aiAsset)
         {
-            //  Use the aiID to be able to grab the correct UtilityAIAsset;
+            //  Use the aiID to be able to grab the correct AIStorage;
+            //serializedObject.Update();
+
+            taskNetwork.aiConfigs = GrowArray(taskNetwork.aiConfigs, aiAsset.Length);
+
+            for (int idx = 0; idx < aiAsset.Length; idx ++)
+            {
+                taskNetwork.aiConfigs[ (taskNetwork.aiConfigs.Length - aiAsset.Length) + idx] = new UtilityAIConfig()
+                {
+                    aiId = aiAsset[idx].aiId
+                };
+            }
+
+            EditorUtility.SetDirty(taskNetwork);
+            serializedObject.Update();
+            serializedObject.ApplyModifiedProperties();
+        }
+
+
+        public void DoAddNew(AIStorage[] aiAsset, Type type)
+        {
+
+            ////  Create a new UtilityAIClient
+            //UtilityAIClient client = new UtilityAIClient(aiAsset[0].configuration, taskNetwork.GetComponent<IContextProvider>());
+            //client.ai = aiAsset[0].configuration;      //  Add the UtilityAI to the UtilityAIClient.
+            //taskNetwork.clients.Add(client);          //  Add the client to the TaskNetwork.
+
+            ////  Initialize AIConfig so we can get the name of the predefined config.
+            //IUtilityAIConfig config = (IUtilityAIConfig)Activator.CreateInstance(type);
+            ////  Configure the predefined settings.
+            //config.ConfigureAI(client.ai);
+
+
+
+            taskNetwork.aiConfigs = GrowArray(taskNetwork.aiConfigs, aiAsset.Length);
+
+            for (int idx = 0; idx < aiAsset.Length; idx++)
+            {
+                taskNetwork.aiConfigs[(taskNetwork.aiConfigs.Length - aiAsset.Length) + idx] = new UtilityAIConfig()
+                {
+                    aiId = aiAsset[idx].aiId,
+                    isPredefined = true,
+                    type = type.ToString()
+                };
+            }
+
+            EditorUtility.SetDirty(taskNetwork);
+            serializedObject.Update();
+            serializedObject.ApplyModifiedProperties();
+
 
             //  Add asset and client to TaskNetwork
             //UtilityAIClient client = new UtilityAIClient(aiAsset.configuration, taskNetwork.contextProvider);
-            UtilityAIClient client = new UtilityAIClient(aiAsset.configuration, taskNetwork.GetComponent<IContextProvider>());
-            client.ai = aiAsset.configuration;
-            taskNetwork.clients.Add(client);
-            //taskNetwork.assets.Add(aiAsset);
 
-            EditorUtility.SetDirty(taskNetwork);
+            //UtilityAIClient client = new UtilityAIClient(aiAsset[0].configuration, taskNetwork.GetComponent<IContextProvider>());
+            //client.ai = aiAsset[0].configuration;
+            //taskNetwork.clients.Add(client);
+
+            //taskNetwork.assets.Add(aiAsset);
         }
+
+
+
+        private T[] GrowArray<T>(T[] array, int increase)
+        {
+            T[] newArray = array;
+            Array.Resize(ref newArray, array.Length + increase);
+            return newArray;
+        }
+
+        private T[] ShrinkArray<T>(T[] array, int idx)
+        {
+            T[] newArray = new T[array.Length - 1];
+            if (idx > 0)
+                Array.Copy(array, 0, newArray, 0, idx);
+
+            if (idx < array.Length - 1)
+                Array.Copy(array, idx + 1, newArray, idx, array.Length - idx - 1);
+
+            return newArray;
+        }
+
 
 
         #region AI Client Inspector
 
+        float propertyHeight;
         /// <summary>
         /// Client Inspector
         /// </summary>
         protected virtual void DrawTaskNetworkInspector()
         {
+            
+
 
             //  Displaying header options.
             using (new EditorGUILayout.HorizontalScope()){
@@ -90,8 +163,8 @@
                 //  Button to add predefined mocks.
                 if (GUILayout.Button("Add Predefined", EditorStyles.miniButton, GUILayout.Width(130f)))
                 {
-                    CreatePredefinedClientWindow window = new CreatePredefinedClientWindow();
-                    window.Init(window, taskNetwork);
+                    AddPredefinedAIWindow window = new AddPredefinedAIWindow();
+                    window.Init(window, this);
                 }
 
                 //  Add a new UtilityAIClient
@@ -102,77 +175,75 @@
 
 
             //  Displaying the AI Clients
-            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+
+            //var aiClientsDisplayBox = new EditorGUILayout.VerticalScope(EditorStyles.helpBox, GUILayout.Height(propertyHeight));
+            var aiClientsDisplayBox = new EditorGUILayout.VerticalScope(EditorStyles.helpBox);
+            using (aiClientsDisplayBox)
             {
-                if (taskNetwork.clients.Count == 0){
+                if (taskNetwork.aiConfigs.Length == 0){
                     EditorGUILayout.HelpBox("There are no AI's attached to this TaskNetworkComponent.", MessageType.Info);
                 }
 
-
-                for (int i = 0; i < taskNetwork.clients.Count; i++)  
+                using (new EditorGUILayout.VerticalScope())
                 {
-                    UtilityAIClient client = taskNetwork.clients[i];
-                    //UtilityAIAsset asset = taskNetwork.assets[i];
-                    using (new EditorGUILayout.VerticalScope())
+                    for (int i = 0; i < taskNetwork.aiConfigs.Length; i++)
                     {
-                        if (client != null){
+                        if (taskNetwork.aiConfigs[i] != null)
+                        {
+                            UtilityAIConfig aiConfig = taskNetwork.aiConfigs[i];
+                            SerializedProperty property = serializedObject.FindProperty("aiConfigs").GetArrayElementAtIndex(i);
+                            SerializedProperty isActive = property.FindPropertyRelative("isActive");
+                            SerializedProperty _debugClient = property.FindPropertyRelative("_debugClient");
+
                             //  For Client Options
                             using (new EditorGUILayout.HorizontalScope())
                             {
-                                EditorGUILayout.ToggleLeft(GUIContent.none, true);  // GUILayout.Width(Screen.width * 0.6f)
+
+                                //  aiConfig isActive toggle.
+                                EditorGUILayout.PropertyField(isActive, GUIContent.none);
+                                //EditorGUILayout.PropertyField(isActive, GUIContent.none, GUILayout.Width(28f));
+
+                                ////  Debug Client toggle
+                                //GUILayout.Space(Screen.width * 0.12f);
+                                //EditorGUILayout.LabelField("Debug Client", GUILayout.Width(75f));
+                                //EditorGUILayout.PropertyField(_debugClient, GUIContent.none, GUILayout.Width(28f));
+                                //GUILayout.Space(Screen.width * 0.25f - 75f - 28f);
 
                                 //  Debug button
-                                if (GUILayout.Button("Debug", EditorStyles.miniButton, GUILayout.Width(48f))){  //  GUILayout.Width(Screen.width * 0.15f)
-                                    Debug.Log(ClientDiagnosticsInfo(i));
-                                    //Debug.Log(client.ai.jsonData);
-                                    //Debug.Log(asset.configuration.jsonData);
+                                if (GUILayout.Button("Debug", EditorStyles.miniButton, GUILayout.Width(48f)))//  GUILayout.Width(Screen.width * 0.15f)
+                                {
+                                    //Debug.Log("Currently cannot debug at the moment.");
+
+                                    //Debug.Log(typeof(AINameMapHelper).GetField(aiConfig.aiId, BindingFlags.Static).GetValue(null));
+
+                                    //var field = typeof(AINameMapHelper).GetField(aiConfig.aiId, BindingFlags.Static);
+                                    //Debug.Log(field.GetValue(typeof(AINameMapHelper)));
+
+                                    Debug.Log(aiConfig.aiId);
                                 }
 
-                                //  Add button
-                                if (InspectorUtility.OptionsPopupButton(InspectorUtility.AddContent)){
-                                    AddPredefinedAIWindow window = new AddPredefinedAIWindow();
-                                    //window.Init(window,taskNetwork, asset);
-                                    window.Init(window, taskNetwork, client.ai);
+                                //  Add or Switch button
+                                if (InspectorUtility.OptionsPopupButton(InspectorUtility.AddContent))
+                                {
+                                    Debug.Log("TODO:  Add functionality for changing AIs.");
                                 }
 
                                 //  Delete button
-                                if (InspectorUtility.OptionsPopupButton(InspectorUtility.DeleteContent)){
+                                if (InspectorUtility.OptionsPopupButton(InspectorUtility.DeleteContent))
+                                {
                                     Delete(i);
                                 }
                             }
 
-
-                            using (new EditorGUILayout.HorizontalScope())
-                            {
-                                EditorGUILayout.LabelField(new GUIContent("AI: "), GUILayout.Width(Screen.width * 0.33f));
-                                //EditorGUILayout.LabelField(new GUIContent(asset.friendlyName));
-                                EditorGUILayout.LabelField(new GUIContent(client.ai.name));  //  Name resets after scene reload
-                            }
+                            //  Draw the aiconfigs.
+                            EditorGUILayout.PropertyField(property);
 
 
-                            using (new EditorGUILayout.HorizontalScope())
-                            {
-                                EditorGUILayout.LabelField("Interval: ", GUILayout.Width(Screen.width * 0.33f));
-                                client.intervalMin = EditorGUILayout.FloatField(client.intervalMin, GUILayout.Width(35f));
-                                EditorGUILayout.LabelField("to ", GUILayout.Width(20f));
-                                client.intervalMax = EditorGUILayout.FloatField(client.intervalMax, GUILayout.Width(35f));
-                            }
-
-                            //  For Client StartDelay
-                            using (new EditorGUILayout.HorizontalScope())
-                            {
-                                //EditorGUILayout.LabelField("Start Delay: ", GUILayout.Width(Screen.width * 0.33f));
-                                //client.startDelayMin = EditorGUILayout.FloatField(client.startDelayMin, GUILayout.Width(35f));
-                                //EditorGUILayout.LabelField("to ", GUILayout.Width(20f));
-                                //client.startDelayMax = EditorGUILayout.FloatField(client.startDelayMax, GUILayout.Width(35f));
-                                float min = client.startDelayMin;
-                                float max = client.startDelayMax;
-                                InspectorUtility.MinMaxInputField(ref min, ref max, new GUIContent("Start Delay: "));
-                            }
                             EditorGUILayout.Space();
                         }
                     }
                 }
+
 
             }  // The group is now ended
 
@@ -212,7 +283,8 @@
 
                 if (GUILayout.Button("Clear", EditorStyles.miniButton, GUILayout.Width(65f)))
                 {
-                    for (int index = 0; index < taskNetwork.clients.Count; index ++){
+                    for (int index = taskNetwork.aiConfigs.Length - 1; index >= 0; index--)
+                    {
                         Delete(index);
                     }
                 }
@@ -223,13 +295,15 @@
                 if(taskNetwork.showDeleteAssetOption){
                     if (GUILayout.Button("Delete", EditorStyles.miniButton, GUILayout.Width(65f)))
                     {
-                        for (int index = 0; index < taskNetwork.clients.Count; index++)
+                        for (int index = taskNetwork.aiConfigs.Length -1 ; index >= 0 ; index--)
                         {
                             Delete(index);
                         }
-                        var results = AssetDatabase.FindAssets("t:UtilityAIAsset", new string[]{AIManager.StorageFolder} );
-                        foreach(string guid in results){
+                        var results = AssetDatabase.FindAssets("t:AIStorage", new string[]{AIManager.StorageFolder} );
+                        foreach(string guid in results)
+                        {
                             AssetDatabase.DeleteAsset(AssetDatabase.GUIDToAssetPath(guid));
+                            AINameMap.UnRegister(guid);
                         }
                         //Repaint();
                     }
@@ -267,6 +341,43 @@
             }
 
 
+            //  Name Map
+            if (GUILayout.Button("AINameMap", EditorStyles.miniButton, GUILayout.Width(65f)))
+            {
+                if(AINameMap.aiNameMap == null){
+                    Debug.Log("aiNameMap is not initialized");
+                }
+                else if (AINameMap.aiNameMap.Count == 0)
+                {
+                    Debug.Log("Nothing registered to aiNameMap. Reregistering AiNameMap.");
+                    AINameMap.RegenerateNameMap();
+
+                }
+                else{
+                    foreach (KeyValuePair<Guid, string> keyValue in AINameMap.aiNameMap)
+                    {
+                        string path = AssetDatabase.GUIDToAssetPath(keyValue.Key.ToString("N"));
+                        Debug.LogFormat("AIID:  {0}  | Guid:  {1}\nPath:  {2}", keyValue.Value, keyValue.Key.ToString("N"), path);
+
+
+                        AIStorage aiStorage = AssetDatabase.LoadMainAssetAtPath(path) as AIStorage;
+
+                        Debug.LogFormat("Path:  {0}\nAIStorage:  {1}", path, aiStorage);
+                    }
+
+                }
+            }
+
+            GUILayout.Space(5);
+
+            if (GUILayout.Button("Generate Name Map", EditorStyles.miniButton, GUILayout.Width(65f)))
+            {
+                AINameMapGenerator.WriteNameMapFile();
+                Debug.Log(AINameMapHelper.AgentActionAI);
+                Debug.Log(AINameMapHelper.AgentMoveAI);
+                Debug.Log(AINameMapHelper.AgentScanAI);
+            }
+
 
             serializedObject.ApplyModifiedProperties();
         }
@@ -285,7 +396,7 @@
         {
             string clientInfo = "";
 
-            UtilityAI utilityAI = taskNetwork.clients[index].ai;
+            IUtilityAI utilityAI = taskNetwork.clients[index].ai;
             Selector rootSelector = utilityAI.rootSelector;
             bool isSelected = false;
 

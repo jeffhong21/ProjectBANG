@@ -25,7 +25,7 @@ namespace Bang
             name = "AgentScanAI";
         }
 
-        public override void ConfigureAI(UtilityAI asset)
+        public override void ConfigureAI(IUtilityAI asset)
         {
             if (qualifiers == null) qualifiers = new List<IQualifier>();
             if (allScorers == null) allScorers = new List<IScorer[]>();

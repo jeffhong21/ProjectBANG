@@ -3,17 +3,17 @@
     using UnityEditor;
     using UnityEngine;
 
-    [CustomEditor(typeof(UtilityAIAsset)) ]
+    [CustomEditor(typeof(AIStorage)) ]
     public class UtilityAIAssetDrawer : Editor
     {
 
-        UtilityAIAsset obj;
+        AIStorage obj;
 
         private GUIStyle textStyle;
 
 		public void OnEnable()
 		{
-            obj = target as UtilityAIAsset;
+            obj = target as AIStorage;
 
             textStyle = new GUIStyle();
             //textStyle.normal.textColor = Color.white;

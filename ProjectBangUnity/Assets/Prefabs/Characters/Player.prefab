@@ -113,7 +113,6 @@ GameObject:
   - component: {fileID: 95859117713158742}
   - component: {fileID: 136658996750469874}
   - component: {fileID: 54698603356901082}
-  - component: {fileID: 114916112818324410}
   - component: {fileID: 114941810916507612}
   - component: {fileID: 114819898467470930}
   m_Layer: 10
@@ -1851,22 +1850,6 @@ MonoBehaviour:
   displayCursorPosition: 0
   cursorPositionDisplayColor: {r: 0, g: 0, b: 0, a: 1}
   displayPlayerInputValues: 0
---- !u!114 &114916112818324410
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d615100e52cc4e2b83dc4336b86cfeb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _head: {fileID: 4645203099748726}
-  _leftHand: {fileID: 4605668109480382}
-  _rightHand: {fileID: 4781103747589800}
-  _mainRenderer:
-  - {fileID: 137022341486526484}
 --- !u!114 &114941810916507612
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1883,6 +1866,11 @@ MonoBehaviour:
   _currentHealth: 0
   _isDead: 0
   _equippedFirearm: {fileID: 0}
+  actorBody:
+    _head: {fileID: 4645203099748726}
+    _leftHand: {fileID: 4605668109480382}
+    _rightHand: {fileID: 4781103747589800}
+    _mainRenderer: []
   _yFocusOffset: 0.75
   sinkSpeed: 2.5
 --- !u!136 &136658996750469874

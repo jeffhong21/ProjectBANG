@@ -89,6 +89,6 @@ MonoBehaviour:
   _poolSetup:
   - type: 0
     prefab: {fileID: 1141768220188808, guid: 50aafa2cd0ecc4fa5883caf500b0fc8a, type: 2}
-    initialInstanceCount: 10
+    initialInstanceCount: 1
   worldIsGroup: 1
   groupPoolTypes: 0

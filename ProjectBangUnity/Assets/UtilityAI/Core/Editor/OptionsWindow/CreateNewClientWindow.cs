@@ -1,22 +1,18 @@
 ﻿namespace UtilityAI
 {
     using System;
-    using System.IO;
-    using System.Linq;
-    using System.Collections.Generic;
-    using System.Reflection;
     using UnityEngine;
     using UnityEditor;
 
 
 
     /// <summary>
-    /// Used in AIAssetEditor to create new UtilityAIAsset
+    /// Used in AIAssetEditor to create new AIStorage
     /// </summary>
     public class CreateNewClientWindow : EditorWindow
     {
         CreateNewClientWindow window;
-        const string filterType = "t:UtilityAIAsset";
+        const string filterType = "t:AIStorage";
 
         protected string windowTitle = "Add Clients";
         protected string defaultAiID = "NewUtilityAI";
@@ -56,8 +52,7 @@
                 {
                     if (GUILayout.Button("Ok"))
                     {
-                        var utilityAIAsset = new UtilityAIAsset();
-                        var aiAsset = utilityAIAsset.CreateAsset(String.IsNullOrEmpty(aiName) || String.IsNullOrWhiteSpace(aiName) ? defaultAiID : aiName,
+                        AIStorage aiAsset = AIStorage.CreateAsset(String.IsNullOrEmpty(aiName) || String.IsNullOrWhiteSpace(aiName) ? defaultAiID : aiName,
                                                                  String.IsNullOrEmpty(aiName) || String.IsNullOrWhiteSpace(aiName) ? defaultAiName : aiName);
 
                         CloseWindow();
@@ -69,24 +64,6 @@
                 }
             }
 
-
-
-
-            ////var oldColor = GUI.backgroundColor;
-            ////GUI.backgroundColor = Color.cyan;
-            //if (GUILayout.Button("Create Scan AI"))
-            //{
-            //    var utilityAIAsset = new UtilityAIAsset();
-            //    var aiAsset = utilityAIAsset.CreateAsset<ScanAIConfig>("DemoMockAI", "DemoMockAI");
-            //    CloseWindow();
-            //}
-            //if (GUILayout.Button("Create Move AI"))
-            //{
-            //    var utilityAIAsset = new UtilityAIAsset();
-            //    var aiAsset = utilityAIAsset.CreateAsset<MoveAIConfig>("DemoMockAI", "DemoMockAI");
-            //    CloseWindow();
-            //}
-            ////GUI.backgroundColor = oldColor;
         }
 
 

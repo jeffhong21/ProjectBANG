@@ -1,4 +1,4 @@
-namespace UtilityAI
+﻿namespace UtilityAI
 {
     using System;
     using System.IO;
@@ -16,55 +16,36 @@ namespace UtilityAI
     public class AddPredefinedAIWindow : EditorWindow
     {
         AddPredefinedAIWindow window;
-        //UtilityAIAsset asset;
-        TaskNetworkComponent taskNetwork;
-        UtilityAI ai;
+        const string filterType = "t:AIStorage";
+        protected TaskNetworkEditor editor { get; set; }
+        protected TaskNetworkComponent taskNetwork { get; set; }
+
         protected int windowMinSize = 250;
         protected int windowMaxSize = 350;
-        protected string windowTitle = "Add Options | AI Object Selector";
+        protected string windowTitle = "Create Predefined Client Window";
+
+
 
 
         List<Type> displayTypes;
-        string searchStr;
-
-
 
         GUIStyle contentStyle;
 
 
 
-        //public void Init(AddPredefinedAIWindow window, TaskNetworkComponent taskNetwork, UtilityAIAsset asset)
-        //{
-        //    displayTypes = TaskNetworkUtilities.GetAllOptions<UtilityAIConfig>();
 
-        //    windowTitle = string.Format("Add Predefined AI");
-
-        //    this.window = window;
-        //    this.window.minSize = this.window.maxSize = new Vector2(windowMinSize, windowMaxSize);
-        //    this.window.titleContent = new GUIContent(windowTitle);
-        //    this.window.ShowUtility();
-
-        //    this.asset = asset;
-        //    this.taskNetwork = taskNetwork;
-        //    contentStyle = new GUIStyle(GUI.skin.button)
-        //    {
-        //        alignment = TextAnchor.MiddleCenter
-        //    };
-        //}
-
-        public void Init(AddPredefinedAIWindow window, TaskNetworkComponent taskNetwork, UtilityAI ai)
+        public void Init(AddPredefinedAIWindow window, TaskNetworkEditor editor)
         {
             displayTypes = TaskNetworkUtilities.GetAllOptions<UtilityAIAssetConfig>();
+            displayTypes.Reverse();
 
-            windowTitle = string.Format("Add Predefined AI");
-
+            this.editor = editor;
+            this.taskNetwork = editor.target as TaskNetworkComponent;
             this.window = window;
             this.window.minSize = this.window.maxSize = new Vector2(windowMinSize, windowMaxSize);
             this.window.titleContent = new GUIContent(windowTitle);
-            this.window.ShowUtility();
 
-            this.ai = ai;
-            this.taskNetwork = taskNetwork;
+            this.window.ShowUtility();
 
             contentStyle = new GUIStyle(GUI.skin.button)
             {
@@ -73,44 +54,55 @@ namespace UtilityAI
         }
 
 
-
         protected virtual void OnGUI()
         {
-
-            EditorGUILayout.Space();
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                string newSearchStr = EditorGUILayout.TextField(searchStr, new GUIStyle("SearchTextField"), GUILayout.Height(EditorGUIUtility.singleLineHeight));
-                if (GUILayout.Button(GUIContent.none, new GUIStyle("SearchCancelButton"), GUILayout.Height(EditorGUIUtility.singleLineHeight)))
-                {
-                    Debug.Log("TODO:  Clearing Search Field");
-                }
-            }
-            EditorGUILayout.Space();
-
 
             foreach (Type type in displayTypes)
             {
                 GUIContent buttonLabel = new GUIContent(type.Name);
                 if (GUILayout.Button(buttonLabel, contentStyle, GUILayout.Height(18)))
                 {
-                    IUtilityAIConfig config = (IUtilityAIConfig)Activator.CreateInstance(type);
-                    config.ConfigureAI(ai);
-                    EditorUtility.SetDirty(taskNetwork);
-                    //EditorUtility.SetDirty(asset);
+                    editor.DoAddNew(new AIStorage[]{ AIStorage.CreateAsset(type.Name, type.Name, taskNetwork.selectAiAssetOnCreate) } , type);
                     CloseWindow();
                 }
-                GUILayout.Space(2);
+                GUILayout.Space(4);
             }
 
         }
+
+
+        ////  AIStorage aiAsset is a premade aiAsset
+        //void AddAIAsset(Type type)
+        //{
+
+
+        //    //  Create a new AIStorage instance.
+        //    AIStorage aiStorage = new AIStorage();
+
+        //    //  Initialize AIConfig so we can get the name of the predefined config.
+        //    IUtilityAIConfig config = (IUtilityAIConfig)Activator.CreateInstance(type);
+        //    //  Use the new instance to create a scriptableObject of aiAsset.
+        //    AIStorage aiAsset = aiStorage.CreateAsset(config.name, config.name, taskNetwork.selectAiAssetOnCreate);
+
+        //    //  Create a new UtilityAIClient
+        //    UtilityAIClient client = new UtilityAIClient(aiAsset.configuration, taskNetwork.GetComponent<IContextProvider>());
+        //    client.ai = aiAsset.configuration;      //  Add the UtilityAI to the UtilityAIClient.
+        //    taskNetwork.clients.Add(client);        //  Add the client to the TaskNetwork.
+
+        //    //  Configure the predefined settings.
+        //    config.ConfigureAI(client.ai);
+
+        //    ////  Remove the type from the list of predefined clients.
+        //    //displayTypes.Remove(type);
+        //    editor.DoAddNew(new AIStorage[] { aiAsset });
+        //}
+
 
 
         protected void CloseWindow()
         {
             window.Close();
         }
-
 
     }
 

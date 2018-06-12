@@ -10,26 +10,6 @@
     using Serialization;
     using Newtonsoft.Json;
 
-    // /// <summary>
-    // /// UtilityAI creates the rootSelector and initializes the tree.
-    // /// </summary>
-    // public interface IUtilityAI : ISerializationCallbackReceiver
-    // {
-    //     void AddSelector(Selector s);
-    //     void RemoveSelector(Selector s);
-    //     bool ReplaceSelector(Selector current, Selector replacement);
-    //     Selector FindSelector(Selector s);
-    //     IAction Select(IAIContext context);
-    //     void RegenerateIds();
-    //     //byte[] PrepareForSerialize();
-    //     //void InitializeAfterDeserialize(byte[] data);
-    //     Guid id { get; }
-    //     string name { get; set; }
-    //     Selector rootSelector { get; set; }
-    //     int selectorCount { get; }
-    //     Selector Item { get; }
-    // }
-
 
     [Serializable]
     public class UtilityAI : IUtilityAI, IPrepareForSerialization, IInitializeAfterDeserialization
@@ -37,12 +17,16 @@
         //[SerializeField] [HideInInspector]
         //private string jsonData;
         [HideInInspector]
-        public string jsonData;
+        public string jsonData;  //  Serialization data.
+
+
+        [SerializeField, HideInInspector]
+        private Guid _rootSelectorId;
 
         [SerializeField, HideInInspector]
         private Guid _id;
 
-        [SerializeField] [HideInInspector]
+        [SerializeField, HideInInspector]
         private List<Selector> _selectors;
 
         private Selector _rootSelector;
@@ -51,47 +35,52 @@
         private string _name;
 
 
-        public Guid id { 
-            get;
+
+        public Guid id
+        {
+            get { return _id; }
         }
 
-        public string name{ 
-            get{ return _name; } 
-            set { _name = value; } 
+        public string name
+        {
+            get { return _name; }
+            set { _name = value; }
         }
 
-        public Selector rootSelector{ 
-            get; 
-            set;
+        public Selector rootSelector
+        {
+            get{ return _rootSelector;}
+            set{ _rootSelector = value;}
         }
 
-        public int selectorCount{
-            get;
+        public int selectorCount
+        {
+            get { return _selectors.Count; }
         }
 
-        //public Selector this[int idx]{
-        //    get;
-        //}
-
-        // //  Get Selector with specific index.
-        // public Selector Item { get; private set; }
-
+        //
+        // Indexer
+        //
+        public Selector this[int idx]
+        {
+            get { return _selectors[idx]; }
+        }
 
 
         public UtilityAI()
         {
-            rootSelector = new ScoreSelector();
-            //selector = new ScoreSelector();
+            _rootSelector = new ScoreSelector();
+            _selectors = new List<Selector>();
             RegenerateIds();
         }
 
         public UtilityAI(string aiName)
         {
-            rootSelector = new ScoreSelector();
-            //selector = new ScoreSelector();
-            name = aiName;
-
+            _rootSelector = new ScoreSelector();
+            _selectors = new List<Selector>();
             RegenerateIds();
+
+            name = aiName;
         }
 
         public void AddSelector(Selector s)
@@ -116,7 +105,13 @@
 
         public void RegenerateIds()
         {
+            _rootSelector.RegenerateId();
+            _rootSelectorId = _rootSelector.id;
             _id = Guid.NewGuid();
+
+            for (int i = 0; i < _selectors.Count; i++){
+                _selectors[i].RegenerateId();
+            }
             //Debug.Log(id);
         }
 
@@ -148,6 +143,10 @@
 
 
 
+
+        //
+        // Serialization
+        //
 
         public void PrepareForSerialization()
         {
@@ -192,12 +191,12 @@
         public void OnAfterDeserialize()
         {
             //Debug.Log("After deserialize");
-            if(rootSelector == null){
+            if (rootSelector == null)
+            {
                 rootSelector = new ScoreSelector();
             }
             InitializeAfterDeserialization(rootSelector);
         }
-
 
 
 

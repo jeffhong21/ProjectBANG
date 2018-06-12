@@ -20,6 +20,6 @@ namespace UtilityAI
             set;
         }
 
-        void ConfigureAI(UtilityAI asset);
+        void ConfigureAI(IUtilityAI asset);
     }
 }

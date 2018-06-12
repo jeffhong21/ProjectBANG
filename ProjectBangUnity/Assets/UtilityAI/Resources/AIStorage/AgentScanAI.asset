@@ -8,18 +8,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 308bdd222503246d9b5943e55d6b88c2, type: 3}
+  m_Script: {fileID: 11500000, guid: af1fc1e6d897f4da89612470171cd033, type: 3}
   m_Name: AgentScanAI
   m_EditorClassIdentifier: 
-  friendlyName: AgentScanAI
   description: 
   version: 1
   aiId: AgentScanAI
-  aiConfig: 
-  editorConfig: 
   configuration:
-    jsonData: "{\n  \"$id\": \"1\",\n  \"id\": \"56729c76-e031-4ca4-820a-7282efbf5a7b\",\n
+    jsonData: "{\n  \"$id\": \"1\",\n  \"id\": \"0eae4302-38ac-4a84-8fc1-f19237ae7cb4\",\n
       \ \"qualifiers\": [],\n  \"defaultQualifier\": {\n    \"$id\": \"2\",\n    \"$type\":
       \"UtilityAI.DefaultQualifier, Assembly-CSharp\",\n    \"score\": 1.0,\n    \"isDisabled\":
       false,\n    \"action\": null,\n    \"_score\": 0.0\n  }\n}"
     _name: AgentScanAI
+  guid: 

@@ -114,7 +114,6 @@ GameObject:
   - component: {fileID: 136658996750469874}
   - component: {fileID: 54698603356901082}
   - component: {fileID: 195639632207810378}
-  - component: {fileID: 114916112818324410}
   - component: {fileID: 114790253131203490}
   - component: {fileID: 114558835538233468}
   - component: {fileID: 114193328531158472}
@@ -122,7 +121,7 @@ GameObject:
   - component: {fileID: 114547873525375904}
   - component: {fileID: 114061504493827786}
   m_Layer: 10
-  m_Name: NpcChar
+  m_Name: AIAgent
   m_TagString: Actor
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1906,123 +1905,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b5cd3d809d064004b75a66de9fde05d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  aiConfigs: []
-  _clients:
-  - contextProvider: {fileID: 114193328531158472}
-    _ai:
-      jsonData: "{\n  \"$id\": \"1\",\n  \"id\": \"56729c76-e031-4ca4-820a-7282efbf5a7b\",\n
-        \ \"qualifiers\": [\n    {\n      \"$id\": \"2\",\n      \"$type\": \"UtilityAI.CompositeScoreQualifier,
-        Assembly-CSharp\",\n      \"action\": {\n        \"$id\": \"3\",\n        \"$type\":
-        \"UtilityAI.CompositeAction, Assembly-CSharp\",\n        \"actions\": {\n
-        \         \"$id\": \"4\",\n          \"$values\": [\n            {\n              \"$id\":
-        \"5\",\n              \"$type\": \"Bang.ScanForEntities, Assembly-CSharp\",\n
-        \             \"samplingRange\": 20.0,\n              \"samplingDensity\":
-        3.0,\n              \"scanRange\": 20.0,\n              \"name\": \"ScanForEntitites\"\n
-        \           },\n            {\n              \"$id\": \"6\",\n              \"$type\":
-        \"Bang.ScanForPositions, Assembly-CSharp\",\n              \"samplingRange\":
-        20.0,\n              \"samplingDensity\": 2.5,\n              \"name\": \"ScanForPositions\"\n
-        \           }\n          ]\n        },\n        \"name\": \"Scan\"\n      },\n
-        \     \"isDisabled\": false,\n      \"scorers\": {\n        \"$id\": \"7\",\n
-        \       \"$values\": [\n          {\n            \"$id\": \"8\",\n            \"$type\":
-        \"Bang.FixedScorer, Assembly-CSharp\",\n            \"score\": 5\n          }\n
-        \       ]\n      },\n      \"_score\": 0.0\n    }\n  ],\n  \"defaultQualifier\":
-        {\n    \"$id\": \"9\",\n    \"$type\": \"UtilityAI.DefaultQualifier, Assembly-CSharp\",\n
-        \   \"score\": 1.0,\n    \"isDisabled\": false,\n    \"action\": {\n      \"$id\":
-        \"10\",\n      \"$type\": \"Bang.ScanForEntities, Assembly-CSharp\",\n      \"samplingRange\":
-        20.0,\n      \"samplingDensity\": 2.5,\n      \"scanRange\": 20.0,\n      \"name\":
-        \"DefaultScanForPositions\"\n    },\n    \"_score\": 0.0\n  }\n}"
-      _name: AgentScanAI
-    _state: 1
-    _intervalMin: 1
-    _intervalMax: 1
-    _startDelayMin: 0
-    _startDelayMax: 0
-    debugClient: 0
-  - contextProvider: {fileID: 114193328531158472}
-    _ai:
-      jsonData: "{\n  \"$id\": \"1\",\n  \"id\": \"9001b69b-f737-49b8-8af6-b62de600ef33\",\n
-        \ \"qualifiers\": [\n    {\n      \"$id\": \"2\",\n      \"$type\": \"UtilityAI.CompositeScoreQualifier,
-        Assembly-CSharp\",\n      \"action\": {\n        \"$id\": \"3\",\n        \"$type\":
-        \"Bang.MoveToBestPosition, Assembly-CSharp\",\n        \"name\": \"MoveToBestPosition\",\n
-        \       \"scorers\": {\n          \"$id\": \"4\",\n          \"$values\":
-        [\n            {\n              \"$id\": \"5\",\n              \"$type\":
-        \"Bang.PositionProximityToSelf, Assembly-CSharp\",\n              \"score\":
-        10.0,\n              \"factor\": 0.01\n            },\n            {\n              \"$id\":
-        \"6\",\n              \"$type\": \"Bang.ProximityToNearestEnemy, Assembly-CSharp\",\n
-        \             \"desiredRange\": 14.0,\n              \"score\": 50.0\n            },\n
-        \           {\n              \"$id\": \"7\",\n              \"$type\": \"Bang.OverRangeToClosestEnemy,
-        Assembly-CSharp\",\n              \"desiredRange\": 5.0,\n              \"score\":
-        100.0\n            },\n            {\n              \"$id\": \"8\",\n              \"$type\":
-        \"Bang.LineOfSightToAnyEnemy, Assembly-CSharp\",\n              \"score\":
-        50.0,\n              \"YHeightOffset\": 0.5\n            },\n            {\n
-        \             \"$id\": \"9\",\n              \"$type\": \"Bang.LineOfSightToClosestEnemy,
-        Assembly-CSharp\",\n              \"score\": 50.0,\n              \"YHeightOffset\":
-        0.5\n            },\n            {\n              \"$id\": \"10\",\n              \"$type\":
-        \"Bang.OverRangeToAnyEnemy, Assembly-CSharp\",\n              \"desiredRange\":
-        5.0,\n              \"score\": 50.0\n            },\n            {\n              \"$id\":
-        \"11\",\n              \"$type\": \"Bang.OverRangeToAnyEnemySpawner, Assembly-CSharp\",\n
-        \             \"multiplier\": 1.0,\n              \"score\": 100.0\n            },\n
-        \           {\n              \"$id\": \"12\",\n              \"$type\": \"Bang.ProximityToAgentSpawner,
-        Assembly-CSharp\",\n              \"score\": 100.0,\n              \"multiplier\":
-        1.0\n            }\n          ]\n        }\n      },\n      \"isDisabled\":
-        false,\n      \"scorers\": {\n        \"$id\": \"13\",\n        \"$values\":
-        [\n          {\n            \"$id\": \"14\",\n            \"$type\": \"Bang.FixedScorer,
-        Assembly-CSharp\",\n            \"score\": 10\n          }\n        ]\n      },\n
-        \     \"_score\": 0.0\n    }\n  ],\n  \"defaultQualifier\": {\n    \"$id\":
-        \"15\",\n    \"$type\": \"UtilityAI.DefaultQualifier, Assembly-CSharp\",\n
-        \   \"score\": 1.0,\n    \"isDisabled\": false,\n    \"action\": {\n      \"$id\":
-        \"16\",\n      \"$type\": \"Bang.RandomWander, Assembly-CSharp\",\n      \"name\":
-        \"RandomWander\"\n    },\n    \"_score\": 0.0\n  }\n}"
-      _name: AgentMoveAI
-    _state: 1
-    _intervalMin: 0.5
-    _intervalMax: 0.5
-    _startDelayMin: 0
-    _startDelayMax: 0
-    debugClient: 0
-  - contextProvider: {fileID: 114193328531158472}
-    _ai:
-      jsonData: "{\n  \"$id\": \"1\",\n  \"id\": \"f0817c81-2713-4588-ba6c-f1052334923a\",\n
-        \ \"qualifiers\": [\n    {\n      \"$id\": \"2\",\n      \"$type\": \"UtilityAI.CompositeScoreQualifier,
-        Assembly-CSharp\",\n      \"action\": {\n        \"$id\": \"3\",\n        \"$type\":
-        \"UtilityAI.CompositeAction, Assembly-CSharp\",\n        \"actions\": {\n
-        \         \"$id\": \"4\",\n          \"$values\": [\n            {\n              \"$id\":
-        \"5\",\n              \"$type\": \"Bang.SetBestAttackTarget, Assembly-CSharp\",\n
-        \             \"name\": \"SetBestAttackTarget\",\n              \"scorers\":
-        {\n                \"$id\": \"6\",\n                \"$values\": [\n                  {\n
-        \                   \"$id\": \"7\",\n                    \"$type\": \"Bang.IsAttackTargetAlive,
-        Assembly-CSharp\",\n                    \"score\": 100.0\n                  },\n
-        \                 {\n                    \"$id\": \"8\",\n                    \"$type\":
-        \"Bang.EnemyProximityToSelf, Assembly-CSharp\",\n                    \"multiplier\":
-        1.0,\n                    \"score\": 50.0\n                  },\n                  {\n
-        \                   \"$id\": \"9\",\n                    \"$type\": \"Bang.IsCurrentTargetScorer,
-        Assembly-CSharp\",\n                    \"multiplier\": 1.0,\n                    \"score\":
-        1.5\n                  }\n                ]\n              }\n            },\n
-        \           {\n              \"$id\": \"10\",\n              \"$type\": \"Bang.FireAtAttackTarget,
-        Assembly-CSharp\",\n              \"name\": \"FireAtAttackTarget\"\n            }\n
-        \         ]\n        },\n        \"name\": \"FireAtTarget\"\n      },\n      \"isDisabled\":
-        false,\n      \"scorers\": {\n        \"$id\": \"11\",\n        \"$values\":
-        [\n          {\n            \"$id\": \"12\",\n            \"$type\": \"Bang.HasEnemiesInRange,
-        Assembly-CSharp\",\n            \"range\": 10.0,\n            \"score\": 15\n
-        \         }\n        ]\n      },\n      \"_score\": 0.0\n    },\n    {\n      \"$id\":
-        \"13\",\n      \"$type\": \"UtilityAI.CompositeScoreQualifier, Assembly-CSharp\",\n
-        \     \"action\": {\n        \"$id\": \"14\",\n        \"$type\": \"Bang.EmptyAction,
-        Assembly-CSharp\",\n        \"name\": \"Null Action\"\n      },\n      \"isDisabled\":
-        false,\n      \"scorers\": {\n        \"$id\": \"15\",\n        \"$values\":
-        [\n          {\n            \"$id\": \"16\",\n            \"$type\": \"Bang.FixedScorer,
-        Assembly-CSharp\",\n            \"score\": 10\n          }\n        ]\n      },\n
-        \     \"_score\": 0.0\n    }\n  ],\n  \"defaultQualifier\": {\n    \"$id\":
-        \"17\",\n    \"$type\": \"UtilityAI.DefaultQualifier, Assembly-CSharp\",\n
-        \   \"score\": 1.0,\n    \"isDisabled\": false,\n    \"action\": {\n      \"$id\":
-        \"18\",\n      \"$type\": \"Bang.EmptyAction, Assembly-CSharp\",\n      \"name\":
-        \"Null Action\"\n    },\n    \"_score\": 0.0\n  }\n}"
-      _name: AgentActionAI
-    _state: 1
-    _intervalMin: 1
-    _intervalMax: 1
-    _startDelayMin: 0
-    _startDelayMax: 0
-    debugClient: 0
+  aiConfigs:
+  - aiId: AgentScanAI
+    intervalMin: 1
+    intervalMax: 1
+    startDelayMin: 0
+    startDelayMax: 0
+    isActive: 1
+    _debugClient: 0
+    isPredefined: 1
+    type: Bang.AgentScanAI
+  - aiId: AgentMoveAI
+    intervalMin: 1
+    intervalMax: 1
+    startDelayMin: 0
+    startDelayMax: 0
+    isActive: 1
+    _debugClient: 0
+    isPredefined: 1
+    type: Bang.AgentMoveAI
+  - aiId: AgentActionAI
+    intervalMin: 1
+    intervalMax: 1
+    startDelayMin: 0
+    startDelayMax: 0
+    isActive: 1
+    _debugClient: 0
+    isPredefined: 1
+    type: Bang.AgentActionAI
   _hasStarted: 0
   debugNextIntervalTime: 0
   showDefaultInspector: 0
@@ -2044,26 +1954,19 @@ MonoBehaviour:
   _currentHealth: 0
   _isDead: 0
   _equippedFirearm: {fileID: 0}
-  _yFocusOffset: 0.75
-  sinkSpeed: 2.5
-  _fireSpeed: 1
+  actorBody:
+    _head: {fileID: 4645203099748726}
+    _leftHand: {fileID: 4605668109480382}
+    _rightHand: {fileID: 4781103747589800}
+    _mainRenderer: []
+  _fieldOfView: 108
+  _sightRange: 20
+  _scanRadius: 12
+  _attackSpeed: 1
   _aimAccuracy: 3
---- !u!114 &114916112818324410
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d615100e52cc4e2b83dc4336b86cfeb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _head: {fileID: 4645203099748726}
-  _leftHand: {fileID: 4605668109480382}
-  _rightHand: {fileID: 4781103747589800}
-  _mainRenderer:
-  - {fileID: 137629596905926438}
+  _coverTarget: {fileID: 0}
+  indicator:
+    icon: {fileID: 0}
 --- !u!136 &136658996750469874
 CapsuleCollider:
   m_ObjectHideFlags: 1

@@ -19,9 +19,12 @@
 
 
         [Header("----- Actor Misc Settings -----")]
-        [SerializeField, Range(0, 1), Tooltip("YAxis height for aiming and sight")]
+        public ActorBody actorBody = new ActorBody();
+
+        //[SerializeField, Range(0, 1), Tooltip("YAxis height for aiming and sight")]
         protected float _yFocusOffset = 0.75f;
-        [SerializeField, Tooltip("The speed at which the enemy sinks through the floor when dead.")]
+
+        //[SerializeField, Tooltip("The speed at which the enemy sinks through the floor when dead.")]
         protected float sinkSpeed = 2.5f;           
 
 
@@ -31,7 +34,7 @@
         private float startSinkingTime;
 
         protected Animator animator;
-        protected ActorBody actorBody;
+        //protected ActorBody actorBody;
         protected CapsuleCollider capsuleCollider;
 
 
@@ -80,7 +83,7 @@
             }
 
 
-            actorBody = GetComponent<ActorBody>();
+            //actorBody = GetComponent<ActorBody>();
             animator = GetComponent<Animator>();
             capsuleCollider = GetComponent<CapsuleCollider>();
 

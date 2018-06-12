@@ -20,11 +20,21 @@
 
 		public bool isActive;
 
+        public bool _debugClient;
+
+        public bool isPredefined;
+
+        public string type;
+
 		//
 		// Constructors
 		//
-        public UtilityAIConfig (){
-            
+        public UtilityAIConfig ()
+        {
+            aiId = "New AI";
+            intervalMin = intervalMax = 1;
+            startDelayMin = startDelayMax = 0;
+            isActive = true;
         }
 	}
 }

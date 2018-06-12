@@ -5,12 +5,37 @@ namespace Bang
     public interface IAgentCtrl
     {
 
+        AgentInput agentInput
+        {
+            get;
+        }
+
+        float scanRadius
+        {
+            get;
+            set;
+        }
+
+        float attackSpeed
+        {
+            get;
+            set;
+        }
+
+        IHasHealth attackTarget
+        {
+            get;
+            set;
+        }
+
+        Collider coverTarget
+        {
+            get;
+            set;
+        }
 
 
-        void MoveTo(Vector3 destination);
 
-
-        void StopMoving();
 
 
         /// <summary>

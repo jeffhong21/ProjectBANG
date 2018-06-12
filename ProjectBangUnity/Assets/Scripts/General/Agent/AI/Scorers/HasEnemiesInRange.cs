@@ -4,7 +4,7 @@
     using UtilityAI;
 
     /// <summary>
-    /// Returns the score is a hostile is within range.
+    /// Returns the score if a hostile is within range.
     /// </summary>
     public class HasEnemiesInRange : ScorerBase
     {

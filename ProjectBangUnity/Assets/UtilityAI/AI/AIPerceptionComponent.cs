@@ -33,7 +33,7 @@ namespace UtilityAI
 		private void OnEnable()
 		{
             units = new List<GameObject>();
-            obstaclesLayer = Layers.worldObjects;
+            obstaclesLayer = Layers.cover;
 		}
 
 		void Update()

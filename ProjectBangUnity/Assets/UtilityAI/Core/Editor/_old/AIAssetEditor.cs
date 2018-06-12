@@ -13,7 +13,7 @@
     
     public class AIAssetEditor : EditorWindow
     {
-        UtilityAIAsset currentClient;
+        AIStorage currentClient;
         SerializedObject serializedObject;
         //List<ContainerNode> containerNodes = new List<ContainerNode>();
 
@@ -39,13 +39,13 @@
 
         void UpdateClientList(){
             clientList = new GenericMenu();
-            foreach (UtilityAIAsset asset in InspectorUtility.GetAllClients()){
+            foreach (AIStorage asset in InspectorUtility.GetAllClients()){
                 clientList.AddItem(new GUIContent(asset.configuration.name), false, SetActiveClient, asset);
             }
         }
 
         void SetActiveClient(object c){
-            currentClient = c as UtilityAIAsset;
+            currentClient = c as AIStorage;
             serializedObject = new SerializedObject(currentClient);
         }
 
@@ -210,7 +210,7 @@
                     //    if(currentClient.configuration.Equals(newData))
                     //    {
                     //        currentClient.configuration = newData;
-                    //        EditorUtility.SetDirty((UtilityAIAsset)currentClient);
+                    //        EditorUtility.SetDirty((AIStorage)currentClient);
                     //    }
                     //
                     //    //Debug.Log("Saving");

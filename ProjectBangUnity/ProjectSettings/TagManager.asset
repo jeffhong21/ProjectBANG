@@ -8,6 +8,7 @@ TagManager:
   - Firearm
   - Projectile
   - SpawnPoint
+  - Cover
   layers:
   - Default
   - TransparentFX
@@ -18,9 +19,9 @@ TagManager:
   - 
   - 
   - PostProcessing
-  - WorldObjects
+  - Floor
   - Entites
-  - 
+  - Cover
   - 
   - 
   - 

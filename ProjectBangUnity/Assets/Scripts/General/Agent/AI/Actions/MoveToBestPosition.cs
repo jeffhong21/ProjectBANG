@@ -21,7 +21,7 @@
                 return;
             }
 
-            c.agent.MoveTo(bestDestination);
+            c.agent.agentInput.MoveTo(bestDestination);
             //if (Mathf.Abs(bestDestination.sqrMagnitude) > Mathf.Abs(c.agent.transform.position.sqrMagnitude))
             //{
             //    //Debug.Log(string.Format("Entity position:  <{0}>  |  Entity sqrMagnitude:  {1}\nBestDestination position:  <{2}>  |  BestDestination sqrMagnitude:  {3}", 

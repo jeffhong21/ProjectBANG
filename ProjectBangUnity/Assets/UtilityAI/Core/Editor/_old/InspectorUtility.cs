@@ -108,7 +108,7 @@
                 {
                     if (GUILayout.Button("Ok"))
                     {
-                        var utilityAIAsset = new UtilityAIAsset();
+                        var utilityAIAsset = new AIStorage();
                         //var aiAsset = utilityAIAsset.CreateAsset(String.IsNullOrEmpty(aiName) || String.IsNullOrWhiteSpace(aiName) ? _defaultAiID : aiName,
                                                                  //String.IsNullOrEmpty(aiName) || String.IsNullOrWhiteSpace(aiName) ? _defaultAiName : aiName,
                                                                  //taskNetwork.selectAiAssetOnCreate);
@@ -166,14 +166,14 @@
         }
 
 
-        public static UtilityAIAsset[] GetAllClients()
+        public static AIStorage[] GetAllClients()
         {
-            string filterType = "t:UtilityAIAsset";
-            var aiAssets = new List<UtilityAIAsset>();
+            string filterType = "t:AIStorage";
+            var aiAssets = new List<AIStorage>();
 
             foreach (var guid in AssetDatabase.FindAssets(filterType)){
                 string assetPath = AssetDatabase.GUIDToAssetPath(guid);
-                UtilityAIAsset aiAsset = AssetDatabase.LoadMainAssetAtPath(assetPath) as UtilityAIAsset;
+                AIStorage aiAsset = AssetDatabase.LoadMainAssetAtPath(assetPath) as AIStorage;
                 aiAssets.Add(aiAsset);
             }
             return aiAssets.ToArray();

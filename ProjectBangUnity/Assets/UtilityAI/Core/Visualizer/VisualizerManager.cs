@@ -80,12 +80,19 @@
         /// <param name="context">Context.</param>
         public static void UpdateVisualizer(object aiEntity, IAIContext context)
         {
-            ICustomVisualizer visualizer = null;
-            if (visualizers.TryGetValue(aiEntity.GetType(), out visualizer))
-            {
-                visualizer.EntityUpdate(aiEntity, context);
-                //Debug.LogFormat("Updated the Visualizer for :  {0}", aiEntity.GetType());
+            if(visualizers.ContainsKey(aiEntity.GetType())){
+                ICustomVisualizer visualizer = null;
+                if (visualizers.TryGetValue(aiEntity.GetType(), out visualizer))
+                {
+                    if (visualizer != null)
+                    {
+                        visualizer.EntityUpdate(aiEntity, context);
+                    }
+
+                    //Debug.LogFormat("Updated the Visualizer for :  {0}", aiEntity.GetType());
+                }
             }
+
         }
 
 

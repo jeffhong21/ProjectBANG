@@ -1,4 +1,4 @@
-namespace UtilityAI.Visualization
+﻿namespace UtilityAI.Visualization
 {
     using UnityEngine;
     using UnityEditor;
@@ -11,7 +11,7 @@ namespace UtilityAI.Visualization
     /// </summary>
     /// <typeparam name="T">The concrete ActionWithOptions type</typeparam>
     /// <typeparam name = "TOption" > The type of the options.</typeparam>
-    //public class ActionWithOptionsVisualizerComponent<T, TOption> : CustomGizmoGUIVisualizer<List<ScoredOption<TOption>>, TOption>
+    //public class ActionWithOptionsVisualizerComponent<T, TOption> : CustomGizmoGUIVisualizer<List<OptionScorer<TOption>>, TOption>
     //    where T : ActionWithOptions<TOption>
     //{
     public abstract class ActionWithOptionsVisualizerComponent<T, TOption> : MonoBehaviour, ICustomVisualizer
@@ -22,12 +22,12 @@ namespace UtilityAI.Visualization
         protected bool drawGUI = true;
         [SerializeField]
         protected bool drawGizmo = true;
-        protected List<ScoredOption<TOption>> data;
+        protected List<OptionScorer<TOption>> data;
 
 
         private void OnEnable()
         {
-            data = new List<ScoredOption<TOption>>();
+            data = new List<OptionScorer<TOption>>();
             VisualizerManager.RegisterVisualizer<T>(this);
         }
 
@@ -70,9 +70,9 @@ namespace UtilityAI.Visualization
         /// <param name="aiEntity">Ai entity.</param>
         /// <param name="context">Context.</param>
         /// <param name="aiID">Ai identifier.</param>
-        protected List<ScoredOption<TOption>> GetDataForVisualization(T aiEntity, IAIContext context)
+        protected List<OptionScorer<TOption>> GetDataForVisualization(T aiEntity, IAIContext context)
         {
-            var scoredOptions = new List<ScoredOption<TOption>>();
+            var scoredOptions = new List<OptionScorer<TOption>>();
             scoredOptions = aiEntity.GetAllScorers(context, GetOptions(context), scoredOptions);
 
             if(data != null){
@@ -80,7 +80,7 @@ namespace UtilityAI.Visualization
                 data = scoredOptions;
             }
             else{
-                data = new List<ScoredOption<TOption>>(scoredOptions);
+                data = new List<OptionScorer<TOption>>(scoredOptions);
             }
 
             //IContext c = context as AIContext;
@@ -122,9 +122,9 @@ namespace UtilityAI.Visualization
 
 
 
-        protected abstract void DrawGUI(List<ScoredOption<TOption>> data);
+        protected abstract void DrawGUI(List<OptionScorer<TOption>> data);
 
-        protected abstract void DrawGizmos(List<ScoredOption<TOption>> data);
+        protected abstract void DrawGizmos(List<OptionScorer<TOption>> data);
 
 
     }

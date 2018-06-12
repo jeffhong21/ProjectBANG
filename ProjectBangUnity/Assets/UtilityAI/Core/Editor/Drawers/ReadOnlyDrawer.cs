@@ -3,8 +3,8 @@ namespace UtilityAI
     using UnityEditor;
     using UnityEngine;
 
-    [CustomPropertyDrawer(typeof(ShowOnlyAttribute))]
-    public class ShowOnlyDrawer : PropertyDrawer
+    [CustomPropertyDrawer(typeof(ReadOnlyAttribute))]
+    public class ReadOnlyDrawer : PropertyDrawer
     {
         public override void OnGUI(Rect position, SerializedProperty prop, GUIContent label)
         {

@@ -50,7 +50,8 @@ namespace Bang
         private void Spawn()
         {
             _lastSpawnTime = Time.time;
-            ActorPoolManager.instance.Spawn(entityType, transform.position, transform.rotation);
+            Quaternion rotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
+            ActorPoolManager.instance.Spawn(entityType, transform.position, rotation);
         }
     }
 }

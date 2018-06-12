@@ -31,7 +31,7 @@
                 var range = dir.magnitude;
                 var ray = new Ray(position + Vector3.up * YHeightOffset, dir);
                 //Debug.DrawRay(position + Vector3.up * YHeightOffset, dir, Color.red, 1f);
-                if (Physics.Raycast(ray, range, Layers.worldObjects) == false)
+                if (Physics.Raycast(ray, range, Layers.cover) == false)
                 {
                     return this.score;
                 }

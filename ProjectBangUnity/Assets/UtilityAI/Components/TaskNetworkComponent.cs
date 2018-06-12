@@ -14,26 +14,24 @@
     public class TaskNetworkComponent : MonoBehaviour
     {
         
-        [HideInInspector, SerializeField]
-        public List<UtilityAIConfig> aiConfigs;
+        //[HideInInspector, SerializeField]
+        [SerializeField]
+        public UtilityAIConfig[] aiConfigs;
 
         [SerializeField]
-        private List<UtilityAIClient> _clients = new List<UtilityAIClient>();
+        private List<IUtilityAIClient> _clients;
 
         //  AddClientWindow
-        public List<UtilityAIClient> clients
+        public List<IUtilityAIClient> clients
         {
             get{
                 return _clients;
             }
-            set{
-                _clients = value;
-            }
         }
 
-        //  For OnStartAndEnable;
+
         [SerializeField]
-        private bool _hasStarted;
+        private bool _hasStarted;  //  For OnStartAndEnable;
 
 
         [Header(" -------- Debug -------- ")]
@@ -64,7 +62,7 @@
 		private void OnDisable()
 		{
             _hasStarted = false;
-            foreach (UtilityAIClient client in clients)
+            foreach (IUtilityAIClient client in clients)
             {
                 client.Stop();
             }
@@ -75,47 +73,103 @@
             if (_hasStarted) return;  //  If already initialized, return from function.
             _hasStarted = true;
 
+            if (aiConfigs.Length == 0) return;
 
-            foreach(UtilityAIClient client in clients)
+            if(_clients == null)
+                _clients = new List<IUtilityAIClient>();
+
+
+            AINameMap.RegenerateNameMap();
+
+
+            if(aiConfigs.Length != clients.Count)
             {
-                client.Start();
-                StartCoroutine(ExecuteUpdate(client));
+                clients.Clear();
+                for (int i = 0; i < aiConfigs.Length; i++)
+                {
+                    //  Create a new IUtilityAIClient
+                    Guid guid = AINameMap.GetGUID(aiConfigs[i].aiId);
+                    if (guid == Guid.Empty)
+                    {
+                        //Debug.LogWarningFormat("Guid for {0} does not exist.", aiConfigs[i].aiId);
+                        continue;
+                    }
+
+                    IUtilityAIClient client = new UtilityAIClient(guid, GetComponent<IContextProvider>(),
+                                                                  aiConfigs[i].intervalMin, aiConfigs[i].intervalMax,
+                                                                  aiConfigs[i].startDelayMin, aiConfigs[i].startDelayMax);
+
+                    clients.Add(client);                          //  Add the client to the TaskNetwork.
+
+                    if (aiConfigs[i].isPredefined)
+                    {
+                        //  Initialize AIConfig so we can get the name of the predefined config.
+                        Type type = Type.GetType(aiConfigs[i].type);
+                        IUtilityAIConfig config = (IUtilityAIConfig)Activator.CreateInstance(type);
+                        //  Configure the predefined settings.
+                        config.ConfigureAI(client.ai);
+
+                    }
+                }
+            }
+
+
+            //Debug.Log("Enabling Client");
+            for (int i = 0; i < aiConfigs.Length; i ++)
+            {
+                if(aiConfigs[i].isActive)
+                {
+                    //Debug.Log(aiConfigs[i].aiId + " is active and running.\nDebugClient is set to " + aiConfigs[i]._debugClient);
+
+                    clients[i].Start();
+                    StartCoroutine(ExecuteUpdate((UtilityAIClient)clients[i]));
+                }    
             }
         }
+
 
 
         public IEnumerator ExecuteUpdate(UtilityAIClient client)
         {
             float nextInterval = 0f;
-            //IEnumerator activeAction = null;
 
-            yield return new WaitForSeconds(Random.Range(client.startDelayMin, client.startDelayMax));
+            //Debug.Log(" Waiting for startDelay ");
+            //yield return new WaitForSeconds(Random.Range(client.startDelayMin, client.startDelayMax));
 
             while (isRunning)
             {   
-                if (Time.timeSinceLevelLoad > nextInterval)
+                if (Time.timeSinceLevelLoad + 0.25f > nextInterval)
                 {
                     client.Execute();
                     nextInterval = Time.timeSinceLevelLoad + Random.Range(client.intervalMin, client.intervalMax);
                     if (debugNextIntervalTime) Debug.Log("Current Time:  " + Time.timeSinceLevelLoad + " | Next interval in:  " + (nextInterval - Time.timeSinceLevelLoad));
 
                 }
-
                 yield return null;
             }
         }
 
 
-        public void GetClient(Guid aiId)
+        public IUtilityAIClient GetClient(Guid aiId)
         {
+            foreach (IUtilityAIClient client in clients)
+            {
+                if(client.ai.id == aiId){
+                    Debug.Log("Client:  " + client);
+                    return null;
+                }
+            }
 
+            Debug.Log("Did not find a client");
+
+            return null;
         }
 
 
         public void Pause()
         {
             //isRunning = false;
-            foreach (UtilityAIClient client in clients)
+            foreach (IUtilityAIClient client in clients)
             {
                 client.Pause();
             }
@@ -125,7 +179,7 @@
         public void Resume()
         {
             //isRunning = true;
-            foreach (UtilityAIClient client in clients)
+            foreach (IUtilityAIClient client in clients)
             {
                 client.Resume();
             }
@@ -133,12 +187,27 @@
 
         internal void ToggleActive(int idx, bool active)
         {
+            if(idx < aiConfigs.Length)
+                aiConfigs[idx].isActive = active;
             
         }
 
 
+        ////  For LoadBalancer
+        //private void Update()
+        //{
 
+        //    for (int index = 0; index < clients.Count; index++)
+        //    {
+        //        float nextInterval = 0f;
 
+        //        if (Time.time > nextInterval)
+        //        {
+        //            clients[index].Execute();
+        //            nextInterval = Time.timeSinceLevelLoad + Random.Range(clients[index].intervalMin, clients[index].intervalMax);
+        //        }
+        //    }
+        //}
 
 
 
@@ -156,7 +225,7 @@
 		//    scanAiClient.debug = false;
 
 		//    //  Starting all clients.
-		//    foreach (UtilityAIClient client in clients)
+		//    foreach (IUtilityAIClient client in clients)
 		//    {
 		//        //client.ActionSelected += taskNetworkDebugger.GetSelectorResults;
 		//        client.Start();
@@ -164,16 +233,16 @@
 		//    }
 		//}
 
-		//public UtilityAIClient InitializeAI(UtilityAI utilityAI, float iMin = 1f, float iMax = 1f, float sMin = 0f, float sMax = 0f)
+		//public IUtilityAIClient InitializeAI(UtilityAI utilityAI, float iMin = 1f, float iMax = 1f, float sMin = 0f, float sMax = 0f)
 		//{
-		//    var aiClient = new UtilityAIClient(this, utilityAI, iMin, iMax, sMin, sMax);
+		//    var aiClient = new IUtilityAIClient(this, utilityAI, iMin, iMax, sMin, sMax);
 		//    clients.Add(aiClient);
 		//    return aiClient;
 		//}
 
 
 
-		//public IEnumerator _ExecuteUpdate(UtilityAIClient client)
+		//public IEnumerator _ExecuteUpdate(IUtilityAIClient client)
 		//{
 		//    float nextInterval = 0f;
 		//    IEnumerator activeAction = null;
@@ -225,7 +294,7 @@
 		///// </summary>
 		///// <returns>The running.</returns>
 		///// <param name="client">Client.</param>
-		//public IEnumerator OnRunning(UtilityAIClient client)
+		//public IEnumerator OnRunning(IUtilityAIClient client)
 		//{
 		//    while (isRunning)
 		//    {

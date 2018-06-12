@@ -27,7 +27,7 @@
 
 
         ////  All the TOptions and its score.
-        //public List<ScoredOption<TOption>> scoredOptions { get; protected set;}
+        //public List<OptionScorer<TOption>> scoredOptions { get; protected set;}
 
 
         /// <summary>
@@ -39,7 +39,7 @@
         /// <param name="options">Options.</param>
         public TOption GetBest(IAIContext context, List<TOption> options)
         {
-            var scoredOptions = new List<ScoredOption<TOption>>();
+            var scoredOptions = new List<OptionScorer<TOption>>();
             //scoredOptions.Clear();
 
             if (options.Count == 0)
@@ -56,7 +56,7 @@
             return scoredOptions[0].score == 0 ? default(TOption) : scoredOptions[0].option;
 
             //string scoredOptionInfo = "";
-            //foreach(ScoredOption<TOption> scoredOption in scoredOptions){
+            //foreach(OptionScorer<TOption> scoredOption in scoredOptions){
             //    scoredOptionInfo += string.Format("OptionType:  {0}  | Score: {1}\n", scoredOption.option, scoredOption.score);
             //}
             //Debug.Log(scoredOptionInfo);
@@ -73,7 +73,7 @@
         /// <param name="context">Context.</param>
         /// <param name="options">Options.</param>
         /// <param name="optionsBuffer">The buffer which is populated with the scored options.</param>
-        public List<ScoredOption<TOption>> GetAllScorers(IAIContext context, List<TOption> options, List<ScoredOption<TOption>> optionsBuffer)
+        public List<OptionScorer<TOption>> GetAllScorers(IAIContext context, List<TOption> options, List<OptionScorer<TOption>> optionsBuffer)
         {
             //optionsBuffer.Clear();
             //  Loop through every TOption and tallys all scorers.  (e.g loop through all Vector3 position points and than calculate all scores of that position.)
@@ -86,7 +86,7 @@
                     score += scorers[index].Score(context, option);
                 }
                 //  ScoredOptions would contain all the scores and TOption to return to the ActionWithOptions.
-                optionsBuffer.Add(new ScoredOption<TOption>(option, score));
+                optionsBuffer.Add(new OptionScorer<TOption>(option, score));
             }
             return optionsBuffer;
         }

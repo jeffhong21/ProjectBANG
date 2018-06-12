@@ -1,6 +1,7 @@
 ﻿namespace UtilityAI
 {
     using UnityEngine;
+    using UnityEditor;
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -18,18 +19,16 @@
     /// This is the decision maker.
     /// </summary>
     [Serializable]
-    public class UtilityAIClient
+    public class UtilityAIClient : IUtilityAIClient
     {
         //  ContextProvider from BANG.
-        [SerializeField]
-        [HideInInspector]
+        [SerializeField, HideInInspector]
         private Bang.AIContextProvider contextProvider;
 
         [SerializeField]
-        private UtilityAI _ai;
+        private IUtilityAI _ai;
         [SerializeField]
         private UtilityAIClientState _state;
-
 
         [SerializeField]
         private float _intervalMin;
@@ -42,65 +41,62 @@
 
 
 
-        public UtilityAI ai{ 
-            get{
-                return _ai;
-            }
-            set{ _ai = value;
-            }
+        public IUtilityAI ai{ 
+            get{return _ai;}
+            set{ _ai = value;}
         }
 
         public UtilityAIClientState state{ 
-            get{
-                return _state; 
-            }
-            protected set{
-                _state = value;
-            }
+            get{return _state; }
+            protected set{_state = value;}
         }
 
         public float intervalMin { 
-            get{ 
-                return _intervalMin; 
-            } 
-            set{ 
-                _intervalMin = value; 
+            get{
+                //if (_intervalMin > _intervalMax){
+                //    _intervalMin = _intervalMax;
+                //}
+                return _intervalMin;
             }
+            set { _intervalMin = value; }
         }
 
         public float intervalMax{
             get{
-                return _intervalMax; 
-            } 
-            set {
-                _intervalMax = value; 
+                //if (_intervalMax < _intervalMin){
+                //    _intervalMax = _intervalMin;
+                //}
+                return _intervalMax;
             }
+            set { _intervalMax = value; }
         }
 
         public float startDelayMin{
             get{
-                return _startDelayMin;
-            } 
-            set{
-                _startDelayMin = value;
+                //if (_startDelayMin > _startDelayMax){
+                //    _startDelayMin = _startDelayMax;
+                //}
+                return _startDelayMax;
             }
+            set{_startDelayMin = value;}
         }
 
         public float startDelayMax{
-            get{
+            get { 
+                //if(_startDelayMax < _startDelayMin){
+                //    _startDelayMax = _startDelayMin;
+                //}
                 return _startDelayMax;
-            } 
-            set{
-                _startDelayMax = value;
             }
+            set { _startDelayMax = value; }
         }
 
 
-        public IAction activeAction
-        {
+        public IAction activeAction{
             get; 
             protected set;
         }
+
 
 
         //  For Debuging.
@@ -113,13 +109,17 @@
 
         public UtilityAIClient(Guid aiId, IContextProvider contextProvider) 
         {
-            //this.ai = ai;
             this.contextProvider = contextProvider as Bang.AIContextProvider;
 
-            this.intervalMin = this.intervalMax = 1f;
-            this.startDelayMin = this.startDelayMax = 0f;
+            string path = AssetDatabase.GUIDToAssetPath(aiId.ToString("N"));
+            AIStorage aiStorage = AssetDatabase.LoadMainAssetAtPath(path) as AIStorage;
+            ai = aiStorage.configuration;
 
-            //Debug.Log("Contructor with aiID");
+            intervalMin = intervalMax = 1f;
+            startDelayMin = startDelayMax = 0f;
+            state = UtilityAIClientState.Stopped;
+
+            Debug.Log("Constructing UtilityAIClient with aiId - v1");
         }
 
         public UtilityAIClient(UtilityAI ai, IContextProvider contextProvider)
@@ -127,12 +127,31 @@
             this.ai = ai;
             this.contextProvider = contextProvider as Bang.AIContextProvider;
 
-            this.intervalMin = this.intervalMax = 1f;
-            this.startDelayMin = this.startDelayMax = 0f;
+            intervalMin = intervalMax = 1f;
+            startDelayMin = startDelayMax = 0f;
             state = UtilityAIClientState.Stopped;
 
             //Debug.LogFormat("this.IContextProvider:  {0}  |  param IContextProvider:  {1}", this.contextProvider, contextProvider);
         }
+
+
+        public UtilityAIClient(Guid aiId, IContextProvider contextProvider, float intervalMin, float intervalMax, float startDelayMin, float startDelayMax)
+        {
+            this.contextProvider = contextProvider as Bang.AIContextProvider;
+
+            string path = AssetDatabase.GUIDToAssetPath(aiId.ToString("N"));
+            AIStorage aiStorage = AssetDatabase.LoadMainAssetAtPath(path) as AIStorage;
+            ai = aiStorage.configuration;
+
+            this.intervalMin = intervalMin;
+            this.intervalMax = intervalMax;
+            this.startDelayMin = startDelayMin;
+            this.startDelayMax = startDelayMax;
+            state = UtilityAIClientState.Stopped;
+
+            //Debug.Log("Constructing UtilityAIClient with aiId - v2");
+        }
+
 
         public UtilityAIClient(UtilityAI ai, IContextProvider contextProvider, float intervalMin, float intervalMax, float startDelayMin, float startDelayMax)
         {
@@ -152,6 +171,15 @@
 
 
 
+        //  Part of a IBalanced/Scheduler
+        public float? ExecuteUpdate(float deltaTime, float nextInterval)
+        {
+
+            Execute();
+
+            return null;
+        }
+
 
 
         public void Execute()
@@ -164,20 +192,23 @@
             IAction newAction = ai.Select(contextProvider.GetContext());
             activeAction = newAction;
 
-            //  For Debug
-            selectorResults = GetSelectorResults(contextProvider.GetContext(), ai.rootSelector.qualifiers, ai.rootSelector.defaultQualifier);
-            // --------------
-
             if (activeAction == null)
                 return;
 
 
-            //  Execute the current action.
-            if(debugClient) Debug.Log("Executing " + activeAction.name);
+            //  For Debug
+            //selectorResults = GetSelectorResults(contextProvider.GetContext(), ai.rootSelector.qualifiers, ai.rootSelector.defaultQualifier);
+            // --------------
+            //Debug.Log("Executing " + activeAction.name);
+
+            //  Delay the execution based on the delayMin/max.
+
+
             activeAction.Execute(contextProvider.GetContext());
+
+
             //  Call event for GetDataForVisualization(activeAction, contextProvider.GetContext())
             VisualizerManager.UpdateVisualizer(activeAction, contextProvider.GetContext());
-
         }
 
 
@@ -192,23 +223,20 @@
             state = UtilityAIClientState.Running;
             OnStart();
             //Debug.Log(string.Format("Executing action:  {0} | {1}", activeAction.GetType().Name, Time.time));
+            AIManager.Register(this);
         }
 
-        /// <summary>
-        /// Called when action has finished executing.  Client remains in Stopped state until it performs a Execute().
-        /// </summary>
+
         public void Stop(){
             if (state == UtilityAIClientState.Stopped)
                 return;
             
             state = UtilityAIClientState.Stopped;
             OnStop();
-            //Debug.Log(string.Format("{0} is finished executing.  | {1}", activeAction.GetType().Name, Time.time));
+            AIManager.UnRegister(this);
         }
 
-        /// <summary>
-        /// Called when the ai is performing a Execute().  Client stays in Running state until it finishes its action.
-        /// </summary>
+
         public void Resume(){
             if (state != UtilityAIClientState.Pause)
                 return;

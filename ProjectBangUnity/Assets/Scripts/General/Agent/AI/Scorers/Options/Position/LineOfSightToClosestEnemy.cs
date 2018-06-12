@@ -43,7 +43,7 @@
             var range = dir.magnitude;
             var ray = new Ray(position + Vector3.up * YHeightOffset, dir);
 
-            if (!Physics.Raycast(ray, range, Layers.worldObjects))
+            if (!Physics.Raycast(ray, range, Layers.cover))
             {
                 return this.score;
             }

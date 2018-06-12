@@ -8,8 +8,9 @@ namespace UtilityAI
     /// <summary>
     /// Used to make a readonly property.  (Field cannot be edited)
     /// </summary>
-    public class ShowOnlyAttribute : PropertyAttribute
+    public class ReadOnlyAttribute : PropertyAttribute
     {
+        
     }
 
 

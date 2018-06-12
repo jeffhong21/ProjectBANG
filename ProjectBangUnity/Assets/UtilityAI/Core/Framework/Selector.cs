@@ -13,19 +13,21 @@
     /// </summary>
     //[DebuggerDisplay("qualifiers = {qualifiers}")]
     [Serializable]
-    public abstract class Selector
+    public abstract class Selector : ISelect
     {
-
+        [SerializeField, HideInInspector]
         protected Guid _id;
+
+        [SerializeField, HideInInspector]
         protected List<IQualifier> _qualifiers;
+
+        [SerializeField, HideInInspector]
         protected IDefaultQualifier _defaultQualifier;
 
 
         //  Gets the id of this selector.
-        public Guid id
-        {
+        public Guid id{
             get { return _id; }
-            set { _id = value; }
         }
 
         //  Gets the qualifiers of this selector.
@@ -48,6 +50,35 @@
         }
 
 
+
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:UtilityAI.Selector"/> class.
+        /// </summary>
+        public Selector()
+        {
+            //Debug.Log(string.Format("Selector:  {0} : Abstract Constructor Message", this.GetType().Name));
+            _qualifiers = new List<IQualifier>();
+            defaultQualifier = new DefaultQualifier();
+            RegenerateId();
+        }
+
+
+        public virtual void CloneFrom(object other)
+        {
+            var cloneFrom = other as Selector;
+            _id = cloneFrom.id;
+            _qualifiers = new List<IQualifier>(cloneFrom.qualifiers);
+            _defaultQualifier = cloneFrom.defaultQualifier;
+        }
+
+
+        public void RegenerateId()
+        {
+            _id = Guid.NewGuid();
+        }
+
+
         /// <summary>
         /// Selects the action for execution.
         /// </summary>
@@ -58,6 +89,7 @@
             throw new NotImplementedException();
         }
 
+
         /// <summary>
         ///   This function selects the best score from a list of qualifiers.
         /// </summary>
@@ -65,21 +97,11 @@
         //public abstract IQualifier Select(IAIContext context, List<IQualifier> qualifiers, IDefaultQualifier defaultQualifier);
 
 
-        protected void RegenerateId(){
-            id = Guid.NewGuid();
-        }
 
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="T:UtilityAI.Selector"/> class.
-        /// </summary>
-        protected Selector()
-        {
-            //Debug.Log(string.Format("Selector:  {0} : Abstract Constructor Message", this.GetType().Name));
-            _qualifiers = new List<IQualifier>();
-            defaultQualifier = new DefaultQualifier();
-            RegenerateId();
-        }
+
+
+
 
 
 

@@ -130,43 +130,43 @@
     public static class DebugEditorUtilities
     {
 
-        /// <summary>
-        /// Debugs the client info.
-        /// </summary>
-        /// <returns>The client info.</returns>
-        /// <param name="taskNetwork">Task network.</param>
-        public static string ClientStateInfo(TaskNetworkComponent taskNetwork)
-        {
-            string clientInfo = "";
-            foreach (UtilityAIClient client in taskNetwork.clients)
-            {
-                clientInfo = "AI:  " + client.ai.name + "\n";
-                foreach (KeyValuePair<IQualifier, float> item in client.selectorResults)
-                {
-                    IQualifier qualifier = item.Key;
-                    float score = item.Value;
+        ///// <summary>
+        ///// Debugs the client info.
+        ///// </summary>
+        ///// <returns>The client info.</returns>
+        ///// <param name="taskNetwork">Task network.</param>
+        //public static string ClientStateInfo(TaskNetworkComponent taskNetwork)
+        //{
+        //    string clientInfo = "";
+        //    foreach (IUtilityAIClient client in taskNetwork.clients)
+        //    {
+        //        clientInfo = "AI:  " + client.ai.name + "\n";
+        //        foreach (KeyValuePair<IQualifier, float> item in client.selectorResults)
+        //        {
+        //            IQualifier qualifier = item.Key;
+        //            float score = item.Value;
 
-                    var action = qualifier.action;
-                    var actionName = action.name;
-                    if (action is ActionWithOptions<Vector3>)
-                    {
-                        var _action = action as ActionWithOptions<Vector3>;
-                        action = _action;
-                        actionName = action.name;
-                    }
+        //            var action = qualifier.action;
+        //            var actionName = action.name;
+        //            if (action is ActionWithOptions<Vector3>)
+        //            {
+        //                var _action = action as ActionWithOptions<Vector3>;
+        //                action = _action;
+        //                actionName = action.name;
+        //            }
 
-                    if (client.activeAction == action)
-                        clientInfo += string.Format(" <b>Qualifier:</b> {0} | <b>Score:</b>: <color=lime>{1}</color>\n <b>Action:</b>:  <color=lime>{2}</color>\n", qualifier.GetType().Name, score, actionName);
-                    else
-                        clientInfo += string.Format(" <b>Qualifier:</b> {0} | <b>Score:</b>: {1}\n <b>Action:</b>:  {2}\n", qualifier.GetType().Name, score, actionName);
+        //            if (client.activeAction == action)
+        //                clientInfo += string.Format(" <b>Qualifier:</b> {0} | <b>Score:</b>: <color=lime>{1}</color>\n <b>Action:</b>:  <color=lime>{2}</color>\n", qualifier.GetType().Name, score, actionName);
+        //            else
+        //                clientInfo += string.Format(" <b>Qualifier:</b> {0} | <b>Score:</b>: {1}\n <b>Action:</b>:  {2}\n", qualifier.GetType().Name, score, actionName);
 
-                }
+        //        }
 
-            }
+        //    }
 
 
-            return clientInfo;
-        }
+        //    return clientInfo;
+        //}
 
 
         /// <summary>

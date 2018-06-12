@@ -20,8 +20,7 @@
         [SerializeField]
         protected float _acceleration = 8f;
         [SerializeField]
-        protected float _angularSpeed = 270f;
-        [Header("----- Misc -----")]
+        protected float _angularSpeed = 135f;
         [SerializeField]
         protected float _arrivalDistance = 1f;
         [SerializeField, HideInInspector]
@@ -66,6 +65,9 @@
         public Vector3 position{
             get { return transform.position; }
         }
+
+
+
 
 
         protected override void Awake()
@@ -113,21 +115,44 @@
 
         public virtual void MoveTo(Vector3 destination)
         {
-            isMoving = true;  //  Used for the animator
-            agent.isStopped = false;
-            agent.SetDestination(destination);
-            Debug.LogFormat("Agent setting destination to:  {0} | {1}\nBaseOffset is:  {2}", destination, Time.time, agent.baseOffset);
-
+            SetLocomotion(true);
+            destination.y = 0;
+            SetDestination(destination);
+            //Debug.LogFormat("Agent setting destination to:  {0} | {1}\nBaseOffset is:  {2}", destination, Time.time, agent.baseOffset);
         }
 
 
         public virtual void StopWalking()
         {
-            isMoving = false;  //  Used for the animator
-            agent.isStopped = true;
+            path = agent.path;
+            //agent.destination = gameObject.transform.position;
+            agent.velocity = Vector3.zero;
+            agent.ResetPath();
+            SetLocomotion(false);
+        }
+
+        public void ResumeWalking()
+        {
+            agent.SetPath(path);
+            SetLocomotion(true);
+        }
+
+
+        private void SetDestination(Vector3 destination, float maxDist = 2f) // maxDist is Sample within this distance from sourcePosition.
+        {
+            agent.speed = moveSpeed;
+
+            int areaMask = NavMesh.AllAreas;
+            NavMeshHit hit;
+            if(NavMesh.SamplePosition(destination, out hit, maxDist, areaMask))
+            {
+                destination = hit.position;
+                agent.SetDestination(destination);
+            }
 
         }
- 
+
+
 
         /// <summary>
         /// Set the position to look at. Set to null is the Ai should stop looking
@@ -195,6 +220,31 @@
         }
 
 
+        public bool SetLocomotion(bool _isMoving)
+        {
+            isMoving = _isMoving;  //  Used for the animator
+            agent.isStopped = !isMoving;
+
+            //Debug.LogFormat("Parameter:  {2} |  IsMoving:  {0}  | isStopped:  {1}", isMoving, agent.isStopped, _isMoving);
+
+            return isMoving;
+        }
+
+
+        //bool KeepWalking()
+        //{
+        //    isMoving = true;  //  Used for the animator
+        //    agent.isStopped = !isMoving;
+        //    return isMoving;
+        //}
+
+
+        //bool StopWalking()
+        //{
+        //    isMoving = false;  //  Used for the animator
+        //    agent.isStopped = !isMoving;
+        //    return isMoving;
+        //}
 
     }
 }

@@ -3,7 +3,8 @@ namespace Bang
     using UnityEngine;
     using System;
 
-    public class ActorBody : MonoBehaviour
+    [Serializable]
+    public class ActorBody
     {
 
         [SerializeField, Tooltip("Used for sight")]
@@ -14,10 +15,6 @@ namespace Bang
         private Transform _rightHand;
         [SerializeField, Tooltip("Main renderer")]
         private SkinnedMeshRenderer[] _mainRenderer;
-
-
-
-
 
 
         public Transform Head{
@@ -34,18 +31,10 @@ namespace Bang
             get { return _rightHand; }
         }
 
-
         public SkinnedMeshRenderer[] MainRenderer
         {
             get { return _mainRenderer; }
         }
-
-
-
-		private void Awake()
-		{
-            //if(_weaponHolder == null) throw new ArgumentNullException("Player has no weapon location marker.");
-		}
 
 
 	}

@@ -18,7 +18,7 @@
     public class AddClientWindow : EditorWindow
     {
         AddClientWindow window;
-        const string filterType = "t:UtilityAIAsset";
+        const string filterType = "t:AIStorage";
         protected TaskNetworkEditor editor { get; set; }
         protected TaskNetworkComponent taskNetwork { get; set; }
 
@@ -37,7 +37,7 @@
         GUIStyle contentStyle;
 
 
-        //void AddAIAsset(UtilityAIAsset aiAsset)
+        //void AddAIAsset(AIStorage aiAsset)
         //{
         //    //  Add asset and client to TaskNetwork
         //    //UtilityAIClient client = new UtilityAIClient(aiAsset.configuration, taskNetwork.contextProvider);
@@ -83,11 +83,11 @@
 
                     if (GUILayout.Button(buttonLabel, GUILayout.Height(18)))
                     {
-                        UtilityAIAsset aiAsset = AssetDatabase.LoadMainAssetAtPath(assetPath) as UtilityAIAsset;
+                        AIStorage aiAsset = AssetDatabase.LoadMainAssetAtPath(assetPath) as AIStorage;
 
                         //  Add asset and client to TaskNetwork
                         //AddAIAsset(aiAsset);
-                        editor.DoAddNew(aiAsset);
+                        editor.DoAddNew(new AIStorage[] { aiAsset });
                         // -----------------------------------
 
                         //taskNetworkEditor.AddUtilityAIAsset(aiAsset);
@@ -100,7 +100,7 @@
 
         void CreateClientDrawer()
         {
-            UtilityAIAsset utilityAIAsset;
+
 
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
@@ -114,14 +114,12 @@
                 {
                     if (GUILayout.Button("Ok"))
                     {
-                        //utilityAIAsset = isDemoAI == false ? new UtilityAIAsset() : new UtilityAIConfig();
-                        utilityAIAsset = new UtilityAIAsset();
-                        var aiAsset = utilityAIAsset.CreateAsset(String.IsNullOrEmpty(aiName) || String.IsNullOrWhiteSpace(aiName) ? defaultID : aiName,
+                        AIStorage aiAsset = AIStorage.CreateAsset(String.IsNullOrEmpty(aiName) || String.IsNullOrWhiteSpace(aiName) ? defaultID : aiName,
                                                                  String.IsNullOrEmpty(aiName) || String.IsNullOrWhiteSpace(aiName) ? defaultName : aiName );
 
                         //  Add asset and client to TaskNetwork
                         //AddAIAsset(aiAsset);
-                        editor.DoAddNew(aiAsset);
+                        editor.DoAddNew(new AIStorage[] { aiAsset });
                         // -----------------------------------
 
                         //editor.AddUtilityAIAsset(aiAsset);

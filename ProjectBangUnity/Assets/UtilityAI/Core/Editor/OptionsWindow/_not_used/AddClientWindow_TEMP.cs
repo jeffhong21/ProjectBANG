@@ -7,12 +7,12 @@
 
 
 //    /// <summary>
-//    /// Used in TaskNetworkEditor to create new UtilityAIAsset
+//    /// Used in TaskNetworkEditor to create new AIStorage
 //    /// </summary>
 //    public class AddClientWindow_TEMP : OptionsWindow<AddClientWindow_TEMP>
 //    {
 //        AddClientWindow_TEMP window;
-//        const string filterType = "t:UtilityAIAsset";
+//        const string filterType = "t:AIStorage";
 
 //        protected string windowTitle = "Add Clients";
 //        protected string defaultAiID = "NewUtilityAI";
@@ -24,7 +24,7 @@
 //        protected string defaultDemoAiName = "NewDemoMockAI";
 
 
-//        void AddAIAsset(UtilityAIAsset aiAsset)
+//        void AddAIAsset(AIStorage aiAsset)
 //        {
 //            //  Add asset and client to TaskNetwork
 //            UtilityAIClient client = new UtilityAIClient(aiAsset.configuration, taskNetwork.contextProvider);
@@ -77,7 +77,7 @@
 
 //                    if (GUILayout.Button(buttonLabel, GUILayout.Height(18)))
 //                    {
-//                        UtilityAIAsset aiAsset = AssetDatabase.LoadMainAssetAtPath(assetPath) as UtilityAIAsset;
+//                        AIStorage aiAsset = AssetDatabase.LoadMainAssetAtPath(assetPath) as AIStorage;
 
 //                        //  Add asset and client to TaskNetwork
 //                        AddAIAsset(aiAsset);
@@ -102,7 +102,7 @@
 
 //        //    if (GUILayout.Button("Create Scan AI"))
 //        //    {
-//        //        var utilityAIAsset = new UtilityAIAsset();
+//        //        var utilityAIAsset = new AIStorage();
 //        //        var aiAsset = utilityAIAsset.CreateAsset<ScanAIConfig>("DemoScanAI", "DemoScanAI", taskNetwork.selectAiAssetOnCreate);
 //        //        //  Add asset and client to TaskNetwork
 //        //        AddAIAsset(aiAsset);
@@ -110,7 +110,7 @@
 //        //    }
 //        //    if (GUILayout.Button("Create Move AI"))
 //        //    {
-//        //        var utilityAIAsset = new UtilityAIAsset();
+//        //        var utilityAIAsset = new AIStorage();
 //        //        var aiAsset = utilityAIAsset.CreateAsset<MoveAIConfig>("DemoMoveAI", "DemoMoveAI", taskNetwork.selectAiAssetOnCreate);
 //        //        //  Add asset and client to TaskNetwork
 //        //        AddAIAsset(aiAsset);
@@ -133,7 +133,7 @@
 //        {
 //            string _defaultAiID = isDemoAI == false ? defaultDemoAiID : defaultAiID;
 //            string _defaultAiName = isDemoAI == false ? defaultDemoAiName : defaultAiName;
-//            UtilityAIAsset utilityAIAsset;
+//            AIStorage utilityAIAsset;
 
 //            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
 //            {
@@ -147,8 +147,8 @@
 //                {
 //                    if (GUILayout.Button("Ok"))
 //                    {
-//                        //utilityAIAsset = isDemoAI == false ? new UtilityAIAsset() : new UtilityAIConfig();
-//                        utilityAIAsset = new UtilityAIAsset();
+//                        //utilityAIAsset = isDemoAI == false ? new AIStorage() : new UtilityAIConfig();
+//                        utilityAIAsset = new AIStorage();
 //                        var aiAsset = utilityAIAsset.CreateAsset(String.IsNullOrEmpty(aiName) || String.IsNullOrWhiteSpace(aiName) ? _defaultAiID : aiName,
 //                                                                 String.IsNullOrEmpty(aiName) || String.IsNullOrWhiteSpace(aiName) ? _defaultAiName : aiName,
 //                                                                 taskNetwork.selectAiAssetOnCreate);

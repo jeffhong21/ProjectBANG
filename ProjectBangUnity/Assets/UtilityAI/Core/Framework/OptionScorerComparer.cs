@@ -1,10 +1,10 @@
-namespace UtilityAI
+﻿namespace UtilityAI
 {
     using System;
     using System.Collections.Generic;
 
-    [System.Serializable]
-    public struct ScoredOptionComparer<T> : IComparer<ScoredOption<T>>
+    [Serializable]
+    public struct OptionScorerComparer<T> : IComparer<OptionScorer<T>>
     {
         public bool _descending;
 
@@ -15,7 +15,7 @@ namespace UtilityAI
 
 
 
-        int IComparer<ScoredOption<T>>.Compare(ScoredOption<T> x, ScoredOption<T> y)
+        int IComparer<OptionScorer<T>>.Compare(OptionScorer<T> x, OptionScorer<T> y)
         {
             throw new NotImplementedException();
         }

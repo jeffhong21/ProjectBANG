@@ -8,13 +8,13 @@ namespace Bang
     /// <seealso cref="UnityEngine.MonoBehaviour" />
     public sealed class LayerMapping : MonoBehaviour
     {
-        public LayerMask worldLayer;
+        public LayerMask coverLayer;
         public LayerMask hitableObjectsLayer;
         public LayerMask entitiesLayer;
 
         private void Awake()
         {
-            Layers.worldObjects = worldLayer;
+            Layers.cover = coverLayer;
             Layers.hitableObjects = hitableObjectsLayer;
             Layers.entites = entitiesLayer;
         }
@@ -24,8 +24,8 @@ namespace Bang
 
     public static class Layers
     {
-        public static LayerMask worldObjects;
-        public static LayerMask hitableObjects;
+        public static LayerMask cover;
+        public static LayerMask hitableObjects;   //  Used for projectiles
         public static LayerMask entites;
     }
 

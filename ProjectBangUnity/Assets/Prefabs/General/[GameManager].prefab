@@ -78,12 +78,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03b2c764fb5d749d1bac5548c55034fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  worldLayer:
+  coverLayer:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 2048
   hitableObjectsLayer:
     serializedVersion: 2
-    m_Bits: 1536
+    m_Bits: 3072
   entitiesLayer:
     serializedVersion: 2
     m_Bits: 1024

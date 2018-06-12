@@ -1,4 +1,4 @@
-namespace Bang
+﻿namespace Bang
 {
     using UnityEngine;
     using System;
@@ -12,18 +12,41 @@ namespace Bang
     /// </summary>
     public class AgentCtrl : ActorCtrl, IAgentCtrl, IHasFirearm
     {
-        [Header("----- Shooting Stas -----")]
+        readonly static float minimumAttackSpeed = 0.25f;
+        readonly static int colliderBufferCount = 15;
+
+        protected AgentInput _agentInput;
+
+        [Header("----- Agent Stats -----")]
+        [SerializeField, Range(0, 360), Tooltip("Agent's field of view.")]
+        protected float _fieldOfView = 108f;
+
+        [SerializeField, Tooltip("How far can the agent see.")]
+        protected float _sightRange = 20;
+
+        [SerializeField, Tooltip("How far can the agent scan for things.")]
+        protected float _scanRadius;
+
         [SerializeField, Tooltip("Agents fire speed.")]
-        protected float _fireSpeed = 1f;
+        protected float _attackSpeed = 1f;
+
         [SerializeField, Tooltip("Agents accuracy range.")]
         protected float _aimAccuracy = 3f;
+
+        protected IHasHealth _attackAtarget;
+        [SerializeField, Tooltip("Current cover target")]
+        protected Collider _coverTarget;
+
+        [SerializeField, Tooltip("Icons to indicate what the agent is doing.")]
+        protected AgentStateIndicator indicator = new AgentStateIndicator();
+
+
+        bool isAiming;
+
+        IAIContext _context;
+        Collider[] _colliders = new Collider[colliderBufferCount];
         float fireWeaponAttackTime;
         float fireWeaponCoolDown;
-
-
-        AgentInput _agentInput;
-        IHasHealth _attackAtarget;
-        IAIContext _context;
 
 
 
@@ -32,8 +55,22 @@ namespace Bang
             get { return _agentInput; }
         }
 
+        public float scanRadius
+        {
+            get { return _scanRadius; }
+            set { _scanRadius = value; }
+        }
 
-        public float aimAccuracy{
+        public float attackSpeed
+        {
+            get { return _attackSpeed; }
+            set{
+                _attackSpeed = value < minimumAttackSpeed ? minimumAttackSpeed : value;
+            }
+        }
+
+        public float aimAccuracy
+        {
             get { return _aimAccuracy; }
         }
 
@@ -49,6 +86,15 @@ namespace Bang
                 OnAttackTargetChanged(_attackAtarget);
             }
         }
+
+        public Collider coverTarget
+        {
+            get { return _coverTarget; }
+            set { _coverTarget = value; }
+        }
+
+
+
 
 
 
@@ -79,37 +125,64 @@ namespace Bang
             base.OnEnable();
         }
 
-
         protected override void OnDisable()
         {
             base.OnDisable();
         }
 
 
+
         public override void FireWeapon(Vector3 target)
         {
-            if(Time.time > fireWeaponCoolDown)
+            if(Time.time > fireWeaponCoolDown && CanSeeTarget(target))
             {
-                fireWeaponCoolDown = Time.time + _fireSpeed;
+                fireWeaponCoolDown = Time.time + _attackSpeed;
                 //target = UnityEngine.Random.insideUnitSphere * aimAccuracy;
                 target.y = equippedFirearm == null ? YFocusOffset : equippedFirearm.projectileSpawn.position.y; ;
+
+                StartCoroutine(AimWeapon(2f));
                 equippedFirearm.Shoot(target);
             }
         }
 
 
-
-        public virtual void MoveTo(Vector3 destination)
+        IEnumerator AimWeapon(float aimDelay)
         {
-            destination.y = 0;
-            agentInput.MoveTo(destination);
-        }
-
-
-        public virtual void StopMoving()
-        {
+            //agentInput.SetLocomotion(false);
             agentInput.StopWalking();
+            float timer = aimDelay;
+            float rate = 1 / aimDelay;
+
+            while(timer > 0)
+            {
+                timer -= Time.deltaTime * rate;
+                yield return 0;
+            }
+            //agentInput.SetLocomotion(true);
+            agentInput.ResumeWalking();
         }
+
+
+
+        //  Calculates if npc can see target.
+        public bool CanSeeTarget(Vector3 target)
+        {
+            //var targetPosition = new Vector3(target.position.x, (target.position.y + transform.position.y), target.position.z);
+            target.y = YFocusOffset;
+            var dirToPlayer = (target - transform.position).normalized;
+
+            var angleBetweenNpcAndPlayer = Vector3.Angle(transform.forward, dirToPlayer);
+
+            if (Vector3.Distance(transform.position, target) < _sightRange &&
+                angleBetweenNpcAndPlayer < _fieldOfView / 2f &&
+                Physics.Linecast(transform.position, target, Layers.cover) == false)
+            {
+                return true;
+            }
+            return false;
+        }
+
+
 
 
 

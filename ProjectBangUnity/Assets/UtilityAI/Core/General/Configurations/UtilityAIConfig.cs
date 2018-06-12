@@ -1,4 +1,4 @@
-namespace UtilityAI
+﻿namespace UtilityAI
 {
     using UnityEngine;
     using UnityEditor;
@@ -9,7 +9,7 @@ namespace UtilityAI
 
     public abstract class UtilityAIAssetConfig : IUtilityAIConfig
     {
-        public UtilityAIAsset asset;
+        public AIStorage asset;
 
         public string name{
             get;
@@ -27,7 +27,7 @@ namespace UtilityAI
         protected List<IAction> actions;
 
 
-        public abstract void ConfigureAI(UtilityAI asset);
+        public abstract void ConfigureAI(IUtilityAI asset);
 
     }
 

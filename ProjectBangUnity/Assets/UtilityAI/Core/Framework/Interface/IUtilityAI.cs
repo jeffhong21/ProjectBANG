@@ -1,9 +1,17 @@
 namespace UtilityAI
 {
     using UnityEngine;
+    using System;
 
-    public interface IUtilityAI : ISerializationCallbackReceiver
+    /// <summary>
+    /// UtilityAI creates the rootSelector and initializes the tree.
+    /// </summary>
+    public interface IUtilityAI : ISelect, ISerializationCallbackReceiver
     {
+        Guid id{
+            get;
+        }
+
         string name{
             get;
             set;
@@ -18,13 +26,15 @@ namespace UtilityAI
             get; 
         }
 
-        // Selector Item { 
-        //     get; 
-        // }
 
-        //Selector this[int idx]{
-        //    get;
-        //}
+        //
+        // Indexer
+        //
+        Selector this[int idx]
+        {
+            get;
+        }
+
 
         void AddSelector(Selector s);
 

@@ -28,7 +28,7 @@
         }
 
 
-        public override void ConfigureAI(UtilityAI asset)
+        public override void ConfigureAI(IUtilityAI asset)
         {
             if (qualifiers == null) qualifiers = new List<IQualifier>();
             if (allScorers == null) allScorers = new List<IScorer[]>();
@@ -56,19 +56,47 @@
             };
             actions.Add(a);  // --  Add to Actions Group
 
-
             // ---- New Scorers Group ----
             scorers = new List<IScorer>();
-            // ---- New Scorer ----
-            scorer = new FixedScorer() { score = 10 };
+            // ---- Add Scorers ----
+            scorer = new HasEnemiesInRange() { score = 20, range = 8 };
+            scorers.Add(scorer);  // --  Add to Scorers Group
+            scorer = new FixedScorer() { score = 1 };
             scorers.Add(scorer);  // --  Add to Scorers Group
             allScorers.Add(scorers.ToArray());
-
-
 
             // ---- New Qualifier ----
             q = new CompositeScoreQualifier();
             qualifiers.Add(q);
+
+
+
+            // ---- New Action ----
+            a = new CompositeAction()
+            {
+                name = "MoveToCover",
+                actions = new List<IAction>()
+                {
+                    new FindClosestCover(){name = "FindClosestCover"},
+                    new MoveToCover(){name = "MoveToCover"}
+                }
+            };
+            actions.Add(a);  // --  Add to Actions Group
+
+            // ---- New Scorers Group ----
+            scorers = new List<IScorer>();
+            // ---- Add Scorers ----
+            scorer = new HasEnemiesInRange() { score = 10, range = 16 };
+            scorers.Add(scorer);  // --  Add to Scorers Group
+            scorer = new HasCoverPosition() { score = 10};
+            scorers.Add(scorer);  // --  Add to Scorers Group
+            allScorers.Add(scorers.ToArray());
+
+            // ---- New Qualifier ----
+            q = new CompositeScoreQualifier();
+            qualifiers.Add(q);
+
+
 
 
             rs.defaultQualifier.action = new RandomWander() 
