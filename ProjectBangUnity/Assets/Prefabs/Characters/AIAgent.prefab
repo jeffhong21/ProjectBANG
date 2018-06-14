@@ -1936,7 +1936,7 @@ MonoBehaviour:
   _hasStarted: 0
   debugNextIntervalTime: 0
   showDefaultInspector: 0
-  showDeleteAssetOption: 0
+  showDeleteAssetOption: 1
   selectAiAssetOnCreate: 0
 --- !u!114 &114790253131203490
 MonoBehaviour:

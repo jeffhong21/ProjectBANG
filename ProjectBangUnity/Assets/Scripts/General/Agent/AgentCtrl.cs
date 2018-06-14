@@ -25,7 +25,7 @@
         protected float _sightRange = 20;
 
         [SerializeField, Tooltip("How far can the agent scan for things.")]
-        protected float _scanRadius;
+        protected float _scanRadius = 15;
 
         [SerializeField, Tooltip("Agents fire speed.")]
         protected float _attackSpeed = 1f;
@@ -43,11 +43,11 @@
 
         bool isAiming;
 
-        IAIContext _context;
+
         Collider[] _colliders = new Collider[colliderBufferCount];
         float fireWeaponAttackTime;
         float fireWeaponCoolDown;
-
+        IAIContext _context;
 
 
         public AgentInput agentInput

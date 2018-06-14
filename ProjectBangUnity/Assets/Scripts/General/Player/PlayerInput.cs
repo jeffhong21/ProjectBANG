@@ -3,9 +3,12 @@
     using UnityEngine;
     using System;
 
+
+
     [RequireComponent(typeof(PlayerCtrl))]
     public class PlayerInput : ActorInput
     {
+        
         [Header("----- Movement -----")]
         [SerializeField]
         protected float _moveSpeed = 6f;
@@ -124,9 +127,9 @@
 
 		protected virtual void Update()
         {
-            if(Input.GetKeyDown(KeyCode.Q)){
-                displayPlayerInputValues = !displayPlayerInputValues;
-            }
+            //if(Input.GetKeyDown(KeyCode.Q)){
+            //    displayPlayerInputValues = !displayPlayerInputValues;
+            //}
 
             //  Draw aim line.
             DrawAimLine(drawAimLine);
@@ -136,12 +139,33 @@
             RotatePlayer();
 
 
+            if (InputManager.Space)
+            {
+                isDashing = true;
+                animator.SetBool("Dash", isDashing);
+                dashStartPosition = transform.position;
+            }
+            else if (InputManager.LMB)
+            {
+                playerCtrl.FireWeapon(cursorPosition);
+            }
+            else if (InputManager.RMB)
+            {
+                
+            }
+            else if (InputManager.Q)
+            {
+                
+            }
+            else if (InputManager.E)
+            {
 
-            ////  Misc Inputs
-            Dash();
-            Reload();
-            FireWeaponInput();
-
+            }
+            else if (InputManager.R)
+            {
+                Debug.LogFormat("<color=#800080ff>{0}</color>.  Current ammo is <color=#800080ff>{1}</color>", "Reloading weapon", playerCtrl.equippedFirearm.currentAmmo);  // purple
+                playerCtrl.Reload();
+            }
 
 
             ////  Play walk animation.
@@ -228,33 +252,6 @@
         }
 
 
-
-        protected void Dash()
-        {
-            if(InputManager.Space){
-                isDashing = true;
-                animator.SetBool("Dash", isDashing);
-                dashStartPosition = transform.position;
-            }
-        }
-
-
-        protected void Reload()
-        {
-            if(InputManager.R){
-                Debug.LogFormat("<color=#800080ff>{0}</color>.  Current ammo is <color=#800080ff>{1}</color>", "Reloading weapon", playerCtrl.equippedFirearm.currentAmmo);  // purple
-                playerCtrl.Reload();
-            }
-
-        }
-
-        protected void FireWeaponInput()
-        {
-            if(InputManager.LMB){
-                playerCtrl.FireWeapon(cursorPosition);
-            }
-
-        }
 
 
 

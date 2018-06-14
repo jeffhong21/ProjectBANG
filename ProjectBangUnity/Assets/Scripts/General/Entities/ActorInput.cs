@@ -4,6 +4,7 @@
     using System;
 
 
+
     public abstract class ActorInput : MonoBehaviour
     {
         const string inputXStringId = "InputX";
