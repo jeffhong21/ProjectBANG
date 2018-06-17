@@ -15,7 +15,7 @@ MonoBehaviour:
   version: 1
   aiId: AgentMoveAI
   configuration:
-    jsonData: "{\n  \"$id\": \"1\",\n  \"id\": \"ba89b942-2380-45da-83f9-f9c97f673395\",\n
+    jsonData: "{\n  \"$id\": \"1\",\n  \"id\": \"84e6ce6b-8591-4c67-b911-9792931587b6\",\n
       \ \"qualifiers\": [],\n  \"defaultQualifier\": {\n    \"$id\": \"2\",\n    \"$type\":
       \"UtilityAI.DefaultQualifier, Assembly-CSharp\",\n    \"score\": 1.0,\n    \"isDisabled\":
       false,\n    \"action\": null,\n    \"_score\": 0.0\n  }\n}"

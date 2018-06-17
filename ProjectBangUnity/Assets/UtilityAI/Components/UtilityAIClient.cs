@@ -5,7 +5,6 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
-
     using Visualization;
 
     public enum UtilityAIClientState
@@ -175,6 +174,11 @@
         public float? ExecuteUpdate(float deltaTime, float nextInterval)
         {
 
+            //var sw = Stopwatch.StartNew();
+            //var ticks = (nextInterval * Stopwatch.Frequency) / 1000;
+            //while (sw.ElapsedTicks < ticks) { }
+
+
             Execute();
 
             return null;
@@ -207,8 +211,8 @@
             activeAction.Execute(contextProvider.GetContext());
 
 
-            //  Call event for GetDataForVisualization(activeAction, contextProvider.GetContext())
-            VisualizerManager.UpdateVisualizer(activeAction, contextProvider.GetContext());
+            ////  Call event for GetDataForVisualization(activeAction, contextProvider.GetContext())
+            //VisualizerManager.UpdateVisualizer(activeAction, contextProvider.GetContext());
         }
 
 

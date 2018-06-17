@@ -2,7 +2,9 @@
 {
     using UnityEngine;
     using System;
+    using System.Reflection;
     using System.Collections.Generic;
+
 
 
     /// <summary>
@@ -18,16 +20,26 @@
         private static List<IContextProvider> _visualizedContextProviders;
 
 
-		internal static bool isVisualizing {
+        public static bool isVisualizing {
 			get;
 		}
 
-		internal static IList<IContextProvider> visualizedContextProviders {
-			get;
+        public static List<IContextProvider> visualizedContextProviders
+        {
+            get
+            {
+                if(_visualizedContextProviders == null) _visualizedContextProviders = new List<IContextProvider>();
+
+                foreach(TaskNetworkComponent taskNetwork in Utilities.ComponentHelper.FindAllComponentsInScene<TaskNetworkComponent>())
+                {
+                    _visualizedContextProviders.Add(taskNetwork.GetComponent<IContextProvider>());
+                }
+                return _visualizedContextProviders;
+            }
 		}
 
 
-        internal static bool BeginVisualization ()
+        public static bool BeginVisualization ()
         {
             throw new NotImplementedException();
         }
@@ -37,10 +49,7 @@
             throw new NotImplementedException();
         }
 
-        internal static void UpdateSelectedGameObjects (GameObject[] selected)
-        {
-            throw new NotImplementedException();
-        }
+
 
         /// <summary>
         /// Registers the visualizer.
@@ -59,11 +68,17 @@
                 visualizers.Add(typeof(TFor), visualizer);
                 //Debug.LogFormat("Registered {0} to a Visualizer", typeof(TFor));
             }
+
+            // TODO:  need to search for every agent that contains a class that derives from visualizer. 
         }
 
 
         public static void UnregisterVisualizer<TFor>()
         {
+            if (visualizers == null)
+            {
+                return;
+            }
 
             if (visualizers.ContainsKey(typeof(TFor)))
             {
@@ -73,10 +88,61 @@
         }
 
 
+
+        public static bool TryGetVisualizerFor(Type t, out ICustomVisualizer visualizer)  //  internal
+        {
+            if (visualizers.ContainsKey(t))
+            {
+                visualizer = visualizers[t];
+                return true;
+            }
+
+            visualizer = null;
+            return false;
+        }
+
+
+        public static void UpdateSelectedGameObjects(GameObject[] selected)  //  internal
+        {
+            for (int index = 0; index < selected.Length; index++)
+            {
+                //  Check if selected gameObject contains taskNetwork component.
+                if(selected[index].GetComponent<TaskNetworkComponent>() == true)
+                {
+                    //  Get the TaskNetworkComponent.
+                    TaskNetworkComponent go = selected[index].GetComponent<TaskNetworkComponent>();
+                    //  Get Context.
+                    IAIContext context = go.GetComponent<IContextProvider>().GetContext();
+                    //  Loop through each aiConfig.
+                    for (int i = 0; i < go.aiConfigs.Length; i++)
+                    {
+                        //  Get aiId.
+                        string aiId = go.aiConfigs[i].aiId;
+                        //  Get ai Guid.
+                        var field = typeof(AINameMapHelper).GetField(aiId, BindingFlags.Public | BindingFlags.Static);
+                        Guid guid = (Guid)field.GetValue(null);
+
+                        ICustomVisualizer visualizer = null;
+                        if (TryGetVisualizerFor(go.GetType(), out visualizer))
+                        {
+                            visualizer.EntityUpdate(go.GetType(), context);
+                            //EntityUpdate(object aiEntity, IAIContext context, Guid aiId)
+                        }
+                    }
+
+
+                }
+                
+
+            }
+        }
+
+
+
         /// <summary>
         /// Updates the visualizer.
         /// </summary>
-        /// <param name="forType">Type for.</param>
+        /// <param name="aiEntity">Type for.</param>
         /// <param name="context">Context.</param>
         public static void UpdateVisualizer(object aiEntity, IAIContext context)
         {
@@ -96,6 +162,26 @@
 
         }
 
+        public static string DebugLogRegisteredVisualziers(bool indent = false)
+        {
+            string registeredVisualziersLog = "";
+            string indentString = "|";
+
+            if(indent){
+                indentString = "\n    ";
+            }
+
+            if(visualizers != null)
+            {
+                foreach (KeyValuePair<Type, ICustomVisualizer> visualizer in visualizers)
+                {
+                    registeredVisualziersLog += string.Format("VisualizerType:  {0} {2} ICustomVisualizer:  {1}\n", visualizer.Key.Name, visualizer.Value.GetType(), indentString);
+                }
+            }
+
+
+            return registeredVisualziersLog;
+        }
 
     }
 }

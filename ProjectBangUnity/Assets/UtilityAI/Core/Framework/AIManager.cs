@@ -5,51 +5,48 @@
     using System.Collections.Generic;
     using System.IO;
 
+    using System.Linq;
 
     public static class AIManager
     {
+        public delegate IUtilityAIClient AIClientResolver(GameObject host, Guid aiId);
+
+
         public static string StorageFolder = Path.GetDirectoryName("Assets/UtilityAI/Resources/AIStorage/");
 
         private static Dictionary<Guid, AIData> _aiLookup;
-
-        private static Dictionary<Guid, List<IUtilityAIClient>> _aiClients = new Dictionary<Guid, List<IUtilityAIClient>>();
-
-
+        //  TaskNetworkComponent and its list of UtilityAIClients
+        private static Dictionary<Guid, List<IUtilityAIClient>> _aiClients;
 
 
-
-        /// <summary>
-        /// Gets all registered clients.
-        /// </summary>
-        /// <value>All clients.</value>
-        //public static HashSet<UtilityAIClient> allClients { get; private set; } = new HashSet<UtilityAIClient>();
+        public static AIClientResolver GetAIClient;
 
 
-        /// <summary>
-        /// Gets the list of clients for a given AI.
-        /// </summary>
-        /// <param name="aiID">Ai identifier.</param>
-        ///<returns> The list of clients for the specified AI. </returns>
-        public static List<UtilityAIClient> GetAllClients(string aiID){
-            List<UtilityAIClient> clients = new List<UtilityAIClient>();
-
-            return clients;
-        }
-
-        ///<summary>
-        ///Gets an AI by ID.
-        ///</summary>
-        ///<param name = "id" > The ID.</param>
-        ///<returns> The AI with the specified ID, or null if no match is found.</returns>
-        public static IUtilityAI GetAI(Guid id)
+        //
+        // Static Properties
+        //
+        public static IEnumerable<IUtilityAIClient> allClients
         {
-            if(_aiLookup.ContainsKey(id) == false){
-                return null;
-            }
-            else{
-                return _aiLookup[id].ai;
+            get{
+                if (_aiClients != null)
+                {
+                    List<IUtilityAIClient> clients = new List<IUtilityAIClient>();
+                    foreach (KeyValuePair<Guid, List<IUtilityAIClient>> client in _aiClients)
+                    {
+                        clients.Concat(client.Value);
+                    }
+                    return clients.ToArray();
+                }
+                else 
+                { 
+                    return null; 
+                }
+
+
             }
         }
+
+
 
         //<summary>
         //Executes the specified AI once.
@@ -57,23 +54,59 @@
         //<param name = "id" > The AI ID.</param>
         //<param name = "context" > The context.</param>
         //<returns><c>true</c> if the AI was found and executed; otherwise<c>false</c>.</returns>
-        public static bool ExecuteAI(string id, IAIContext context){
+        public static bool ExecuteAI(Guid id, IAIContext context)
+        {
             return true;
         }
 
 
         private static void ReadAndInit(AIData data)
         {
-            
+
+        }
+
+
+
+        /// <summary>
+        /// Gets the list of clients for a given AI through the AIStorage aiId.
+        /// </summary>
+        /// <param name="aiId">Ai identifier.</param>
+        ///<returns> The list of clients for the specified AI. </returns>
+        public static List<IUtilityAIClient> GetAllClients(Guid aiId)
+        {
+            if (_aiClients.ContainsKey(aiId))
+            {
+                return _aiClients[aiId];
+            }
+            else
+            {
+                return null;
+            }
+
+        }
+
+        ///<summary>
+        ///Gets a UtilityAI
+        ///</summary>
+        ///<param name = "id" > The ID.</param>
+        ///<returns> The AI with the specified ID, or null if no match is found.</returns>
+        public static IUtilityAI GetAI(Guid id)
+        {
+            if(_aiLookup.ContainsKey(id))
+            {
+                return _aiLookup[id].ai;
+            }
+            else{
+                return null;
+            }
         }
 
 
         public static void Register(IUtilityAIClient client)
         {
-            if(_aiLookup == null)
-            {
-                _aiLookup = new Dictionary<Guid, AIData>();
-            }
+            if(_aiLookup == null) _aiLookup = new Dictionary<Guid, AIData>();
+            if (_aiClients == null) _aiClients = new Dictionary<Guid, List<IUtilityAIClient>>();
+
 
             if(_aiLookup.ContainsKey(client.ai.id) == false) // || _aiLookup[client.ai.id] == null)
             {

@@ -15,7 +15,8 @@
 
 
 
-        protected override List<Vector3> GetOptions(IAIContext context){
+        protected override List<Vector3> GetOptions(IAIContext context)
+        {
             AgentContext c = context as AgentContext;
             return c.sampledPositions;
         }

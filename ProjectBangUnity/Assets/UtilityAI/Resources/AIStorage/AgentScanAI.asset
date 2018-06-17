@@ -15,7 +15,7 @@ MonoBehaviour:
   version: 1
   aiId: AgentScanAI
   configuration:
-    jsonData: "{\n  \"$id\": \"1\",\n  \"id\": \"a1bc0c4b-f051-4ab7-a1f2-2014ab97bd2e\",\n
+    jsonData: "{\n  \"$id\": \"1\",\n  \"id\": \"7c3e1eb3-c6b1-436a-8173-5d91ff57dd95\",\n
       \ \"qualifiers\": [],\n  \"defaultQualifier\": {\n    \"$id\": \"2\",\n    \"$type\":
       \"UtilityAI.DefaultQualifier, Assembly-CSharp\",\n    \"score\": 1.0,\n    \"isDisabled\":
       false,\n    \"action\": null,\n    \"_score\": 0.0\n  }\n}"

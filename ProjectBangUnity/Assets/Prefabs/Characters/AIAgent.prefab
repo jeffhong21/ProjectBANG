@@ -1872,8 +1872,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecfcf8be752b8446e8a91a3d07241665, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  relevantAIId: 
+  mode: 0
+  drawGizmos: 0
   drawGUI: 1
-  drawGizmo: 1
   sphereSize: 0.25
   sphereAlpha: 0.5
 --- !u!114 &114558835538233468

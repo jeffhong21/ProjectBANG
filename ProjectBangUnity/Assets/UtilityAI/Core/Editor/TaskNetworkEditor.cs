@@ -76,6 +76,8 @@
             EditorUtility.SetDirty(taskNetwork);
             serializedObject.Update();
             serializedObject.ApplyModifiedProperties();
+
+            AINameMapGenerator.WriteNameMapFile();
         }
 
 
@@ -110,7 +112,7 @@
             serializedObject.Update();
             serializedObject.ApplyModifiedProperties();
 
-
+            AINameMapGenerator.WriteNameMapFile();
             //  Add asset and client to TaskNetwork
             //UtilityAIClient client = new UtilityAIClient(aiAsset.configuration, taskNetwork.contextProvider);
 
@@ -214,12 +216,10 @@
                                 {
                                     //Debug.Log("Currently cannot debug at the moment.");
 
-                                    //Debug.Log(typeof(AINameMapHelper).GetField(aiConfig.aiId, BindingFlags.Static).GetValue(null));
-
-                                    //var field = typeof(AINameMapHelper).GetField(aiConfig.aiId, BindingFlags.Static);
-                                    //Debug.Log(field.GetValue(typeof(AINameMapHelper)));
-
-                                    Debug.Log(aiConfig.aiId);
+                                    string aiClientName = aiConfig.aiId;
+                                    var field = typeof(AINameMapHelper).GetField(aiClientName, BindingFlags.Public | BindingFlags.Static);
+                                    Guid aiId = (Guid)field.GetValue(null);
+                                    Debug.LogFormat("{0} Guid:  {1}",aiConfig.aiId, aiId);
                                 }
 
                                 //  Add or Switch button
@@ -303,9 +303,11 @@
                         foreach(string guid in results)
                         {
                             AssetDatabase.DeleteAsset(AssetDatabase.GUIDToAssetPath(guid));
-                            AINameMap.UnRegister(guid);
+
                         }
-                        //Repaint();
+
+                        AINameMapGenerator.WriteNameMapFile();
+
                     }
                 }
             }
@@ -341,32 +343,32 @@
             }
 
 
-            //  Name Map
-            if (GUILayout.Button("AINameMap", EditorStyles.miniButton, GUILayout.Width(65f)))
-            {
-                if(AINameMap.aiNameMap == null){
-                    Debug.Log("aiNameMap is not initialized");
-                }
-                else if (AINameMap.aiNameMap.Count == 0)
-                {
-                    Debug.Log("Nothing registered to aiNameMap. Reregistering AiNameMap.");
-                    AINameMap.RegenerateNameMap();
+            ////  Name Map
+            //if (GUILayout.Button("AINameMap", EditorStyles.miniButton, GUILayout.Width(65f)))
+            //{
+            //    if(AINameMap.aiNameMap == null){
+            //        Debug.Log("aiNameMap is not initialized");
+            //    }
+            //    else if (AINameMap.aiNameMap.Count == 0)
+            //    {
+            //        Debug.Log("Nothing registered to aiNameMap. Reregistering AiNameMap.");
+            //        AINameMap.RegenerateNameMap();
 
-                }
-                else{
-                    foreach (KeyValuePair<Guid, string> keyValue in AINameMap.aiNameMap)
-                    {
-                        string path = AssetDatabase.GUIDToAssetPath(keyValue.Key.ToString("N"));
-                        Debug.LogFormat("AIID:  {0}  | Guid:  {1}\nPath:  {2}", keyValue.Value, keyValue.Key.ToString("N"), path);
+            //    }
+            //    else{
+            //        foreach (KeyValuePair<Guid, string> keyValue in AINameMap.aiNameMap)
+            //        {
+            //            string path = AssetDatabase.GUIDToAssetPath(keyValue.Key.ToString("N"));
+            //            Debug.LogFormat("AIID:  {0}  | Guid:  {1}\nPath:  {2}", keyValue.Value, keyValue.Key.ToString("N"), path);
 
 
-                        AIStorage aiStorage = AssetDatabase.LoadMainAssetAtPath(path) as AIStorage;
+            //            AIStorage aiStorage = AssetDatabase.LoadMainAssetAtPath(path) as AIStorage;
 
-                        Debug.LogFormat("Path:  {0}\nAIStorage:  {1}", path, aiStorage);
-                    }
+            //            Debug.LogFormat("Path:  {0}\nAIStorage:  {1}", path, aiStorage);
+            //        }
 
-                }
-            }
+            //    }
+            //}
 
             GUILayout.Space(5);
 

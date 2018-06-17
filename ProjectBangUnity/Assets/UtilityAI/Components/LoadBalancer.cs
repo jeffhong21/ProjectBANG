@@ -24,49 +24,16 @@ namespace UtilityAI
         }
 
 
+        //  Part of a IBalanced/Scheduler
+        public float? ExecuteUpdate(float deltaTime, float nextInterval)
+        {
+
+
+
+            return null;
+        }
 
     }
-
-
-
-
-
-
-
-
-
-
-    public abstract class SingleInstanceComponent<T> : MonoBehaviour where T : MonoBehaviour
-    {
-        //
-        // Static Fields
-        //
-        //private static int _instanceMark;
-
-        //
-        // Constructors
-        //
-        //protected SingleInstanceComponent();
-
-        //
-        // Methods
-        //
-        private void Awake()
-        {
-            OnAwake();
-        }
-
-        protected virtual void OnAwake()
-        {
-            
-        }
-
-        protected virtual void OnDestroy()
-        {
-            
-        }
-    }
-
 
 
 

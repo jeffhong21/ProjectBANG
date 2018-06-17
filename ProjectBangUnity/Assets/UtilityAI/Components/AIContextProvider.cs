@@ -23,5 +23,9 @@
             return context as IAIContext;
         }
 
+        public IAIContext GetContext(Guid aiId){
+            return GetContext();
+        }
+
     }
 }

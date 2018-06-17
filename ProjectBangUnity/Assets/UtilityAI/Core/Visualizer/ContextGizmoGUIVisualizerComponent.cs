@@ -12,6 +12,7 @@ namespace UtilityAI.Visualization
     public abstract class ContextGizmoGUIVisualizerComponent : MonoBehaviour
     {
         public bool drawGUI = true;
+
         public bool drawGizmo = true;
 
         [SerializeField]
@@ -36,6 +37,7 @@ namespace UtilityAI.Visualization
 		{
 			
 		}
+
 
 
 
