@@ -84,18 +84,6 @@
         public void DoAddNew(AIStorage[] aiAsset, Type type)
         {
 
-            ////  Create a new UtilityAIClient
-            //UtilityAIClient client = new UtilityAIClient(aiAsset[0].configuration, taskNetwork.GetComponent<IContextProvider>());
-            //client.ai = aiAsset[0].configuration;      //  Add the UtilityAI to the UtilityAIClient.
-            //taskNetwork.clients.Add(client);          //  Add the client to the TaskNetwork.
-
-            ////  Initialize AIConfig so we can get the name of the predefined config.
-            //IUtilityAIConfig config = (IUtilityAIConfig)Activator.CreateInstance(type);
-            ////  Configure the predefined settings.
-            //config.ConfigureAI(client.ai);
-
-
-
             taskNetwork.aiConfigs = GrowArray(taskNetwork.aiConfigs, aiAsset.Length);
 
             for (int idx = 0; idx < aiAsset.Length; idx++)
@@ -113,14 +101,7 @@
             serializedObject.ApplyModifiedProperties();
 
             AINameMapGenerator.WriteNameMapFile();
-            //  Add asset and client to TaskNetwork
-            //UtilityAIClient client = new UtilityAIClient(aiAsset.configuration, taskNetwork.contextProvider);
 
-            //UtilityAIClient client = new UtilityAIClient(aiAsset[0].configuration, taskNetwork.GetComponent<IContextProvider>());
-            //client.ai = aiAsset[0].configuration;
-            //taskNetwork.clients.Add(client);
-
-            //taskNetwork.assets.Add(aiAsset);
         }
 
 
@@ -195,7 +176,7 @@
                             UtilityAIConfig aiConfig = taskNetwork.aiConfigs[i];
                             SerializedProperty property = serializedObject.FindProperty("aiConfigs").GetArrayElementAtIndex(i);
                             SerializedProperty isActive = property.FindPropertyRelative("isActive");
-                            SerializedProperty _debugClient = property.FindPropertyRelative("_debugClient");
+
 
                             //  For Client Options
                             using (new EditorGUILayout.HorizontalScope())
@@ -205,11 +186,18 @@
                                 EditorGUILayout.PropertyField(isActive, GUIContent.none);
                                 //EditorGUILayout.PropertyField(isActive, GUIContent.none, GUILayout.Width(28f));
 
-                                ////  Debug Client toggle
-                                //GUILayout.Space(Screen.width * 0.12f);
-                                //EditorGUILayout.LabelField("Debug Client", GUILayout.Width(75f));
+                                //  Debug Client toggle
+
+
                                 //EditorGUILayout.PropertyField(_debugClient, GUIContent.none, GUILayout.Width(28f));
-                                //GUILayout.Space(Screen.width * 0.25f - 75f - 28f);
+                                if(taskNetwork.clients != null)
+                                {
+                                    EditorGUILayout.LabelField("Debug Client", GUILayout.Width(75f));
+                                    GUILayout.Space(Screen.width * 0.12f);
+                                    taskNetwork.clients[i].debugClient = EditorGUILayout.Toggle(taskNetwork.clients[i].debugClient, GUILayout.Width(28f));
+                                    GUILayout.Space(Screen.width * 0.25f - 75f - 28f);
+                                }
+
 
                                 //  Debug button
                                 if (GUILayout.Button("Debug", EditorStyles.miniButton, GUILayout.Width(48f)))//  GUILayout.Width(Screen.width * 0.15f)
@@ -375,9 +363,9 @@
             if (GUILayout.Button("Generate Name Map", EditorStyles.miniButton, GUILayout.Width(65f)))
             {
                 AINameMapGenerator.WriteNameMapFile();
-                Debug.Log(AINameMapHelper.AgentActionAI);
-                Debug.Log(AINameMapHelper.AgentMoveAI);
-                Debug.Log(AINameMapHelper.AgentScanAI);
+                //Debug.Log(AINameMapHelper.AgentActionAI);
+                //Debug.Log(AINameMapHelper.AgentMoveAI);
+                //Debug.Log(AINameMapHelper.AgentScanAI);
             }
 
 

@@ -44,18 +44,20 @@ namespace UtilityAI.Visualization
         protected virtual void OnGUI()
         {
             if (contextProvider != null && drawGUI == true && Application.isEditor){
-                if (Camera.current == Camera.main || Camera.current == SceneView.lastActiveSceneView.camera){
-                    DrawGUI(contextProvider.GetContext());
-                }
+                DrawGUI(contextProvider.GetContext());
+                //if (Camera.current == Camera.main || Camera.current == SceneView.lastActiveSceneView.camera){
+                //    DrawGUI(contextProvider.GetContext());
+                //}
             }
         }
 
         protected virtual void OnDrawGizmos()
         {
             if (contextProvider != null && drawGizmo == true && Application.isEditor){
-                if (Camera.current == Camera.main || Camera.current == SceneView.lastActiveSceneView.camera){
-                    DrawGizmos(contextProvider.GetContext());
-                }
+                DrawGizmos(contextProvider.GetContext());
+                //if (Camera.current == Camera.main || Camera.current == SceneView.lastActiveSceneView.camera){
+                //    DrawGizmos(contextProvider.GetContext());
+                //}
             }
         }
 

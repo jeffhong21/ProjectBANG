@@ -99,7 +99,12 @@
 
 
         //  For Debuging.
-        public bool debugClient;
+        public bool _debugClient;
+        public bool debugClient
+        {
+            get { return _debugClient; }
+            set { _debugClient = value; }
+        }
         public Dictionary<IQualifier, float> selectorResults;
 
 
@@ -203,7 +208,8 @@
             //  For Debug
             //selectorResults = GetSelectorResults(contextProvider.GetContext(), ai.rootSelector.qualifiers, ai.rootSelector.defaultQualifier);
             // --------------
-            //Debug.Log("Executing " + activeAction.name);
+            if(debugClient)
+                Debug.Log("Executing " + activeAction.name);
 
             //  Delay the execution based on the delayMin/max.
 

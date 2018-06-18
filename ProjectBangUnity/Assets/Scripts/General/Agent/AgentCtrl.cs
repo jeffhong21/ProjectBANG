@@ -1,53 +1,56 @@
 ﻿namespace Bang
 {
     using UnityEngine;
+    using UnityEngine.AI;
     using System;
     using System.Collections;
 
     using UtilityAI;
 
+    using Random = UnityEngine.Random;
 
     /// <summary>
     /// Agent Controller has methods that the agent can perform.
     /// </summary>
-    public class AgentCtrl : ActorCtrl, IAgentCtrl, IHasFirearm
+    public class AgentCtrl : ActorCtrl //, IAgentCtrl //, IHasFirearm
     {
         readonly static float minimumAttackSpeed = 0.25f;
-        readonly static int colliderBufferCount = 15;
+        //readonly static int colliderBufferCount = 15;
 
         protected AgentInput _agentInput;
 
         [Header("----- Agent Stats -----")]
-        [SerializeField, Range(0, 360), Tooltip("Agent's field of view.")]
-        protected float _fieldOfView = 108f;
+        [SerializeField, Range(0, 360)]
+        protected float _fieldOfView = 135f;
 
-        [SerializeField, Tooltip("How far can the agent see.")]
+        [SerializeField]
         protected float _sightRange = 20;
 
-        [SerializeField, Tooltip("How far can the agent scan for things.")]
+        [SerializeField]
         protected float _scanRadius = 15;
 
-        [SerializeField, Tooltip("Agents fire speed.")]
+        [SerializeField]
         protected float _attackSpeed = 1f;
 
-        [SerializeField, Tooltip("Agents accuracy range.")]
+        [SerializeField]
+        protected float _aimSpeed = 1.25f;
+
+        [SerializeField, Range(0,3)]
         protected float _aimAccuracy = 3f;
 
-        protected IHasHealth _attackAtarget;
-        [SerializeField, Tooltip("Current cover target")]
-        protected Collider _coverTarget;
-
-        [SerializeField, Tooltip("Icons to indicate what the agent is doing.")]
-        protected AgentStateIndicator indicator = new AgentStateIndicator();
 
 
-        bool isAiming;
+
+        bool _canAttack;
+        bool _isAiming;
+        bool _hasTargets;
+        bool _moveToCover;
 
 
-        Collider[] _colliders = new Collider[colliderBufferCount];
-        float fireWeaponAttackTime;
-        float fireWeaponCoolDown;
-        IAIContext _context;
+        //Collider[] colliders = new Collider[colliderBufferCount];
+        float fireWeaponAttackTime, fireWeaponCoolDown;
+        AgentContext _context;
+        IEnumerator fireWeaponCoroutine;
 
 
         public AgentInput agentInput
@@ -69,28 +72,25 @@
             }
         }
 
+        public float aimSpeed
+        {
+            get { return _aimSpeed; }
+        }
+
         public float aimAccuracy
         {
             get { return _aimAccuracy; }
         }
 
-
-        public IHasHealth attackTarget
+        public AgentContext context
         {
-            get { 
-                return _attackAtarget; 
-            }
-            set { 
-                _attackAtarget = value;
-                //  Set context focus target?
-                OnAttackTargetChanged(_attackAtarget);
-            }
+            get { return _context; }
         }
 
-        public Collider coverTarget
+
+        public bool isAiming
         {
-            get { return _coverTarget; }
-            set { _coverTarget = value; }
+            get { return _isAiming; }
         }
 
 
@@ -102,7 +102,8 @@
         {
             base.Awake();
             _agentInput = GetComponent<AgentInput>();
-            _context = GetComponent<AIContextProvider>().GetContext();
+            _context = GetComponent<AIContextProvider>().GetContext() as AgentContext;
+
         }
 
 
@@ -123,68 +124,111 @@
         protected override void OnEnable()
         {
             base.OnEnable();
+            agentInput.enabled = true;
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
+            agentInput.enabled = false;
+
+            //CoroutineHelper.Stop(fireWeaponCoroutine);
+            if (fireWeaponCoroutine != null)
+                StopCoroutine(fireWeaponCoroutine);
+            
         }
 
 
 
-        public override void FireWeapon(Vector3 target)
+        public void MoveTo(Vector3 destination)
         {
-            if(Time.time > fireWeaponCoolDown && CanSeeTarget(target))
+            context.destination = destination;
+            agentInput.MoveTo(destination);
+        }
+
+
+        public void StopMoving()
+        {
+            context.destination = this.position;
+            agentInput.StopMoving();
+        }
+
+
+        public void FireWeapon(Transform target)
+        {
+            if (Time.time > fireWeaponCoolDown && CanSeeTarget(target.position))
             {
                 fireWeaponCoolDown = Time.time + _attackSpeed;
-                //target = UnityEngine.Random.insideUnitSphere * aimAccuracy;
-                target.y = equippedFirearm == null ? YFocusOffset : equippedFirearm.projectileSpawn.position.y; ;
 
-                StartCoroutine(AimWeapon(2f));
-                equippedFirearm.Shoot(target);
+                fireWeaponCoroutine = FireWeapon(target, aimSpeed);
+
+                StartCoroutine(fireWeaponCoroutine);
+                //CoroutineHelper.Start(fireWeaponCoroutine);
             }
         }
 
 
-        IEnumerator AimWeapon(float aimDelay)
+        private IEnumerator FireWeapon(Transform target, float aimDelay)
         {
-            //agentInput.SetLocomotion(false);
-            agentInput.StopWalking();
+            _isAiming = true;
+
+            agentInput.StopMoving();
+
             float timer = aimDelay;
             float rate = 1 / aimDelay;
 
-            while(timer > 0)
+            while (timer > 0)
             {
                 timer -= Time.deltaTime * rate;
                 yield return 0;
             }
-            //agentInput.SetLocomotion(true);
-            agentInput.ResumeWalking();
-        }
 
-
-
-        //  Calculates if npc can see target.
-        public bool CanSeeTarget(Vector3 target)
-        {
-            //var targetPosition = new Vector3(target.position.x, (target.position.y + transform.position.y), target.position.z);
-            target.y = YFocusOffset;
-            var dirToPlayer = (target - transform.position).normalized;
-
-            var angleBetweenNpcAndPlayer = Vector3.Angle(transform.forward, dirToPlayer);
-
-            if (Vector3.Distance(transform.position, target) < _sightRange &&
-                angleBetweenNpcAndPlayer < _fieldOfView / 2f &&
-                Physics.Linecast(transform.position, target, Layers.cover) == false)
+            if (CanSeeTarget(target.position))
             {
-                return true;
+                var targetAimAdjusted = VectorSpread(target.position, aimAccuracy);
+                equippedFirearm.Shoot(targetAimAdjusted);
             }
-            return false;
+
+            agentInput.ResumeWalking();
+            _isAiming = false;
+            yield return null;
         }
 
 
+        int missCount;
+        public virtual void OnTargetMiss()
+        {
+            missCount++;
+            if(missCount > Random.Range(2, 5)){
+                missCount = 0;
+                _moveToCover = true;
+            }
+        }
 
 
+        private bool RaycastToTarget(Vector3 origin, Vector3 target, float targetHitlocation = 0.5f, bool debug = true)
+        {
+            bool hitTarget = false;
+            //Vector3 origin = transform.position;
+            origin.y = actorBody.Head.position.y;
+            target.y = targetHitlocation;
+            Vector3 direction = target - origin;
+
+            RaycastHit hit;
+            if(Physics.Raycast(origin, direction, out hit, scanRadius))  //  Maybe need a layers to ignore.
+            {
+                if(hit.transform.GetComponent<IHasHealth>() != null)
+                {
+                    hitTarget = true;
+                    if (debug) Debug.DrawRay(origin, direction * scanRadius, Color.green);
+                }
+            }
+            else{
+                if (debug) Debug.DrawRay(origin, direction * scanRadius, Color.red);
+            }
+
+            return hitTarget;
+        }
 
 
         /// <summary>
@@ -203,7 +247,8 @@
         public virtual void OnAttackTargetDead()
         {
             //When our target dies, stop shooting
-            this.attackTarget = null;
+            context.attackTarget = null;
+            context.lastTargetPosition = default(Vector3);
             //_playerShooting.shooting = false;
         }
 
@@ -211,8 +256,45 @@
 		public override void Death()
 		{
             base.Death();
+            this.enabled = false;
             gameObject.GetComponent<TaskNetworkComponent>().enabled = false;
 		}
+
+
+
+
+
+
+        //Takes a vector and returns a new vector that is slightly variated in direction
+        //0 = 100% accurate and the larger the number, the less accurate
+        public static Vector3 VectorSpread(Vector3 target, float accuracy)
+        {
+            float myIntx = Random.Range(-accuracy, accuracy);
+            //float myInty = (float)Random.Range(-accuracy, accuracy) / 1000;
+            float myIntz = Random.Range(-accuracy, accuracy);
+            Vector3 newVector = new Vector3(target.x + myIntx, target.y, target.z + myIntz);
+
+            return newVector;
+        }
+
+
+        //  Calculates if npc can see target.
+        public bool CanSeeTarget(Vector3 target)
+        {
+            //var targetPosition = new Vector3(target.position.x, (target.position.y + transform.position.y), target.position.z);
+            //target.y = YFocusOffset;
+            var dirToPlayer = (target - transform.position).normalized;
+
+            var angleBetweenNpcAndPlayer = Vector3.Angle(transform.forward, dirToPlayer);
+
+            if (Vector3.Distance(transform.position, target) < _sightRange &&
+                angleBetweenNpcAndPlayer < _fieldOfView / 2f &&
+                Physics.Linecast(transform.position, target, Layers.cover) == false)
+            {
+                return true;
+            }
+            return false;
+        }
 
 	}
 }

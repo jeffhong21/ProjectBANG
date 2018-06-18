@@ -2,7 +2,7 @@
 {
     using UnityEngine;
 
-    public interface IHasHealth : IEntity, IPooled
+    public interface IHasHealth : IPooled, IEntity
     {
         //
         //  Properties

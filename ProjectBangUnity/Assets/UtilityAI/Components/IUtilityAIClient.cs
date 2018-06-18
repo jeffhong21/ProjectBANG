@@ -19,6 +19,11 @@ namespace UtilityAI
         }
 
 
+        bool debugClient{
+            get;
+            set;
+        }
+
         //
         // Methods
         //

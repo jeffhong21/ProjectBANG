@@ -17,10 +17,9 @@
             if (best != null)
             {
                 // Set the attack target
-                c.focusTarget = best;
-                agent.attackTarget = c.focusTarget;
-                agent.OnAttackTargetChanged(c.focusTarget);
-                //Debug.Log("FocusTarget is " + c.focusTarget);
+                c.attackTarget = best;
+                agent.OnAttackTargetChanged(c.attackTarget);
+                //Debug.Log("FocusTarget is " + c.attackTarget);
             }
         }
 

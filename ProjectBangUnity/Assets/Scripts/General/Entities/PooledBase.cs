@@ -1,4 +1,4 @@
-namespace Bang
+﻿namespace Bang
 {
     using UnityEngine;
 
@@ -6,7 +6,7 @@ namespace Bang
     public abstract class PooledBase : MonoBehaviour, IPooled
     {
         
-        [SerializeField, Util.ReadOnly, Tooltip("The instance pool ID. Guaranteed to be unique.")]
+        [SerializeField, ReadOnly, Tooltip("The instance pool ID. Guaranteed to be unique.")]
         protected uint _poolId;
 
         /// <summary>

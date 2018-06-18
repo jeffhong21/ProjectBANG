@@ -18,7 +18,7 @@
             pos.y = agent.position.y;
 
             Debug.Log("RandomWander position:  " + pos);
-            agent.agentInput.MoveTo(pos);
+            agent.MoveTo(pos);
         }
     }
 }

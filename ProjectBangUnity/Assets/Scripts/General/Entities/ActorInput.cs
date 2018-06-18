@@ -12,9 +12,10 @@
 
 
         protected Animator animator;
-        [SerializeField, Util.ReadOnly]
+        [SerializeField, ReadOnly]
         protected bool isMoving;
-
+        protected bool isDashing;
+        protected bool isWalking, isRunning, isJumping, isCrouching, isAiming;
 
         Vector3 velocity = Vector3.zero;
         Vector3 prevPos = Vector3.zero;
@@ -26,8 +27,13 @@
 
         protected virtual void Awake()
         {
-            animator = GetComponent<Animator>();
-
+            if(GetComponent<Animator>() != null)
+            {
+                animator = GetComponent<Animator>();
+            }
+            else{
+                animator = GetComponentInChildren<Animator>();
+            }
         }
 
         protected virtual void FixedUpdate()

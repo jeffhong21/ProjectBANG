@@ -89,7 +89,7 @@ namespace Bang
                 }
             }
 
-            Debug.Log("Finish Initializing " + this.GetType().Name);
+            //Debug.Log("Finish Initializing " + this.GetType().Name);
         }
 
 

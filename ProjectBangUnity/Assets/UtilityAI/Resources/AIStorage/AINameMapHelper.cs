@@ -9,9 +9,9 @@ namespace UtilityAI
 
     public static class AINameMapHelper
     {
-		public static readonly Guid AgentActionAI = new Guid("0ef02b0031ce5417abd2f84b8cea1ff7");
-		public static readonly Guid AgentMoveAI = new Guid("8d75d33343c884e7f8ca31ed81afd3c6");
-		public static readonly Guid AgentScanAI = new Guid("db35650a0b2464340a69d3d5ea3381a5");
+		public static readonly Guid AgentActionAI = new Guid("f855880b30b304fd7869bfcc538938bb");
+		public static readonly Guid AgentMoveAI = new Guid("b6a23c75e462441e596a1decd1020bb9");
+		public static readonly Guid AgentScanAI = new Guid("b35eb05201aee4bb8892cb8a8d34fa60");
 
     }
 }

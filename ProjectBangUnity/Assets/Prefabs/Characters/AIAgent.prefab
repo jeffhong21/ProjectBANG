@@ -50,9 +50,10 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4043560268267752}
+  - component: {fileID: 95430689164168026}
   m_Layer: 10
   m_Name: characters_grp
-  m_TagString: Untagged
+  m_TagString: Outlaw
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -110,19 +111,17 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4800368842353962}
-  - component: {fileID: 95859117713158742}
-  - component: {fileID: 136658996750469874}
-  - component: {fileID: 54698603356901082}
-  - component: {fileID: 195639632207810378}
+  - component: {fileID: 54972994153984370}
+  - component: {fileID: 136877615479576448}
+  - component: {fileID: 195483426579643508}
   - component: {fileID: 114790253131203490}
   - component: {fileID: 114558835538233468}
   - component: {fileID: 114193328531158472}
   - component: {fileID: 114720206722545972}
-  - component: {fileID: 114547873525375904}
-  - component: {fileID: 114061504493827786}
+  - component: {fileID: 114979029075574234}
   m_Layer: 10
   m_Name: AIAgent
-  m_TagString: Actor
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1361,7 +1360,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1088390977674254}
   m_LocalRotation: {x: -0.5000002, y: 0.5, z: 0.49999988, w: -0.50000006}
-  m_LocalPosition: {x: -0.07516832, y: -0.033741314, z: -0.000026574555}
+  m_LocalPosition: {x: -0.134, y: 0.034, z: 0.06}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4885947261287116}
@@ -1579,7 +1578,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1737790555669700}
   m_LocalRotation: {x: -0.49999985, y: 0.5, z: -0.5, w: 0.5000002}
-  m_LocalPosition: {x: 0.075168274, y: 0.033739686, z: 0.000026359046}
+  m_LocalPosition: {x: 0.134, y: 0.034, z: -0.06}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4894783996685124}
@@ -1797,7 +1796,7 @@ Transform:
   m_Father: {fileID: 4179418332684734}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!54 &54698603356901082
+--- !u!54 &54972994153984370
 Rigidbody:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -1812,13 +1811,13 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 116
   m_CollisionDetection: 0
---- !u!95 &95859117713158742
+--- !u!95 &95430689164168026
 Animator:
   serializedVersion: 3
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1141768220188808}
+  m_GameObject: {fileID: 1050159647219662}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 8ce62a6952efa4b5e8d7274529184df3, type: 3}
   m_Controller: {fileID: 9100000, guid: bc8bd76c46b7e4d879ee79499612c8e0, type: 2}
@@ -1830,24 +1829,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &114061504493827786
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a4d9af83973347b6bfb63c82f64c4b9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  drawGUI: 1
-  drawGizmo: 1
-  locationRadius: 0.5
-  lineColor: {r: 0.7058824, g: 1, b: 0, a: 1}
-  focusTargetColor: {r: 0, g: 0.7058824, b: 1, a: 0.5019608}
-  accuracyRangeColor: {r: 0, g: 0.7058824, b: 1, a: 0.2509804}
-  yOffset: 0.05
 --- !u!114 &114193328531158472
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1860,24 +1841,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _context:
-    _sampledPositions: []
---- !u!114 &114547873525375904
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ecfcf8be752b8446e8a91a3d07241665, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  relevantAIId: 
-  mode: 0
-  drawGizmos: 0
-  drawGUI: 1
-  sphereSize: 0.25
-  sphereAlpha: 0.5
+    navMeshAgent: {fileID: 0}
+    _destination: {x: 0, y: 0, z: 0}
+    _lastTargetPosition: {x: 0, y: 0, z: 0}
+    _locationOfInterest: {x: 0, y: 0, z: 0}
+    __attackTargetName: 
+    _coverTarget: {fileID: 0}
+    _coverPosition: {x: 0, y: 0, z: 0}
+    __hostiles: []
+    _isSearching: 0
 --- !u!114 &114558835538233468
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1914,7 +1886,6 @@ MonoBehaviour:
     startDelayMin: 0
     startDelayMax: 0
     isActive: 1
-    _debugClient: 0
     isPredefined: 1
     type: Bang.AgentScanAI
   - aiId: AgentMoveAI
@@ -1923,7 +1894,6 @@ MonoBehaviour:
     startDelayMin: 0
     startDelayMax: 0
     isActive: 1
-    _debugClient: 0
     isPredefined: 1
     type: Bang.AgentMoveAI
   - aiId: AgentActionAI
@@ -1932,7 +1902,6 @@ MonoBehaviour:
     startDelayMin: 0
     startDelayMax: 0
     isActive: 1
-    _debugClient: 0
     isPredefined: 1
     type: Bang.AgentActionAI
   _hasStarted: 0
@@ -1955,21 +1924,34 @@ MonoBehaviour:
   _maxHealth: 2
   _currentHealth: 0
   _isDead: 0
-  _equippedFirearm: {fileID: 0}
   actorBody:
     _head: {fileID: 4645203099748726}
     _leftHand: {fileID: 4605668109480382}
     _rightHand: {fileID: 4781103747589800}
     _mainRenderer: []
+  _equippedFirearm: {fileID: 0}
   _fieldOfView: 108
   _sightRange: 20
   _scanRadius: 12
   _attackSpeed: 1
-  _aimAccuracy: 3
-  _coverTarget: {fileID: 0}
-  indicator:
-    icon: {fileID: 0}
---- !u!136 &136658996750469874
+  _aimSpeed: 1.25
+  _aimAccuracy: 1
+--- !u!114 &114979029075574234
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f921121c9d2504702b893588b0fb5398, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  locationRadius: 0.5
+  lineColor: {r: 0.7058824, g: 1, b: 0, a: 1}
+  focusTargetColor: {r: 0, g: 0.7058824, b: 1, a: 0.5019608}
+  yOffset: 0.05
+--- !u!136 &136877615479576448
 CapsuleCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -1978,7 +1960,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.5
+  m_Radius: 0.25
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
@@ -2750,7 +2732,7 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.00000011920929, y: 0.8587489, z: -0.027915299}
     m_Extent: {x: 1.0258236, y: 0.9798567, z: 0.30891627}
   m_DirtyAABB: 0
---- !u!195 &195639632207810378
+--- !u!195 &195483426579643508
 NavMeshAgent:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}

@@ -42,6 +42,7 @@ namespace Bang
                 name = "FireAtTarget",
                 actions = new List<IAction>()
                 {
+                    new StopMovement(){ name = "StopMovement"},
                     new SetBestAttackTarget()
                     {
                         name = "SetBestAttackTarget",
@@ -57,22 +58,31 @@ namespace Bang
             };
             actions.Add(a);  // --  Add to Actions Group
 
+            // ---- New Scorers Group ----
+            scorers = new List<IScorer>();
+            // ---- Add Scorers ----
+            scorer = new HasEnemies() { score = 5};
+            scorers.Add(scorer);  // --  Add to Scorers Group
+            // ---- New Scorer ----
+            scorer = new HasEnemiesInRange() { score = 15, range = 10 };
+            scorers.Add(scorer);  // --  Add to Scorers Group
+            allScorers.Add(scorers.ToArray());
+
+            // ---- New Qualifier ----
+            q = new CompositeScoreQualifier();
+            qualifiers.Add(q);
+            //CompositeScoreQualifier csq = q as CompositeScoreQualifier;
+            //csq.debugScore = true;
+
+
+
+
             // ---- New Action ----
             a = new EmptyAction()
             {
                 name = "Null Action",
             };
             actions.Add(a);  // --  Add to Actions Group
-
-
-
-
-            // ---- New Scorers Group ----
-            scorers = new List<IScorer>();
-            // ---- New Scorer ----
-            scorer = new HasEnemiesInRange() { score = 15 };
-            scorers.Add(scorer);  // --  Add to Scorers Group
-            allScorers.Add(scorers.ToArray());
 
             // ---- New Scorers Group ----
             scorers = new List<IScorer>();
@@ -81,13 +91,10 @@ namespace Bang
             scorers.Add(scorer);  // --  Add to Scorers Group
             allScorers.Add(scorers.ToArray());
 
+            // ---- New Qualifier ----
+            q = new CompositeScoreQualifier();
+            qualifiers.Add(q);
 
-            // ---- New Qualifier ----
-            q = new CompositeScoreQualifier();
-            qualifiers.Add(q);
-            // ---- New Qualifier ----
-            q = new CompositeScoreQualifier();
-            qualifiers.Add(q);
 
 
             rs.defaultQualifier.action = new EmptyAction()
@@ -116,7 +123,7 @@ namespace Bang
                 }
             }
 
-            Debug.Log("Finish Initializing " + this.GetType().Name);
+            //Debug.Log("Finish Initializing " + this.GetType().Name);
         }
 
 

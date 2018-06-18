@@ -12,7 +12,7 @@
         Vector3 defaultPosition = new Vector3(0, 16, -8);
         [SerializeField]
         float smoothSpeed = 0.125f;
-        [SerializeField, Util.ReadOnly]
+        [SerializeField, ReadOnly]
         Vector3 currentPosition;
 
 

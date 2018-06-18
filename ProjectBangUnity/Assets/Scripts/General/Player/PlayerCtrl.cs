@@ -4,7 +4,7 @@ namespace Bang
     using System;
     using System.Collections;
 
-    using AbilitySystem;
+
 
     public class PlayerCtrl : ActorCtrl, IHasFirearm
     {

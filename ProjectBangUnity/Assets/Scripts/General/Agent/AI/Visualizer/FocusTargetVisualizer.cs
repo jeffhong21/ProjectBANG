@@ -35,16 +35,16 @@
             var agent = c.agent;
 
 
-            if(c.focusTarget != null)
+            if(c.attackTarget != null)
             {
                 Handles.color = lineColor;
-                Handles.DrawLine(agent.position + Vector3.up * yOffset, c.focusTarget.position + Vector3.up * yOffset);
+                Handles.DrawLine(agent.position + Vector3.up * yOffset, c.attackTarget.position + Vector3.up * yOffset);
 
                 Handles.color = focusTargetColor;
-                Handles.DrawSolidDisc(c.focusTarget.position + Vector3.up * yOffset, Vector3.up, locationRadius);
+                Handles.DrawSolidDisc(c.attackTarget.position + Vector3.up * yOffset, Vector3.up, locationRadius);
 
                 Handles.color = accuracyRangeColor;
-                Handles.DrawSolidDisc(c.focusTarget.position + Vector3.up * yOffset, Vector3.up, agent.aimAccuracy);
+                Handles.DrawSolidDisc(c.attackTarget.position + Vector3.up * yOffset, Vector3.up, agent.aimAccuracy);
             }
 
 

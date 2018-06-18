@@ -10,7 +10,7 @@
         private float _maxHealth = 4f;
         [SerializeField, Tooltip("Current health")]
         private float _currentHealth;
-        [SerializeField, Util.ReadOnly, Tooltip("isDead")]
+        [SerializeField, ReadOnly, Tooltip("isDead")]
         private bool _isDead;
 
 

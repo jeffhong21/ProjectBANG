@@ -5,15 +5,15 @@ namespace Bang
     public interface IProjectile : IPooled
     {
 
-        float Damage { get; }
+        float damage { get; set; }
 
-        float LifeDuration { get; }
+        //float lifeDuration { get; }
 
-        Vector3 SpawnLocation { get; }
+        Vector3 spawnLocation { get; }
 
-        float MaxRange { get; }
+        //float maxRange { get; }
 
-        float Velocity { get; }
+        float velocity { get; set; }
 
     }
 

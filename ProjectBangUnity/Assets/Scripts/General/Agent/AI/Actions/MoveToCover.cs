@@ -13,20 +13,20 @@ namespace Bang
             var c = context as AgentContext;
             var agent = c.agent;
 
-            Collider col = agent.coverTarget;
+            Collider col = c.coverTarget;
 
-            if (agent.coverTarget == null || agent.attackTarget == null)
+            if (c.coverTarget == null || c.attackTarget == null)
                 return;
 
             var currentCover = col;
-            Vector3 dirToTarget = agent.attackTarget.position - col.transform.position;
+            Vector3 dirToTarget = c.attackTarget.position - col.transform.position;
             dirToTarget.Normalize();
 
             Vector3 targetPosition = col.transform.position + (dirToTarget * -1);
 
             //Debug.LogFormat("Position:  {0} | Cover Position: {1}", agent.position, col.transform.position);
 
-            agent.agentInput.MoveTo(targetPosition);
+            agent.MoveTo(targetPosition);
         }
 
 

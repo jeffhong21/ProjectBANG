@@ -11,7 +11,7 @@
             var c = context as AgentContext;
             var agent = c.agent;
 
-            var attackTarget = agent.attackTarget;
+            var attackTarget = c.attackTarget;
 
             if (attackTarget == null)
             {
@@ -21,7 +21,7 @@
 
             //  TODO:  Get a Random Range of the target.
             //Debug.LogFormat("Firing at {0}", attackTarget.position);
-            agent.FireWeapon(attackTarget.position);
+            agent.FireWeapon(attackTarget.transform);
         }
     }
 }

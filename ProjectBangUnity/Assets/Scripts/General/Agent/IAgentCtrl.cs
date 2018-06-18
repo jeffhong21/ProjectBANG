@@ -1,54 +1,43 @@
-namespace Bang
-{
-    using UnityEngine;
+//namespace Bang
+//{
+//    using UnityEngine;
 
-    public interface IAgentCtrl
-    {
+//    public interface IAgentCtrl
+//    {
 
-        AgentInput agentInput
-        {
-            get;
-        }
+//        AgentInput agentInput
+//        {
+//            get;
+//        }
 
-        float scanRadius
-        {
-            get;
-            set;
-        }
+//        float scanRadius
+//        {
+//            get;
+//            set;
+//        }
 
-        float attackSpeed
-        {
-            get;
-            set;
-        }
-
-        IHasHealth attackTarget
-        {
-            get;
-            set;
-        }
-
-        Collider coverTarget
-        {
-            get;
-            set;
-        }
+//        float attackSpeed
+//        {
+//            get;
+//            set;
+//        }
 
 
 
 
 
-        /// <summary>
-        /// Called when the attack target changes.
-        /// </summary>
-        /// <param name="newAttackTarget">The new attack target.</param>
-        void OnAttackTargetChanged(IHasHealth newAttackTarget);
+
+//        /// <summary>
+//        /// Called when the attack target changes.
+//        /// </summary>
+//        /// <param name="newAttackTarget">The new attack target.</param>
+//        void OnAttackTargetChanged(IHasHealth newAttackTarget);
 
 
-        /// <summary>
-        /// Called when the attack target dies.
-        /// </summary>
-        void OnAttackTargetDead();
-    }
+//        /// <summary>
+//        /// Called when the attack target dies.
+//        /// </summary>
+//        void OnAttackTargetDead();
+//    }
 
-}
+//}

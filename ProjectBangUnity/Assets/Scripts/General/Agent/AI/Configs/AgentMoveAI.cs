@@ -39,9 +39,37 @@
 
 
             // ---- New Action ----
+            a = new CompositeAction()
+            {
+                name = "SearchForTarget",
+                actions = new List<IAction>()
+                {
+                    new SearchForTargets(){name = "SearchForTarget"},
+                }
+            };
+            actions.Add(a);  // --  Add to Actions Group
+
+            // ---- New Scorers Group ----
+            scorers = new List<IScorer>();
+            // ---- Add Scorers ----
+            scorer = new HasEnemies() { score = 25, not = true };
+            scorers.Add(scorer);  // --  Add to Scorers Group
+            // ---- Add Scorers ----
+            scorer = new HasArrivedToDestination() {score = 10};
+            scorers.Add(scorer);  // --  Add to Scorers Group
+            allScorers.Add(scorers.ToArray());
+            // ---- New Qualifier ----
+            q = new CompositeScoreQualifier();
+            qualifiers.Add(q);
+            //CompositeScoreQualifier csq = q as CompositeScoreQualifier;
+            //csq.debugScore = true;
+
+
+
+            // ---- New Action ----
             a = new MoveToBestPosition()
             {
-                name = "MoveToBestPosition",
+                name = "MoveToBestAttackPosition",
                 scorers = new List<IOptionScorer<Vector3>>()
                 {
                     new PositionProximityToSelf(),
@@ -86,7 +114,7 @@
             // ---- New Scorers Group ----
             scorers = new List<IScorer>();
             // ---- Add Scorers ----
-            scorer = new HasEnemiesInRange() { score = 10, range = 16 };
+            scorer = new HasEnemiesInRange() { score = 10, range = 4 };
             scorers.Add(scorer);  // --  Add to Scorers Group
             scorer = new HasCoverPosition() { score = 10};
             scorers.Add(scorer);  // --  Add to Scorers Group
@@ -95,13 +123,64 @@
             // ---- New Qualifier ----
             q = new CompositeScoreQualifier();
             qualifiers.Add(q);
+            //CompositeScoreQualifier csq2 = q as CompositeScoreQualifier;
+            //csq2.debugScore = true;
 
 
 
-
-            rs.defaultQualifier.action = new RandomWander() 
+            // ---- New Action ----
+            a = new StopMovement()
             {
-                name = "RandomWander"
+                name = "StopMovement",
+            };
+            actions.Add(a);  // --  Add to Actions Group
+
+            // ---- New Scorers Group ----
+            scorers = new List<IScorer>();
+            // ---- Add Scorers ----
+            scorer = new IsAiming() { score = 32 };
+            scorers.Add(scorer);  // --  Add to Scorers Group
+            allScorers.Add(scorers.ToArray());
+
+            // ---- New Qualifier ----
+            q = new CompositeScoreQualifier();
+            qualifiers.Add(q);
+            //CompositeScoreQualifier csq1 = q as CompositeScoreQualifier;
+            //csq1.debugScore = true;
+
+
+
+            // ---- New Action ----
+            a = new EmptyAction()
+            {
+                name = "Still Searching",
+            };
+            actions.Add(a);  // --  Add to Actions Group
+
+            // ---- New Scorers Group ----
+            scorers = new List<IScorer>();
+            // ---- Add Scorers ----
+            scorer = new HasEnemies() { score = 25, not = true };
+            scorers.Add(scorer);  // --  Add to Scorers Group
+            // ---- Add Scorers ----
+            scorer = new HasArrivedToDestination() { score = 10, not = true };
+            scorers.Add(scorer);  // --  Add to Scorers Group
+            // ---- Add Scorers ----
+            scorer = new IsSearchingForTargets() { score = 5 };
+            scorers.Add(scorer);  // --  Add to Scorers Group
+            allScorers.Add(scorers.ToArray());
+
+            // ---- New Qualifier ----
+            q = new CompositeScoreQualifier();
+            qualifiers.Add(q);
+            //CompositeScoreQualifier csq1 = q as CompositeScoreQualifier;
+            //csq1.debugScore = true;
+
+
+
+            rs.defaultQualifier.action = new SearchForTargets() 
+            {
+                name = "SearchForTarget"
             };
 
 
@@ -127,7 +206,7 @@
                 }
             }
 
-            Debug.Log("Finish Initializing " + this.GetType().Name);
+            //Debug.Log("Finish Initializing " + this.GetType().Name);
         }
 
 

@@ -5,7 +5,7 @@
 
     public abstract class FirearmBase : MonoBehaviour, IFirearm
     {
-        
+        protected ActorCtrl owner;
         [SerializeField, Tooltip("Location of the projectile")]
         protected Transform _projectileSpawn;
         [SerializeField, Tooltip("What kind of projectile")]
@@ -110,6 +110,11 @@
 
         }
 
+        public virtual void Init(ActorCtrl actorCtrl)
+        {
+            owner = actorCtrl;
+        }
+
 
         public virtual void CockFirearm()
         {
@@ -131,7 +136,9 @@
 
                 //Debug.LogFormat("Shot Fired:  {0}", Time.time);
 
-                PoolManager.instance.Spawn(PoolTypes.Projectile, projectileSpawn.position, projectileSpawn.rotation);
+                var _pooledProjectile = PoolManager.instance.Spawn(PoolTypes.Projectile, projectileSpawn.position, projectileSpawn.rotation);
+                ProjectileBase pooledProjectile = _pooledProjectile.gameObject.GetComponent<ProjectileBase>();
+                pooledProjectile.Init(owner);
             }
         }
 

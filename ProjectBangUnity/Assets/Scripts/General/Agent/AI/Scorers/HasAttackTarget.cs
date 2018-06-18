@@ -15,7 +15,7 @@
             var c = context as AgentContext;
             var agent = c.agent;
 
-            if (c.focusTarget == null)
+            if (c.attackTarget == null)
             {
                 return 0f;
             }

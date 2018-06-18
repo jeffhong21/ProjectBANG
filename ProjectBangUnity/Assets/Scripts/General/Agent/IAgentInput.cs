@@ -9,7 +9,7 @@
 
         void MoveTo(Vector3 destination);
 
-        void StopWalking();
+        void StopMoving();
 
         void LookAt(Transform lookAtTarget);
 

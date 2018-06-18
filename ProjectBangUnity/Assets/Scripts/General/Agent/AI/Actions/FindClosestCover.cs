@@ -45,7 +45,7 @@
                 }
             }
 
-            agent.coverTarget = closestCover;
+            c.coverTarget = closestCover;
 
 
         }

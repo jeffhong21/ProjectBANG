@@ -21,7 +21,7 @@
         [SerializeField]
         protected float _dashDistance = 10f;
 
-        protected bool isDashing;
+
         private Vector3 dashStartPosition, cursorPosition, playerVelocity;
 
         [Header("----- References -----")]

@@ -5,43 +5,71 @@ namespace Bang
 
     public class ProjectileBase : MonoBehaviour, IProjectile
     {
-        [SerializeField, Tooltip("TEMP")]
+        protected ActorCtrl _owner;
+        [SerializeField]
         protected float _damage = 1f;
-        [SerializeField, Tooltip("TEMP")]
+        [SerializeField]
         protected float _lifeDuration = 2f;
-        [SerializeField, Tooltip("TEMP")]
+        [SerializeField]
         protected Vector3 _spawnLocation;
-        [SerializeField, Tooltip("TEMP")]
+        [SerializeField]
         protected float _maxRange = 50f;
-        [SerializeField, Tooltip("TEMP")]
+        [SerializeField]
         protected float _velocity = 100f;
 
 
 
+        public float damage{
+            get{
+                return _damage;
+            }
+            set{
+                _damage = value;
+            }
+        }
+            
+        public Vector3 spawnLocation{
+            get{
+                return _spawnLocation;
+            }
+            //set{
+            //    _spawnLocation = value;
+            //}
+        }
 
-        public float Damage { get {return _damage; } }
-
-        public float LifeDuration { get { return _lifeDuration; } }
-
-        public Vector3 SpawnLocation { get { return _spawnLocation; } }
-
-        public float MaxRange { get { return _maxRange; } }
-
-        public float Velocity { get { return _velocity; } }
-
-
-        private float currentTime;
+        public float velocity{
+            get { 
+                return _velocity; 
+            }
+            set{
+                _velocity = value;
+            }
+        }
 
 
-        protected virtual void OnEnable()
+        private float spawnTime;
+
+
+        public void Init(ActorCtrl actorCtrl)
+		{
+            _owner = actorCtrl;
+		}
+
+
+		protected virtual void OnEnable()
         {
-            currentTime = Time.time;
+            spawnTime = Time.time;
             
             Collider[] initialCollisions = Physics.OverlapSphere(transform.position, 0.1f, Layers.hitableObjects);
             if (initialCollisions.Length > 0)
             {
                 OnHitObject(initialCollisions[0], transform.position);
             }
+        }
+
+        protected virtual void OnDisable()
+        {
+            
         }
 
 
@@ -51,7 +79,7 @@ namespace Bang
             CheckCollisions(moveDistance);
             transform.Translate(Vector3.forward * moveDistance);
 
-            if(Time.time > currentTime + LifeDuration){
+            if(Time.time > spawnTime + _lifeDuration){
                 PoolManager.instance.Return(PoolTypes.Projectile, this);
             }
 
@@ -59,7 +87,7 @@ namespace Bang
         }
 
 
-        void CheckCollisions(float moveDistance)
+        private void CheckCollisions(float moveDistance)
         {
             Ray ray = new Ray(transform.position, transform.forward);
             RaycastHit hit;
@@ -71,7 +99,7 @@ namespace Bang
         }
 
 
-        void OnHitObject(Collider c, Vector3 hitPoint)
+        private void OnHitObject(Collider c, Vector3 hitPoint)
         {
             //Debug.Log(hit.collider.gameObject.name);
 
@@ -83,15 +111,16 @@ namespace Bang
             }
 
 
-            if (c.gameObject.layer == LayerMask.NameToLayer("WorldObjects"))
+            if (c.gameObject.layer == LayerMask.NameToLayer("Cover"))  // LayerMask.NameToLayer("WorldObjects")
             {
-                //PoolManager.instance.Spawn(PoolTypes.VFX, hitPoint, Quaternion.FromToRotation(Vector3.forward, -transform.forward));
                 ParticlePoolManager.instance.SpawnParticleSystem(ParticlesType.ImpactHit, hitPoint, Quaternion.FromToRotation(Vector3.forward, -transform.forward));
             }
 
-            //Destroy(gameObject);
+
             PoolManager.instance.Return(PoolTypes.Projectile, this);
 
+            //  Reset the owner of projectile.
+            _owner = null;
         }
 
 

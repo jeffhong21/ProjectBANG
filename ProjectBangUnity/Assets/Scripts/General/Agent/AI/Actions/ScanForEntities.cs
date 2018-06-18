@@ -29,12 +29,14 @@
             c.hostiles.Clear();
 
             // Use OverlapSphere for getting all relevant colliders within scan range, filtered by the scanning layer
-            var colliders = Physics.OverlapSphere(agent.position, scanRange, Layers.entites);
+            var colliders = Physics.OverlapSphere(agent.position, 8, Layers.entites);
             foreach (Collider col in colliders)
             {
-                if (col.transform.CompareTag(entityTag))
+                Transform transform = col.transform == col.transform.root ? col.transform : col.transform.root;
+
+                if (transform.CompareTag(entityTag))
                 {
-                    c.hostiles.Add(col.GetComponent<IHasHealth>());
+                    c.hostiles.Add(transform.GetComponent<IHasHealth>());
                 }
             }
 

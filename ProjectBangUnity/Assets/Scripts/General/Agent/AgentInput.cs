@@ -2,9 +2,7 @@
 {
     using UnityEngine;
     using UnityEngine.AI;
-    using System;
-    using System.Collections.Generic;
-    using UtilityAI;
+
 
 
 
@@ -14,7 +12,6 @@
 
         [SerializeField]
         protected NavigationType navType = NavigationType.NavMeshAgent;
-        [Header("----- Movement -----")]
         [SerializeField]
         protected float _moveSpeed = 6f;
         [SerializeField]
@@ -86,7 +83,7 @@
             agent.acceleration = acceleration;
             agent.angularSpeed = angularSpeed;
             agent.stoppingDistance = arrivalDistance;
-            agent.autoBraking = false;
+            agent.autoBraking = true;
             // we give the unit a random avoidance priority so as to ensure that units will actually avoid each other (since same priority units will not try to avoid each other)
             agent.avoidancePriority = UnityEngine.Random.Range(0, 99);
 
@@ -104,7 +101,8 @@
         protected virtual void Update()
         {
             if(HasReachedDestination()){
-                StopWalking();
+                StopMoving();
+
             }
 
             Turn();
@@ -117,12 +115,13 @@
         {
             SetLocomotion(true);
             destination.y = 0;
+
             SetDestination(destination);
             //Debug.LogFormat("Agent setting destination to:  {0} | {1}\nBaseOffset is:  {2}", destination, Time.time, agent.baseOffset);
         }
 
 
-        public virtual void StopWalking()
+        public virtual void StopMoving()
         {
             path = agent.path;
             //agent.destination = gameObject.transform.position;
@@ -136,22 +135,6 @@
             agent.SetPath(path);
             SetLocomotion(true);
         }
-
-
-        private void SetDestination(Vector3 destination, float maxDist = 2f) // maxDist is Sample within this distance from sourcePosition.
-        {
-            agent.speed = moveSpeed;
-
-            int areaMask = NavMesh.AllAreas;
-            NavMeshHit hit;
-            if(NavMesh.SamplePosition(destination, out hit, maxDist, areaMask))
-            {
-                destination = hit.position;
-                agent.SetDestination(destination);
-            }
-
-        }
-
 
 
         /// <summary>
@@ -173,6 +156,21 @@
         }
 
 
+        private void SetDestination(Vector3 destination, float maxDist = 1f) // maxDist is Sample within this distance from sourcePosition.
+        {
+            agent.speed = moveSpeed;
+
+            int areaMask = NavMesh.AllAreas;
+            NavMeshHit hit;
+            if(NavMesh.SamplePosition(destination, out hit, maxDist, areaMask))
+            {
+                destination = hit.position;
+                agent.SetDestination(destination);
+            }
+
+        }
+
+
         private void Turn()
         {
             if (_target != null)
@@ -183,8 +181,6 @@
                 transform.rotation = Quaternion.Slerp(transform.rotation, newRotatation, Time.fixedDeltaTime * angularSpeed);
             }
         }
-
-
 
 
         float GetDistanceRemaining()
@@ -231,20 +227,6 @@
         }
 
 
-        //bool KeepWalking()
-        //{
-        //    isMoving = true;  //  Used for the animator
-        //    agent.isStopped = !isMoving;
-        //    return isMoving;
-        //}
-
-
-        //bool StopWalking()
-        //{
-        //    isMoving = false;  //  Used for the animator
-        //    agent.isStopped = !isMoving;
-        //    return isMoving;
-        //}
 
     }
 }

@@ -1,6 +1,7 @@
 ﻿namespace BuildingGenerator
 {
     using UnityEngine;
+    using UnityEditor;
     using System;
     using System.Collections.Generic;
     using Random = System.Random;
@@ -161,8 +162,13 @@
             int index = uRandom.Range(0, prefabs.Length);
             BuildingAsset asset = prefabs[index];
 
+            string assetPath = AssetDatabase.GetAssetPath(asset.prefab);
+            UnityEngine.Object prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+            Debug.Log(assetPath);
+
             //  Instantiate the prefab
-            GameObject go = Instantiate(asset.prefab, grpContainers.ContainsKey(id) ? grpContainers[id].transform : buildingRoot.transform);
+            //GameObject go = Instantiate(asset.prefab, grpContainers.ContainsKey(id) ? grpContainers[id].transform : buildingRoot.transform);
+            GameObject go = Instantiate(prefab, grpContainers.ContainsKey(id) ? grpContainers[id].transform : buildingRoot.transform) as GameObject;
             //var go = UnityEditor.PrefabUtility.InstantiatePrefab(asset.prefab);
             //  Add it to the list of assets.
             assets.Add(id, go);

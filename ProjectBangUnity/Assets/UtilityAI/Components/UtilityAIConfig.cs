@@ -20,8 +20,6 @@
 
 		public bool isActive;
 
-        public bool _debugClient;
-
         public bool isPredefined;
 
         public string type;

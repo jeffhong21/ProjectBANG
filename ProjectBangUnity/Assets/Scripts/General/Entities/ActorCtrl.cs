@@ -13,19 +13,17 @@
     {
         protected GameManagerController gm;
 
-        [Header("----- Weapons -----")]
-        [SerializeField, Tooltip("Currently equipped firearm")]
-        protected FirearmBase _equippedFirearm;
-
-
-        [Header("----- Actor Misc Settings -----")]
         public ActorBody actorBody = new ActorBody();
+        //[SerializeField, Range(0,100)]
+        protected int threat;
 
-        //[SerializeField, Range(0, 1), Tooltip("YAxis height for aiming and sight")]
+        [SerializeField, HideInInspector]
+        protected FirearmBase _equippedFirearm;
+        //[SerializeField]
         protected float _yFocusOffset = 0.75f;
-
         //[SerializeField, Tooltip("The speed at which the enemy sinks through the floor when dead.")]
-        protected float sinkSpeed = 2.5f;           
+        protected float sinkSpeed = 0.5f;
+
 
 
 
@@ -71,6 +69,18 @@
         }
 
 
+        public Vector3 HeadPosition{
+            get{
+                return actorBody.Head.transform.position;
+            }
+        }
+
+        public Vector3 FireArmProjectilePosition
+        {
+            get{
+                return equippedFirearm.projectileSpawn.position;
+            }
+        }
 
 
         protected virtual void Awake()
@@ -84,7 +94,15 @@
 
 
             //actorBody = GetComponent<ActorBody>();
-            animator = GetComponent<Animator>();
+            if (GetComponent<Animator>() != null)
+            {
+                animator = GetComponent<Animator>();
+            }
+            else
+            {
+                animator = GetComponentInChildren<Animator>();
+            }
+
             capsuleCollider = GetComponent<CapsuleCollider>();
 
         }
@@ -105,7 +123,21 @@
         }
 
 
+        protected void StopCoroutineHelper(IEnumerator coroutine)
+        {
+            if (coroutine != null)
+            {
+                StopCoroutine(coroutine);
+            }
+        }
 
+
+        protected Vector3 Target(Vector3 target)
+        {
+            //target.y = FireArmProjectilePosition.y;
+            target.y = equippedFirearm == null ? YFocusOffset : FireArmProjectilePosition.y; ;
+            return target;
+        }
 
 
 
@@ -118,8 +150,7 @@
 
         public virtual void FireWeapon(Vector3 target)
         {
-            target.y = equippedFirearm == null ? _yFocusOffset : equippedFirearm.projectileSpawn.position.y; ;
-            equippedFirearm.Shoot(target);
+            equippedFirearm.Shoot(Target(target));
         }
 
 
@@ -165,7 +196,7 @@
 
 
 
-        IEnumerator StartSinking(float delaySinkTime = 2f)
+        IEnumerator StartSinking(float delaySinkTime = 3f)
         {
             yield return new WaitForSeconds(delaySinkTime);
 
@@ -184,7 +215,6 @@
                     gameObject.SetActive(false);
                     yield break;
                 }
-
 
                 //Debug.LogFormat("Direction:  {3}\nVector3 Up:  {0}\nSinkSpeed:  {1}\nDeltaTime:  {2}", -Vector3.up, sinkSpeed, Time.deltaTime, (-Vector3.up * sinkSpeed * Time.deltaTime));
                 yield return null;

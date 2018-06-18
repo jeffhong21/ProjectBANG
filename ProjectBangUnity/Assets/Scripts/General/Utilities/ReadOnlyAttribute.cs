@@ -1,4 +1,4 @@
-﻿namespace Bang.Util
+﻿namespace Bang
 {
     using System;
     using UnityEngine;

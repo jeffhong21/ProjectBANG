@@ -8,6 +8,8 @@
     /// </summary>
     public class HasEnemies : ScorerBase
     {
+        [SerializeField]
+        public bool not = false;  //  If false, it will return second option.  If true it will return first option.
         
         public override float Score(IAIContext context)
         {
@@ -16,11 +18,12 @@
 
             if (c.hostiles.Count == 0)
             {
-                //Debug.Log("No hostiles");
-                return 0f;
+                //  returns 0 if "not" is false or returns the score if "not" is true.
+                return this.not ? this.score : 0f;
             }
 
-            return this.score;
+            return this.not ? 0f : this.score;
+
         }
     }
 }

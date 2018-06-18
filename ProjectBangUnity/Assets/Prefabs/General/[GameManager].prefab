@@ -61,7 +61,7 @@ MonoBehaviour:
   _playerCamera: {fileID: 114414480808502134, guid: 3055f080243a047bd897834a5e731da2,
     type: 2}
   _players:
-    playerPrefab: {fileID: 114819898467470930, guid: 9459e25039f6a44628bd56f9ce9598fe,
+    playerPrefab: {fileID: 114819898467470930, guid: d8293d68dc2f944de8e727ec62ea3a01,
       type: 2}
     playerInstance: {fileID: 0}
     startingHealth: 4
@@ -83,7 +83,7 @@ MonoBehaviour:
     m_Bits: 2048
   hitableObjectsLayer:
     serializedVersion: 2
-    m_Bits: 3072
+    m_Bits: 7168
   entitiesLayer:
     serializedVersion: 2
-    m_Bits: 1024
+    m_Bits: 5120

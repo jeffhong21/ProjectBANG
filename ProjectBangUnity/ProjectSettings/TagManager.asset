@@ -4,11 +4,12 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Actor
-  - Firearm
-  - Projectile
   - SpawnPoint
   - Cover
+  - Firearm
+  - Projectile
+  - Deputy
+  - Outlaw
   layers:
   - Default
   - TransparentFX
@@ -22,7 +23,7 @@ TagManager:
   - Floor
   - Entites
   - Cover
-  - 
+  - Player
   - 
   - 
   - 

@@ -2,7 +2,7 @@
 {
     using UnityEngine;
     using System;
-    using System.Linq;
+    using System.Reflection;
     using System.Collections;
     using System.Collections.Generic;
     using Random = UnityEngine.Random;
@@ -46,7 +46,7 @@
 
         private void Awake()
         {
-
+            _clients = new List<IUtilityAIClient>();
         }
 
 		private void Start()
@@ -75,9 +75,8 @@
 
             if (aiConfigs.Length == 0) return;
 
-            if(_clients == null)
+            if (_clients == null)
                 _clients = new List<IUtilityAIClient>();
-
 
             AINameMap.RegenerateNameMap();
 
@@ -88,16 +87,22 @@
                 for (int i = 0; i < aiConfigs.Length; i++)
                 {
                     //  Create a new IUtilityAIClient
-                    Guid guid = AINameMap.GetGUID(aiConfigs[i].aiId);
+                    string aiClientName = aiConfigs[i].aiId;
+                    var field = typeof(AINameMapHelper).GetField(aiClientName, BindingFlags.Public | BindingFlags.Static);
+                    Guid guid = (Guid)field.GetValue(null);
+
+                    //Guid guid = AINameMap.GetGUID(aiConfigs[i].aiId);
                     if (guid == Guid.Empty)
                     {
                         //Debug.LogWarningFormat("Guid for {0} does not exist.", aiConfigs[i].aiId);
+                        Debug.LogFormat("<color=red> AINameMap does not contain aiId ( {0} ) </color>", aiConfigs[i].aiId);
                         continue;
                     }
 
                     IUtilityAIClient client = new UtilityAIClient(guid, GetComponent<IContextProvider>(),
                                                                   aiConfigs[i].intervalMin, aiConfigs[i].intervalMax,
                                                                   aiConfigs[i].startDelayMin, aiConfigs[i].startDelayMax);
+
 
                     clients.Add(client);                          //  Add the client to the TaskNetwork.
 
@@ -120,7 +125,6 @@
                 if(aiConfigs[i].isActive)
                 {
                     //Debug.Log(aiConfigs[i].aiId + " is active and running.\nDebugClient is set to " + aiConfigs[i]._debugClient);
-
                     clients[i].Start();
                     StartCoroutine(ExecuteUpdate((UtilityAIClient)clients[i]));
                 }    

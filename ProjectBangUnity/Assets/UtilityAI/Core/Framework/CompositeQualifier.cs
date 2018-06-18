@@ -85,7 +85,10 @@
     [Serializable]
     public class CompositeScoreQualifier : CompositeQualifier
     {
-        
+
+        public bool debugScore;
+
+
         public override float Score(IAIContext context, List<IScorer> scorers)
         {
             var score = 0f;
@@ -98,6 +101,9 @@
             }
 
             _score = score;
+
+            if(debugScore) Debug.LogFormat("{0} : {1}", action.name, score);
+
             return score;
         }
     }
