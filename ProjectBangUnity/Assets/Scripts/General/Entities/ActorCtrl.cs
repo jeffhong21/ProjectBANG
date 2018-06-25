@@ -166,6 +166,10 @@
 
         public override void TakeDamage(float damage)
         {
+            if (_invinsible)
+                return;
+
+
             currentHealth -= damage;;
             if (currentHealth <= 0){
                 Death();

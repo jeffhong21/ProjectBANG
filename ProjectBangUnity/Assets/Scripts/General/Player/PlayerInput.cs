@@ -210,7 +210,7 @@
                 Debug.DrawRay(dashStartPosition, transform.forward * _dashDistance, Color.green);
                 transform.Translate(Vector3.up * 2 * animator.GetFloat("HeightCurve"));
                 transform.Translate(Vector3.forward * Time.deltaTime * _dashSpeed);
-                if ((transform.position - dashStartPosition).sqrMagnitude >= (_dashDistance * _dashDistance))
+                if ((transform.position - dashStartPosition).magnitude >= _dashDistance)
                 {
                     isDashing = false;
                     animator.SetBool("Dash", isDashing);

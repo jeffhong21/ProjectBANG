@@ -17,8 +17,9 @@ namespace Bang
         [SerializeField]
         private PlayerManager _players;
         [SerializeField, Tooltip("Default firearm to equip.")]
-        protected FirearmBase _defaultWeapon;
-
+        private FirearmBase _defaultWeapon;
+        [SerializeField]
+        private bool removeAssetsWithTag = true;
 
         public PoolManager poolManager{
             get { return _poolManager; }
@@ -56,7 +57,7 @@ namespace Bang
 		{
             base.Awake();
             //  Remove any player assets.
-            RemoveAssetsWithTag(Tags.Player);
+            if(removeAssetsWithTag) RemoveAssetsWithTag(Tags.Player);
 
             if (FindObjectOfType<PoolManager>() == null){
                 _poolManager = Instantiate(poolManager);
@@ -70,8 +71,7 @@ namespace Bang
                 _pauseManager = Instantiate(pauseManager);
             }
 
-            if (_defaultWeapon == null) throw new ArgumentNullException("GameManager has no default firearm.");
-
+            if (_defaultWeapon == null) throw new ArgumentNullException("GameManager has no default weapon.");
 
             InstantiatePlayers();
             //  Stay Persistent throught scenes.
@@ -106,7 +106,8 @@ namespace Bang
 
 		private void InstantiatePlayers()
         {
-            players.playerInstance = Instantiate(players.playerPrefab, Vector3.zero, Quaternion.Euler(0,180,0));
+            if(players.doNotSpawn == false)
+                players.playerInstance = Instantiate(players.playerPrefab, Vector3.zero, Quaternion.Euler(0,180,0));
 
         }
 
@@ -120,9 +121,10 @@ namespace Bang
     [Serializable]
     public class PlayerManager
     {
+        public bool doNotSpawn;
         //public string playerName;
         public PlayerInput playerPrefab;
-        [HideInInspector]
+        //[HideInInspector]
         public PlayerInput playerInstance;
         public float startingHealth = 4f;
 

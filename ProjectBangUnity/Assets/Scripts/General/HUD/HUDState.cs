@@ -58,10 +58,12 @@ namespace Bang
             _canvas = GetComponent<Canvas>();
         }
 
+
 		private void OnEnable()
 		{
             _canvas.enabled = true;
 		}
+
 
 		private void OnDisable()
 		{

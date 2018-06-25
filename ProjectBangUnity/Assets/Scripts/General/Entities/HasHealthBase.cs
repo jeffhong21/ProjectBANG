@@ -6,6 +6,7 @@
     public abstract class HasHealthBase : EntityBase, IHasHealth
     {
         [Header("----- Health -----")]
+        public bool _invinsible;
         [SerializeField, Tooltip("Total max health.")]
         private float _maxHealth = 4f;
         [SerializeField, Tooltip("Current health")]

@@ -9,7 +9,11 @@
 	{
         public Transform target;
         [SerializeField]
-        Vector3 defaultPosition = new Vector3(0, 16, -8);
+        Vector3 defaultPosition = new Vector3(0, 12, -9);
+        [SerializeField]
+        bool useExtendedPosition;
+        [SerializeField]
+        Vector3 extendedPosition = new Vector3(0, 18, -12);
         [SerializeField]
         float smoothSpeed = 0.125f;
         [SerializeField, ReadOnly]
@@ -30,7 +34,7 @@
 
 		void FollowTarget()
         {
-            currentPosition = defaultPosition;
+            currentPosition = useExtendedPosition ? extendedPosition : defaultPosition;
             //cameraDirection = target.position - transform.position;
             //Vector3 desiredPosition = transform.position + target.position + defaultPosition;
 

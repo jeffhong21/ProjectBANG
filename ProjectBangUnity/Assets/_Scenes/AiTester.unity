@@ -1854,21 +1854,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4298694849386544, guid: 3055f080243a047bd897834a5e731da2, type: 2}
       propertyPath: m_RootOrder
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 20289394047185378, guid: 3055f080243a047bd897834a5e731da2,
-        type: 2}
-      propertyPath: field of view
-      value: 54
-      objectReference: {fileID: 0}
-    - target: {fileID: 20097451196929732, guid: 3055f080243a047bd897834a5e731da2,
-        type: 2}
-      propertyPath: m_CullingMask.m_Bits
-      value: 4294967295
-      objectReference: {fileID: 0}
-    - target: {fileID: 1550180085056254, guid: 3055f080243a047bd897834a5e731da2, type: 2}
-      propertyPath: m_IsActive
-      value: 0
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3055f080243a047bd897834a5e731da2, type: 2}
@@ -3745,7 +3731,7 @@ Prefab:
     - target: {fileID: 114605198866535966, guid: 4e7d76d67948d4d539e7df57ebd4dc65,
         type: 2}
       propertyPath: _poolSetup.Array.data[0].initialInstanceCount
-      value: 8
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 114605198866535966, guid: 4e7d76d67948d4d539e7df57ebd4dc65,
         type: 2}
@@ -4158,7 +4144,7 @@ Prefab:
     - target: {fileID: 114153510885682738, guid: f79983532494b45bc8031765cb05237f,
         type: 2}
       propertyPath: delay
-      value: 5
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1095826965023092, guid: f79983532494b45bc8031765cb05237f, type: 2}
       propertyPath: m_IsActive
@@ -4323,7 +4309,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2109252353
 Prefab:
@@ -4434,11 +4420,11 @@ Prefab:
     - target: {fileID: 114153510885682738, guid: f79983532494b45bc8031765cb05237f,
         type: 2}
       propertyPath: delay
-      value: 4
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1095826965023092, guid: f79983532494b45bc8031765cb05237f, type: 2}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1095826965023092, guid: f79983532494b45bc8031765cb05237f, type: 2}
       propertyPath: m_Name

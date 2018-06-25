@@ -132,8 +132,18 @@
 
         public Vector3 coverPosition
         {
-            get{ return _destination;}
-            set{ _destination = value; }
+            get
+            {
+                if(coverTarget != null)
+                {
+                    Vector3 closestCoverPoint = coverTarget.ClosestPoint(agent.position);
+
+                    return closestCoverPoint;
+                }
+
+                return Vector3.zero;
+            }
+            set{ _coverPosition = value; }
         }
 
 

@@ -119,6 +119,7 @@ GameObject:
   - component: {fileID: 114193328531158472}
   - component: {fileID: 114720206722545972}
   - component: {fileID: 114979029075574234}
+  - component: {fileID: 114061342786591958}
   m_Layer: 10
   m_Name: AIAgent
   m_TagString: Player
@@ -1829,6 +1830,21 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &114061342786591958
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a41b4919c76494158859b63cda66ec5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  drawGizmos: 1
+  drawGUI: 1
+  sphereSize: 0.25
+  sphereAlpha: 0.5
 --- !u!114 &114193328531158472
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1888,14 +1904,16 @@ MonoBehaviour:
     isActive: 1
     isPredefined: 1
     type: Bang.AgentScanAI
+    debug: 0
   - aiId: AgentMoveAI
-    intervalMin: 1
+    intervalMin: 0.5
     intervalMax: 1
     startDelayMin: 0
     startDelayMax: 0
     isActive: 1
     isPredefined: 1
     type: Bang.AgentMoveAI
+    debug: 0
   - aiId: AgentActionAI
     intervalMin: 1
     intervalMax: 1
@@ -1904,10 +1922,11 @@ MonoBehaviour:
     isActive: 1
     isPredefined: 1
     type: Bang.AgentActionAI
+    debug: 0
   _hasStarted: 0
   debugNextIntervalTime: 0
   showDefaultInspector: 0
-  showDeleteAssetOption: 1
+  showDeleteAssetOption: 0
   selectAiAssetOnCreate: 0
 --- !u!114 &114790253131203490
 MonoBehaviour:
@@ -1921,6 +1940,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _poolId: 0
+  _invinsible: 0
   _maxHealth: 2
   _currentHealth: 0
   _isDead: 0

@@ -9,8 +9,9 @@ namespace Bang
     {
 
         public GameModeTypes gameMode;
-
+        public string[] roundStartingText = { "3", "2", "1", "Draw!" };
         public GameModeBase shootout = new GameModeBase();
+
 
 
         public TeamManager roundWinner;
