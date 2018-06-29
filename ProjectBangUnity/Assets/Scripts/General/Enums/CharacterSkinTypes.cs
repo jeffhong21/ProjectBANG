@@ -3,8 +3,14 @@ namespace Bang
 
     public enum CharacterSkinTypes
     {
+        Badguy,
+        BusinessMan,
         Cowboy,
-        Cowgirl
+        Cowgirl,
+        Gunman,
+        Sheriff,
+        Woman,
+        WorkingGirl
     }
 }
 

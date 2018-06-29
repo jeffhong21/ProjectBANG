@@ -23,7 +23,7 @@
             waypoints = new Queue<Vector3>();
             hostiles = new List<IHasHealth>();
 
-            navMeshAgent = agent.agentInput.agent;
+            navMeshAgent = agent.GetComponent<NavMeshAgent>();
             if(navMeshAgent == null){
                 Debug.Log("Context can't find navMeshAgent");
             }
@@ -106,6 +106,7 @@
             }
         }
 
+
         public IHasHealth attackTarget
         {
             get{
@@ -122,6 +123,7 @@
                 __attackTargetName = _attackTarget.GetType().Name;  
             }
         }
+
 
         public Collider coverTarget
         {

@@ -1,11 +1,11 @@
-namespace Bang
+﻿namespace Bang
 {
     using UnityEngine;
     using System;
 
     public class InventoryHandler : MonoBehaviour
     {
-        protected GameManagerController gm;
+        protected GameManager gm;
 
         [SerializeField]
         protected FirearmBase _equippedFirearm;
@@ -24,10 +24,10 @@ namespace Bang
 
         protected virtual void Awake()
         {
-            //gm = GameManagerController.instance;
+            //gm = GameManager.instance;
             //if (gm == null)
             //{
-            //    gm = FindObjectOfType<GameManagerController>();
+            //    gm = FindObjectOfType<GameManager>();
             //    if (gm == null)
             //        Debug.LogWarning("Still can't find GameManagerInstance.");
             //}

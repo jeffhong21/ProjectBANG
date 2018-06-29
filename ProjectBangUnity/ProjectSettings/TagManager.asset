@@ -10,6 +10,7 @@ TagManager:
   - Projectile
   - Deputy
   - Outlaw
+  - RespawnPoint
   layers:
   - Default
   - TransparentFX

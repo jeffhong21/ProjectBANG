@@ -114,14 +114,15 @@ GameObject:
   - component: {fileID: 54972994153984370}
   - component: {fileID: 136877615479576448}
   - component: {fileID: 195483426579643508}
-  - component: {fileID: 114790253131203490}
-  - component: {fileID: 114558835538233468}
+  - component: {fileID: 114839373653343526}
+  - component: {fileID: 114991947578987826}
+  - component: {fileID: 114032756066691608}
   - component: {fileID: 114193328531158472}
   - component: {fileID: 114720206722545972}
   - component: {fileID: 114979029075574234}
   - component: {fileID: 114061342786591958}
   m_Layer: 10
-  m_Name: AIAgent
+  m_Name: AIAgentV2
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1830,6 +1831,18 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &114032756066691608
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 550203269ca29404fa5c362221bb364b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  arrivalDistance: 1
 --- !u!114 &114061342786591958
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1866,24 +1879,6 @@ MonoBehaviour:
     _coverPosition: {x: 0, y: 0, z: 0}
     __hostiles: []
     _isSearching: 0
---- !u!114 &114558835538233468
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e295b50f1e8348709862f022afc2fce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isMoving: 0
-  navType: 0
-  _moveSpeed: 6
-  _acceleration: 6
-  _angularSpeed: 270
-  _arrivalDistance: 1
-  _agent: {fileID: 0}
 --- !u!114 &114720206722545972
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1928,7 +1923,7 @@ MonoBehaviour:
   showDefaultInspector: 0
   showDeleteAssetOption: 0
   selectAiAssetOnCreate: 0
---- !u!114 &114790253131203490
+--- !u!114 &114839373653343526
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -1936,26 +1931,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 1141768220188808}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fcf5c82132dfa41f4b27264bed1f8828, type: 3}
+  m_Script: {fileID: 11500000, guid: 0a04b682cba734687bf03caa146ca3c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _poolId: 0
-  _invinsible: 0
-  _maxHealth: 2
-  _currentHealth: 0
-  _isDead: 0
-  actorBody:
-    _head: {fileID: 4645203099748726}
-    _leftHand: {fileID: 4605668109480382}
-    _rightHand: {fileID: 4781103747589800}
-    _mainRenderer: []
-  _equippedFirearm: {fileID: 0}
-  _fieldOfView: 108
-  _sightRange: 20
-  _scanRadius: 12
-  _attackSpeed: 1
-  _aimSpeed: 1.25
-  _aimAccuracy: 1
+  moveSpeed: 6
+  rollSpeed: 10
+  rollDistance: 10
+  idleTimeout: 5
+  canAttack: 0
+  isMoving: 0
+  weapon: {fileID: 0}
+  defaultWeapon: {fileID: 114922952180561708, guid: d1ee3bcc0eb744f5cae6cb1a5e6fe2e0,
+    type: 2}
+  weaponHolder: {fileID: 4781103747589800}
+  aimHeight: 0.75
+  fieldOfView: 135
+  sightRange: 20
+  scanRadius: 15
+  attackSpeed: 1
+  aimSpeed: 1.25
+  aimAccuracy: 3
 --- !u!114 &114979029075574234
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1971,6 +1966,22 @@ MonoBehaviour:
   lineColor: {r: 0.7058824, g: 1, b: 0, a: 1}
   focusTargetColor: {r: 0, g: 0.7058824, b: 1, a: 0.5019608}
   yOffset: 0.05
+--- !u!114 &114991947578987826
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f03b32af37de64d94b4c93de22c4df9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _invinsible: 0
+  _maxHealth: 2
+  _currentHealth: 0
+  _timeInvincibleAfterRespawn: 0
+  _isDead: 0
 --- !u!136 &136877615479576448
 CapsuleCollider:
   m_ObjectHideFlags: 1

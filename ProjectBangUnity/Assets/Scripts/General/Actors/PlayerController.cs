@@ -5,81 +5,69 @@ namespace Bang
     using UnityEngine.Events;
 
 
-    public class PlayerController : MonoBehaviour
+    public class PlayerController : ActorController
     {
         public Action<int> ammoChange;
         public Action<float> healthChange;
 
-
-        public float moveSpeed = 6f;
-        public float rollSpeed = 10f;
-        public float rollDistance = 10f;
-        public float idleTimeout = 5f;
-        public bool canAttack;
-        public bool isMoving;
-
-        public FirearmBase weapon;
-        public FirearmBase defaultWeapon;
+        //
+        //  Fields
+        //
         public PlayerCrosshairs crosshairs;
-        public Transform weaponHolder;
-        public float aimHeight = 0.75f;
 
 
-
-        protected Camera playerCamera;
         protected PlayerInput1 input;
-        protected ActorHealth health;
-        protected InventoryHandler inventory;
-        protected AnimationHandler animHandler;
-        protected Renderer[] renderers;                 // References used to make sure Renderers are reset properly. 
-        protected float idleTimer;                      // Used to count up to player considering a random idle.
-
-
         protected Vector3 cursorPosition;
         protected Vector3 playerInput;
         protected Vector3 playerVelocity;
         protected Vector3 previousPosition;
-        [SerializeField] protected float fwdDotProduct;
-        [SerializeField] protected float rightDotProduct;
+        [SerializeField, ReadOnly]
+        protected float fwdDotProduct;
+        [SerializeField, ReadOnly]
+        protected float rightDotProduct;
 
-        public Vector3 CursorPosition{
+
+        //
+        //  Properties
+        //
+        public Vector3 CursorPosition
+        {
             get { return cursorPosition; }
         }
 
 
-        private void Awake()
+        //
+        //  Methods
+        //
+        protected override void Awake()
         {
             input = GetComponent<PlayerInput1>();
             animHandler = GetComponent<AnimationHandler>();
             inventory = GetComponent<InventoryHandler>();
 
-            if (playerCamera == null) playerCamera = Camera.main;
+            if (playerCamera == null)
+            {
+                gm.PlayerCamera.target = this.transform;
+                playerCamera = gm.PlayerCamera.GetComponent<Camera>();
+            }
 
             crosshairs = Instantiate(crosshairs, this.transform.position, crosshairs.transform.rotation, this.transform);
-
-
-
         }
 
 
-		private void OnEnable()
+        protected override void OnEnable()
 		{
-            renderers = GetComponentsInChildren<Renderer>();
-
-            EquipWeapon(defaultWeapon, weaponHolder);
+            base.OnEnable();
 		}
 
 
-		private void OnDisable()
+        protected override void OnDisable()
 		{
-            //for (int i = 0; i < renderers.Length; ++i)
-            //{
-            //    renderers[i].enabled = true;
-            //}
+            base.OnDisable();
 		}
 
 
-		private void FixedUpdate()
+        protected virtual void FixedUpdate()
 		{
             CalculateMovement();
 
@@ -88,24 +76,21 @@ namespace Bang
 		}
 
 
-		public virtual void EquipWeapon(FirearmBase weapon, Transform location)
+        public override void EquipWeapon(FirearmBase weapon, Transform location)
         {
             this.weapon = Instantiate(weapon, location.position, location.rotation, location) as FirearmBase;
         }
 
 
-        public virtual void FireWeapon(Vector3 target)
+        public override void FireWeapon(Vector3 target)
         {
             weapon.Shoot(target);
         }
 
 
-        public virtual void Reload()
+        public override void Reload()
         {
-            //canShoot = false;
-            //equippedFirearm.Reload();
-            //canShoot = true;
-            //HUDState.UpdateAmmo(equippedFirearm.currentAmmo, equippedFirearm.maxAmmo);
+            // TODO    
         }
 
 
@@ -120,7 +105,7 @@ namespace Bang
             rightDotProduct = Vector3.Dot(transform.right, playerVelocity);
 
             isMoving = Math.Abs(playerInput.x) >= 0.1f || Math.Abs(playerInput.y) >= 0.1f;
-            animHandler.Idle(isMoving);
+
         }
 
 
@@ -129,6 +114,7 @@ namespace Bang
             playerInput.Set(input.PlayerInput.x, 0, input.PlayerInput.y);
             transform.position += playerInput.normalized * moveSpeed * Time.deltaTime;
 
+            animHandler.Idle(isMoving);
             animHandler.Locomotion(fwdDotProduct, rightDotProduct);
         }
 
@@ -161,12 +147,12 @@ namespace Bang
 
 
 
-        public void EnableControl()
+        public override void EnableControls()
         {
             input.enabled = true;
         }
 
-        public void DisableControl()
+        public override void DisableControls()
         {
             input.enabled = false;
         }

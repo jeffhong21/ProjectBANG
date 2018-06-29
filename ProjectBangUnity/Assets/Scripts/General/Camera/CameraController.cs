@@ -20,15 +20,15 @@
         Vector3 currentPosition;
 
 
-		void Start()
-		{
-            if(target == null){
-                target = GameManagerController.instance.players.playerInstance.transform;
-            }
-            else{
-                Debug.LogWarning("Camera has no target");
-            }
-		}
+		//void Start()
+		//{
+  //          if(target == null){
+  //              target = GameManager.instance.players.playerInstance.transform;
+  //          }
+  //          else{
+  //              Debug.LogWarning("Camera has no target");
+  //          }
+		//}
 
 
 

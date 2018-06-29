@@ -73,6 +73,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _poolSetup:
   - type: 0
+    id: 
     prefab: {fileID: 152594, guid: 4bd9b690abcb37c4797032b5541f2fc7, type: 2}
     initialInstanceCount: 18
 --- !u!114 &114605198866535966
@@ -89,9 +90,6 @@ MonoBehaviour:
   _poolSetup:
   - type: 0
     prefab: {fileID: 1141768220188808, guid: 50aafa2cd0ecc4fa5883caf500b0fc8a, type: 2}
-    initialInstanceCount: 1
-  - type: 1
-    prefab: {fileID: 1141768220188808, guid: 5f9b0703ae2ef427bac3494fa5ebd9d5, type: 2}
-    initialInstanceCount: 1
+    initialInstanceCount: 0
   worldIsGroup: 1
   groupPoolTypes: 0

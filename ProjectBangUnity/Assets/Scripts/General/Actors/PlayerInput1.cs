@@ -59,7 +59,7 @@ namespace Bang
             else if (InputManager.LMB)
             {
                 playerCtrl.FireWeapon(playerCtrl.CursorPosition);
-                Debug.Log("Shooting");
+                //Debug.Log("Shooting");
             }
             else if (InputManager.RMB)
             {

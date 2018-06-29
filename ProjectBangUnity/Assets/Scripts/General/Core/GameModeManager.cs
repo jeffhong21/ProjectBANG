@@ -7,46 +7,115 @@ namespace Bang
 
     public class GameModeManager : SingletonMonoBehaviour<GameModeManager>
     {
+        [System.Serializable]
+        public class TeamManager
+        {
+            public TeamTypes teamType;
+            public ActorManager[] members;
+            public int totalWins;
+        }
 
+
+        //
+        //  Readonly
+        //
+        protected readonly string respawnPointTag = "RespawnPoint";
+        protected readonly string[] roundStartingText = { " 3 ", " 2 ", " 1 ", "Draw!" };
+
+
+        //
+        //  Fields
+        //
+        public bool skipIntro;
         public GameModeTypes gameMode;
-        public string[] roundStartingText = { "3", "2", "1", "Draw!" };
-        public GameModeBase shootout = new GameModeBase();
+        public int numberRoundsToWin = 1;
+        public float timePerRound = 180f;
+        public float respawnTime = 3f;
+
+        [SerializeField, ReadOnly]
+        protected int currentRound;
+        [SerializeField]
+        protected ActorManager[] actors;
+        [SerializeField, ReadOnly]
+        protected GameObject[] respawnPoints;
 
 
 
-        public TeamManager roundWinner;
-        public TeamManager gameWinner;
+        //
+        //  Properties
+        //
+        public int CurrentRound
+        {
+            get { return currentRound; }
+        }
+
+        public ActorManager[] Actors
+        {
+            get { return actors; }
+        }
+
+        public GameObject[] RespawnPoints
+        {
+            get { return respawnPoints; }
+        }
 
 
-		protected override void Awake()
+        //
+        //  Methods
+        //
+
+        protected virtual void SetTeams()
+        {
+            
+        }
+
+
+        protected override void Awake()
 		{
             base.Awake();
+
+            respawnPoints = GameObject.FindGameObjectsWithTag(respawnPointTag);
 
 
             DontDestroyOnLoad(gameObject);
 		}
 
 
-
         protected virtual void Start()
         {
-            switch (gameMode)
+            for (int i = 0; i < Actors.Length; i ++)
             {
-                case GameModeTypes.Shootout:
-                    shootout.Setup();
-                    break;
+                if(respawnPoints.Length > 0)
+                {
+                    int index = UnityEngine.Random.Range(0, respawnPoints.Length);
+                    Actors[i].instance = Instantiate(Actors[i].prefab, respawnPoints[index].transform.position, Quaternion.Euler(0, 180, 0));
+                    Actors[i].DisableControls();
+                }
+                else
+                {
+                    Vector3 defaultSpawn = UnityEngine.Random.insideUnitCircle * 5;
+                    defaultSpawn.y = 0;
+                    Actors[i].instance = Instantiate(Actors[i].prefab, defaultSpawn, Quaternion.Euler(0, 180, 0));
+                    Actors[i].DisableControls();
+                }
+
             }
 
-            //StartCoroutine(GameLoop());
+            SetActorControls(false);
+
+            StartCoroutine(GameLoop());
         }
+
 
         protected virtual IEnumerator GameLoop()
         {
-            //if (GameManager.Instance.skipIntro == false)
-            //{
-            //    yield return StartCoroutine(RoundStarting());
-            //}
+            if (skipIntro == false)
+            {
+                yield return StartCoroutine(RoundStarting());
+            }
+
             yield return StartCoroutine(RoundPlaying());
+
             yield return StartCoroutine(RoundEnding());
 
             //if (gameWinner != null)
@@ -65,7 +134,16 @@ namespace Bang
 
         protected virtual IEnumerator RoundStarting()
         {
-            //Debug.Log("RoundStarting");
+            Debug.Log("RoundStarting");
+
+            //for (int i = 0; i < roundStartingText.Length; i ++)
+            //{
+            //    //  Set Round Starting TExt to be active.
+            //    yield return new WaitForSeconds(0.5f);
+            //    //  Set the text for each second.
+            //    //  
+            //}
+
             //if (GameManager.Instance.isRoundPlaying == false)
             //{
             //    ResetAllPlayers();
@@ -91,7 +169,9 @@ namespace Bang
 
         protected virtual IEnumerator RoundPlaying()
         {
-            //Debug.Log("RoundPlaying");
+            Debug.Log("RoundPlaying");
+            SetActorControls(true);
+
             //EnablePlayerControl();
             //GameManager.Instance.isRoundPlaying = true;
             //yield return new WaitForSeconds(1);
@@ -108,8 +188,10 @@ namespace Bang
 
         protected virtual IEnumerator RoundEnding()
         {
-            //Debug.Log("Round Ending");
-            //GameManager.Instance.isRoundPlaying = false;
+            Debug.Log("Round Ending");
+            //SetActorControls(false);
+
+
             //yield return new WaitForSeconds(1);
             //DisablePlayerControl();
 
@@ -135,23 +217,21 @@ namespace Bang
         //}
 
 
-        //void DisablePlayerControl()
-        //{
-        //    for (int i = 0; i < players.Length; i++)
-        //    {
-        //        players[i].DisableControl();
-        //    }
-        //}
 
-
-        //void EnablePlayerControl()
-        //{
-        //    for (int i = 0; i < players.Length; i++)
-        //    {
-        //        players[i].EnableControl();
-        //    }
-        //}
-
+        protected void SetActorControls(bool enable)
+        {
+            for (int i = 0; i < Actors.Length; i++)
+            {
+                if(enable)
+                {
+                    Actors[i].EnableControls();
+                }
+                else
+                {
+                    Actors[i].DisableControls();
+                }
+            }
+        }
 
 
         //bool OnePlayerLeft()

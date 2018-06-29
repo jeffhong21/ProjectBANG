@@ -1,27 +1,27 @@
-namespace Bang
-{
-    using UnityEngine;
-    using System;
+//namespace Bang
+//{
+//    using UnityEngine;
+//    using System;
 
 
-    [Serializable]
-    public class TeamManager
-    {
-        public TeamTypes teamType;
+//    [Serializable]
+//    public class TeamManager
+//    {
+//        public TeamTypes teamType;
 
-        public ActorManager[] teamMembers;
+//        public ActorManager[] teamMembers;
 
-        public int totalWins;
-
-
-
-    }
+//        public int totalWins;
 
 
 
+//    }
 
 
 
-}
+
+
+
+//}
 
 

@@ -49,7 +49,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1210439646878448}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8da4e04d651a8462abbbcc5f66412c77, type: 3}
+  m_Script: {fileID: 11500000, guid: 8faff62e6a06c47c38a2de603e025ec9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _poolManager: {fileID: 114363392651108178, guid: 4e7d76d67948d4d539e7df57ebd4dc65,
@@ -60,11 +60,6 @@ MonoBehaviour:
     type: 2}
   _playerCamera: {fileID: 114414480808502134, guid: 3055f080243a047bd897834a5e731da2,
     type: 2}
-  _players:
-    playerPrefab: {fileID: 114819898467470930, guid: d8293d68dc2f944de8e727ec62ea3a01,
-      type: 2}
-    playerInstance: {fileID: 0}
-    startingHealth: 4
   _defaultWeapon: {fileID: 114922952180561708, guid: d1ee3bcc0eb744f5cae6cb1a5e6fe2e0,
     type: 2}
 --- !u!114 &114107020904691694

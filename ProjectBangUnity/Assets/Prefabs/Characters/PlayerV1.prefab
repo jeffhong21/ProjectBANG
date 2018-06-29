@@ -116,7 +116,7 @@ GameObject:
   - component: {fileID: 114941810916507612}
   - component: {fileID: 114819898467470930}
   m_Layer: 12
-  m_Name: Player
+  m_Name: PlayerV1
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1862,6 +1862,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _poolId: 0
+  _invinsible: 0
   _maxHealth: 10
   _currentHealth: 0
   _isDead: 0

@@ -246,7 +246,7 @@
 
                 cursorPosition.y += playerCtrl.YFocusOffset;
                 crosshairs.transform.position = cursorPosition;
-                //crosshairs.transform.LookAt(GameManagerController.instance.playerCamera.transform);
+                //crosshairs.transform.LookAt(GameManager.instance.playerCamera.transform);
             }
 
         }

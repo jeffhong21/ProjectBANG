@@ -55,9 +55,9 @@
                     new OverRangeToClosestEnemy(),
                     new LineOfSightToAnyEnemy(),
                     new LineOfSightToClosestEnemy(),
-                    new OverRangeToAnyEnemy(),
-                    new OverRangeToAnyEnemySpawner(),
-                    new ProximityToAgentSpawner()
+                    new OverRangeToAnyEnemy()
+                    //new OverRangeToAnyEnemySpawner()
+                    //new ProximityToAgentSpawner()
                 }
             };
             actions.Add(a);  // --  Add to Actions Group
@@ -86,38 +86,38 @@
 
             #region MoveToCover
 
-            // ---- New Action ----
-            a = new CompositeAction()
-            {
-                name = "MoveToCover",
-                actions = new List<IAction>()
-                {
-                    new FindClosestCover(){name = "FindClosestCover"},
-                    new MoveToCover(){name = "MoveToCover"}
-                }
-            };
-            actions.Add(a);  // --  Add to Actions Group
+            //// ---- New Action ----
+            //a = new CompositeAction()
+            //{
+            //    name = "MoveToCover",
+            //    actions = new List<IAction>()
+            //    {
+            //        new FindClosestCover(){name = "FindClosestCover"},
+            //        new MoveToCover(){name = "MoveToCover"}
+            //    }
+            //};
+            //actions.Add(a);  // --  Add to Actions Group
 
-            // ---- New Scorers Group ----
-            scorers = new List<IScorer>();
-            //
-            // ---- New Scorer ----
-            scorer = new ShouldFindCover() { score = 15 };
-            scorers.Add(scorer);
-            // ---- New Scorer ----
-            scorer = new HasEnemiesInRange() { score = 10, range = 4 };
-            scorers.Add(scorer);
-            // ---- New Scorer ----
-            scorer = new HasCoverPosition() { score = 5};
-            scorers.Add(scorer);
-            //
-            // ---- Add All Scorers to Scorers Group ----
-            allScorers.Add(scorers.ToArray());
+            //// ---- New Scorers Group ----
+            //scorers = new List<IScorer>();
+            ////
+            //// ---- New Scorer ----
+            //scorer = new ShouldFindCover() { score = 15 };
+            //scorers.Add(scorer);
+            //// ---- New Scorer ----
+            //scorer = new HasEnemiesInRange() { score = 10, range = 4 };
+            //scorers.Add(scorer);
+            //// ---- New Scorer ----
+            //scorer = new HasCoverPosition() { score = 5};
+            //scorers.Add(scorer);
+            ////
+            //// ---- Add All Scorers to Scorers Group ----
+            //allScorers.Add(scorers.ToArray());
 
-            // ---- New Qualifier ----
-            q = new CompositeAllOrNothingQualifier() { threshold = 20 };
-            //q = new CompositeScoreQualifier();
-            qualifiers.Add(q);
+            //// ---- New Qualifier ----
+            //q = new CompositeAllOrNothingQualifier() { threshold = 20 };
+            ////q = new CompositeScoreQualifier();
+            //qualifiers.Add(q);
 
             #endregion
 

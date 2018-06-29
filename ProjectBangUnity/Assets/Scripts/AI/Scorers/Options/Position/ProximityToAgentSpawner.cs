@@ -15,11 +15,13 @@ namespace Bang
 
         public override float Score(IAIContext context, Vector3 position)
         {
-            var c = context as AgentContext;
+            //var c = context as AgentContext;
 
 
-            var range = (position - c.agent.spawnPoint).magnitude;
-            return Mathf.Max(0f, (this.score - range) * multiplier);
+            //var range = (position - c.agent.spawnPoint).magnitude;
+            //return Mathf.Max(0f, (this.score - range) * multiplier);
+            Debug.Log("ProximityToAgentSpawner returns 0");
+            return 0;
         }
     }
 }

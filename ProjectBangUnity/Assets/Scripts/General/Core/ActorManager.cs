@@ -9,12 +9,15 @@
     {
         
         public string name;
-
         public TeamTypes team;
-
         public bool isBot;
+        public GameObject prefab;
+        [HideInInspector]
+        public GameObject instance;
         [ReadOnly]
         public int id;
+        [ReadOnly]
+        public int lives;
         [ReadOnly]
         public int wins;
         [ReadOnly]
@@ -24,20 +27,20 @@
 
 
 
-
-
         public void Reset(){
             
         }
 
 
-        public void EnableControls(){
-            
+        public void EnableControls()
+        {
+            instance.GetComponent<IActorController>().EnableControls();
         }
 
 
-        public void DisableControls(){
-            
+        public void DisableControls()
+        {
+            instance.GetComponent<IActorController>().DisableControls();
         }
 
     }

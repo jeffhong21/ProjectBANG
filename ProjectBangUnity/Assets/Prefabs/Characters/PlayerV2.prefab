@@ -118,8 +118,8 @@ GameObject:
   - component: {fileID: 114000905349334412}
   - component: {fileID: 114464352963231710}
   m_Layer: 12
-  m_Name: Player_Test
-  m_TagString: Untagged
+  m_Name: PlayerV2
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1890,10 +1890,10 @@ MonoBehaviour:
   weapon: {fileID: 0}
   defaultWeapon: {fileID: 114922952180561708, guid: d1ee3bcc0eb744f5cae6cb1a5e6fe2e0,
     type: 2}
-  crosshairs: {fileID: 114826101891483204, guid: 7db2964c8ec8b44fcb79a8d7e2ffb41d,
-    type: 2}
   weaponHolder: {fileID: 4781103747589800}
   aimHeight: 0.75
+  crosshairs: {fileID: 114826101891483204, guid: 7db2964c8ec8b44fcb79a8d7e2ffb41d,
+    type: 2}
   fwdDotProduct: 0
   rightDotProduct: 0
 --- !u!136 &136461347018360410

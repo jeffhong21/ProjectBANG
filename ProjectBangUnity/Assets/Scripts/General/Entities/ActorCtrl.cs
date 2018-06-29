@@ -11,7 +11,7 @@
     /// </summary>
     public class ActorCtrl : HasHealthBase, IHasFirearm
     {
-        protected GameManagerController gm;
+        protected GameManager gm;
 
         public ActorBody actorBody = new ActorBody();
         //[SerializeField, Range(0,100)]
@@ -85,9 +85,9 @@
 
         protected virtual void Awake()
         {
-            gm = GameManagerController.instance;
+            gm = GameManager.instance;
             if (gm == null){
-                gm = FindObjectOfType<GameManagerController>();
+                gm = FindObjectOfType<GameManager>();
                 if (gm == null)
                     Debug.LogWarning("Still can't find GameManagerInstance.");
             }
