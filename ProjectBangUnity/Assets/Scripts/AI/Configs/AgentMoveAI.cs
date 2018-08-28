@@ -4,7 +4,7 @@
     using System;
     using System.Collections.Generic;
 
-    using UtilityAI;
+    using AtlasAI;
 
     [Serializable]
     public class AgentMoveAI : UtilityAIAssetConfig
@@ -34,8 +34,8 @@
             //  Initializes the setup of AI.
             InitializeAI(asset);
 
-            rs.debugScores = true;
-            rs.debugIfDefault = true;
+            //rs.debugScores = true;
+            //rs.debugIfDefault = true;
 
 
 
@@ -50,14 +50,12 @@
                 name = "MoveToBestAttackPosition",
                 scorers = new List<IOptionScorer<Vector3>>()
                 {
-                    new PositionProximityToSelf(),
-                    new ProximityToNearestEnemy(),
-                    new OverRangeToClosestEnemy(),
-                    new LineOfSightToAnyEnemy(),
-                    new LineOfSightToClosestEnemy(),
-                    new OverRangeToAnyEnemy()
-                    //new OverRangeToAnyEnemySpawner()
-                    //new ProximityToAgentSpawner()
+                    new PositionProximityToSelf(),      //  How close each point is to agent.
+                    new ProximityToNearestEnemy(),      //  How close each point is to each enemy.
+                    new OverRangeToClosestEnemy(),      //  If point is over a certain range to each enemy.
+                    new LineOfSightToAnyEnemy(),        //  Does each point have line of sight to each enemy.
+                    new LineOfSightToClosestEnemy(),    //  Does each point have line of sight to closest enemy.
+                    new OverRangeToAnyEnemy()           //  If point is over range to any enemy.
                 }
             };
             actions.Add(a);  // --  Add to Actions Group
@@ -125,27 +123,27 @@
 
             #region StopMovement
 
-            // ---- New Action ----
-            a = new StopMovement()
-            {
-                name = "StopMovement",
-            };
-            actions.Add(a);  // --  Add to Actions Group
+            //// ---- New Action ----
+            //a = new StopMovement()
+            //{
+            //    name = "StopMovement",
+            //};
+            //actions.Add(a);  // --  Add to Actions Group
 
-            // ---- New Scorers Group ----
-            scorers = new List<IScorer>();
-            //
-            // ---- Add Scorers ----
-            scorer = new IsAiming() { score = 50 };
-            scorers.Add(scorer);  // --  Add to Scorers Group
-            //
-            // ---- Add All Scorers to Scorers Group ----
-            allScorers.Add(scorers.ToArray());
+            //// ---- New Scorers Group ----
+            //scorers = new List<IScorer>();
+            ////
+            //// ---- Add Scorers ----
+            //scorer = new IsAiming() { score = 50 };
+            //scorers.Add(scorer);  // --  Add to Scorers Group
+            ////
+            //// ---- Add All Scorers to Scorers Group ----
+            //allScorers.Add(scorers.ToArray());
 
-            // ---- New Qualifier ----
-            q = new CompositeAllOrNothingQualifier() { threshold = 50 };
-            //q = new CompositeScoreQualifier();
-            qualifiers.Add(q);
+            //// ---- New Qualifier ----
+            //q = new CompositeAllOrNothingQualifier() { threshold = 50 };
+            ////q = new CompositeScoreQualifier();
+            //qualifiers.Add(q);
 
             #endregion
 

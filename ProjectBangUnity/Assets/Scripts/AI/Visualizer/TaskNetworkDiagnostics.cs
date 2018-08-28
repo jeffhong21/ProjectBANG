@@ -1,4 +1,4 @@
-﻿//namespace Bang //UtilityAI.Visualization
+﻿//namespace Bang //AtlasAI.Visualization
 //{
 //    using UnityEngine;
 //    using UnityEditor;
@@ -6,8 +6,8 @@
 //    using System;
 //    using System.Collections.Generic;
 
-//    using UtilityAI.Visualization;
-//    using UtilityAI;
+//    using AtlasAI.Visualization;
+//    using AtlasAI;
 
 
 //    public class TaskNetworkDiagnostics : MonoBehaviour
@@ -324,7 +324,7 @@
 //        #region Old
 
 
-//        public string SelectorInfo(UtilityAI s)
+//        public string SelectorInfo(AtlasAI s)
 //        {
 //            var selector = s.rootSelector;
 

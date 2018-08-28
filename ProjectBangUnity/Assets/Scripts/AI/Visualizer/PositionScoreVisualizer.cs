@@ -4,8 +4,8 @@
     using UnityEngine;
     using System.Collections.Generic;
 
-    using UtilityAI.Visualization;
-    using UtilityAI;
+    using AtlasAI.Visualization;
+    using AtlasAI;
 
     public class PositionScoreVisualizer : MonoBehaviour //ActionWithOptionsVisualizerComponent<MoveToBestPosition, Vector3>
     {

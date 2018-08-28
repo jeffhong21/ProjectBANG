@@ -38,10 +38,16 @@ namespace Bang
 
             context = GetComponent<AIContextProvider>().GetContext() as AgentContext;
             navMeshAgent = GetComponent<NavMeshAgentBridge>();
+
+            if (context == null){
+                Debug.Log("***** No context");
+            }
         }
 
 
-        protected override void OnDisable()
+
+
+		protected override void OnDisable()
         {
             base.OnDisable();
 
@@ -149,7 +155,7 @@ namespace Bang
         /// Called when the attack target changes.
         /// </summary>
         /// <param name="newAttackTarget">The new attack target.</param>
-        public virtual void OnAttackTargetChanged(IHasHealth newAttackTarget)
+        public virtual void OnAttackTargetChanged(ActorHealth newAttackTarget)
         {
             var target = newAttackTarget != null ? newAttackTarget.transform : null;
             navMeshAgent.LookAt(target);
@@ -169,19 +175,25 @@ namespace Bang
 
 
 
-
-
+        public override void Death()
+        {
+            animHandler.Death();
+            navMeshAgent.enabled = false;
+            GetComponent<AtlasAI.TaskNetworkComponent>().enabled = false;
+        }
 
 
         public override void DisableControls()
         {
-            GetComponent<UtilityAI.TaskNetworkComponent>().enabled = false;
+            navMeshAgent.enabled = false;
+            GetComponent<AtlasAI.TaskNetworkComponent>().Pause();
             //throw new System.NotImplementedException();
         }
 
         public override void EnableControls()
         {
-            GetComponent<UtilityAI.TaskNetworkComponent>().enabled = true;
+            navMeshAgent.enabled = true;
+            GetComponent<AtlasAI.TaskNetworkComponent>().Resume();
             //throw new System.NotImplementedException();
         }
 

@@ -5,7 +5,7 @@ namespace Bang
 
     public class ProjectileBase : MonoBehaviour, IProjectile
     {
-        protected ActorCtrl _owner;
+        protected ActorController _owner;
         [SerializeField]
         protected float _damage = 1f;
         [SerializeField]
@@ -50,7 +50,7 @@ namespace Bang
         private float spawnTime;
 
 
-        public void Init(ActorCtrl actorCtrl)
+        public void Init(ActorController actorCtrl)
 		{
             _owner = actorCtrl;
 		}

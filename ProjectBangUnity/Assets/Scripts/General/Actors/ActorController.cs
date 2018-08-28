@@ -2,8 +2,10 @@
 {
     using UnityEngine;
 
-
-    public abstract class ActorController : MonoBehaviour, IActorController
+    /// <summary>
+    /// Abstract class for Actors.
+    /// </summary>
+    public abstract class ActorController : EntityBase, IActorController
     {
         protected GameManager gm = GameManager.instance;
 
@@ -32,21 +34,6 @@
         protected float idleTimer;                      // Used to count up to player considering a random idle.
 
 
-        //
-        //  Properties
-        //
-        public Vector3 position
-        {
-            get { return this.transform.position; }
-            set { this.transform.position = value; }
-        }
-
-        public Quaternion rotation
-        {
-            get { return this.transform.rotation; }
-            set { this.transform.rotation = value; }
-        }
-
 
         //
         //  Methods
@@ -61,7 +48,6 @@
         protected virtual void OnEnable()
         {
             renderers = GetComponentsInChildren<Renderer>();
-
             EquipWeapon(defaultWeapon, weaponHolder);
         }
 
@@ -96,9 +82,12 @@
         }
 
 
+
+
         //
         //  Abstract
         //
+        public abstract void Death();
 
         public abstract void DisableControls();
 

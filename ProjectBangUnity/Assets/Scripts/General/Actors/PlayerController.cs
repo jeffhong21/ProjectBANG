@@ -16,7 +16,7 @@ namespace Bang
         public PlayerCrosshairs crosshairs;
 
 
-        protected PlayerInput1 input;
+        protected PlayerInputHandler input;
         protected Vector3 cursorPosition;
         protected Vector3 playerInput;
         protected Vector3 playerVelocity;
@@ -41,7 +41,7 @@ namespace Bang
         //
         protected override void Awake()
         {
-            input = GetComponent<PlayerInput1>();
+            input = GetComponent<PlayerInputHandler>();
             animHandler = GetComponent<AnimationHandler>();
             inventory = GetComponent<InventoryHandler>();
 
@@ -69,7 +69,7 @@ namespace Bang
 
         protected virtual void FixedUpdate()
 		{
-            CalculateMovement();
+            //CalculateMovement();
 
             UpdatePosition();
             UpdateOrientation();
@@ -105,7 +105,6 @@ namespace Bang
             rightDotProduct = Vector3.Dot(transform.right, playerVelocity);
 
             isMoving = Math.Abs(playerInput.x) >= 0.1f || Math.Abs(playerInput.y) >= 0.1f;
-
         }
 
 
@@ -114,8 +113,8 @@ namespace Bang
             playerInput.Set(input.PlayerInput.x, 0, input.PlayerInput.y);
             transform.position += playerInput.normalized * moveSpeed * Time.deltaTime;
 
-            animHandler.Idle(isMoving);
-            animHandler.Locomotion(fwdDotProduct, rightDotProduct);
+            //animHandler.Idle(isMoving);
+            //animHandler.Locomotion(fwdDotProduct, rightDotProduct);
         }
 
 
@@ -145,6 +144,12 @@ namespace Bang
         }
 
 
+
+        public override void Death()
+        {
+            animHandler.Death();
+            DisableControls();
+        }
 
 
         public override void EnableControls()

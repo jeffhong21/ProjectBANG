@@ -4,7 +4,7 @@
     using System;
     using System.Collections.Generic;
 
-    using UtilityAI;
+    using AtlasAI;
 
     [Serializable]
     public class AgentActionAI : UtilityAIAssetConfig
@@ -47,7 +47,7 @@
                     new SetBestAttackTarget()
                     {
                         name = "SetBestAttackTarget",
-                        scorers = new List<IOptionScorer<IHasHealth>>()
+                        scorers = new List<IOptionScorer<ActorHealth>>()
                         {
                             new IsTargetAlive(){score = 100f},
                             new EnemyProximityToSelf(){multiplier = 1f, score = 50f},

@@ -21,9 +21,8 @@ namespace Bang
         /// <summary>
         /// Called by Unity when [enabled].
         /// </summary>
-        protected override void OnEnable()
+        protected virtual void OnEnable()
         {
-            base.OnEnable();
 
             _system = this.GetComponent<ParticleSystem>();
         }

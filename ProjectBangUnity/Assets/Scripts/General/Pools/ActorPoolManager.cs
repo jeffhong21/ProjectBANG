@@ -97,36 +97,36 @@
 
 
 
-        /// <summary>
-        /// Gets the player closest to the specified position.
-        /// </summary>
-        /// <param name="position">The position.</param>
-        /// <returns>The closest player, or null if no more players exist.</returns>
-        public HasHealthBase GetClosestPlayer(Vector3 position)
-        {
-            HasHealthBase closest = null;
-            float closestDistance = Mathf.Infinity;
+        ///// <summary>
+        ///// Gets the player closest to the specified position.
+        ///// </summary>
+        ///// <param name="position">The position.</param>
+        ///// <returns>The closest player, or null if no more players exist.</returns>
+        //public HasHealthBase GetClosestPlayer(Vector3 position)
+        //{
+        //    HasHealthBase closest = null;
+        //    float closestDistance = Mathf.Infinity;
 
-            var count = _players.Count;
-            for (int i = 0; i < count; i++)
-            {
-                var e = _players[i] as HasHealthBase;
-                if (e.currentHealth <= 0)
-                {
-                    continue;
-                }
+        //    var count = _players.Count;
+        //    for (int i = 0; i < count; i++)
+        //    {
+        //        var e = _players[i] as HasHealthBase;
+        //        if (e.currentHealth <= 0)
+        //        {
+        //            continue;
+        //        }
 
-                var dist = (position - e.position).sqrMagnitude;
+        //        var dist = (position - e.position).sqrMagnitude;
 
-                if (dist < closestDistance)
-                {
-                    closestDistance = dist;
-                    closest = e;
-                }
-            }
+        //        if (dist < closestDistance)
+        //        {
+        //            closestDistance = dist;
+        //            closest = e;
+        //        }
+        //    }
 
-            return closest;
-        }
+        //    return closest;
+        //}
 
 
     }

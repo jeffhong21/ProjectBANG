@@ -83,12 +83,14 @@ namespace Bang
 
         protected virtual void Start()
         {
+            
             for (int i = 0; i < Actors.Length; i ++)
             {
                 if(respawnPoints.Length > 0)
                 {
-                    int index = UnityEngine.Random.Range(0, respawnPoints.Length);
-                    Actors[i].instance = Instantiate(Actors[i].prefab, respawnPoints[index].transform.position, Quaternion.Euler(0, 180, 0));
+                    //SuffleSpawnPoints(RespawnPoints);
+
+                    Actors[i].instance = Instantiate(Actors[i].prefab, respawnPoints[i].transform.position, Quaternion.Euler(0, 180, 0));
                     Actors[i].DisableControls();
                 }
                 else
@@ -98,13 +100,35 @@ namespace Bang
                     Actors[i].instance = Instantiate(Actors[i].prefab, defaultSpawn, Quaternion.Euler(0, 180, 0));
                     Actors[i].DisableControls();
                 }
-
             }
 
             SetActorControls(false);
 
             StartCoroutine(GameLoop());
         }
+
+        //protected GameObject[] SuffleSpawnPoints(GameObject[] a)
+        //{
+        //    for (int i = 0; i < a.Length - 1; i--)
+        //    {
+        //        // Randomize a number between 0 and i (so that the range decreases each time)
+        //        int rnd = Random.Range(0, i);
+        //        // Save the value of the current i, otherwise it'll overright when we swap the values
+        //        GameObject temp = a[i];
+
+        //        a[i] = a[rnd];
+        //        a[rnd] = temp;
+        //    }
+
+        //    for (int i = 0; i < a.Length; i++)
+        //    {
+        //        Debug.Log(a[i]);
+        //    }
+
+
+        //    return a;
+        //}
+
 
 
         protected virtual IEnumerator GameLoop()
@@ -134,7 +158,7 @@ namespace Bang
 
         protected virtual IEnumerator RoundStarting()
         {
-            Debug.Log("RoundStarting");
+            //Debug.Log("RoundStarting");
 
             //for (int i = 0; i < roundStartingText.Length; i ++)
             //{
@@ -169,7 +193,7 @@ namespace Bang
 
         protected virtual IEnumerator RoundPlaying()
         {
-            Debug.Log("RoundPlaying");
+            //Debug.Log("RoundPlaying");
             SetActorControls(true);
 
             //EnablePlayerControl();
@@ -188,7 +212,7 @@ namespace Bang
 
         protected virtual IEnumerator RoundEnding()
         {
-            Debug.Log("Round Ending");
+            //Debug.Log("Round Ending");
             //SetActorControls(false);
 
 

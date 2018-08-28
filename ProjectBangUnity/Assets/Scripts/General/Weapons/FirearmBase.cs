@@ -5,7 +5,7 @@
 
     public abstract class FirearmBase : MonoBehaviour, IFirearm
     {
-        protected ActorCtrl owner;
+        protected ActorController owner;
         [SerializeField, Tooltip("Location of the projectile")]
         protected Transform _projectileSpawn;
         [SerializeField, Tooltip("What kind of projectile")]
@@ -110,7 +110,7 @@
 
         }
 
-        public virtual void Init(ActorCtrl actorCtrl)
+        public virtual void Init(ActorController actorCtrl)
         {
             owner = actorCtrl;
         }

@@ -4,21 +4,40 @@ namespace Bang
     using System;
     using System.Collections;
 
-    public class ActorHealth : MonoBehaviour
+    public class ActorHealth : MonoBehaviour, IHasHealth
     {
+        //
+        //  Fields
+        //
         public bool _invinsible;
         [SerializeField]
-        private float _maxHealth = 4f;
+        protected float _maxHealth = 4f;
         [SerializeField]
-        private float _currentHealth;
+        protected float _currentHealth;
         [SerializeField]
-        private float _timeInvincibleAfterRespawn;
+        protected float _timeInvincibleAfterRespawn;
         [SerializeField, ReadOnly]
-        private bool _isDead;
-
+        protected bool _isDead;
+        [SerializeField]
         protected float sinkSpeed = 0.5f;
-        private float startSinkingTime;
+        [SerializeField]
+        protected float delaySinkTime = 3f;
 
+        private IActorController controller;
+        private AnimationHandler animHandler;
+        private float startSinkingTime;
+        private WaitForSeconds sinkDelay;
+
+
+
+        //
+        //  Properties
+        //
+        public Vector3 position{
+            get{
+                return this.transform.position;
+            }
+        }
 
 
         public float maxHealth
@@ -52,6 +71,14 @@ namespace Bang
 
 
 
+        //
+        //  Methods
+        //
+        protected virtual void Awake()
+        {
+            controller = GetComponent<IActorController>() as ActorController;
+            sinkDelay = new WaitForSeconds(delaySinkTime);
+        }
 
 
         protected virtual void OnEnable()
@@ -86,17 +113,16 @@ namespace Bang
         public void Death()
         {
             isDead = true;
+            controller.Death();
             StartCoroutine(StartSinking());
         }
 
 
-        IEnumerator StartSinking(float delaySinkTime = 3f)
+        IEnumerator StartSinking()
         {
-            yield return new WaitForSeconds(delaySinkTime);
+            yield return sinkDelay;
 
             startSinkingTime = Time.time;
-
-
 
             while (true)
             {

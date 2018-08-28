@@ -10,6 +10,7 @@ namespace Bang
 
 
         protected NavMeshAgent navMeshAgent;
+        [SerializeField]
         private Transform target;
         private float distance;
         private Vector3[] corners;

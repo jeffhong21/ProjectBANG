@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 6e938e41a9e5d47d78a1b9956e4e8b2a
+guid: e6796d69320c04215abbca1fdd96396b
 ModelImporter:
   serializedVersion: 22
   fileIDToRecycleName:
@@ -138,7 +138,7 @@ ModelImporter:
       name: Pistol_Strafe_Right
       takeName: mixamo.com
       firstFrame: 0
-      lastFrame: 18
+      lastFrame: 14
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -152,7 +152,7 @@ ModelImporter:
       loopBlendPositionXZ: 1
       keepOriginalOrientation: 1
       keepOriginalPositionY: 1
-      keepOriginalPositionXZ: 0
+      keepOriginalPositionXZ: 1
       heightFromFeet: 0
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
