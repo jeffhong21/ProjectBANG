@@ -4,9 +4,15 @@ namespace Bang
     using System.Collections;
 
 
-    public class ItemBase : EntityBase
+    public abstract class ItemBase : EntityBase
     {
 
     }
-}
 
+
+    public interface IItemBase
+    {
+        
+    }
+
+}

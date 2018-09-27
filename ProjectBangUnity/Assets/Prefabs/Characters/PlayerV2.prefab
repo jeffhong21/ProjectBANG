@@ -1887,8 +1887,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb1e9817073d5428bb1a8be2b5571342, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skinType: 5
-  textureType: 2
+  skinType: 7
+  textureType: 0
   textureIndex: 1
   mesh: {fileID: 137829834481376980}
   material: {fileID: 2100000, guid: de7104d9f6edd444b8d8343e393a54b0, type: 2}
@@ -1925,7 +1925,7 @@ MonoBehaviour:
   canAttack: 0
   isMoving: 0
   weapon: {fileID: 0}
-  defaultWeapon: {fileID: 114922952180561708, guid: d1ee3bcc0eb744f5cae6cb1a5e6fe2e0,
+  defaultWeapon: {fileID: 114762899869664738, guid: 928600b91b9524ac29bcbebfcee83e04,
     type: 2}
   weaponHolder: {fileID: 4781103747589800}
   aimHeight: 0.75
@@ -2576,7 +2576,7 @@ SkinnedMeshRenderer:
   m_Quality: 0
   m_UpdateWhenOffscreen: 0
   m_SkinnedMotionVectors: 1
-  m_Mesh: {fileID: 4300006, guid: 4837235d67e136e4b883adb2bafc73e8, type: 3}
+  m_Mesh: {fileID: 4300000, guid: 4837235d67e136e4b883adb2bafc73e8, type: 3}
   m_Bones:
   - {fileID: 4907368545052878}
   - {fileID: 4363823349750652}
