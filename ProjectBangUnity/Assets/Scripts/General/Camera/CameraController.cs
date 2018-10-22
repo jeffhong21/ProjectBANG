@@ -20,19 +20,13 @@
         Vector3 currentPosition;
 
 
-		//void Start()
-		//{
-  //          if(target == null){
-  //              target = GameManager.instance.players.playerInstance.transform;
-  //          }
-  //          else{
-  //              Debug.LogWarning("Camera has no target");
-  //          }
-		//}
+        public void SetTarget(Transform target)
+        {
+            this.target = target;
+        }
 
 
-
-		void FollowTarget()
+		private void FollowTarget()
         {
             currentPosition = useExtendedPosition ? extendedPosition : defaultPosition;
             //cameraDirection = target.position - transform.position;
@@ -45,7 +39,7 @@
         }
 
 
-		void LateUpdate()
+        private void LateUpdate()
 		{
             if(target){
                 FollowTarget();

@@ -4,13 +4,9 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - SpawnPoint
   - Cover
-  - Firearm
-  - Projectile
-  - Deputy
-  - Outlaw
   - RespawnPoint
+  - Actor
   layers:
   - Default
   - TransparentFX
@@ -25,8 +21,8 @@ TagManager:
   - Entites
   - Cover
   - Player
-  - 
-  - 
+  - TeamA
+  - TeamB
   - 
   - 
   - 

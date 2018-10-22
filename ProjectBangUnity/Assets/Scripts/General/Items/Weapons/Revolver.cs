@@ -1,9 +1,9 @@
-namespace Bang
+﻿namespace Bang
 {
     using UnityEngine;
 
 
-    public class Revolver : FirearmBase
+    public class Revolver : WeaponController
     {
 
 

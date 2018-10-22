@@ -14,11 +14,11 @@
         [SerializeField]
         private HUDState _hudState;
         [SerializeField]
-        private PauseManager _pauseManager;
+        private PauseMenu _pauseManager;
         [SerializeField]
         private CameraController _playerCamera;
         [SerializeField]
-        private FirearmBase _defaultWeapon;
+        private WeaponController _defaultWeapon;
 
 
         //
@@ -32,7 +32,7 @@
             get { return _hudState;}
         }
 
-        public PauseManager PauseManager { 
+        public PauseMenu PauseManager { 
             get { return _pauseManager; } 
         }
 
@@ -41,7 +41,7 @@
             get { return _playerCamera; }
         }
 
-        public FirearmBase defaultWeapon
+        public WeaponController defaultWeapon
         {
             get { return _defaultWeapon; }
         }
@@ -65,7 +65,7 @@
                 _hudState = Instantiate(HudState);
             }
 
-            if (FindObjectOfType<PauseManager>() == null){
+            if (FindObjectOfType<PauseMenu>() == null){
                 _pauseManager = Instantiate(PauseManager);
             }
 
@@ -75,8 +75,7 @@
             if (_defaultWeapon == null) throw new ArgumentNullException("GameManager has no default weapon.");
 
             //InstantiatePlayers();
-            //  Stay Persistent throught scenes.
-            DontDestroyOnLoad(gameObject);
+
 		}
 
 

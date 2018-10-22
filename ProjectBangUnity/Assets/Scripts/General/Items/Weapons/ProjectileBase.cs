@@ -89,6 +89,8 @@ namespace Bang
 
         private void CheckCollisions(float moveDistance)
         {
+            Debug.DrawRay(transform.position, transform.forward, Color.red);
+
             Ray ray = new Ray(transform.position, transform.forward);
             RaycastHit hit;
 

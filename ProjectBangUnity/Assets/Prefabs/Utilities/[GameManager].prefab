@@ -8,15 +8,15 @@ Prefab:
     m_TransformParent: {fileID: 0}
     m_Modifications: []
     m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 0}
+  m_SourcePrefab: {fileID: 0}
   m_RootGameObject: {fileID: 1210439646878448}
-  m_IsPrefabParent: 1
+  m_IsPrefabAsset: 1
 --- !u!1 &1210439646878448
 GameObject:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 5
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4563685064246084}
   - component: {fileID: 114004846144460458}
@@ -31,7 +31,7 @@ GameObject:
 --- !u!4 &4563685064246084
 Transform:
   m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1210439646878448}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -44,7 +44,7 @@ Transform:
 --- !u!114 &114004846144460458
 MonoBehaviour:
   m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1210439646878448}
   m_Enabled: 1
@@ -56,16 +56,15 @@ MonoBehaviour:
     type: 2}
   _hudState: {fileID: 114051188668219278, guid: bd45d85d145c24e88828a9f28f5984b9,
     type: 2}
-  _pauseManager: {fileID: 114273158856164900, guid: ec509140f074848329126f1ad6095829,
-    type: 2}
-  _playerCamera: {fileID: 114414480808502134, guid: 3055f080243a047bd897834a5e731da2,
+  _pauseManager: {fileID: 0}
+  _playerCamera: {fileID: 114807070018686270, guid: 06799b02fca774b79a28488a7e541f2a,
     type: 2}
   _defaultWeapon: {fileID: 114922952180561708, guid: d1ee3bcc0eb744f5cae6cb1a5e6fe2e0,
     type: 2}
 --- !u!114 &114107020904691694
 MonoBehaviour:
   m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1210439646878448}
   m_Enabled: 1

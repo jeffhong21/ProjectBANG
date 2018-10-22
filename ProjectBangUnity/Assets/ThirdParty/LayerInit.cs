@@ -30,6 +30,8 @@
             EnsureLayer("Player", tagManagerAsset);
             EnsureLayer("Enemies", tagManagerAsset);
             EnsureLayer("Damageable", tagManagerAsset);
+
+
         }
 
         private static int EnsureLayer(string name, SerializedObject tagManagerAsset)

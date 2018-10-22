@@ -1,21 +1,12 @@
 namespace Bang
 {
     using UnityEngine;
+    using UnityEngine.UI;
     using System.Collections;
     using System.Collections.Generic;
 
-
     public class GameModeManager : SingletonMonoBehaviour<GameModeManager>
     {
-        [System.Serializable]
-        public class TeamManager
-        {
-            public TeamTypes teamType;
-            public ActorManager[] members;
-            public int totalWins;
-        }
-
-
         //
         //  Readonly
         //
@@ -26,11 +17,11 @@ namespace Bang
         //
         //  Fields
         //
-        public bool skipIntro;
-        public GameModeTypes gameMode;
         public int numberRoundsToWin = 1;
         public float timePerRound = 180f;
         public float respawnTime = 3f;
+        public bool skipIntro;
+        public bool placeAgents;
 
         [SerializeField, ReadOnly]
         protected int currentRound;
@@ -39,23 +30,21 @@ namespace Bang
         [SerializeField, ReadOnly]
         protected GameObject[] respawnPoints;
 
+        public Text displayMessage;
 
-
+            
         //
         //  Properties
         //
-        public int CurrentRound
-        {
+        public int CurrentRound{
             get { return currentRound; }
         }
 
-        public ActorManager[] Actors
-        {
+        public ActorManager[] Actors{
             get { return actors; }
         }
 
-        public GameObject[] RespawnPoints
-        {
+        public GameObject[] RespawnPoints{
             get { return respawnPoints; }
         }
 
@@ -63,76 +52,52 @@ namespace Bang
         //
         //  Methods
         //
-
-        protected virtual void SetTeams()
-        {
-            
-        }
-
-
         protected override void Awake()
 		{
             base.Awake();
-
-            respawnPoints = GameObject.FindGameObjectsWithTag(respawnPointTag);
-
-
-            DontDestroyOnLoad(gameObject);
+            //DontDestroyOnLoad(gameObject);
 		}
 
 
-        protected virtual void Start()
+        private void Start()
         {
-            
-            for (int i = 0; i < Actors.Length; i ++)
+            respawnPoints = GameObject.FindGameObjectsWithTag(respawnPointTag);
+
+            if(!placeAgents)
+                SpawnPlayers();
+
+            //  Start the game.
+            StartCoroutine(GameLoop());
+        }
+
+
+
+        private void SpawnPlayers()
+        {
+            for (int i = 0; i < Actors.Length; i++)
             {
-                if(respawnPoints.Length > 0)
+                if (respawnPoints.Length > 0)
                 {
                     //SuffleSpawnPoints(RespawnPoints);
-
                     Actors[i].instance = Instantiate(Actors[i].prefab, respawnPoints[i].transform.position, Quaternion.Euler(0, 180, 0));
                     Actors[i].DisableControls();
                 }
                 else
                 {
-                    Vector3 defaultSpawn = UnityEngine.Random.insideUnitCircle * 5;
+                    Vector3 defaultSpawn = Random.insideUnitCircle * 5;
                     defaultSpawn.y = 0;
                     Actors[i].instance = Instantiate(Actors[i].prefab, defaultSpawn, Quaternion.Euler(0, 180, 0));
                     Actors[i].DisableControls();
                 }
             }
-
             SetActorControls(false);
-
-            StartCoroutine(GameLoop());
         }
 
-        //protected GameObject[] SuffleSpawnPoints(GameObject[] a)
-        //{
-        //    for (int i = 0; i < a.Length - 1; i--)
-        //    {
-        //        // Randomize a number between 0 and i (so that the range decreases each time)
-        //        int rnd = Random.Range(0, i);
-        //        // Save the value of the current i, otherwise it'll overright when we swap the values
-        //        GameObject temp = a[i];
 
-        //        a[i] = a[rnd];
-        //        a[rnd] = temp;
-        //    }
-
-        //    for (int i = 0; i < a.Length; i++)
-        //    {
-        //        Debug.Log(a[i]);
-        //    }
-
-
-        //    return a;
-        //}
-
-
-
-        protected virtual IEnumerator GameLoop()
+        private IEnumerator GameLoop()
         {
+            yield return StartCoroutine(PlaceAgents());
+
             if (skipIntro == false)
             {
                 yield return StartCoroutine(RoundStarting());
@@ -152,13 +117,21 @@ namespace Bang
             //    Debug.Log(" No Game Winner, Starting Next Round");
             //    StartCoroutine(GameLoop());
             //}
-
-
         }
 
-        protected virtual IEnumerator RoundStarting()
+
+
+        private IEnumerator PlaceAgents()
         {
-            //Debug.Log("RoundStarting");
+            yield return null;
+        }
+
+
+
+
+        private IEnumerator RoundStarting()
+        {
+            Debug.Log("RoundStarting");
 
             //for (int i = 0; i < roundStartingText.Length; i ++)
             //{
@@ -170,28 +143,39 @@ namespace Bang
 
             //if (GameManager.Instance.isRoundPlaying == false)
             //{
-            //    ResetAllPlayers();
-            //    DisablePlayerControl();
+            //    //ResetAllPlayers();
+            //    //DisablePlayerControl();
 
-            //    GameManager.Instance.messageText.gameObject.SetActive(true);
+            //    displayMessage.gameObject.SetActive(true);
             //    yield return new WaitForSeconds(0.5f);
-            //    GameManager.Instance.messageText.text = "3";
+            //    displayMessage.text = "3";
             //    yield return new WaitForSeconds(1f);
-            //    GameManager.Instance.messageText.text = "2";
+            //    displayMessage.text = "2";
             //    yield return new WaitForSeconds(1f);
-            //    GameManager.Instance.messageText.text = "1";
+            //    displayMessage.text = "1";
             //    yield return new WaitForSeconds(1f);
-            //    GameManager.Instance.messageText.text = "GO!";
+            //    displayMessage.text = "GO!";
             //}
             //else
             //{
             //    yield return null;
             //}
 
+
+            //displayMessage.gameObject.SetActive(true);
+            //yield return new WaitForSeconds(0.5f);
+            //displayMessage.text = "3";
+            //yield return new WaitForSeconds(1f);
+            //displayMessage.text = "2";
+            //yield return new WaitForSeconds(1f);
+            //displayMessage.text = "1";
+            //yield return new WaitForSeconds(1f);
+            //displayMessage.text = "GO!";
+
             yield return null;
         }
 
-        protected virtual IEnumerator RoundPlaying()
+        private IEnumerator RoundPlaying()
         {
             //Debug.Log("RoundPlaying");
             SetActorControls(true);
@@ -210,7 +194,7 @@ namespace Bang
             yield return null;
         }
 
-        protected virtual IEnumerator RoundEnding()
+        private IEnumerator RoundEnding()
         {
             //Debug.Log("Round Ending");
             //SetActorControls(false);
@@ -242,7 +226,7 @@ namespace Bang
 
 
 
-        protected void SetActorControls(bool enable)
+        private void SetActorControls(bool enable)
         {
             for (int i = 0; i < Actors.Length; i++)
             {
@@ -300,6 +284,26 @@ namespace Bang
         //}
 
 
+
+        //private GameObject[] SuffleSpawnPoints(GameObject[] a)
+        //{
+        //    for (int i = 0; i < a.Length - 1; i--)
+        //    {
+        //        // Randomize a number between 0 and i (so that the range decreases each time)
+        //        int rnd = Random.Range(0, i);
+        //        // Save the value of the current i, otherwise it'll overright when we swap the values
+        //        GameObject temp = a[i];
+        //
+        //        a[i] = a[rnd];
+        //        a[rnd] = temp;
+        //    }
+        //
+        //    for (int i = 0; i < a.Length; i++)
+        //    {
+        //        Debug.Log(a[i]);
+        //    }
+        //    return a;
+        //}
     }
 }
 

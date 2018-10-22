@@ -9,26 +9,26 @@
     {
         
         public string name;
-        public TeamTypes team;
+
+        public int teamID;
+
         public bool isBot;
+
         public GameObject prefab;
         [HideInInspector]
         public GameObject instance;
-        [ReadOnly]
-        public int id;
-        [ReadOnly]
+        [HideInInspector]
         public int lives;
-        [ReadOnly]
-        public int wins;
-        [ReadOnly]
-        public int kills;
-        [ReadOnly]
-        public int deaths;
-
-
 
         public void Reset(){
             
+        }
+
+
+        public void SetTeam(string teamID)
+        {
+            //instance.tag = teamID;
+            //instance.layer = LayerMask.NameToLayer(teamID);
         }
 
 
