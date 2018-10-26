@@ -35,26 +35,27 @@
             //  Initializes the setup of AI.
             InitializeAI(asset);
 
-
+            //rs.debugScores = true;
 
             // ---- New Action ----
             a = new CompositeAction()
             {
-                name = "FireAtTarget",
+                name = "Fire At Target",
                 actions = new List<IAction>()
                 {
                     //new StopMovement(){ name = "StopMovement"},
                     new SetBestAttackTarget()
                     {
-                        name = "SetBestAttackTarget",
+                        name = "Set Best Attack Target",
                         scorers = new List<IOptionScorer<ActorHealth>>()
                         {
-                            new IsTargetAlive(){score = 100f},
-                            new EnemyProximityToSelf(){multiplier = 1f, score = 50f},
+                            new IsTargetAlive(){ score = 100f},
+                            new CanSeeTarget(){ score = 50f },
+                            new EnemyProximityToSelf(){ multiplier = 1f, score = 50f},
                             new IsCurrentTargetScorer()
                         }
                     },
-                    new FireAtAttackTarget(){ name = "FireAtAttackTarget" }
+                    new FireAtAttackTarget(){ name = "Fire At Target" }
                 }
             };
             actions.Add(a);  // --  Add to Actions Group
@@ -66,45 +67,24 @@
             scorer = new HasEnemies() { score = 5};
             scorers.Add(scorer);
             // ---- New Scorer ----
-            scorer = new HasEnemiesInRange() { score = 15, range = 10 };
-            scorers.Add(scorer); 
+            scorer = new HasEnemiesInRange() { score = 10, range = 10 };
+            scorers.Add(scorer);
             //
             // ---- Add All Scorers to Scorers Group ----
             allScorers.Add(scorers.ToArray());
 
             // ---- New Qualifier ----
-            q = new CompositeScoreQualifier();
+            q = new CompositeAllOrNothingQualifier() { threshold = 10 };
             qualifiers.Add(q);
 
 
 
-
-
-            // ---- New Action ----
-            a = new EmptyAction()
-            {
-                name = "Null Action",
-            };
-            actions.Add(a);  // --  Add to Actions Group
-
-            // ---- New Scorers Group ----
-            scorers = new List<IScorer>();
-            //
-            // ---- New Scorer ----
-            scorer = new FixedScorer() { score = 10 };
-            scorers.Add(scorer);  // --  Add to Scorers Group
-            //
-            // ---- Add All Scorers to Scorers Group ----
-            allScorers.Add(scorers.ToArray());
-
-            // ---- New Qualifier ----
-            q = new CompositeScoreQualifier();
-            qualifiers.Add(q);
 
 
             //
             //  Default Qualifier
             //
+            rs.defaultQualifier.score = 12;
             rs.defaultQualifier.action = new EmptyAction()
             {
                 name = "Null Action"

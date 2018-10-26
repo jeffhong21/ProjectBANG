@@ -38,15 +38,47 @@
             #region Damaged
 
             // ---- New Action ----
+            Selector selector = new ScoreSelector();
             a = new CompositeAction()
             {
-                name = "MoveToCover",
+                name = "FireAtTarget",
                 actions = new List<IAction>()
                 {
-                    new FindClosestCover(){name = "FindClosestCover"},
-
+                    new SetBestAttackTarget()
+                    {
+                        name = "SetBestAttackTarget",
+                        scorers = new List<IOptionScorer<ActorHealth>>()
+                        {
+                            new IsTargetAlive(){score = 100f},
+                            new EnemyProximityToSelf(){multiplier = 1f, score = 50f},
+                            new IsCurrentTargetScorer()
+                        }
+                    },
+                    new FireAtAttackTarget(){ name = "FireAtAttackTarget" }
                 }
             };
+            actions.Add(a);  // --  Add to Actions Group
+
+            // ---- New Scorers Group ----
+            scorers = new List<IScorer>();
+            //
+            // ---- New Scorers ----
+            scorer = new HasEnemies() { score = 15 };
+            scorers.Add(scorer);
+            // ---- New Scorer ----
+            scorer = new HasEnemiesInRange() { score = 25, range = 10 };
+            scorers.Add(scorer);
+            //
+            // ---- Add All Scorers to Scorers Group ----
+            allScorers.Add(scorers.ToArray());
+
+            // ---- New Qualifier ----
+            q = new CompositeAllOrNothingQualifier() { threshold = 20 };
+            qualifiers.Add(q);
+
+
+
+            a = new SelectorAction(selector);
             actions.Add(a);  // --  Add to Actions Group
 
             // ---- New Scorers Group ----

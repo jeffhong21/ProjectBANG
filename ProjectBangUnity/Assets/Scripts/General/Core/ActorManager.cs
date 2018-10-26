@@ -25,6 +25,12 @@
         }
 
 
+        public void InitializeActor()
+        {
+            instance.GetComponent<ActorController>().Init(this);   
+        }
+
+
         public void SetTeam(string teamID)
         {
             //instance.tag = teamID;

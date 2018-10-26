@@ -41,8 +41,9 @@ namespace Bang
             startWait = new WaitForSeconds(startDelay);
             endWait = new WaitForSeconds(endDelay);
 
-            actors = new ActorManager[playerCount];
+            actors = new ActorManager[playerCount + 1];
             spawnPoints = GameObject.FindGameObjectsWithTag(respawnPointTag);
+
 
             //  Spawn players.
             SpawnPlayers();
@@ -69,27 +70,41 @@ namespace Bang
         private void SpawnPlayers()
         {
             if(spawnPoints.Length > 0){
-                for (int i = 0; i < playerCount; i++){
+                for (int i = 0; i < actors.Length; i++){
                     actors[i] = new ActorManager();
+
+                    //  Instantiate actors.
                     if(i == 0){
                         actors[i].instance = Instantiate(playerPrefab, spawnPoints[i].transform.position, Quaternion.Euler(0, 180, 0));
                     } else {
                         actors[i].instance = Instantiate(agentPrefab, spawnPoints[i].transform.position, Quaternion.Euler(0, 180, 0));
                     }
+
+                    //  Initialize Actors:
+                    actors[i].InitializeActor();
+
+                    //  Disable controls.
                     actors[i].DisableControls();
                 }
             }
             else{
                 Debug.Log(" DeathmatchManager:  No Spawn Points");
-                for (int i = 0; i < playerCount; i++){
+                for (int i = 0; i < actors.Length; i++){
                     actors[i] = new ActorManager();
                     Vector3 defaultSpawn = Random.insideUnitCircle * 5;
                     defaultSpawn.y = 0;
+
+                    //  Instantiate actors.
                     if(i == 0){
                         actors[i].instance = Instantiate(playerPrefab, defaultSpawn, Quaternion.Euler(0, 180, 0));
                     } else {
                         actors[i].instance = Instantiate(agentPrefab, defaultSpawn, Quaternion.Euler(0, 180, 0));
                     }
+
+                    //  Initialize Actors:
+                    actors[i].InitializeActor();
+
+                    //  Disable controls.
                     actors[i].DisableControls();
                 }
             }

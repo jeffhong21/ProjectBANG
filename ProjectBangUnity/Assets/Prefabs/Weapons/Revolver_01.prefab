@@ -445,10 +445,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa3475695450048e291e385ab116b030, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _projectileSpawn: {fileID: 4354005002595738}
-  _projectile: {fileID: 114150881140841306, guid: 4bd9b690abcb37c4797032b5541f2fc7,
+  id: 
+  weaponType: 0
+  currentAmmo: 0
+  maxAmmo: 0
+  reloadSpeed: 0
+  fireRate: 0.5
+  isReloading: 0
+  projectileSpawn: {fileID: 4354005002595738}
+  projectile: {fileID: 114150881140841306, guid: 4bd9b690abcb37c4797032b5541f2fc7,
     type: 2}
-  _maxAmmo: 18
-  _currentAmmo: 6
-  _timeBetweenShots: 0.25
-  _isReloading: 0

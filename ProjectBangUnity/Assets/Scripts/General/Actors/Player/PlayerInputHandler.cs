@@ -57,7 +57,8 @@ namespace Bang
             }
             else if (InputManager.R)
             {
-                Debug.LogFormat("<color=#800080ff>{0}</color>.  Current ammo is <color=#800080ff>{1}</color>", "Reloading playerCtrl.weapon", playerCtrl.weapon.currentAmmo);  // purple
+                playerCtrl.Reload();
+                Debug.LogFormat("<color=#800080ff>{0}</color>.  Current ammo is <color=#800080ff>{1}</color>", "Reloading playerCtrl.weapon", playerCtrl.weapon.CurrentAmmo);  // purple
             }
 
             //  Check if player is moving.

@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6da0edd13a73e41e1ab48ce5c07befbe, type: 3}
+  m_Name: CharacterSkinManager
+  m_EditorClassIdentifier: 
+  skins:
+  - id: Badguy
+    skinType: 0
+    mesh: {fileID: 13700000, guid: 4837235d67e136e4b883adb2bafc73e8, type: 3}
+  - id: BusinessMan
+    skinType: 1
+    mesh: {fileID: 13700002, guid: 4837235d67e136e4b883adb2bafc73e8, type: 3}
+  - id: Cowboy
+    skinType: 2
+    mesh: {fileID: 13700004, guid: 4837235d67e136e4b883adb2bafc73e8, type: 3}
+  - id: Cowgirl
+    skinType: 3
+    mesh: {fileID: 13700006, guid: 4837235d67e136e4b883adb2bafc73e8, type: 3}
+  - id: Gunman
+    skinType: 4
+    mesh: {fileID: 13700008, guid: 4837235d67e136e4b883adb2bafc73e8, type: 3}
+  - id: Sheriff
+    skinType: 5
+    mesh: {fileID: 13700010, guid: 4837235d67e136e4b883adb2bafc73e8, type: 3}
+  - id: Women
+    skinType: 6
+    mesh: {fileID: 13700012, guid: 4837235d67e136e4b883adb2bafc73e8, type: 3}
+  - id: WorkingGirl
+    skinType: 7
+    mesh: {fileID: 13700014, guid: 4837235d67e136e4b883adb2bafc73e8, type: 3}
+  textures:
+  - id: Texture1
+    textureType: 0
+    texture:
+    - {fileID: 2800000, guid: 93926096c845f8047bb7a28b74664007, type: 3}
+    - {fileID: 2800000, guid: eda681f5b7e10b446a6e23ddf3b74c0c, type: 3}
+    - {fileID: 2800000, guid: 1b70ea072930be048a51e32bc50964a1, type: 3}
+    - {fileID: 2800000, guid: 105f80efe20ead547ab33f2649bd1a84, type: 3}
+  - id: Texture2
+    textureType: 1
+    texture:
+    - {fileID: 2800000, guid: 6c88b4dd65148ae45a4464437b3ef2a6, type: 3}
+    - {fileID: 2800000, guid: 133da83b42e6b5a4fb2dad21ab812fb2, type: 3}
+    - {fileID: 2800000, guid: a70ee0408280c0540834992618cd9948, type: 3}
+    - {fileID: 2800000, guid: cc5f48d5151ea0545a026bca4e6d7885, type: 3}
+  - id: Texture3
+    textureType: 2
+    texture:
+    - {fileID: 2800000, guid: b7f7913d478835e4f8d8010a13c8546a, type: 3}
+    - {fileID: 2800000, guid: bbd05c0a93aa316418e1667cdefafd91, type: 3}
+    - {fileID: 2800000, guid: 935759cd778991a459f94dcf89141ed9, type: 3}
+    - {fileID: 2800000, guid: 6f1fe5d146b13d84184e612f6326c551, type: 3}
+  - id: Texture4
+    textureType: 3
+    texture:
+    - {fileID: 2800000, guid: d459f5ad385b5914e9ffc03ab032d0e5, type: 3}
+    - {fileID: 2800000, guid: 0f34bafebd967e347899fc5058f42639, type: 3}
+    - {fileID: 2800000, guid: 6bd8f41e055ee30468703cc63498337a, type: 3}
+    - {fileID: 2800000, guid: 7263f16843b1a9d41b405c24a0a0983c, type: 3}

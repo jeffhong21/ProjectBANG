@@ -15,8 +15,7 @@
         {
             var c = context as AgentContext;
 
-            if (hostile.currentHealth > 0)
-            {
+            if (hostile.currentHealth > 0){
                 return this.score;
             }
 

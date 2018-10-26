@@ -34,7 +34,7 @@
             //  Initializes the setup of AI.
             InitializeAI(asset);
 
-            rs.debugScores = true;
+            //rs.debugScores = true;
             //rs.debugIfDefault = true;
 
 
@@ -157,7 +157,7 @@
             scorers = new List<IScorer>();
             //
             // ---- New Scorer ----
-            scorer = new HasEnemiesInRange() { score = 125, range = 3 };
+            scorer = new HasEnemiesInRange() { score = 150, range = 3 };
             scorers.Add(scorer);
             //
             // ---- Add All Scorers to Scorers Group ----
@@ -171,6 +171,32 @@
             #endregion
 
 
+
+            #region Move In Cover
+
+            // ---- New Action ----
+            a = new MoveToPeekPosition()
+            {
+                name = "Move To Peek Position",
+            };
+            actions.Add(a);  // --  Add to Actions Group
+
+            // ---- New Scorers Group ----
+            scorers = new List<IScorer>();
+            //
+            // ---- New Scorer ----
+            scorer = new IsInCover() { score = 125 };
+            scorers.Add(scorer);
+            //
+            // ---- Add All Scorers to Scorers Group ----
+            allScorers.Add(scorers.ToArray());
+
+            // ---- New Qualifier ----
+            q = new CompositeAllOrNothingQualifier() { threshold = 100 };
+            qualifiers.Add(q);
+
+
+            #endregion
 
 
 

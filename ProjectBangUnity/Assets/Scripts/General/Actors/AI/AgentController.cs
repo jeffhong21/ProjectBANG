@@ -84,8 +84,10 @@
 
         private void Start()
         {
+            canShoot = true;
             currentSpeed = stats.walkSpeed;
             lastShotFired = Time.timeSinceLevelLoad;
+
         }
 
 
@@ -95,31 +97,65 @@
             delta = Time.deltaTime;
 
             checkRateTimer += delta;
-            if(checkRateTimer > stats.checkRate)
-            {
+            if(checkRateTimer > stats.checkRate){
                 checkRateTimer = 0;
                 //  Handle scanning or perception stuff.
             }
+            //  Set shooting coldown timer.
+            HandleShootingCooldown(delta);
+            //  Set damage taken cooldown timer.
+            HandleDamageTaken(delta);
 
 
-            if(shootingCooldown > 0){
-                shootingCooldown -= delta;
-                if(shootingCooldown <= 0){
-                    canShoot = true;
-                }
-            }
+            //  Set aiming position.
+            HandleAimingPosition(context.attackTarget, stats.sightRange);
 
-            if(damageTakenCooldown > 0){
-                damageTakenCooldown -= delta;
-                if(damageTakenCooldown <= 0){
-                    isUnderFire = false;
-                }
+		}
+
+
+		private void FixedUpdate()
+		{
+            if (weapon != null){
+                weapon.transform.LookAt(AimPosition);
             }
 		}
 
 
+        private void HandleAimingPosition(ActorHealth target, float distance)
+        {
+            if(target != null){
+                AimPosition = target.position;
+            }
+            else{
+                AimPosition = transform.position + transform.forward * distance;
+            }
+        }
 
-        private void OnTargetMiss()
+
+        private void HandleShootingCooldown(float time)
+        {
+            if (shootingCooldown > 0){
+                shootingCooldown -= time;
+                if (shootingCooldown <= 0)
+                {
+                    canShoot = true;
+                }
+            }
+        }
+
+
+        private void HandleDamageTaken(float time)
+        {
+            if (damageTakenCooldown > 0){
+                damageTakenCooldown -= time;
+                if (damageTakenCooldown <= 0){
+                    isUnderFire = false;
+                }
+            }
+        }
+
+
+		private void OnTargetMiss()
         {
             missCount++;
             if(missCount > Random.Range(1, 5)){
@@ -127,6 +163,7 @@
                 //  Handle something.  Set a bool ito be true.
             }
         }
+
 
 
 
@@ -166,14 +203,14 @@
                 {
                     Quaternion rot = Quaternion.FromToRotation(-transform.forward, hit.normal) * transform.rotation;
                     transform.rotation = rot;
+
+                    isInCover = true;
+                    canShoot = false;
+                    AnimHandler.CoverState();
+                    Debug.Log("Agent is taking cover");
                 }
             }
 
-
-            isInCover = true;
-            canShoot = false;
-            AnimHandler.CoverState();
-            Debug.Log("Agent is taking cover");
         }
 
 
@@ -195,9 +232,13 @@
                 float myIntz = Random.Range(-stats.aimAccuracy, stats.aimAccuracy);
                 Vector3 newVector = new Vector3(target.x + myIntx, target.y, target.z + myIntz);
 
-                //bool raycastToTarget = true;//RaycastToTarget(target);
 
-                weapon.Shoot(target);
+                AimPosition = target;
+                //weapon.Shoot(target);
+                weapon.Shoot();
+                Debug.DrawLine(weapon.ProjectileSpawn.position, weapon.ProjectileSpawn.position + (weapon.ProjectileSpawn.forward * 10), Color.red, 1f);
+                Debug.DrawLine(weapon.ProjectileSpawn.position, AimPosition, Color.magenta, 1f);
+
                 shootingCooldown = stats.shootSpeed;
                 lastShotFired = Time.timeSinceLevelLoad;
                 canShoot = false;
@@ -218,14 +259,14 @@
 
         public void Reload()
         {
-            IsReloading = true;
+            isReloading = true;
             //  Get the amount of ammo needed to reload.
-            int ammoToReload = weapon.maxAmmo - weapon.currentAmmo;
+            int ammoToReload = weapon.MaxAmmo - weapon.CurrentAmmo;
             //  Subtract that ammo amount from inventory.
 
+            weapon.Reload(1f);
             //  Add it to the weapon current ammo.
-            weapon.currentAmmo += ammoToReload;
-
+            weapon.CurrentAmmo += ammoToReload;
         }
 
 
@@ -237,66 +278,7 @@
         }
 
 
-
-
-
-
-        public void ScanForEntities()
-        {
-            Collider[] hits = colliders;
-            Physics.OverlapSphereNonAlloc(this.position, stats.scanRadius, hits, Layers.entites, QueryTriggerInteraction.Collide);
-            var timestamp = Time.timeSinceLevelLoad;
-
-            for (int i = 0; i < hits.Length; i ++)
-            {
-                Collider hit = hits[i];
-
-                if (hit == null){
-                    continue;
-                }
-
-                // ignore hits with self
-                if (hit.gameObject == this.gameObject){
-                    continue;
-                }
-
-                //var entity = hit.GetEntity();
-                //if (entity == null){
-                //    // hit is somehow not an entity
-                //    continue;
-                //}
-
-                if (hit.CompareTag(Tags.Actor))
-                {
-                   context.hostiles.Add(transform.GetComponent<ActorHealth>());
-                }
-            }
-        }
-
-
-
-        /// <summary>
-        /// Calculates if npc can see target.
-        /// </summary>
-        /// <returns><c>true</c>, if see target was caned, <c>false</c> otherwise.</returns>
-        /// <param name="lookAtPoint">Look at point.</param>
-        /// <param name="target">Target.</param>
-        public bool CanSeeTarget(Vector3 lookAtPoint, Vector3 target)
-        {
-            var dirToPlayer = (target - lookAtPoint).normalized;
-            var angleBetweenNpcAndPlayer = Vector3.Angle(lookAtPoint + Vector3.forward, dirToPlayer);
-
-            if (Vector3.Distance(lookAtPoint, target) < stats.sightRange &&
-                angleBetweenNpcAndPlayer < stats.fieldOfView / 2f &&
-                Physics.Linecast(lookAtPoint, target, Layers.cover) == false)
-            {
-                return true;
-            }
-            return false;
-        }
-
-
-        private bool RaycastToTarget(Transform target)
+        public bool CanSeeTarget(Transform target)
         {
             Vector3 origin = transform.position;
             origin.y += 1.4f;
@@ -304,17 +286,47 @@
             dir.y += 1.2f;
             dir = dir - origin;
 
-            RaycastHit hit;
-            Debug.DrawRay(origin, dir * stats.scanRadius);
 
-            if (Physics.Raycast(origin, dir, out hit, stats.scanRadius, ignoreLayerMask))
-            {
-                ActorHealth other = hit.transform.GetComponentInParent<ActorHealth>();
-                if (other.transform == context.attackTarget)
-                    return true;
+            RaycastHit hit;
+            //Debug.DrawRay(origin, dir * stats.sightRange, Color.green);
+            //Debug.Break();
+            if (Physics.Raycast(origin, dir, out hit, stats.sightRange, Layers.cover) == false ){
+                return true;
             }
             return false;
         }
+
+
+        public void ShootFromCover()
+        {
+            if(isInCover){
+                
+            }
+        }
+
+
+        public void PeekFromCover()
+        {
+            
+        }
+
+
+        public bool CanPeekSide(bool left = false)
+        {
+            float entitySize = 0.5f;
+            Vector3 side = left == false ? Vector3.right : Vector3.left;
+            Vector3 scanPosition = position + side * entitySize;
+            Vector3 scanDirection = scanPosition + Vector3.back;
+
+            Ray ray = new Ray(scanPosition, scanDirection);
+            RaycastHit hit;
+
+            if(Physics.Raycast(ray, out hit, 1, Layers.cover)){
+                return true;
+            }
+            return false;
+        }
+
 
 
 
@@ -370,6 +382,32 @@
 
 
 
+
+
+
+
+
+        /// <summary>
+        /// Calculates if npc can see target.
+        /// </summary>
+        /// <returns><c>true</c>, if see target was caned, <c>false</c> otherwise.</returns>
+        /// <param name="lookAtPoint">Look at point.</param>
+        /// <param name="target">Target.</param>
+        public bool CanSeeTarget(Vector3 lookAtPoint, Vector3 target)
+        {
+            var dirToPlayer = (target - lookAtPoint).normalized;
+            var angleBetweenNpcAndPlayer = Vector3.Angle(lookAtPoint + Vector3.forward, dirToPlayer);
+
+            if (Vector3.Distance(lookAtPoint, target) < stats.sightRange &&
+                angleBetweenNpcAndPlayer < stats.fieldOfView / 2f &&
+                Physics.Linecast(lookAtPoint, target, Layers.cover) == false)
+            {
+                return true;
+            }
+            return false;
+        }
+
+
         public void TestHandleCover()
         {
             Collider col = FindClosestCover();
@@ -408,6 +446,43 @@
         {
             
         }
+
+
+        public void ScanForEntities()
+        {
+            Collider[] hits = colliders;
+            Physics.OverlapSphereNonAlloc(this.position, stats.scanRadius, hits, Layers.entites, QueryTriggerInteraction.Collide);
+            var timestamp = Time.timeSinceLevelLoad;
+
+            for (int i = 0; i < hits.Length; i++)
+            {
+                Collider hit = hits[i];
+
+                if (hit == null)
+                {
+                    continue;
+                }
+
+                // ignore hits with self
+                if (hit.gameObject == this.gameObject)
+                {
+                    continue;
+                }
+
+                //var entity = hit.GetEntity();
+                //if (entity == null){
+                //    // hit is somehow not an entity
+                //    continue;
+                //}
+
+                if (hit.CompareTag(Tags.Actor))
+                {
+                    context.hostiles.Add(transform.GetComponent<ActorHealth>());
+                }
+            }
+        }
+
+
     }
 }
 

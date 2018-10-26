@@ -8,18 +8,21 @@
 
     public class SelectorAction : IAction //, ISerializationCallbackReceiver, IPrepareForSerialization, IInitializeAfterDeserialization
     {
-        [HideInInspector]
-        public string jsonData;  //  Serialization data.
-        [SerializeField]
-        private string _name;
+        //
+        // Fields
+        //
 
         private Guid _selectorId;
+
         private Selector _selector;
 
-        public string name
-        {
-            get { return _name; }
-            set { _name = value; }
+
+        //
+        // Properties
+        //
+        public string name {
+            get;
+            set;
         }
 
         public Selector selector
@@ -32,10 +35,6 @@
         //
         // Constructors
         //
-        public SelectorAction()
-        {
-        }
-
         public SelectorAction(Selector selector)
         {
             _selector = selector;
@@ -52,55 +51,6 @@
         }
 
 
-        //public void PrepareForSerialization()
-        //{
-        //    jsonData = JsonConvert.SerializeObject(selector, Formatting.Indented, new JsonSerializerSettings
-        //    {
-        //        TypeNameHandling = TypeNameHandling.Auto,
-        //        PreserveReferencesHandling = PreserveReferencesHandling.All
-        //    });
-        //}
-
-
-        //public void InitializeAfterDeserialization(object rootObject)
-        //{
-        //    //Debug.Log(jsonData);
-        //    if (jsonData == null) return;
-
-
-        //    selector = JsonConvert.DeserializeObject<ScoreSelector>(jsonData, new JsonSerializerSettings
-        //    {
-        //        TypeNameHandling = TypeNameHandling.Auto,
-        //        NullValueHandling = NullValueHandling.Ignore,
-        //        PreserveReferencesHandling = PreserveReferencesHandling.All
-        //    });
-        //    //rootSelector = rootObject as ScoreSelector;
-
-        //}
-
-
-        ///// <summary>
-        ///// Part of ISerializationCallbackReceiver.
-        ///// </summary>
-        //public void OnBeforeSerialize()
-        //{
-        //    //Debug.Log("Prepare for serialization");
-        //    PrepareForSerialization();
-        //}
-
-
-        ///// <summary>
-        ///// Part of ISerializationCallbackReceiver.
-        ///// </summary>
-        //public void OnAfterDeserialize()
-        //{
-        //    //Debug.Log("After deserialize");
-        //    if (selector == null)
-        //    {
-        //        selector = new ScoreSelector();
-        //    }
-        //    InitializeAfterDeserialization(selector);
-        //}
 
 
 

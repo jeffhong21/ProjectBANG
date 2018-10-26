@@ -6,12 +6,12 @@
     public class InventoryHandler : MonoBehaviour
     {
         [SerializeField]
-        protected WeaponController _equippedFirearm;
+        protected Gun _equippedFirearm;
         [SerializeField]
         protected ActorBody actorBody = new ActorBody();
 
 
-        public WeaponController equippedFirearm
+        public Gun equippedFirearm
         {
             get { return _equippedFirearm; }
             set { _equippedFirearm = value; }
@@ -49,9 +49,9 @@
 
 
 
-        public virtual void EquipGun(WeaponController fireArm, Transform location)
+        public virtual void EquipGun(Gun fireArm, Transform location)
         {
-            equippedFirearm = Instantiate(fireArm, location.position, location.rotation) as WeaponController;
+            equippedFirearm = Instantiate(fireArm, location.position, location.rotation) as Gun;
             equippedFirearm.transform.parent = location;
 
             //HUDState.UpdateWeapon(fireArm.GetType().Name);

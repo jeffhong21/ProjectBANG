@@ -18,8 +18,7 @@
         [SerializeField]
         private CameraController _playerCamera;
         [SerializeField]
-        private WeaponController _defaultWeapon;
-
+        private WeaponManager weaponManager;
 
         //
         //  Properties
@@ -41,9 +40,9 @@
             get { return _playerCamera; }
         }
 
-        public WeaponController defaultWeapon
+        public WeaponManager WeaponManager
         {
-            get { return _defaultWeapon; }
+            get { return weaponManager; }
         }
 
 
@@ -72,7 +71,7 @@
             _playerCamera = Camera.main.GetComponent<CameraController>();
 
 
-            if (_defaultWeapon == null) throw new ArgumentNullException("GameManager has no default weapon.");
+            //if (_defaultWeapon == null) throw new ArgumentNullException("GameManager has no default weapon.");
 
             //InstantiatePlayers();
 

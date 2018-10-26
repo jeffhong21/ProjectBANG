@@ -104,27 +104,36 @@ namespace Bang
         private void OnHitObject(Collider c, Vector3 hitPoint)
         {
             //Debug.Log(hit.collider.gameObject.name);
-
             IHasHealth damageableObject = c.GetComponent<IHasHealth>();
 
+            //  Hit a damagable object.
             if (damageableObject != null)
             {
                 damageableObject.TakeDamage(_damage, hitPoint, transform.forward);
             }
+            ////  Hit a cover layer
+            //else if (c.gameObject.layer == LayerMask.NameToLayer("Cover"))  // LayerMask.NameToLayer("WorldObjects")
+            //{
+            //    ParticlePoolManager.instance.SpawnParticleSystem(ParticlesType.ImpactHit, hitPoint, Quaternion.FromToRotation(Vector3.forward, -transform.forward));
+            //}
 
-
-            if (c.gameObject.layer == LayerMask.NameToLayer("Cover"))  // LayerMask.NameToLayer("WorldObjects")
+            else
             {
                 ParticlePoolManager.instance.SpawnParticleSystem(ParticlesType.ImpactHit, hitPoint, Quaternion.FromToRotation(Vector3.forward, -transform.forward));
             }
 
-
+            //  Return projectile to pool.
             PoolManager.instance.Return(PoolTypes.Projectile, this);
 
             //  Reset the owner of projectile.
             _owner = null;
         }
 
+
+        private void NotifyOwner(ActorController owner)
+        {
+            
+        }
 
     }
 }

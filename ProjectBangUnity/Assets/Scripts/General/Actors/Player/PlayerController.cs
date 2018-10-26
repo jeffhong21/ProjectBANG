@@ -20,6 +20,7 @@
 
 
 
+
         //
         //  Methods
         //
@@ -37,27 +38,27 @@
         }
 
 
-        protected override void OnEnable()
-		{
-            base.OnEnable();
-		}
-
-
-        protected override void OnDisable()
-		{
-            base.OnDisable();
-		}
-
 
         public void ShootWeapon(Vector3 target)
         {
-            weapon.Shoot(target);
+            Debug.DrawLine(weapon.ProjectileSpawn.position, weapon.ProjectileSpawn.position + (weapon.ProjectileSpawn.forward * 15), Color.red, 1f);
+            AimPosition = target;
+            //weapon.Shoot(target);
+            weapon.Shoot();
         }
 
 
         public void Reload()
         {
-            // TODO    
+            //  Get the amount of ammo needed to reload.
+            int ammoToReload = weapon.MaxAmmo - weapon.CurrentAmmo;
+            //  Subtract that ammo amount from inventory.
+
+
+            AnimHandler.PlayReload();
+            weapon.Reload(2f);
+            //  Add it to the weapon current ammo.
+            weapon.CurrentAmmo += ammoToReload;
         }
 
 
@@ -115,7 +116,14 @@
             input.enabled = false;
         }
 
-    }
+
+
+        //public void OnDrawGizmosSelected(){
+        //    Gizmos.color = Color.green;
+        //    Gizmos.DrawLine(AimOrigin, _shootTarget);
+        //}
+
+	}
 }
 
 

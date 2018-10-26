@@ -50,16 +50,8 @@
                 }
             }
 
-            //foreach (Collider col in colliders)
-            //{
-            //    Transform transform = col.transform == col.transform.root ? col.transform : col.transform.root;
 
-            //    if (transform.CompareTag(entityTag))
-            //    {
-            //        if (transform != agent.transform)
-            //            c.hostiles.Add(transform.GetComponent<ActorHealth>());
-            //    }
-            //}
+
 
         }
 

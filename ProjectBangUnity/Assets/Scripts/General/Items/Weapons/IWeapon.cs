@@ -4,23 +4,7 @@
 
     public interface IWeapon : IPooled
     {
-        /// <summary>
-        /// Gets or sets the projectile spawn.
-        /// </summary>
-        /// <value>The projectile spawn.</value>
-        Transform projectileSpawn{
-            get;
-            set;
-        }
 
-        /// <summary>
-        /// Gets or sets the projectile.
-        /// </summary>
-        /// <value>The projectile.</value>
-        ProjectileBase projectile{
-            get;
-            set;
-        }
 
         /// <summary>
         /// Gets the max ammo.
@@ -38,15 +22,6 @@
             get;
             set;
         }
-
-        /// <summary>
-        /// Gets the time between shots.
-        /// </summary>
-        /// <value>The time between shots.</value>
-        float timeBetweenShots { 
-            get; 
-        }
-
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="T:Bang.IWeapon"/> is reloading.

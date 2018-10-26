@@ -134,37 +134,6 @@
         }
 
 
-        public Vector3? GetCoverSpot(GameObject entity)
-        {
-            foreach (var spot in occupants){
-                if(spot.Value == entity){
-                    return spot.Key;
-                }
-            }
-
-            return null;
-        }
-
-
-        public Vector3 GetClosestSpot(Transform entity, float rangeModifier = 1f)
-        {
-            float distance = 0f;
-            float range = EntitySize * rangeModifier;
-            float closest = float.MaxValue;
-            Vector3 closestSpot = Vector3.zero;
-
-            for (int i = 0; i < CoverSpots.Length; i++)
-            {
-                distance = Vector3.Distance(CoverSpots[i], entity.position);
-                if (distance < closest + range){
-                    closest = distance;
-                    closestSpot = CoverSpots[i];
-                }
-            }
-
-            return closestSpot;
-        }
-
 
 
         public bool TakeCoverSpot(GameObject entity)
@@ -237,6 +206,55 @@
                 }
             }
 		}
+
+
+
+        public Vector3? GetCoverSpot(GameObject entity)
+        {
+            foreach (var spot in occupants)
+            {
+                if (spot.Value == entity)
+                {
+                    return spot.Key;
+                }
+            }
+
+            return null;
+        }
+
+
+        public Vector3 GetClosestSpot(Transform entity, float rangeModifier = 1f)
+        {
+            float distance = 0f;
+            float range = EntitySize * rangeModifier;
+            float closest = float.MaxValue;
+            Vector3 closestSpot = Vector3.zero;
+
+            for (int i = 0; i < CoverSpots.Length; i++)
+            {
+                distance = Vector3.Distance(CoverSpots[i], entity.position);
+                if (distance < closest + range)
+                {
+                    closest = distance;
+                    closestSpot = CoverSpots[i];
+                }
+            }
+
+            return closestSpot;
+        }
+
+
+
+
+
+        public class CoverPosition
+        {
+            public GameObject entity;
+            public Vector3 location;
+            public Vector3 neighborA;
+            public Vector3 neighborB;
+        }
+
 
 
 
