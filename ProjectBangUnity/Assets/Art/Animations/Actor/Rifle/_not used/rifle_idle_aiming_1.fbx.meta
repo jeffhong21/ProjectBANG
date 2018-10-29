@@ -103,7 +103,7 @@ ModelImporter:
     400094: Toes_R
     400096: UpperLeg_L
     400098: UpperLeg_R
-    7400000: rifle_idle_aiming
+    7400000: rifle_idle_aiming_1
     9500000: //RootNode
     2186277476908879412: ImportLogs
   externalObjects: {}
@@ -135,7 +135,7 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: rifle_idle_aiming
+      name: rifle_idle_aiming_1
       takeName: mixamo.com
       firstFrame: 0
       lastFrame: 63

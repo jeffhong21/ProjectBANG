@@ -3,7 +3,7 @@
     using UnityEngine;
     using AtlasAI;
 
-    public class ReloadFirearm : ActionBase
+    public class ReloadGun : ActionBase
     {
 
 

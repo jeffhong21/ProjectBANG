@@ -35,8 +35,38 @@
 
 
 
-            // ---- New Action ----
-            a = new CompositeAction()
+            //// ---- New Action ----
+            //a = new CompositeAction()
+            //{
+            //    name = "Scan",
+            //    actions = new List<IAction>()
+            //    {
+            //        new ScanForEntities(){name = "ScanForEntitites"},
+            //        new ScanForPositions(){ name = "ScanForPositions", samplingRange = 20, samplingDensity = 2.5f }
+            //    }
+            //};
+            //actions.Add(a);  // --  Add to Actions Group
+            //
+            //// ---- New Scorers Group ----
+            //scorers = new List<IScorer>();
+            ////
+            //// ---- New Scorer ----
+            //scorer = new FixedScorer() { score = 5 };
+            //scorers.Add(scorer);
+            ////
+            //// ---- Add All Scorers to Scorers Group ----
+            //allScorers.Add(scorers.ToArray());
+            //
+            //// ---- New Qualifier ----
+            //q = new CompositeScoreQualifier();
+            //qualifiers.Add(q);
+
+
+
+            //
+            //  Default Qualifier
+            //
+            rs.defaultQualifier.action = new CompositeAction()
             {
                 name = "Scan",
                 actions = new List<IAction>()
@@ -44,33 +74,6 @@
                     new ScanForEntities(){name = "ScanForEntitites"},
                     new ScanForPositions(){ name = "ScanForPositions", samplingRange = 20, samplingDensity = 2.5f }
                 }
-            };
-            actions.Add(a);  // --  Add to Actions Group
-
-            // ---- New Scorers Group ----
-            scorers = new List<IScorer>();
-            //
-            // ---- New Scorer ----
-            scorer = new FixedScorer() { score = 5 };
-            scorers.Add(scorer);
-            //
-            // ---- Add All Scorers to Scorers Group ----
-            allScorers.Add(scorers.ToArray());
-
-            // ---- New Qualifier ----
-            q = new CompositeScoreQualifier();
-            qualifiers.Add(q);
-
-
-
-            //
-            //  Default Qualifier
-            //
-            rs.defaultQualifier.action = new ScanForEntities()
-            {
-                name = "ScanForPositions",
-                samplingRange = 20,
-                samplingDensity = 2.5f
             };
 
 

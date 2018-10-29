@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 846be37c2efbb4a799d60d6b97190a63
+guid: 030ebd26ee73d44e498c93a75bb13b54
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
@@ -103,7 +103,7 @@ ModelImporter:
     400094: Toes_R
     400096: UpperLeg_L
     400098: UpperLeg_R
-    7400000: rifle_reload_running
+    7400000: cover_idle
     9500000: //RootNode
   externalObjects: {}
   materials:
@@ -134,21 +134,21 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: rifle_reload_running
+      name: cover_idle
       takeName: mixamo.com
       firstFrame: 0
-      lastFrame: 110
+      lastFrame: 68
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 0
+      loopTime: 1
       loopBlend: 0
-      loopBlendOrientation: 0
-      loopBlendPositionY: 0
-      loopBlendPositionXZ: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
       keepOriginalOrientation: 1
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 1

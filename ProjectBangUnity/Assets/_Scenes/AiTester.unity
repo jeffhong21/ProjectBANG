@@ -313,7 +313,7 @@ Prefab:
     - target: {fileID: 114187247001489940, guid: 4b3d35125cdfd468289a3e6f86ac0c10,
         type: 2}
       propertyPath: playerCount
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4b3d35125cdfd468289a3e6f86ac0c10, type: 2}
@@ -597,12 +597,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _entitySize: 0.5
   _coverSpots:
-  - {x: -12, y: 0, z: 9.5}
-  - {x: -13.5, y: 0, z: 8}
-  - {x: -12, y: 0, z: 6.5}
-  - {x: -10.5, y: 0, z: 8}
+  - {x: -11, y: 0, z: 8.5}
+  - {x: -11, y: 0, z: 7.5}
+  - {x: -11.5, y: 0, z: 7}
+  - {x: -12.5, y: 0, z: 7}
+  - {x: -13, y: 0, z: 7.5}
+  - {x: -13, y: 0, z: 8.5}
+  - {x: -12.5, y: 0, z: 9}
+  - {x: -11.5, y: 0, z: 9}
   debug:
-    _size: 0.5
+    _size: 0.1
     _emptyColor: {r: 0, g: 1, b: 0, a: 1}
     _occupiedColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!1 &147310747 stripped
@@ -4459,12 +4463,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _entitySize: 0.5
   _coverSpots:
-  - {x: -6, y: 0, z: 9.5}
-  - {x: -7.5, y: 0, z: 8}
-  - {x: -6, y: 0, z: 6.5}
-  - {x: -4.5, y: 0, z: 8}
+  - {x: -5, y: 0, z: 8.5}
+  - {x: -5, y: 0, z: 7.5}
+  - {x: -5.5, y: 0, z: 7}
+  - {x: -6.5, y: 0, z: 7}
+  - {x: -7, y: 0, z: 7.5}
+  - {x: -7, y: 0, z: 8.5}
+  - {x: -6.5, y: 0, z: 9}
+  - {x: -5.5, y: 0, z: 9}
   debug:
-    _size: 0.5
+    _size: 0.1
     _emptyColor: {r: 0, g: 1, b: 0, a: 1}
     _occupiedColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!1 &1378440710 stripped

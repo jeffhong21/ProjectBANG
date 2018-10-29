@@ -16,18 +16,16 @@
         protected float _currentHealth;
         [SerializeField]
         protected float _timeInvincibleAfterRespawn;
-        [SerializeField, ReadOnly]
-        protected bool _isDead;
         [SerializeField]
         protected float sinkSpeed = 0.5f;
         [SerializeField]
         protected float delaySinkTime = 3f;
 
-        private IActorController controller;
+        private ActorController controller;
         private AnimationHandler AnimHandler;
         private float startSinkingTime;
         private WaitForSeconds sinkDelay;
-
+        private bool _isDead;
 
 
         //
@@ -76,7 +74,7 @@
         //
         protected virtual void Awake()
         {
-            controller = GetComponent<IActorController>() as ActorController;
+            controller = GetComponent<ActorController>();
             sinkDelay = new WaitForSeconds(delaySinkTime);
         }
 
@@ -87,27 +85,24 @@
         }
 
 
-        protected virtual void OnDisable()
-        {
-            
-        }
-
-
 
         public void TakeDamage(float damage)
         {
             if(!_invinsible)
-                currentHealth -= damage;
-            
-            if (currentHealth <= 0)
             {
-                Death();
+                if(currentHealth > 0){
+                    currentHealth -= damage;
+                }
+                else{
+                    Death();
+                }
             }
         }
 
 
         public void TakeDamage(float damage, Vector3 hitLocation, Vector3 hitDirection)
         {
+            controller.TakeDamage(hitDirection);
             TakeDamage(damage);
             ParticlePoolManager.instance.SpawnParticleSystem(ParticlesType.ActorHit, hitLocation, Quaternion.FromToRotation(Vector3.forward, hitDirection));
         }
@@ -116,7 +111,7 @@
 
         public void Death()
         {
-            isDead = true;
+            _isDead = true;
             controller.Death();
             StartCoroutine(StartSinking());
         }

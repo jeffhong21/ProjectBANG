@@ -19,11 +19,22 @@
         public float distanceForNewTarget = 5f;
 
 
+        private Vector3 position;
+
+
         public override void Execute(IAIContext context)
         {
             var c = context as AgentContext;
 
-            Vector3 position = default(Vector3);
+            if (c.agent.IsSearching){
+                float distance = Vector3.Distance(c.agent.position, position);
+                if (distance <= 2f){
+                    c.agent.IsSearching = false;
+                }else{
+                    return;
+                }
+            }
+
 
             for (int i = 0; i < samplePoints; i++)
             {
@@ -33,10 +44,10 @@
                 if (NavMesh.SamplePosition(position, out hit, this.maxDistance, NavMesh.AllAreas))
                 {
                     position = hit.position;
-                    c.isSearching = true;
+                    c.agent.IsSearching = true;
                     c.agent.MoveTo(position);
 
-                    //Debug.LogFormat("{0} is searching for target.", c.agent.gameObject.name);
+                    Debug.LogFormat("{0} is searching for target at {1}", c.agent.gameObject.name, position);
                     return;
                 }
             }

@@ -12,7 +12,7 @@ namespace Bang
         [SerializeField]
         protected int maxAmmo;
         [SerializeField]
-        protected float fireRate = 0.5f;
+        protected float cooldown = 0.5f;
         [SerializeField]
         protected bool isReloading;
         [SerializeField]
@@ -24,7 +24,6 @@ namespace Bang
 
 
         protected IEnumerator reloadCoroutine;
-        protected float nextShotTime;
         protected Vector3 dirToTarget; // = Vector3.forward;
 
 
@@ -43,6 +42,10 @@ namespace Bang
             get { return maxAmmo; }
         }
 
+        public float Cooldown
+        {
+            get { return cooldown; }
+        }
 
         public bool IsReloading{
             get { return isReloading; }
@@ -81,13 +84,9 @@ namespace Bang
 
         public virtual void Shoot()
         {
-            if (currentAmmo > 0 && Time.time > nextShotTime)
+            if (currentAmmo > 0)
             {
                 currentAmmo--;
-                nextShotTime = Time.time + fireRate;
-
-                //Debug.LogFormat("Shot Fired:  {0}", Time.time);
-
                 var _pooledProjectile = PoolManager.instance.Spawn(PoolTypes.Projectile, projectileSpawn.position, projectileSpawn.rotation);
                 ProjectileBase pooledProjectile = _pooledProjectile.gameObject.GetComponent<ProjectileBase>();
                 pooledProjectile.Init(owner);

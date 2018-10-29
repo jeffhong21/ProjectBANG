@@ -19,13 +19,22 @@
                 return;
             }
 
-            c._positionScores = scorers;
+            //c._positionScores = scorers;
 
 
             c.agent.MoveTo(best);
-            //c.agent.GetComponent<PositionScoreVisualizer>().EntityUpdate(this, context);
+
+            //  Update context.
+            //UpdateContext(context);
         }
 
+
+
+        //private void UpdateContext(IAIContext context)
+        //{
+        //    var c = context as AgentContext;
+        //    c.PositionScores = scorers;
+        //}
 
   
 

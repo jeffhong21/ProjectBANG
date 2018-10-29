@@ -4,6 +4,7 @@
     using UnityEngine;
     using AtlasAI;
 
+
     public class GetCoverPositions : ActionBase
     {
 
@@ -13,7 +14,6 @@
             var c = context as AgentContext;
             var agent = c.agent;
             float scanRadius = agent.stats.scanRadius;
-
 
             List<Vector3> coverPositions = new List<Vector3>();
 
@@ -33,7 +33,7 @@
                 {
                     CoverObject coverObject = colliders[i].GetComponent<CoverObject>();
 
-                    for (int index = 0; index < coverObject.CoverSpots.Length; index++)
+                    for (int index = 0; index < coverObject.CoverSpots.Count; index++)
                     {
                         Vector3 position = coverObject.CoverSpots[index];
                         coverPositions.Add(position);

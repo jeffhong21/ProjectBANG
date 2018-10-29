@@ -20,12 +20,17 @@
         protected Dictionary<IAIContext, Vector3> _data;
         private List<OptionScorer<Vector3>> _scoredBuffer;
 
-
+        private IAIContext context;
 
         protected virtual void Awake()
         {
             _data = new Dictionary<IAIContext, Vector3>();
             _scoredBuffer = new List<OptionScorer<Vector3>>();
+
+            context = GetComponent<AIContextProvider>().GetContext() as AgentContext;
+
+            var c = context as AgentContext;
+            //_scoredBuffer = c.PositionScores;
         }
 
 
@@ -50,27 +55,7 @@
         }
 
 
-        public void EntityUpdate(ActionWithOptions<Vector3> aiEntity, IAIContext context)
-        {
-            GetDataForVisualization(aiEntity, context);
-        }
 
-
-
-        protected List<OptionScorer<Vector3>> GetDataForVisualization(ActionWithOptions<Vector3> aiEntity, IAIContext context)
-        {
-            //var scoredOptions = new List<OptionScorer<TOption>>();
-            _scoredBuffer.Clear();
-            _scoredBuffer = aiEntity.GetAllScorers(context, GetOptions(context), _scoredBuffer);
-            return _scoredBuffer;
-        }
-
-
-        protected List<Vector3> GetOptions(IAIContext context)
-        {
-            AgentContext c = context as AgentContext;
-            return c.sampledPositions;
-        }
 
 
         protected void DrawGUI(List<OptionScorer<Vector3>> data)
@@ -162,5 +147,29 @@
         }
 
 
+
+
+
+        //public void EntityUpdate(ActionWithOptions<Vector3> aiEntity, IAIContext context)
+        //{
+        //    GetDataForVisualization(aiEntity, context);
+        //}
+
+
+
+        //protected List<OptionScorer<Vector3>> GetDataForVisualization(ActionWithOptions<Vector3> aiEntity, IAIContext context)
+        //{
+        //    //var scoredOptions = new List<OptionScorer<TOption>>();
+        //    _scoredBuffer.Clear();
+        //    _scoredBuffer = aiEntity.GetAllScorers(context, GetOptions(context), _scoredBuffer);
+        //    return _scoredBuffer;
+        //}
+
+
+        //protected List<Vector3> GetOptions(IAIContext context)
+        //{
+        //    AgentContext c = context as AgentContext;
+        //    return c.sampledPositions;
+        //}
     }
 }

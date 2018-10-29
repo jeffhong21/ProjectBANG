@@ -684,7 +684,6 @@ MonoBehaviour:
   weaponType: 1
   currentAmmo: 0
   maxAmmo: 0
-  reloadTime: 0
   fireRate: 0.5
   isReloading: 0
   offhandIK: {fileID: 4726260802812588}

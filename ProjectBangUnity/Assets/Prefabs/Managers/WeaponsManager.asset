@@ -20,5 +20,5 @@ MonoBehaviour:
   - id: Rifle_01
     prefab: {fileID: 114922952180561708, guid: 6ec2d0bc745e349d8be0da4952e736e7, type: 2}
     fireRate: 1
-    ammo: 20
-    maxAmmo: 20
+    ammo: 6
+    maxAmmo: 6

@@ -158,7 +158,7 @@
 
         public IEnumerator ExecuteUpdate(UtilityAIClient client)
         {
-            float nextInterval = 0f;
+            float nextInterval = 1f;
 
             //Debug.Log(" Waiting for startDelay ");
             //yield return new WaitForSeconds(Random.Range(client.startDelayMin, client.startDelayMax));

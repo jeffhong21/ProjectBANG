@@ -39,67 +39,78 @@
 
 
 
-        public void ShootWeapon(Vector3 target)
+        protected override void ExecuteUpdate(float deltaTime)
         {
-            Debug.DrawLine(weapon.ProjectileSpawn.position, weapon.ProjectileSpawn.position + (weapon.ProjectileSpawn.forward * 15), Color.red, 1f);
-            AimPosition = target;
-            //weapon.Shoot(target);
+
+        }
+
+        protected override void ExecuteFixedUpdate(float deltaTime)
+        {
+
+        }
+
+
+        protected override void OnShootWeapon(){
             weapon.Shoot();
         }
 
-
-        public void Reload()
+        protected override void OnTakeDamage(Vector3 hitDirection)
         {
-            //  Get the amount of ammo needed to reload.
-            int ammoToReload = weapon.MaxAmmo - weapon.CurrentAmmo;
-            //  Subtract that ammo amount from inventory.
-
-
-            AnimHandler.PlayReload();
-            weapon.Reload(2f);
-            //  Add it to the weapon current ammo.
-            weapon.CurrentAmmo += ammoToReload;
-        }
-
-
-        public void InitiateCover(CoverObject target)
-        {
-            
+            AnimHandler.PlayTakeDamage(hitDirection);
         }
 
 
         public void EnterCover()
         {
-            bool inCover = false;
-            Collider[] colliders = Physics.OverlapSphere(transform.position, 3, Layers.cover);
-            float mDist = float.MaxValue;
+            CoverObject cover = FindClosestCover();
+            EnterCover(cover);
+        }
+
+
+        private CoverObject FindClosestCover()
+        {
             CoverObject closestCover = null;
+            float mDist = float.MaxValue;
+            Collider[] colliders = Physics.OverlapSphere(transform.position, 2, Layers.cover);
 
             for (int i = 0; i < colliders.Length; i++)
             {
                 var col = colliders[i];
-                if (col == null || col.gameObject == gameObject) {
+                if (col == null || col.gameObject == gameObject)
+                {
                     continue;
                 }
 
-                if (col.GetComponent<CoverObject>()){
+                if (col.GetComponent<CoverObject>())
+                {
                     float tDist = Vector3.Distance(colliders[i].transform.position, position);
-                    if (tDist < mDist){
+                    if (tDist < mDist)
+                    {
                         mDist = tDist;
                         closestCover = colliders[i].GetComponent<CoverObject>();
                     }
                 }
             }
-
-            if(closestCover != null){
-                inCover = closestCover.TakeCoverSpot(this.gameObject);
-                if(inCover) Debug.Log("In Cover");
-            }
-
+            return closestCover;
         }
 
 
-        public override void Death()
+		public void CheckIfCanEmerge()
+		{
+            if(CanEmergeFromCover(rightHelper, true)){
+                Debug.Log("Can emerge from right.");
+            }
+            else if(CanEmergeFromCover(leftHelper, false)){
+                Debug.Log("Can emerge from left.");
+            }
+            else{
+                Debug.Log("Cannot emerge");
+            }
+            //Debug.Break();
+		}
+
+
+		public override void OnDeath()
         {
             AnimHandler.Death();
             DisableControls();

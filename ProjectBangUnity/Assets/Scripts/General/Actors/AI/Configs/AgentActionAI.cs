@@ -37,6 +37,37 @@
 
             //rs.debugScores = true;
 
+
+
+            // ---- New Action ----
+            a = new ReloadGun(){
+                name = "Reload Weapon.",
+            };
+
+            // ---- New Scorers Group ----
+            scorers = new List<IScorer>();
+            //
+            // ---- New Scorers ----
+            scorer = new IsGunLoaded() { score = 20 };
+            scorers.Add(scorer);
+            // ---- New Scorers ----
+            scorer = new AmmoBelowThreshold() { score = 10, threshold = 0.25f };
+            scorers.Add(scorer);
+
+            // ---- New Qualifier ----
+            q = new CompositeAllOrNothingQualifier() { threshold = 15 };
+
+            // ---- Add all to groups ----
+            actions.Add(a);
+            allScorers.Add(scorers.ToArray());
+            qualifiers.Add(q);
+
+            // ---- End Adding Qualifier ----
+
+
+
+
+
             // ---- New Action ----
             a = new CompositeAction()
             {
@@ -58,24 +89,29 @@
                     new FireAtAttackTarget(){ name = "Fire At Target" }
                 }
             };
-            actions.Add(a);  // --  Add to Actions Group
 
             // ---- New Scorers Group ----
             scorers = new List<IScorer>();
             //
             // ---- New Scorers ----
-            scorer = new HasEnemies() { score = 5};
-            scorers.Add(scorer);
-            // ---- New Scorer ----
             scorer = new HasEnemiesInRange() { score = 10, range = 10 };
             scorers.Add(scorer);
-            //
-            // ---- Add All Scorers to Scorers Group ----
-            allScorers.Add(scorers.ToArray());
+            // ---- New Scorer ----
+            scorer = new IsTargetInSight() { score = 0 };
+            scorers.Add(scorer);
+            // ---- New Scorer ----
+            scorer = new IsAttackTargetAlive() { score = 0 };
+            scorers.Add(scorer);
 
             // ---- New Qualifier ----
             q = new CompositeAllOrNothingQualifier() { threshold = 10 };
+
+            // ---- Add all to groups ----
+            actions.Add(a);
+            allScorers.Add(scorers.ToArray());
             qualifiers.Add(q);
+
+            // ---- End Adding Qualifier ----
 
 
 

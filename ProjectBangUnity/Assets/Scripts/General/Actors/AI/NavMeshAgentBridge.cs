@@ -86,7 +86,7 @@ namespace Bang
 
         private void RotateTowardsTarget()
         {
-            if(agent.IsInCover == false)
+            if(agent.States.InCover == false)
                 if (target != null)
                 {
                     Vector3 lookRotation = (target.position - transform.position);

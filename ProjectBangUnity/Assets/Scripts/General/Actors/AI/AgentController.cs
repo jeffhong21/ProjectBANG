@@ -19,8 +19,6 @@
         [SerializeField]
         private float lastShotFired;
         [SerializeField]
-        private float shootingCooldown;
-        [SerializeField]
         private float lastDamageTaken;
         [SerializeField]
         private float damageTakenCooldown;
@@ -28,42 +26,21 @@
         private float checkRateTimer;           //  Timer for when to check scanning.
         private int missCount;              //  Cache how many shots agent has missed.
 
+
         [Header("Agent States")]
-        [SerializeField]
-        private bool canShoot;
         [SerializeField]
         private bool isUnderFire;
         [SerializeField]
-        private bool isReloading;
-        [SerializeField]
-        private bool isMovingToCover;
-        [SerializeField]
-        private bool isInCover;
+        private bool isSearching;
 
-
-        public bool CanShoot{
-            get { return canShoot; }
-        }
 
         public bool IsUnderFire{
             get { return isUnderFire; }
         }
 
-        public bool IsReloading{
-            get { return isReloading;}
-            set{
-                canShoot = !value;
-                isReloading = value;
-            }
-        }
-
-        public bool IsInCover{
-            get { return isInCover; }
-        }
-
-
-        public bool IsMovingToCover{
-            get { return isMovingToCover; }
+        public bool IsSearching{
+            get { return isSearching; }
+            set { isSearching = value; }
         }
 
         //
@@ -84,41 +61,31 @@
 
         private void Start()
         {
-            canShoot = true;
             currentSpeed = stats.walkSpeed;
             lastShotFired = Time.timeSinceLevelLoad;
-
         }
 
 
-
-		private void Update()
-		{
-            delta = Time.deltaTime;
-
-            checkRateTimer += delta;
-            if(checkRateTimer > stats.checkRate){
+        protected override void ExecuteUpdate(float deltaTime)
+        {
+            checkRateTimer += deltaTime;
+            if (checkRateTimer > stats.checkRate)
+            {
                 checkRateTimer = 0;
                 //  Handle scanning or perception stuff.
             }
-            //  Set shooting coldown timer.
-            HandleShootingCooldown(delta);
             //  Set damage taken cooldown timer.
-            HandleDamageTaken(delta);
-
+            HandleDamageTaken(deltaTime);
 
             //  Set aiming position.
             HandleAimingPosition(context.attackTarget, stats.sightRange);
+        }
 
-		}
+        protected override void ExecuteFixedUpdate(float deltaTime)
+        {
+            
+        }
 
-
-		private void FixedUpdate()
-		{
-            if (weapon != null){
-                weapon.transform.LookAt(AimPosition);
-            }
-		}
 
 
         private void HandleAimingPosition(ActorHealth target, float distance)
@@ -132,21 +99,10 @@
         }
 
 
-        private void HandleShootingCooldown(float time)
-        {
-            if (shootingCooldown > 0){
-                shootingCooldown -= time;
-                if (shootingCooldown <= 0)
-                {
-                    canShoot = true;
-                }
-            }
-        }
-
 
         private void HandleDamageTaken(float time)
         {
-            if (damageTakenCooldown > 0){
+            if(damageTakenCooldown > 0){
                 damageTakenCooldown -= time;
                 if (damageTakenCooldown <= 0){
                     isUnderFire = false;
@@ -172,7 +128,8 @@
             context.destination = destination;
             navMeshAgent.SetDestination(destination);
 
-            if(isInCover){
+
+            if(States.InCover){
                 ExitCover();
             }
 
@@ -189,143 +146,71 @@
         }
 
 
-        public void EnterCover(CoverObject cover)
+        protected override void OnShootWeapon()
         {
-            Vector3 origin = transform.position + Vector3.up;
-            Vector3 directionToCover = -(transform.position - cover.transform.position);
-            RaycastHit hit;
-            float distance = 1f;
-
-            if(Physics.Raycast(origin, directionToCover, out hit, distance, Layers.cover))
-            {
-                //  We hit a box collider
-                if(hit.transform.GetComponent<BoxCollider>())
-                {
-                    Quaternion rot = Quaternion.FromToRotation(-transform.forward, hit.normal) * transform.rotation;
-                    transform.rotation = rot;
-
-                    isInCover = true;
-                    canShoot = false;
-                    AnimHandler.CoverState();
-                    Debug.Log("Agent is taking cover");
-                }
-            }
-
+            weapon.Shoot();
+            lastShotFired = Time.timeSinceLevelLoad;
         }
 
 
-        public void ExitCover()
-        {
-            isInCover = false;
-            canShoot = true;
-            AnimHandler.ExitCover();
-            Debug.Log("Agent is leaving cover");
-        }
-
-
-
-        public void ShootWeapon(Vector3 target)
-        {
-            if(canShoot)
-            {
-                float myIntx = Random.Range(-stats.aimAccuracy, stats.aimAccuracy);
-                float myIntz = Random.Range(-stats.aimAccuracy, stats.aimAccuracy);
-                Vector3 newVector = new Vector3(target.x + myIntx, target.y, target.z + myIntz);
-
-
-                AimPosition = target;
-                //weapon.Shoot(target);
-                weapon.Shoot();
-                Debug.DrawLine(weapon.ProjectileSpawn.position, weapon.ProjectileSpawn.position + (weapon.ProjectileSpawn.forward * 10), Color.red, 1f);
-                Debug.DrawLine(weapon.ProjectileSpawn.position, AimPosition, Color.magenta, 1f);
-
-                shootingCooldown = stats.shootSpeed;
-                lastShotFired = Time.timeSinceLevelLoad;
-                canShoot = false;
-
-                bool hitTarget = false;
-                if (hitTarget)
-                {
-                    //  OnTargetHit.
-                }
-                else
-                {
-                    //  OnTargetMiss
-                }
-            }
-
-        }
-
-
-        public void Reload()
-        {
-            isReloading = true;
-            //  Get the amount of ammo needed to reload.
-            int ammoToReload = weapon.MaxAmmo - weapon.CurrentAmmo;
-            //  Subtract that ammo amount from inventory.
-
-            weapon.Reload(1f);
-            //  Add it to the weapon current ammo.
-            weapon.CurrentAmmo += ammoToReload;
-        }
-
-
-        public void TakeDamage(float cooldownTime)
-        {
+		protected override void OnTakeDamage(Vector3 hitDirection)
+		{
             lastDamageTaken = Time.timeSinceLevelLoad;
-            damageTakenCooldown = cooldownTime;
+            //damageTakenCooldown += cooldownTime;
             isUnderFire = true;
-        }
+
+            AnimHandler.PlayTakeDamage(hitDirection);
+		}
 
 
-        public bool CanSeeTarget(Transform target)
+
+        public bool CanSeeTarget(Vector3 lookAtPoint, Vector3 target, bool debug = false)
         {
-            Vector3 origin = transform.position;
-            origin.y += 1.4f;
-            Vector3 dir = target.position;
-            dir.y += 1.2f;
-            dir = dir - origin;
-
+            target.y = 1f;
 
             RaycastHit hit;
-            //Debug.DrawRay(origin, dir * stats.sightRange, Color.green);
-            //Debug.Break();
-            if (Physics.Raycast(origin, dir, out hit, stats.sightRange, Layers.cover) == false ){
-                return true;
+            if (Physics.Raycast(lookAtPoint, target, out hit, stats.scanRadius, targetLayerMask)){
+                Debug.Log(hit.transform.name);
+                if(hit.transform.GetComponent<ActorHealth>()){
+                    if (debug) Debug.DrawLine(lookAtPoint, target, Color.green, 0.5f);
+                    return true;
+                }
             }
+
+            if (debug) Debug.DrawLine(lookAtPoint, target, Color.red, 0.5f);
             return false;
         }
 
 
-        public void ShootFromCover()
-        {
-            if(isInCover){
-                
-            }
-        }
+        //public bool CanSeeTarget(Vector3 lookAtPoint, Vector3 target, bool debug = false)
+        //{
+        //    Color debugMissColor = Color.red;
+
+        //    target.y = lookAtPoint.y;
+        //    Vector3 direction = target - lookAtPoint;
+        //    float angleBetween = Vector3.Angle(lookAtPoint + transform.forward, direction.normalized);
+        //    float distanceSqr = direction.sqrMagnitude;
+        //    RaycastHit hit;
+
+        //    if (distanceSqr < (stats.sightRange * stats.sightRange) &&
+        //        angleBetween < stats.fieldOfView / 2f)
+        //    {
+        //        if(Physics.Linecast(lookAtPoint, target, out hit, Layers.entites))
+        //        {
+        //            if (debug) Debug.DrawLine(lookAtPoint, target, Color.green, 0.5f);
+        //            return true;
+        //        }
+        //        else{
+        //            if (debug) debugMissColor = Color.yellow;
+        //        }
+        //    }
+        //    if (debug) Debug.DrawLine(lookAtPoint, target, debugMissColor, 0.5f);
+        //    return false;
+        //}
 
 
-        public void PeekFromCover()
-        {
-            
-        }
 
 
-        public bool CanPeekSide(bool left = false)
-        {
-            float entitySize = 0.5f;
-            Vector3 side = left == false ? Vector3.right : Vector3.left;
-            Vector3 scanPosition = position + side * entitySize;
-            Vector3 scanDirection = scanPosition + Vector3.back;
-
-            Ray ray = new Ray(scanPosition, scanDirection);
-            RaycastHit hit;
-
-            if(Physics.Raycast(ray, out hit, 1, Layers.cover)){
-                return true;
-            }
-            return false;
-        }
 
 
 
@@ -354,7 +239,7 @@
 
 
 
-        public override void Death()
+        public override void OnDeath()
         {
             AnimHandler.Death();
             navMeshAgent.enabled = false;
@@ -387,25 +272,7 @@
 
 
 
-        /// <summary>
-        /// Calculates if npc can see target.
-        /// </summary>
-        /// <returns><c>true</c>, if see target was caned, <c>false</c> otherwise.</returns>
-        /// <param name="lookAtPoint">Look at point.</param>
-        /// <param name="target">Target.</param>
-        public bool CanSeeTarget(Vector3 lookAtPoint, Vector3 target)
-        {
-            var dirToPlayer = (target - lookAtPoint).normalized;
-            var angleBetweenNpcAndPlayer = Vector3.Angle(lookAtPoint + Vector3.forward, dirToPlayer);
 
-            if (Vector3.Distance(lookAtPoint, target) < stats.sightRange &&
-                angleBetweenNpcAndPlayer < stats.fieldOfView / 2f &&
-                Physics.Linecast(lookAtPoint, target, Layers.cover) == false)
-            {
-                return true;
-            }
-            return false;
-        }
 
 
         public void TestHandleCover()
@@ -448,39 +315,6 @@
         }
 
 
-        public void ScanForEntities()
-        {
-            Collider[] hits = colliders;
-            Physics.OverlapSphereNonAlloc(this.position, stats.scanRadius, hits, Layers.entites, QueryTriggerInteraction.Collide);
-            var timestamp = Time.timeSinceLevelLoad;
-
-            for (int i = 0; i < hits.Length; i++)
-            {
-                Collider hit = hits[i];
-
-                if (hit == null)
-                {
-                    continue;
-                }
-
-                // ignore hits with self
-                if (hit.gameObject == this.gameObject)
-                {
-                    continue;
-                }
-
-                //var entity = hit.GetEntity();
-                //if (entity == null){
-                //    // hit is somehow not an entity
-                //    continue;
-                //}
-
-                if (hit.CompareTag(Tags.Actor))
-                {
-                    context.hostiles.Add(transform.GetComponent<ActorHealth>());
-                }
-            }
-        }
 
 
     }

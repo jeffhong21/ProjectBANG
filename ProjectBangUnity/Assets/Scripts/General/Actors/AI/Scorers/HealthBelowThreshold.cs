@@ -11,7 +11,7 @@ namespace Bang
         [SerializeField]
         public bool not = false;
 
-        public float threshold = 2f;
+        public float threshold = 0.5f;
 
 
         public override float Score(IAIContext context)
@@ -20,14 +20,15 @@ namespace Bang
             var agent = c.agent;
 
             ActorHealth health = agent.GetComponent<ActorHealth>();
-            var currentHealth = health.currentHealth;
 
-            if (currentHealth < threshold)
+
+            float percent = health.currentHealth / health.maxHealth;
+            if (percent <= threshold)
             {
-                return this.not ? this.score : 0f;  //  If "not" is false, it will return second option.  If true it will return first option.
+                return this.score;
             }
 
-            return this.not ? 0f : this.score;  //  If "not" is false, it will return second option.  If true it will return first option.
+            return 0;
         }
 
 

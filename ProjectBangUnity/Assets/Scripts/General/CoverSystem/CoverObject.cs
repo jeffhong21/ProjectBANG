@@ -20,9 +20,11 @@
         [SerializeField]
         private float _entitySize = 0.5f;
         [SerializeField]
-        private Vector3[] _coverSpots = new Vector3[4];
+        private List<Vector3> _coverSpots = new List<Vector3>();
 
         private Dictionary<Vector3, GameObject> occupants = new Dictionary<Vector3, GameObject>();
+
+        private int density = 2;
 
         [SerializeField]
         private CoverDebugOptions debug;
@@ -51,7 +53,7 @@
             get { return _entitySize; }
         }
 
-        public Vector3[] CoverSpots{
+        public List<Vector3> CoverSpots{
             get { return _coverSpots; }
         }
 
@@ -89,6 +91,7 @@
 		public void SetupCoverLocations()
         {
             Init();
+            CoverSpots.Clear();
 
             Sides[0] = Position + new Vector3(0, 0, Col.size.z) * 0.5f;
             Sides[1] = Position + new Vector3(-(Col.size.x), 0, 0) * 0.5f;
@@ -101,16 +104,38 @@
             Corners[3] = Position + new Vector3(-Col.size.x, 0, Col.size.z) * 0.5f;
 
 
-            for (int i = 0; i < CoverSpots.Length; i++)
+            for (int i = 0; i < Corners.Length; i++)
             {
-                Vector3 direction = Sides[i] - Position;
-                CoverSpots[i] = Sides[i] + (direction.normalized * EntitySize);
+                //int next = i + 1 % Corners.Length == 1 ? 0 : i + 1;
+                int next = i + 1;
+                if (next >= Corners.Length) next = 0;
 
-                if(occupants.ContainsKey(CoverSpots[i]) == false){
-                    occupants.Add(CoverSpots[i], null);
-                }
+                Vector3 dir = (Corners[next] - Corners[i]).normalized;
+
+                Vector3 start = Corners[i] + (EntitySize * dir);
+                CoverSpots.Add(start);
+
+                Vector3 end = Corners[next] - (EntitySize * dir);
+                CoverSpots.Add(end);
             }
+
+
+
+
+
+            //for (int i = 0; i < CoverSpots.Count; i++)
+            //{
+            //    Vector3 direction = Sides[i] - Position;
+            //    CoverSpots[i] = Sides[i] + (direction.normalized * EntitySize);
+
+            //    if(occupants.ContainsKey(CoverSpots[i]) == false){
+            //        occupants.Add(CoverSpots[i], null);
+            //    }
+            //}
         }
+
+
+
 
 
         /// <summary>
@@ -124,7 +149,7 @@
             float distance = 0f;
             float range = EntitySize * rangeModifier;
 
-            for (int i = 0; i < CoverSpots.Length; i++){
+            for (int i = 0; i < CoverSpots.Count; i++){
                 distance = Vector3.Distance(CoverSpots[i], entity.position);
                 if (distance < range){
                     return true;
@@ -146,7 +171,7 @@
                 float closest = float.MaxValue;
                 float distance;
 
-                for (int i = 0; i < CoverSpots.Length; i++)
+                for (int i = 0; i < CoverSpots.Count; i++)
                 {
                     distance = Vector3.Distance(CoverSpots[i], entity.transform.position);
                     if (distance < closest){
@@ -188,12 +213,13 @@
 		private void Reset()
 		{
             _sides = new Vector3[4];
+            _coverSpots = new List<Vector3>();
 		}
 
 
         private void OnDrawGizmosSelected()
 		{
-            for (int i = 0; i < CoverSpots.Length; i++){
+            for (int i = 0; i < CoverSpots.Count; i++){
                 if (CoverSpots[i] != Vector3.zero){
                     if(Occupants != null){
                         if(Occupants.ContainsKey(CoverSpots[i])){
@@ -202,7 +228,7 @@
                     } else {
                         Gizmos.color = Color.white;
                     }
-                    Gizmos.DrawSphere(CoverSpots[i], EntitySize);
+                    Gizmos.DrawSphere(CoverSpots[i], debug.Size);
                 }
             }
 		}
@@ -230,7 +256,7 @@
             float closest = float.MaxValue;
             Vector3 closestSpot = Vector3.zero;
 
-            for (int i = 0; i < CoverSpots.Length; i++)
+            for (int i = 0; i < CoverSpots.Count; i++)
             {
                 distance = Vector3.Distance(CoverSpots[i], entity.position);
                 if (distance < closest + range)

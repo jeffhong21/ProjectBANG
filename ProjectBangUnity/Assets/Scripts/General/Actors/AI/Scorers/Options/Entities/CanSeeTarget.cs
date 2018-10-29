@@ -21,7 +21,7 @@
             bool canSeeTarget = false;
 
             if(c.attackTarget != null){
-                canSeeTarget = agent.CanSeeTarget(c.attackTarget.transform);
+                canSeeTarget = agent.CanSeeTarget(agent.AimOrigin, c.attackTarget.position);
             }
 
             if (canSeeTarget){

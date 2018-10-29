@@ -19,9 +19,11 @@
         public AgentContext(AgentController agent)
         {
             this.agent = agent;
+
             _sampledPositions = new List<Vector3>();
             _hostiles = new List<ActorHealth>();
             _coverPositions = new List<Vector3>();
+            _teammates = new List<ActorHealth>();
 
             navMeshAgent = agent.GetComponent<NavMeshAgent>();
             if(navMeshAgent == null) Debug.Log("Context can't find navMeshAgent");
@@ -32,8 +34,6 @@
         [HideInInspector]
         public NavMeshAgent navMeshAgent;
 
-        private List<Vector3> _sampledPositions;
-
         [SerializeField]
         private Vector3 _destination;
 
@@ -41,21 +41,32 @@
         private ActorHealth _attackTarget;
 
         [SerializeField]
-        private List<ActorHealth> _hostiles;
+        private Vector3 _lastTargetPosition;
 
         [SerializeField]
-        private bool _isSearching;
+        private List<ActorHealth> _hostiles;
 
         [SerializeField]
         private CoverObject _coverTarget;
 
         [SerializeField]
+        private Vector3 _coverPosition;
+
+        [SerializeField]
+        private List<ActorHealth> _teammates;
+
+
+
+        private List<Vector3> _sampledPositions;
+
         private List<Vector3> _coverPositions;
 
         [SerializeField]
-        private Vector3 _coverPosition;
+        private List<IOptionScorer<Vector3>> _positionScores;
 
-        public List<IOptionScorer<Vector3>> _positionScores;
+
+
+
 
 
         public AgentController agent
@@ -82,11 +93,8 @@
         {
             get{return _attackTarget;}
             set{
-                _attackTarget = value;
                 //_lastTargetPosition = _attackTarget.transform.position;
-                if(value != null)
-                    _isSearching = false;
-                
+                _attackTarget = value;
                 agent.OnAttackTargetChanged(_attackTarget);
             }
         }
@@ -116,26 +124,17 @@
         public Vector3 coverPosition
         {
             get{
-                //if(coverTarget != null){
-                //    Vector3 closestCoverPoint = coverTarget.ClosestPoint(agent.position);
-                //    closestCoverPoint.y = 0;
-                //    _coverPosition = closestCoverPoint;
-                //    return _coverPosition;
-                //}
-                //return Vector3.zero;
                 return _coverPosition;
             }
             set{ _coverPosition = value; }
         }
 
 
-        public bool isSearching
+        public List<IOptionScorer<Vector3>> PositionScores
         {
-            get { return _isSearching; }
-            set { _isSearching = value; }
+            get { return _positionScores; }
+            set { _positionScores = value; }
         }
-
-
 
 
     }

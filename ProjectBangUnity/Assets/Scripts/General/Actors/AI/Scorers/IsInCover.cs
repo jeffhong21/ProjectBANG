@@ -16,7 +16,7 @@ namespace Bang
             var c = context as AgentContext;
             var agent = c.agent;
 
-            if (agent.IsInCover)
+            if (agent.States.InCover)
             {
                 return this.not ? 0f : this.score;  //  If "not" is false, it will return second option.  If true it will return first option.
             }

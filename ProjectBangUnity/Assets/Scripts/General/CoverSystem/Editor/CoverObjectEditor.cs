@@ -40,40 +40,40 @@
 
 
 
-        private void OnSceneGUI()
-		{
-            t = target as CoverObject;
+  //      private void OnSceneGUI()
+		//{
+  //          t = target as CoverObject;
 
-            //  Handle Cover Spots
-            Handles.color = t.DebugOptions.EmptyColor;
-            for (int i = 0; i < t.CoverSpots.Length; i++)
-            {
-                if (t.Sides[i] != Vector3.zero){
-                    //Handles.color = t.Occupants[i] == null ? t.DebugOptions.EmptyColor : t.DebugOptions.OccupiedColor;
-                    Handles.DrawSolidDisc(t.CoverSpots[i], Vector3.up, t.EntitySize);
-                    //Handles.DrawWireCube(t.Sides[i], t.DebugOptions.BoxSize);
-                }
-            }
+  //          //  Handle Cover Spots
+  //          Handles.color = t.DebugOptions.EmptyColor;
+  //          for (int i = 0; i < t.CoverSpots.Count; i++)
+  //          {
+  //              if (t.Sides[i] != Vector3.zero){
+  //                  //Handles.color = t.Occupants[i] == null ? t.DebugOptions.EmptyColor : t.DebugOptions.OccupiedColor;
+  //                  Handles.DrawSolidDisc(t.CoverSpots[i], Vector3.up, t.EntitySize);
+  //                  //Handles.DrawWireCube(t.Sides[i], t.DebugOptions.BoxSize);
+  //              }
+  //          }
 
-            //  Handle Sides
-            Handles.color = Color.red;
-            for (int i = 0; i < t.Sides.Length; i++){
-                if(t.Sides[i] != Vector3.zero){
-                    //Handles.DrawSolidDisc(t.Sides[i], Vector3.up, t.DebugOptions.Size);
-                    Handles.DrawWireCube(t.Sides[i], t.DebugOptions.BoxSize);
-                }
-            }
+  //          //  Handle Sides
+  //          Handles.color = Color.red;
+  //          for (int i = 0; i < t.Sides.Length; i++){
+  //              if(t.Sides[i] != Vector3.zero){
+  //                  //Handles.DrawSolidDisc(t.Sides[i], Vector3.up, t.DebugOptions.Size);
+  //                  Handles.DrawWireCube(t.Sides[i], t.DebugOptions.BoxSize);
+  //              }
+  //          }
 
-            //  Handle Corners
-            Handles.color = Color.red;
-            for (int i = 0; i < t.Corners.Length; i++)
-            {
-                if (t.Sides[i] != Vector3.zero){
-                    //Handles.DrawSolidDisc(t.Corners[i], Vector3.up, t.DebugOptions.Size);
-                    Handles.DrawWireCube(t.Corners[i], t.DebugOptions.BoxSize);
-                }
-            }
-		}
+  //          //  Handle Corners
+  //          Handles.color = Color.red;
+  //          for (int i = 0; i < t.Corners.Length; i++)
+  //          {
+  //              if (t.Sides[i] != Vector3.zero){
+  //                  //Handles.DrawSolidDisc(t.Corners[i], Vector3.up, t.DebugOptions.Size);
+  //                  Handles.DrawWireCube(t.Corners[i], t.DebugOptions.BoxSize);
+  //              }
+  //          }
+		//}
 
 
 

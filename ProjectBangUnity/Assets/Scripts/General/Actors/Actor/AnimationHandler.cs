@@ -19,6 +19,7 @@ namespace Bang
             public readonly int InCover = Animator.StringToHash("IsInCover");
             public readonly int ExitCover = Animator.StringToHash("ExitCover");
             public readonly int IsDead = Animator.StringToHash("IsDead");
+            public readonly int IsReloading = Animator.StringToHash("IsReloading");
         }
 
         [Serializable]
@@ -106,8 +107,8 @@ namespace Bang
             actor = GetComponent<ActorController>();
             anim = GetComponent<Animator>();
 
-            leftHandState = new HandState(anim.GetBoneTransform(HumanBodyBones.RightHand));
-            rightHandState = new HandState(anim.GetBoneTransform(HumanBodyBones.LeftHand));
+            leftHandState = new HandState(anim.GetBoneTransform(HumanBodyBones.LeftHand));
+            rightHandState = new HandState(anim.GetBoneTransform(HumanBodyBones.RightHand));
 
             hashID = new HashID();
             currentAnimation = anim.GetCurrentAnimatorStateInfo(0);
@@ -135,7 +136,6 @@ namespace Bang
 
             HandleShoulder();
 
-
         }
 
 
@@ -145,7 +145,7 @@ namespace Bang
             UpdateIK(AvatarIKGoal.LeftHand, leftHandState.target, leftHandState.weight);
 
             //  Update mainhand
-            //UpdateIK(AvatarIKGoal.RightHand, rightHandState.target, rightHandState.weight);
+            UpdateIK(AvatarIKGoal.RightHand, rightHandState.target, rightHandState.weight);
 		}
 
 
@@ -157,19 +157,6 @@ namespace Bang
                 anim.SetIKPosition(goal, target.position);
                 anim.SetIKRotation(goal, target.rotation);
             }
-        }
-
-        //  Used for Reload Animation Event.  
-        private void StoreIKSettings()
-        {
-            leftHandState.savedWeight = leftHandState.weight;
-        }
-
-        //  Used for Reload Animation Event.  (Reload Clip has a event in the animation.)
-        private void RestoreIKSettings()
-        {
-            leftHandState.weight = leftHandState.savedWeight;
-            Debug.Log("Reloading Animation is done.");
         }
 
 
@@ -206,6 +193,9 @@ namespace Bang
         }
 
 
+
+
+
         public void EquidWeapon(Transform mainHand, Transform offHand)
         {
             rightHandState.target = mainHand;
@@ -227,12 +217,22 @@ namespace Bang
         }
 
 
-        public void PlayReload()
+        public void PlayReload(bool isPlaying)
         {
-            StoreIKSettings();
+            if(isPlaying){ //  If is playing, store the weights.
+                leftHandState.savedWeight = leftHandState.weight;
+                leftHandState.weight = 0f;
+            }
+            else{  // If not playing, restore the weights.
+                leftHandState.weight = leftHandState.savedWeight;
+            }
+            anim.SetBool(hashID.IsReloading, isPlaying);
+        }
 
-            leftHandState.weight = 0f;
-            anim.SetTrigger(hashID.Reload);
+
+        public void PlayTakeDamage(Vector3 hitDirection)
+        {
+            
         }
 
 
@@ -266,31 +266,14 @@ namespace Bang
         }
 
 
-        public void TimeoutIdle()
-        {
-            
-        }
-
-
-        public void Taunt()
-        {
-            
-        }
-
-
-        public void StandOff()
-        {
-            
-        }
-
 
 
         public void OnDrawGizmosSelected()
         {
-            if(actor != null){
-                Gizmos.color = Color.green;
-                Gizmos.DrawLine(actor.AimOrigin, actor.AimPosition);
-            }
+            //if(actor != null){
+            //    Gizmos.color = Color.blue;
+            //    Gizmos.DrawLine(actor.AimOrigin, actor.AimPosition);
+            //}
 
         }
     }

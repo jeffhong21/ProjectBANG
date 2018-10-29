@@ -45,8 +45,12 @@ namespace Bang
             }
 
 
-            if (InputManager.Space){
-                playerCtrl.EnterCover();
+            if (InputManager.Space)
+            {
+                if (playerCtrl.States.InCover)
+                    playerCtrl.ExitCover();
+                else
+                    playerCtrl.EnterCover();
             }
             else if (InputManager.LMB){
                 playerCtrl.ShootWeapon(cursorPosition);
@@ -61,6 +65,10 @@ namespace Bang
                 Debug.LogFormat("<color=#800080ff>{0}</color>.  Current ammo is <color=#800080ff>{1}</color>", "Reloading playerCtrl.weapon", playerCtrl.weapon.CurrentAmmo);  // purple
             }
 
+            else if (InputManager.E){
+                playerCtrl.CheckIfCanEmerge();
+            }
+
             //  Check if player is moving.
             //isMoving = Math.Abs(playerInput.x) >= 0.1f || Math.Abs(playerInput.y) >= 0.1f ? true : false;
 
@@ -73,7 +81,9 @@ namespace Bang
             currentSpeed = playerCtrl.stats.walkSpeed;
 
             UpdatePosition(currentSpeed);
-            UpdateOrientation();
+
+            if( !playerCtrl.States.InCover)
+                UpdateOrientation();
         }
 
 
@@ -92,17 +102,9 @@ namespace Bang
             if (groundPlane.Raycast(ray, out rayDistance))
             {
                 cursorPosition = ray.GetPoint(rayDistance);
-
+                playerCtrl.AimPosition = cursorPosition;
 
                 transform.LookAt(cursorPosition);
-
-                if (playerCtrl.weapon != null)
-                {
-                    Vector3 aimDirection = cursorPosition;
-                    aimDirection.y = playerCtrl.weapon.transform.position.y;
-                    playerCtrl.weapon.transform.LookAt(aimDirection);
-                }
-
                 cursorPosition.y = aimHeight;
                 playerCtrl.crosshairs.transform.position = cursorPosition;
             }

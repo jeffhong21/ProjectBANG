@@ -92,15 +92,14 @@
                 name = "Move to Cover Positiion",
                 actions = new List<IAction>()
                 {
-                    new GetCoverPositions(){name = "Get Cover Positions"},
-                    new FindClosestCover(){name = "Find Closest Cover"},
-                    new MoveToCoverPositions()
+                    new GetCoverPositions(){ name = "Get Cover Positions" },
+                    new MoveToCover()
                     {
                         name = "Move to Cove Position",
                         scorers = new List<IOptionScorer<Vector3>>()
                         {
                             new PositionProximityToSelf() { score = 10, factor = 0.01f },      //  How close each point is to agent.
-                            new OverRangeToClosestEnemy() { desiredRange = 5f, score = 100f },      //  If point is over a certain range to each enemy.
+                            new OverRangeToClosestEnemy() { desiredRange = 8f, score = 100f },      //  If point is over a certain range to each enemy.
                         }
                     }
                 }
@@ -111,13 +110,19 @@
             scorers = new List<IScorer>();
             //
             // ---- New Scorer ----
-            scorer = new HasEnemiesInRange() { score = 50, range = 10 };
+            scorer = new IsDamaged() { score = 0};
             scorers.Add(scorer);
             // ---- New Scorer ----
             scorer = new HasCoverPosition() { score = 50 };
             scorers.Add(scorer);
             // ---- New Scorer ----
             scorer = new HealthBelowThreshold() { score = 15, threshold = 2 };
+            scorers.Add(scorer);
+            // ---- New Scorer ----
+            scorer = new HasEnemiesInRange() { score = 50, range = 10 };
+            scorers.Add(scorer);
+            // ---- New Scorer ----
+            scorer = new AmmoBelowThreshold() { score = 0, threshold = 0.5f };
             scorers.Add(scorer);
             // ---- New Scorer ----
             scorer = new ShouldFindCover() { score = 15 };
@@ -157,7 +162,13 @@
             scorers = new List<IScorer>();
             //
             // ---- New Scorer ----
-            scorer = new HasEnemiesInRange() { score = 150, range = 3 };
+            scorer = new HasEnemiesInRange() { score = 150, range = 5 };
+            scorers.Add(scorer);
+            // ---- New Scorer ----
+            scorer = new IsTargetInSight() { score = 0, not = true };
+            scorers.Add(scorer);
+            // ---- New Scorer ----
+            scorer = new IsAttackTargetAlive() { score = 0 };
             scorers.Add(scorer);
             //
             // ---- Add All Scorers to Scorers Group ----
@@ -213,20 +224,18 @@
             scorers = new List<IScorer>();
             //
             // ---- New Scorer ----
-            scorer = new IsSearchingForTargets() { score = 15 };
+            scorer = new IsSearchingForTargets() { score = 15, not = true };
             scorers.Add(scorer);
             // ---- New Scorer ----
-            scorer = new HasEnemies() { score = 45, not = true};  //  If agent has no hostiles ,than it scores.
-            scorers.Add(scorer);
-            // ---- New Scorers ----
-            scorer = new HasArrivedToDestination() { score = -10, not = true };
+            scorer = new HasEnemies() { score = 200, not = true};  //  If agent has no hostiles ,than it scores.
             scorers.Add(scorer);
             //
             // ---- Add All Scorers to Scorers Group ----
             allScorers.Add(scorers.ToArray());
 
             // ---- New Qualifier ----
-            q = new CompositeScoreQualifier();
+            q = new CompositeAllOrNothingQualifier() { threshold = 100 };
+            //q = new CompositeScoreQualifier();
             qualifiers.Add(q);
 
             #endregion

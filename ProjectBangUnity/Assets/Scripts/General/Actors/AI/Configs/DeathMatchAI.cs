@@ -35,68 +35,47 @@
             rs.debugScores = true;
 
 
+
+
+
             #region Damaged
 
-            // ---- New Action ----
-            Selector selector = new ScoreSelector();
+
             a = new CompositeAction()
             {
-                name = "FireAtTarget",
+                name = "Move to Cover Positiion",
                 actions = new List<IAction>()
                 {
-                    new SetBestAttackTarget()
+                    new MoveToCover()
                     {
-                        name = "SetBestAttackTarget",
-                        scorers = new List<IOptionScorer<ActorHealth>>()
-                        {
-                            new IsTargetAlive(){score = 100f},
-                            new EnemyProximityToSelf(){multiplier = 1f, score = 50f},
-                            new IsCurrentTargetScorer()
+                        name = "Move to Cove Position",
+                        scorers = new List<IOptionScorer<Vector3>>(){
+                            new PositionProximityToSelf() { score = 10, factor = 0.01f },      //  How close each point is to agent.
+                            new OverRangeToClosestEnemy() { desiredRange = 5f, score = 100f },      //  If point is over a certain range to each enemy.
                         }
-                    },
-                    new FireAtAttackTarget(){ name = "FireAtAttackTarget" }
+                    }
                 }
             };
-            actions.Add(a);  // --  Add to Actions Group
 
-            // ---- New Scorers Group ----
-            scorers = new List<IScorer>();
-            //
-            // ---- New Scorers ----
-            scorer = new HasEnemies() { score = 15 };
-            scorers.Add(scorer);
-            // ---- New Scorer ----
-            scorer = new HasEnemiesInRange() { score = 25, range = 10 };
-            scorers.Add(scorer);
-            //
-            // ---- Add All Scorers to Scorers Group ----
-            allScorers.Add(scorers.ToArray());
-
-            // ---- New Qualifier ----
-            q = new CompositeAllOrNothingQualifier() { threshold = 20 };
-            qualifiers.Add(q);
-
-
-
-            a = new SelectorAction(selector);
-            actions.Add(a);  // --  Add to Actions Group
 
             // ---- New Scorers Group ----
             scorers = new List<IScorer>();
             //
             // ---- New Scorer ----
-            scorer = new HasEnemiesInRange() { score = 10, range = 10 };
-            scorers.Add(scorer);
-            // ---- New Scorer ----
-            scorer = new HasCoverPosition() { score = 10 };
+            scorer = new HasEnemiesInRange() { score = 50, range = 10 };
             scorers.Add(scorer);
             //
-            // ---- Add All Scorers to Scorers Group ----
-            allScorers.Add(scorers.ToArray());
+
 
             // ---- New Qualifier ----
-            q = new CompositeScoreQualifier();
+            q = new CompositeAllOrNothingQualifier() { threshold = 100 };
+            //q = new CompositeScoreQualifier();
+
+            actions.Add(a);                             // --  Add to Actions Group
+            allScorers.Add(scorers.ToArray());          // ---- Add All Scorers to Scorers Group ----
             qualifiers.Add(q);
+
+            // ---- End Adding Qualifier ----
 
             #endregion
 
@@ -166,40 +145,44 @@
             // ---- New Action ----
             a = new CompositeAction()
             {
-                name = "FireAtTarget",
+                name = "Fire At Target",
                 actions = new List<IAction>()
                 {
+                    //new StopMovement(){ name = "StopMovement"},
                     new SetBestAttackTarget()
                     {
-                        name = "SetBestAttackTarget",
+                        name = "Set Best Attack Target",
                         scorers = new List<IOptionScorer<ActorHealth>>()
                         {
-                            new IsTargetAlive(){score = 100f},
-                            new EnemyProximityToSelf(){multiplier = 1f, score = 50f},
+                            new IsTargetAlive(){ score = 100f},
+                            new CanSeeTarget(){ score = 50f },
+                            new EnemyProximityToSelf(){ multiplier = 1f, score = 50f},
                             new IsCurrentTargetScorer()
                         }
                     },
-                    new FireAtAttackTarget(){ name = "FireAtAttackTarget" }
+                    new FireAtAttackTarget(){ name = "Fire At Target" }
                 }
             };
-            actions.Add(a);  // --  Add to Actions Group
 
             // ---- New Scorers Group ----
             scorers = new List<IScorer>();
             //
             // ---- New Scorers ----
-            scorer = new HasEnemies() { score = 15 };
+            scorer = new HasEnemies() { score = 5 };
             scorers.Add(scorer);
             // ---- New Scorer ----
-            scorer = new HasEnemiesInRange() { score = 25, range = 10 };
+            scorer = new HasEnemiesInRange() { score = 10, range = 10 };
             scorers.Add(scorer);
-            //
-            // ---- Add All Scorers to Scorers Group ----
-            allScorers.Add(scorers.ToArray());
 
             // ---- New Qualifier ----
-            q = new CompositeAllOrNothingQualifier() { threshold = 20 };
+            q = new CompositeAllOrNothingQualifier() { threshold = 10 };
+
+            // ---- Add all to groups ----
+            actions.Add(a);
+            allScorers.Add(scorers.ToArray());
             qualifiers.Add(q);
+
+            // ---- End Adding Qualifier ----
 
             #endregion
 
@@ -213,7 +196,31 @@
 
 
             #region IsAmmoLow
+
+            // ---- New Action ----
+            a = new ReloadGun(){
+                name = "Reload Weapon.",
+            };
+
+            // ---- New Scorers Group ----
+            scorers = new List<IScorer>();
             //
+            // ---- New Scorers ----
+            scorer = new IsGunLoaded() { score = 20 };
+            scorers.Add(scorer);
+            // ---- New Scorers ----
+            scorer = new AmmoBelowThreshold() { score = 10, threshold = 0.25f };
+            scorers.Add(scorer);
+
+            // ---- New Qualifier ----
+            q = new CompositeAllOrNothingQualifier() { threshold = 15 };
+
+            // ---- Add all to groups ----
+            actions.Add(a);
+            allScorers.Add(scorers.ToArray());
+            qualifiers.Add(q);
+
+            // ---- End Adding Qualifier ----
 
             #endregion
 
