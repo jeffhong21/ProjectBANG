@@ -6,7 +6,7 @@
     /// <summary>
     /// Returns a score if agent health is below a threshold.
     /// </summary>
-    public class AmmoBelowThreshold : ScorerBase
+    public class AmmoBelowThreshold : ContextualScorerBase
     {
 
         public float threshold = 0.5f;

@@ -25,7 +25,7 @@
         //
         // Methods
         //
-        public sealed override float Score(IAIContext context, List<IScorer> scorers)
+        public sealed override float Score(IAIContext context, List<IContextualScorer> scorers)
         {
             float score = 0f;
             float scorerScore = 0f;
@@ -50,7 +50,7 @@
             return score;
 
 
-            //foreach (IScorer scorer in scorers)
+            //foreach (IContextualScorer scorer in scorers)
             //{
             //    scorerScore = scorer.Score(context);
             //    if (scorerScore > threshold)

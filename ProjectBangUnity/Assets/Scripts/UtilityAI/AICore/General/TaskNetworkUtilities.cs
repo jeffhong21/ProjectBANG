@@ -75,7 +75,7 @@
                     return "Qualifier";
                 case "ActionBase":
                     return "Action";
-                case "ScorerBase":
+                case "ContextualScorerBase":
                     return "Scorer";
                 default:
                     return "<None>";
@@ -88,7 +88,7 @@
         /// </summary>
         /// <returns> All available options. </returns>
         /// <typeparam name="T"> Is one the AI blocks. </typeparam>
-        public static List<Type> GetAllOptions<T>() //where T: Selector, IQualifier, IAction, IScorer
+        public static List<Type> GetAllOptions<T>() //where T: Selector, IQualifier, IAction, IContextualScorer
         {
             List<Type> availableTypes = new List<Type>();
             Type type = typeof(T);
@@ -192,7 +192,7 @@
 
                 qualifierInfo += string.Format("{0}", qualifier.GetType().Name);
 
-                foreach (IScorer scorer in qualifier.scorers)
+                foreach (IContextualScorer scorer in qualifier.scorers)
                 {
                     scorerInfo += string.Format("    - {0}\n", scorer.GetType().Name);
                 }

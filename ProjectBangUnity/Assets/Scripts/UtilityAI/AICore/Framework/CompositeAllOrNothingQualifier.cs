@@ -22,7 +22,7 @@
         //
         // Methods
         //
-        public override float Score(IAIContext context, List<IScorer> scorers)
+        public override float Score(IAIContext context, List<IContextualScorer> scorers)
         {
             var score = 0f;
             if (scorers.Count == 0)

@@ -20,7 +20,7 @@
         }
 
 
-        public override float Score(IAIContext context, List<IScorer> scorers)
+        public override float Score(IAIContext context, List<IContextualScorer> scorers)
         {
             var score = 0f;
             if (scorers.Count == 0)
@@ -28,7 +28,7 @@
             
             //Debug.Log(this.GetType().ToString() + " is scoring");
 
-            foreach (IScorer scorer in scorers)
+            foreach (IContextualScorer scorer in scorers)
             {
                 score += scorer.Score(context);
             }

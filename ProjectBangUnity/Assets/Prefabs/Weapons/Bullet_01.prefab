@@ -452,8 +452,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2c38ed14fe46442caac14e4aff3c806, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _damage: 1
-  _lifeDuration: 2
-  _spawnLocation: {x: 0, y: 0, z: 0}
-  _maxRange: 50
-  _velocity: 96
+  damage: 1
+  force: 100
+  maxRange: 50
+  velocity: 100
+  lifeDuration: 2

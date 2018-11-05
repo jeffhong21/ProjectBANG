@@ -33,7 +33,7 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1519867001414480}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -55,13 +55,18 @@ MonoBehaviour:
   playersPerTeam: 1
   teamCount: 2
   teamGame: 0
-  playerPrefab: {fileID: 1141768220188808, guid: 5501f685a0dbf486d8850e35be575965,
+  playerPrefab: {fileID: 1141768220188808, guid: 48d5d63a725454afdb444de203f800d6,
     type: 2}
   cameraPrefab: {fileID: 0}
-  agentPrefab: {fileID: 1141768220188808, guid: af01893b29c134708a9c57c104769024,
+  agentPrefab: {fileID: 1141768220188808, guid: e7fd3a34c80874256a862d9560791751,
     type: 2}
+  hud: {fileID: 0}
+  playersParentName: Players
   settings:
     timePerRound: 180
+  primaryColorSettings:
+    redTeam: {r: 1, g: 0, b: 0, a: 1}
+    blueTeam: {r: 0, g: 0, b: 1, a: 1}
   debug:
     skipIntro: 0
     doNotStartGameLoop: 1

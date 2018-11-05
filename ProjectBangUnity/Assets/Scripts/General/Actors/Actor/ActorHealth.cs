@@ -4,28 +4,37 @@
     using System;
     using System.Collections;
 
-    public class ActorHealth : MonoBehaviour, IHasHealth
+    public class ActorHealth : MonoBehaviour
     {
         //
         //  Fields
         //
-        public bool _invinsible;
         [SerializeField]
-        protected float _maxHealth = 4f;
+        protected bool invinsible;
         [SerializeField]
-        protected float _currentHealth;
+        protected float currentHealth;
         [SerializeField]
-        protected float _timeInvincibleAfterRespawn;
+        protected float maxHealth = 4f;
+        [SerializeField]
+        protected float timeInvincibleAfterRespawn;
         [SerializeField]
         protected float sinkSpeed = 0.5f;
         [SerializeField]
         protected float delaySinkTime = 3f;
 
         private ActorController controller;
-        private AnimationHandler AnimHandler;
         private float startSinkingTime;
         private WaitForSeconds sinkDelay;
-        private bool _isDead;
+        [SerializeField]
+        private bool isDead;
+
+
+        public event Action<float, Vector3, Vector3, GameObject> OnHealthDamage;
+
+        public event Action<float> OnHeal;
+
+        public event Action<Vector3, Vector3, GameObject> OnDeath;
+
 
 
         //
@@ -37,34 +46,33 @@
             }
         }
 
-
-        public float maxHealth
+        public bool Invinsible
         {
-            get { return _maxHealth; }
+            get { return invinsible; }
         }
 
 
-        public float currentHealth
+        public float MaxHealth
         {
-            get { return _currentHealth; }
-            set { _currentHealth = value; }
+            get { return maxHealth; }
         }
 
 
-        public float timeInvincibleAfterRespawn
+        public float CurrentHealth
         {
-            get { return _timeInvincibleAfterRespawn; }
+            get { return currentHealth; }
+            //set { currentHealth = value; }
         }
 
 
-        public bool isDead
+        public bool IsDead
         {
             get
             {
-                _isDead = this.currentHealth <= 0f || (this.gameObject != null && this.gameObject.activeSelf == false);
-                return _isDead;
+                isDead = this.CurrentHealth <= 0f || (this.gameObject != null && this.gameObject.activeSelf == false);
+                return isDead;
             }
-            set { _isDead = value; }
+            set { isDead = value; }
         }
 
 
@@ -72,52 +80,48 @@
         //
         //  Methods
         //
-        protected virtual void Awake()
+        private void Awake()
         {
             controller = GetComponent<ActorController>();
             sinkDelay = new WaitForSeconds(delaySinkTime);
         }
 
 
-        protected virtual void OnEnable()
+        private void OnEnable()
         {
-            _currentHealth = _maxHealth;
+            currentHealth = maxHealth;
         }
 
 
 
-        public void TakeDamage(float damage)
+        public void TakeDamage(float damage, Vector3 hitLocation, Vector3 hitDirection, GameObject attacker)
         {
-            if(!_invinsible)
+            if (!invinsible)
             {
-                if(currentHealth > 0){
+                if (currentHealth > 0){
                     currentHealth -= damage;
+                    //OnHealthDamage(damage, hitDirection, hitDirection, attacker);
+                    controller.TakeDamage(hitDirection, hitDirection, attacker);
                 }
-                else{
-                    Death();
+
+                if(currentHealth <= 0){
+                    Die(hitLocation, hitDirection, attacker);
                 }
             }
-        }
-
-
-        public void TakeDamage(float damage, Vector3 hitLocation, Vector3 hitDirection)
-        {
-            controller.TakeDamage(hitDirection);
-            TakeDamage(damage);
             ParticlePoolManager.instance.SpawnParticleSystem(ParticlesType.ActorHit, hitLocation, Quaternion.FromToRotation(Vector3.forward, hitDirection));
         }
 
 
-
-        public void Death()
-        {
-            _isDead = true;
-            controller.Death();
+        private void Die(Vector3 position, Vector3 force, GameObject attacker){
+            isDead = true;
+            //OnDeath(position, force, attacker);
+            controller.Death(position, force, attacker);
+            Debug.LogFormat("{0} was killed by {1}", gameObject.name, attacker.name);
             StartCoroutine(StartSinking());
         }
 
 
-        IEnumerator StartSinking()
+        private IEnumerator StartSinking()
         {
             yield return sinkDelay;
 

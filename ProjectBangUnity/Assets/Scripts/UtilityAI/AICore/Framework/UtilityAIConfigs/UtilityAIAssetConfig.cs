@@ -18,13 +18,13 @@
 
         protected Selector rs;
         protected IAction a;
-        protected IScorer scorer;
-        protected List<IScorer> scorers;
+        protected IContextualScorer scorer;
+        protected List<IContextualScorer> scorers;
         protected IQualifier q;
         protected Selector s;
 
         protected List<IQualifier> qualifiers;
-        protected List<IScorer[]> allScorers;
+        protected List<IContextualScorer[]> allScorers;
         protected List<IAction> actions;
 
 
@@ -35,7 +35,7 @@
                 qualifiers = new List<IQualifier>();
             
             if (allScorers == null) 
-                allScorers = new List<IScorer[]>();
+                allScorers = new List<IContextualScorer[]>();
             
             if (actions == null) 
                 actions = new List<IAction>();
@@ -59,7 +59,7 @@
                 //  Set qualifier's action.
                 qualifier.action = actions[index];
                 //  Add scorers to qualifier.
-                foreach (IScorer scorer in allScorers[index])
+                foreach (IContextualScorer scorer in allScorers[index])
                 {
                     if (qualifier is CompositeQualifier)
                     {

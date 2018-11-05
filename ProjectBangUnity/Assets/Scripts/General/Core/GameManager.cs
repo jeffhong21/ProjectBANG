@@ -16,8 +16,6 @@
         [SerializeField]
         private PauseMenu _pauseManager;
         [SerializeField]
-        private CameraController _playerCamera;
-        [SerializeField]
         private WeaponManager weaponManager;
 
         //
@@ -35,10 +33,6 @@
             get { return _pauseManager; } 
         }
 
-        public CameraController PlayerCamera
-        {
-            get { return _playerCamera; }
-        }
 
         public WeaponManager WeaponManager
         {
@@ -68,7 +62,7 @@
                 _pauseManager = Instantiate(PauseManager);
             }
 
-            _playerCamera = Camera.main.GetComponent<CameraController>();
+
 
 
             //if (_defaultWeapon == null) throw new ArgumentNullException("GameManager has no default weapon.");

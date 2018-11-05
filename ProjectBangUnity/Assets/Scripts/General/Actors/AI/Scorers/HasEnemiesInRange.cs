@@ -6,7 +6,7 @@
     /// <summary>
     /// Returns the score if a hostile is within range.
     /// </summary>
-    public class HasEnemiesInRange : ScorerBase
+    public class HasEnemiesInRange : ContextualScorerBase
     {
 
         public float range = 10f;  //  entites within this range

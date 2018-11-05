@@ -6,7 +6,7 @@
     /// <summary>
     /// Returns score if agent is searching for targets.
     /// </summary>
-    public class IsSearchingForTargets : ScorerBase
+    public class IsSearchingForTargets : ContextualScorerBase
     {
         [SerializeField]
         public bool not = false;

@@ -1,4 +1,4 @@
-namespace Bang
+﻿namespace Bang
 {
     using UnityEngine;
     using AtlasAI;
@@ -6,7 +6,7 @@ namespace Bang
     /// <summary>
     /// Returns score if agent is in cover.
     /// </summary>
-    public class IsInCover : ScorerBase
+    public class IsInCover : ContextualScorerBase
     {
         [SerializeField]
         public bool not = false;

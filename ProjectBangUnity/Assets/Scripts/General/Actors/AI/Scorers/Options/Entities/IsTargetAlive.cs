@@ -6,7 +6,7 @@
     /// <summary>
     /// Will prioritize an entity that is alive.
     /// </summary>
-    public sealed class IsTargetAlive : ScorerOptionBase<ActorHealth>
+    public sealed class IsTargetAlive : OptionScorerBase<ActorHealth>
     {
         
         public float score = 100f;
@@ -15,7 +15,7 @@
         {
             var c = context as AgentContext;
 
-            if (hostile.currentHealth > 0){
+            if (hostile.CurrentHealth > 0){
                 return this.score;
             }
 

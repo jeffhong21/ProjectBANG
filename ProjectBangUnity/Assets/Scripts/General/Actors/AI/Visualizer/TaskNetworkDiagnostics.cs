@@ -150,7 +150,7 @@
 
 //                    if(qualifier is CompositeQualifier)
 //                    {
-//                        foreach (IScorer scorer in ((CompositeQualifier)qualifier).scorers)
+//                        foreach (IContextualScorer scorer in ((CompositeQualifier)qualifier).scorers)
 //                        {
 //                            using (new EditorGUILayout.HorizontalScope())
 //                            {
@@ -264,7 +264,7 @@
 //                //scorersScores = new string[count];
 //                for (int i = 0; i < count; i++)
 //                {
-//                    optionScorers[i] = string.Format("<b>{0}</b>{1} ", "OptionScorer: ", _optionScorers[i].GetType().Name);
+//                    optionScorers[i] = string.Format("<b>{0}</b>{1} ", "ScoredOption: ", _optionScorers[i].GetType().Name);
 //                    networkInfo += string.Format("   - {0}\n", _optionScorers[i]);
 //                }
 //                //actionName += string.Format(" <{0}>", optionType);
@@ -342,7 +342,7 @@
 
 //                qualifierInfo += string.Format("{0}", qualifier.GetType().Name);
 
-//                foreach (IScorer scorer in qualifier.scorers)
+//                foreach (IContextualScorer scorer in qualifier.scorers)
 //                {
 //                    scorerInfo += string.Format("    - {0}\n", scorer.GetType().Name);
 //                }

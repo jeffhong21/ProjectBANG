@@ -84,7 +84,7 @@
         /// <param name="context">Context.</param>
         public virtual IAction Select(IAIContext context)
         {
-            throw new NotImplementedException();
+            return Select(context, qualifiers, defaultQualifier).action;
         }
 
 

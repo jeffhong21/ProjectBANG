@@ -3,7 +3,7 @@
     using UnityEngine;
     using AtlasAI;
 
-    public class ShouldFlee : ScorerBase
+    public class ShouldFlee : ContextualScorerBase
     {
 
         public override float Score(IAIContext context)

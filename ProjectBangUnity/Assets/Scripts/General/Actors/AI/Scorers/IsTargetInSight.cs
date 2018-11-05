@@ -3,7 +3,7 @@
     using UnityEngine;
     using AtlasAI;
 
-    public class IsTargetInSight : ScorerBase
+    public class IsTargetInSight : ContextualScorerBase
     {
         [SerializeField]
         public bool not = false;  //  If false, it will return second option.  If true it will return first option.

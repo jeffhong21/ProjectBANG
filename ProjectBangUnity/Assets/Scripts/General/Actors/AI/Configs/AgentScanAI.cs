@@ -12,13 +12,13 @@
         
         /*
         private IAction a;
-        private IScorer scorer;
-        private List<IScorer> scorers;
+        private IContextualScorer scorer;
+        private List<IContextualScorer> scorers;
         private IQualifier q;
         private Selector s;
 
         private List<IQualifier> qualifiers;
-        private List<IScorer[]> allScorers;
+        private List<IContextualScorer[]> allScorers;
         private List<IAction> actions;
         */
 
@@ -48,7 +48,7 @@
             //actions.Add(a);  // --  Add to Actions Group
             //
             //// ---- New Scorers Group ----
-            //scorers = new List<IScorer>();
+            //scorers = new List<IContextualScorer>();
             ////
             //// ---- New Scorer ----
             //scorer = new FixedScorer() { score = 5 };

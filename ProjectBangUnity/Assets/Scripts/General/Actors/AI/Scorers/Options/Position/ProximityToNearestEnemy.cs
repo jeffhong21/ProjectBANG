@@ -6,7 +6,7 @@
     /// <summary>
     /// Score returned is the score minus the distance to the nearest enemy minus range.
     /// </summary>
-    public class ProximityToNearestEnemy : ScorerOptionBase<Vector3>
+    public class ProximityToNearestEnemy : OptionScorerBase<Vector3>
     {
         
         public float desiredRange = 14f;

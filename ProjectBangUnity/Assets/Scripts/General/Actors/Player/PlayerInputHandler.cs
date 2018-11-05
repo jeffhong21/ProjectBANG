@@ -10,25 +10,24 @@ namespace Bang
         private bool useRawInput = true;
         [SerializeField, Range(0.1f, 1)]
         private float sensitivity = 1f;
-
-        public float aimHeight = 0.75f;
         [SerializeField]
         private Vector3 playerInput;
 
         private Vector3 cursorPosition;
-        [SerializeField]
+
         private float delta;
 
         private float currentSpeed;
 
         private PlayerController playerCtrl;
 
-
+        private Camera playerCamera;
 
 
         private void Awake()
         {
             playerCtrl = GetComponent<PlayerController>();
+            playerCamera = Camera.main;
         }
 
 
@@ -95,7 +94,7 @@ namespace Bang
 
         private void UpdateOrientation()
         {
-            Ray ray = playerCtrl.playerCamera.ScreenPointToRay(Input.mousePosition);
+            Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
             Plane groundPlane = new Plane(Vector3.up, Vector3.zero * 1);
             float rayDistance;
 
@@ -105,8 +104,6 @@ namespace Bang
                 playerCtrl.AimPosition = cursorPosition;
 
                 transform.LookAt(cursorPosition);
-                cursorPosition.y = aimHeight;
-                playerCtrl.crosshairs.transform.position = cursorPosition;
             }
         }
 

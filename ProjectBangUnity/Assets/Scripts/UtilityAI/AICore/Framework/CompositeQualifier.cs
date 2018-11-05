@@ -7,12 +7,12 @@
     /// <summary>
     /// A base class for Qualifiers that base their score on a number of child.
     /// </summary>
-    public abstract class CompositeQualifier : IQualifier, ICanBeDisabled
+    public abstract class CompositeQualifier : IQualifier, ICompositeScorer, ICanBeDisabled
     {
         // //  Used for CompareTo().  
         // public float _score { get; protected set; }  // (IQualifier)
 
-        protected List<IScorer> _scorers;
+        protected List<IContextualScorer> _scorers;
 
         // (IQualifier)
         public IAction action { 
@@ -26,7 +26,7 @@
             set; 
         }
 
-        public List<IScorer> scorers 
+        public List<IContextualScorer> scorers 
         {
             get { return _scorers; }
             set { _scorers = value; }  //  Do not need?
@@ -37,10 +37,16 @@
             protected set; 
         }
 
+
+        //
+        // Constructors
+        //
         protected CompositeQualifier()
         {
-            _scorers = new List<IScorer>();
+            _scorers = new List<IContextualScorer>();
         }
+
+
 
         public virtual void CloneFrom (object other)
         {
@@ -50,21 +56,25 @@
         // (IQualifier)
         public float Score(IAIContext context)
         {
-            var score = 0f;
-            if (scorers.Count == 0)
-                return score;
-            
-            foreach (IScorer scorer in scorers)
-            {
-                score += scorer.Score(context);
-            }
+            return Score(context, scorers);
 
-            _score = score;
-            return score;
-            //return Score(context, scorers);
+            //var score = 0f;
+            //if (scorers.Count == 0)
+            //    return score;
+            
+            //foreach (IContextualScorer scorer in scorers)
+            //{
+            //    score += scorer.Score(context);
+            //}
+
+            //_score = score;
+            //return score;
+            ////return Score(context, scorers);
         }
 
-        public abstract float Score(IAIContext context, List<IScorer> scorers);
+        public abstract float Score(IAIContext context, List<IContextualScorer> scorers);
+
+
 
 
         public int CompareTo(IQualifier other)

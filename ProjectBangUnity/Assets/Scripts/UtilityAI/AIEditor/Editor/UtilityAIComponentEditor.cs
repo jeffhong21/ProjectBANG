@@ -454,20 +454,20 @@
                 optionScorers = new string[count];
                 for (int i = 0; i < count; i++)
                 {
-                    optionScorers[i] = string.Format("<b>{0}</b>{1} ", "OptionScorer: ", _optionScorers[i].GetType().Name);
+                    optionScorers[i] = string.Format("<b>{0}</b>{1} ", "ScoredOption: ", _optionScorers[i].GetType().Name);
                     networkInfo += string.Format("     ----- {0}\n", optionScorers[i]);
                 }
             }
-            else if(action is ActionWithOptions<Bang.IHasHealth>)
+            else if(action is ActionWithOptions<Bang.ActorHealth>)
             {
-                var _actionWithOption = action as ActionWithOptions<Bang.IHasHealth>;
+                var _actionWithOption = action as ActionWithOptions<Bang.ActorHealth>;
                 var _optionScorers = _actionWithOption.scorers;
                 int count = _optionScorers.Count;
 
                 optionScorers = new string[count];
                 for (int i = 0; i < count; i++)
                 {
-                    optionScorers[i] = string.Format("<b>{0}</b>{1} ", "OptionScorer: ", _optionScorers[i].GetType().Name);
+                    optionScorers[i] = string.Format("<b>{0}</b>{1} ", "ScoredOption: ", _optionScorers[i].GetType().Name);
                     networkInfo += string.Format("     ----- {0}\n", optionScorers[i]);
                 }
             }

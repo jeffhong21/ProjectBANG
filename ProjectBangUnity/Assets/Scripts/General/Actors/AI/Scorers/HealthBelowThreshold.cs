@@ -1,4 +1,4 @@
-namespace Bang
+﻿namespace Bang
 {
     using UnityEngine;
     using AtlasAI;
@@ -6,7 +6,7 @@ namespace Bang
     /// <summary>
     /// Returns a score if agent health is below a threshold.
     /// </summary>
-    public class HealthBelowThreshold : ScorerBase
+    public class HealthBelowThreshold : ContextualScorerBase
     {
         [SerializeField]
         public bool not = false;
@@ -22,7 +22,7 @@ namespace Bang
             ActorHealth health = agent.GetComponent<ActorHealth>();
 
 
-            float percent = health.currentHealth / health.maxHealth;
+            float percent = health.CurrentHealth / health.MaxHealth;
             if (percent <= threshold)
             {
                 return this.score;

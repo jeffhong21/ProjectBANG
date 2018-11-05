@@ -63,8 +63,8 @@ namespace Bang
         {
             respawnPoints = GameObject.FindGameObjectsWithTag(respawnPointTag);
 
-            if(!placeAgents)
-                SpawnPlayers();
+            //if(!placeAgents)
+                //SpawnPlayers();
 
             //  Start the game.
             StartCoroutine(GameLoop());
@@ -72,26 +72,26 @@ namespace Bang
 
 
 
-        private void SpawnPlayers()
-        {
-            for (int i = 0; i < Actors.Length; i++)
-            {
-                if (respawnPoints.Length > 0)
-                {
-                    //SuffleSpawnPoints(RespawnPoints);
-                    Actors[i].instance = Instantiate(Actors[i].prefab, respawnPoints[i].transform.position, Quaternion.Euler(0, 180, 0));
-                    Actors[i].DisableControls();
-                }
-                else
-                {
-                    Vector3 defaultSpawn = Random.insideUnitCircle * 5;
-                    defaultSpawn.y = 0;
-                    Actors[i].instance = Instantiate(Actors[i].prefab, defaultSpawn, Quaternion.Euler(0, 180, 0));
-                    Actors[i].DisableControls();
-                }
-            }
-            SetActorControls(false);
-        }
+        //private void SpawnPlayers()
+        //{
+        //    for (int i = 0; i < Actors.Length; i++)
+        //    {
+        //        if (respawnPoints.Length > 0)
+        //        {
+        //            //SuffleSpawnPoints(RespawnPoints);
+        //            Actors[i].instance = Instantiate(Actors[i].prefab, respawnPoints[i].transform.position, Quaternion.Euler(0, 180, 0));
+        //            Actors[i].DisableControls();
+        //        }
+        //        else
+        //        {
+        //            Vector3 defaultSpawn = Random.insideUnitCircle * 5;
+        //            defaultSpawn.y = 0;
+        //            Actors[i].instance = Instantiate(Actors[i].prefab, defaultSpawn, Quaternion.Euler(0, 180, 0));
+        //            Actors[i].DisableControls();
+        //        }
+        //    }
+        //    SetActorControls(false);
+        //}
 
 
         private IEnumerator GameLoop()

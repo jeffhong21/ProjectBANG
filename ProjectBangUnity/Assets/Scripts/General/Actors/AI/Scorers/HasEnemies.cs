@@ -6,7 +6,7 @@
     /// <summary>
     /// Returns a score if there are any hostiles
     /// </summary>
-    public class HasEnemies : ScorerBase
+    public class HasEnemies : ContextualScorerBase
     {
         [SerializeField]
         public bool not = false;  //  If false, it will return second option.  If true it will return first option.

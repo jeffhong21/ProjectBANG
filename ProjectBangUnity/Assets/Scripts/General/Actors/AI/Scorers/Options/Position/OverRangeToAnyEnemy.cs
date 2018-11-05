@@ -7,7 +7,7 @@
     /// <summary>
     /// Returns a score if any hostile entity is over desired range.
     /// </summary>
-    public sealed class OverRangeToAnyEnemy : ScorerOptionBase<Vector3>
+    public sealed class OverRangeToAnyEnemy : OptionScorerBase<Vector3>
     {
         
         public float desiredRange = 5f;

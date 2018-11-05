@@ -7,7 +7,7 @@
     /// This is a tie breaker type scorer. 
     /// Returns a score for each hostile based on the distance minus the score.  (score is like a minimum range)
     /// </summary>
-    public sealed class IsCurrentTargetScorer : ScorerOptionBase<ActorHealth>
+    public sealed class IsCurrentTargetScorer : OptionScorerBase<ActorHealth>
     {
         public float multiplier = 1f;
         public float score = 1.5f;

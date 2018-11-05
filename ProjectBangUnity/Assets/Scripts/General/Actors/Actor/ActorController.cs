@@ -9,42 +9,48 @@
     /// </summary>
     public abstract class ActorController : EntityBase, IActorController
     {
-        
-        [SerializeField]
-        private float delta;
-        public Transform lookTransform;                 //  Optionally specify a transform to determine where to check the line of sight from
+        //
+        //  Fields
+        //
         public Gun weapon;
         public Transform weaponHolder;
-
-
-        private ActorHealth _health;
-        private AnimationHandler _animHandler;
         [SerializeField]
-        private ActorStates _states;
+        private ActorStates states;
+
+
+        private ActorHealth health;
+        private AnimationHandler animHandler;
+        private Rigidbody myRigidbody;
+        private CapsuleCollider controllerCollider;
+
+        private float delta;
         private float aimHeight = 1.25f;
         private Vector3 aimPosition;
-
         protected float shootingCooldown;
         protected float reloadCooldown;
 
 
+        public event Action<GameObject> OnDeathEvent;
+
+
+        //
+        //  Properties
+        //
         public AnimationHandler AnimHandler{
-            get { return _animHandler; }
+            get { return animHandler; }
         }
 
         public ActorHealth Health{
-            get { return _health; }
+            get { return health; }
         }
 
+
         public ActorStates States{
-            get { return _states; }
+            get { return states; }
         }
 
         public Vector3 AimOrigin{
             get{
-                if(lookTransform != null){
-                    return lookTransform.position;
-                }
                 Vector3 origin = transform.position;// + transform.forward;
                 origin.y = aimHeight;
                 return origin;
@@ -70,9 +76,11 @@
         //
         protected virtual void Awake()
         {
-            _animHandler = GetComponent<AnimationHandler>();
-            _health = GetComponent<ActorHealth>();
-            _states = new ActorStates();
+            animHandler = GetComponent<AnimationHandler>();
+            health = GetComponent<ActorHealth>();
+            myRigidbody = GetComponent<Rigidbody>();
+            controllerCollider = GetComponent<CapsuleCollider>();
+            states = new ActorStates();
 
             InitializeCoverMarkers();
         }
@@ -82,11 +90,14 @@
 		{
             AimPosition = transform.position + transform.forward * 15;
             States.CanShoot = true;
+
+            myRigidbody.isKinematic = false;
+            controllerCollider.enabled = true;
 		}
 
 
 
-		public void Init(ActorManager manager)
+		public void InitializeActor(ActorManager manager)
         {
             EquipWeapon(WeaponNameIDs.Rifle_01);
         }
@@ -162,7 +173,9 @@
             weapon.transform.rotation = weaponHolder.rotation;
 
             AnimHandler.EquidWeapon(weapon.MainHandIK, weapon.OffhandIK);
-            weapon.Init(this, w.ammo, w.maxAmmo);
+            weapon.Init(this, weaponID, w.ammo, w.maxAmmo);
+
+            OnEquipWeapon(weapon);
         }
 
 
@@ -197,14 +210,56 @@
             weapon.Reload(2f);
             //  Add it to the weapon current ammo.
             weapon.CurrentAmmo += ammoToReload;
+
+            OnReload();
         }
 
 
-        public void TakeDamage(Vector3 hitDirection)
+        public void TakeDamage(Vector3 hitLocation, Vector3 hitDirection, GameObject attacker)
         {
+            myRigidbody.AddForce(hitDirection, ForceMode.Impulse);
             OnTakeDamage(hitDirection);
         }
 
+
+        public void Death(Vector3 position, Vector3 force, GameObject attacker)
+        {
+            if (OnDeathEvent != null){
+                OnDeathEvent?.Invoke(attacker);
+            }
+            else{
+                Debug.Log("Can't trigger OnDeathEvent");
+            }
+
+            myRigidbody.isKinematic = true;
+            controllerCollider.enabled = false;
+            //states.IsDead = true;
+
+            OnDeath();
+        }
+
+
+        //
+        //  Abstract
+        //
+
+        protected abstract void ExecuteUpdate(float deltaTime);
+
+        protected abstract void ExecuteFixedUpdate(float deltaTime);
+
+        protected abstract void OnEquipWeapon(Gun weapon);
+
+        protected abstract void OnShootWeapon();
+
+        protected abstract void OnReload();
+
+        protected abstract void OnTakeDamage(Vector3 hitDirection);
+
+        protected abstract void OnDeath();
+
+        public abstract void DisableControls();
+
+        public abstract void EnableControls();
 
 
         # region Cover 
@@ -267,101 +322,6 @@
         }
 
 
-        protected IEnumerator TransitionCoverStates()
-        {
-            yield return new WaitForSeconds(1f);
-            States.CanShoot = true;
-            States.InCover = true;
-        }
-
-
-        protected void HandleCoverState()
-        {
-            //Vector3 lookRotation = (transform.position - hitNormal);
-            ////  Errors out when roation method is called towards a vector zero.
-            //if (lookRotation != Vector3.zero)
-            //{
-            //    // Create a quaternion (rotation) based on looking down the vector from the player to the target.
-            //    Quaternion newRotatation = Quaternion.LookRotation(lookRotation);
-            //    transform.rotation = Quaternion.Slerp(transform.rotation, newRotatation, Time.fixedDeltaTime * 8);
-            //}
-        }
-
-
-        public bool CanEmergeFromCover(Transform helper, bool right)
-        {
-            float entitySize = 0.5f;
-            float distOffset = entitySize * 0.5f;
-            Vector3 origin = transform.position;
-            Vector3 side = (right == true) ? transform.right : -transform.right;
-            //side.y = origin.y;
-            Vector3 direction = side - origin;
-            Vector3 helpPosition = side + (direction.normalized * 0.025f);
-            helpPosition.y = 1f;
-            helper.localPosition = helpPosition;
-            Vector3 outDir = (-helper.transform.forward) + helper.position;
-
-
-            float scanDistance = (outDir - helper.position).magnitude;
-            RaycastHit hit;
-
-            if(Physics.Raycast(helper.position, outDir, out hit, scanDistance, Layers.cover))
-            {
-                Debug.DrawLine(helper.position, outDir, Color.red, 1f);
-                Debug.Log(helper.name + " hit " + hit.transform.name);
-                return false;
-            }
-
-            Debug.DrawLine(helper.position, outDir, Color.green, 1f);
-            return true;
-        }
-
-
-		protected void OnDrawGizmosSelected()
-		{
-            if(leftHelper != null && rightHelper != null)
-            {
-                Vector3 size = new Vector3(0.2f, 0.2f, 0.2f);
-                Gizmos.color = Color.yellow;
-                Gizmos.DrawCube(leftHelper.position, size);
-                Gizmos.color = Color.blue;
-                Gizmos.DrawCube(rightHelper.position, size);
-            }
-		}
-
-
-		//public bool CanEmergeFromCover(bool left = false)
-		//{
-		//    float entitySize = 0.5f;
-		//    float distOffset = entitySize * 0.5f;
-		//    Vector3 origin = AimOrigin;
-		//    Vector3 side = left == false ? transform.right : -transform.right;
-
-		//    Vector3 direction = side - origin;
-		//    Vector3 scanPosition = side + (direction.normalized * distOffset);
-
-		//    //Vector3 outDirection = scanPosition - Vector3.back;
-		//    //Vector3 scanPosition = origin + offset * entitySize;
-		//    //Vector3 scanDirection = scanPosition + (outDirection.normalized * 1);
-		//    Vector3 scanDirection = new Vector3(scanPosition.x, scanPosition.y, scanPosition.z - 1);
-
-		//    RaycastHit hit;
-
-		//    Debug.DrawRay(origin, scanPosition, Color.magenta, 0.25f);
-		//    Debug.Log(scanPosition);
-		//    //Debug.DrawRay(scanPosition, scanDirection, Color.blue, 0.25f);
-
-
-		//    if (Physics.Raycast(scanPosition, scanDirection, out hit, entitySize, Layers.cover))
-		//    {
-		//        Debug.DrawRay(scanPosition, scanDirection, Color.red, 0.25f);
-		//        return false;
-		//    }
-		//    //Debug.DrawRay(scanPosition, scanDirection, Color.green, 0.25f);
-		//    Debug.DrawRay(scanPosition, scanDirection, Color.blue, 0.25f);
-		//    return true;
-		//}
-
 
 		public void ExitCover()
         {
@@ -376,29 +336,6 @@
         #endregion
 
 
-        public void Death()
-        {
-            OnDeath();
-        }
-
-
-        //
-        //  Abstract
-        //
-
-        protected abstract void ExecuteUpdate(float deltaTime);
-
-        protected abstract void ExecuteFixedUpdate(float deltaTime);
-
-        protected abstract void OnShootWeapon();
-
-        protected abstract void OnTakeDamage(Vector3 hitDirection);
-
-        public abstract void OnDeath();
-
-        public abstract void DisableControls();
-
-        public abstract void EnableControls();
 
 
 

@@ -6,7 +6,7 @@
     /// <summary>
     /// Returns a score if the agent doesn't have a cover target or if the agent is close to one.
     /// </summary>
-    public class ShouldFindCover : ScorerBase
+    public class ShouldFindCover : ContextualScorerBase
     {
 
         [SerializeField]

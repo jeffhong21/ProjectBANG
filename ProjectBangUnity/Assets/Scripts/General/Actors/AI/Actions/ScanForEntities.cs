@@ -15,7 +15,7 @@
         [SerializeField]
         public float samplingDensity = 3f;
 
-  
+
 
         public override void Execute(IAIContext context)
         {
@@ -29,6 +29,7 @@
             // Use OverlapSphere for getting all relevant colliders within scan range, filtered by the scanning layer
             var colliders = Physics.OverlapSphere(agent.transform.position, sightRange, Layers.entites);
 
+            c.hostiles.Clear();
             for (int i = 0; i < colliders.Length; i++)
             {
                 Collider hit = colliders[i];
@@ -45,11 +46,15 @@
 
                 if (hit.CompareTag(Tags.Actor))
                 {
-                    c.hostiles.Add(hit.GetComponent<ActorHealth>());
-                    //if (agent.CanSeeTarget(agent.AimOrigin, hit.transform.position, true))
-                    //{
-                    //    c.hostiles.Add(hit.GetComponent<ActorHealth>());
-                    //}
+                    bool canSeeTarget = agent.CanSeeTarget(agent.lookTransform.position, hit.transform.position, true);
+
+                    if(canSeeTarget)
+                    {
+                        c.hostiles.Add(hit.GetComponent<ActorHealth>());
+                    }
+
+                    //c.hostiles.Add(hit.GetComponent<ActorHealth>());
+                    agent.IsSearching = false;
                 }
             }
         }

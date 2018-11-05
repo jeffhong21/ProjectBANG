@@ -3,7 +3,7 @@
     using UnityEngine;
     using AtlasAI;
 
-    public class IsAttackTargetAlive : ScorerBase
+    public class IsAttackTargetAlive : ContextualScorerBase
     {
         [SerializeField, Tooltip("Set to true to inverse the logic of this scorer, e.g. instead of scoring when true, it scores when false.")]
         public bool not;
@@ -18,7 +18,7 @@
                 return 0f;
             }
 
-            if (attackTarget.isDead == false)
+            if (attackTarget.IsDead == false)
             {
                 return this.not ? 0f : this.score;
             }

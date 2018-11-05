@@ -8,15 +8,15 @@ namespace Bang
         
         protected ActorController owner;
         [SerializeField]
-        protected string id;
+        protected string nameID;
         [SerializeField]
         protected WeaponTypes weaponType;
 
 
 
-        public string Id{
-            get { return id; }
-            set { id = value; }
+        public string NameID{
+            get { return nameID; }
+            set { nameID = value; }
         }
     }
 }

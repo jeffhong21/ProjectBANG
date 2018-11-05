@@ -4,7 +4,7 @@
     using AtlasAI;
 
 
-    public class HasAttackTarget : ScorerBase
+    public class HasAttackTarget : ContextualScorerBase
     {
 
         [SerializeField]

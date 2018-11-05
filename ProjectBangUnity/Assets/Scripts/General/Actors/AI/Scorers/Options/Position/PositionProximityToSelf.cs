@@ -6,7 +6,7 @@
     /// <summary>
     /// Score returned is the score minus the distance of the point * factor.
     /// </summary>
-    public class PositionProximityToSelf : ScorerOptionBase<Vector3>
+    public class PositionProximityToSelf : OptionScorerBase<Vector3>
     {
         public float score = 10f;
         public float factor = 0.01f;

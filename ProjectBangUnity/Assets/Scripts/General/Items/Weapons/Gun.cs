@@ -22,9 +22,12 @@ namespace Bang
         [SerializeField]
         protected ProjectileBase projectile;
 
+        protected ParticleSystem[] particles;
+
 
         protected IEnumerator reloadCoroutine;
         protected Vector3 dirToTarget; // = Vector3.forward;
+
 
 
         public int CurrentAmmo{
@@ -64,20 +67,26 @@ namespace Bang
             get { return projectileSpawn; }
         }
 
+
+
+
         protected virtual void Awake()
         {
             if (projectileSpawn == null) throw new ArgumentNullException(this.GetType().Name + " has no projectile spawn location");
             if (projectile == null) throw new ArgumentNullException(this.GetType().Name + " has no projectile");
+
+            particles = GetComponentsInChildren<ParticleSystem>();
         }
 
 
 
 
-        public void Init(ActorController owner, int currentAmmo, int maxAmmo)
+        public void Init(ActorController owner, string nameID, int currentAmmo, int maxAmmo)
         {
             this.owner = owner;
             this.currentAmmo = currentAmmo;
             this.maxAmmo = maxAmmo;
+            this.nameID = nameID;
         }
 
 
@@ -86,6 +95,14 @@ namespace Bang
         {
             if (currentAmmo > 0)
             {
+                if (particles != null)
+                {
+                    for (int i = 0; i < particles.Length; i++)
+                    {
+                        particles[i].Play();
+                    }
+                }
+
                 currentAmmo--;
                 var _pooledProjectile = PoolManager.instance.Spawn(PoolTypes.Projectile, projectileSpawn.position, projectileSpawn.rotation);
                 ProjectileBase pooledProjectile = _pooledProjectile.gameObject.GetComponent<ProjectileBase>();

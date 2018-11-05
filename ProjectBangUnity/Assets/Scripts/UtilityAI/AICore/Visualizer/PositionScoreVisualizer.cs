@@ -23,7 +23,7 @@
         }
 
 
-        protected override void DrawGUI(List<OptionScorer<Vector3>> data)
+        protected override void DrawGUI(List<ScoredOption<Vector3>> data)
         {
             
             var cam = Camera.main;
@@ -60,7 +60,7 @@
             }
         }
 
-        protected override void DrawGizmos(List<OptionScorer<Vector3>> data)
+        protected override void DrawGizmos(List<ScoredOption<Vector3>> data)
         {
             Debug.Log(data.Count);
 

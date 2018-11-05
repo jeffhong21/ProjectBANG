@@ -47,7 +47,7 @@
                     c.agent.IsSearching = true;
                     c.agent.MoveTo(position);
 
-                    Debug.LogFormat("{0} is searching for target at {1}", c.agent.gameObject.name, position);
+                    //Debug.LogFormat("{0} is searching for target at {1}", c.agent.gameObject.name, position);
                     return;
                 }
             }

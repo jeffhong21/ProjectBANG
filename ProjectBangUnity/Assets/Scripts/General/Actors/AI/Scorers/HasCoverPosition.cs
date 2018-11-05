@@ -6,7 +6,7 @@
     /// <summary>
     /// Returns the score if agent has cover positions.
     /// </summary>
-    public class HasCoverPosition : ScorerBase
+    public class HasCoverPosition : ContextualScorerBase
     {
 
 

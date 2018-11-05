@@ -12,13 +12,13 @@
         
         /*
         private IAction a;
-        private IScorer scorer;
-        private List<IScorer> scorers;
+        private IContextualScorer scorer;
+        private List<IContextualScorer> scorers;
         private IQualifier q;
         private Selector s;
 
         private List<IQualifier> qualifiers;
-        private List<IScorer[]> allScorers;
+        private List<IContextualScorer[]> allScorers;
         private List<IAction> actions;
         */
 
@@ -56,7 +56,7 @@
             //actions.Add(a);  // --  Add to Actions Group
 
             //// ---- New Scorers Group ----
-            //scorers = new List<IScorer>();
+            //scorers = new List<IContextualScorer>();
             ////
             //// ---- New Scorer ----
             //scorer = new ShouldFindCover() { score = 15 };
@@ -107,7 +107,7 @@
             actions.Add(a);  // --  Add to Actions Group
 
             // ---- New Scorers Group ----
-            scorers = new List<IScorer>();
+            scorers = new List<IContextualScorer>();
             //
             // ---- New Scorer ----
             scorer = new IsDamaged() { score = 0};
@@ -159,7 +159,7 @@
             actions.Add(a);  // --  Add to Actions Group
 
             // ---- New Scorers Group ----
-            scorers = new List<IScorer>();
+            scorers = new List<IContextualScorer>();
             //
             // ---- New Scorer ----
             scorer = new HasEnemiesInRange() { score = 150, range = 5 };
@@ -193,7 +193,7 @@
             actions.Add(a);  // --  Add to Actions Group
 
             // ---- New Scorers Group ----
-            scorers = new List<IScorer>();
+            scorers = new List<IContextualScorer>();
             //
             // ---- New Scorer ----
             scorer = new IsInCover() { score = 125 };
@@ -221,7 +221,7 @@
             actions.Add(a);  // --  Add to Actions Group
 
             // ---- New Scorers Group ----
-            scorers = new List<IScorer>();
+            scorers = new List<IContextualScorer>();
             //
             // ---- New Scorer ----
             scorer = new IsSearchingForTargets() { score = 15, not = true };

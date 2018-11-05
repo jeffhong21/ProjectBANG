@@ -12,13 +12,13 @@
 
         /*
         private IAction a;
-        private IScorer scorer;
-        private List<IScorer> scorers;
+        private IContextualScorer scorer;
+        private List<IContextualScorer> scorers;
         private IQualifier q;
         private Selector s;
 
         private List<IQualifier> qualifiers;
-        private List<IScorer[]> allScorers;
+        private List<IContextualScorer[]> allScorers;
         private List<IAction> actions;
         */
 
@@ -45,7 +45,7 @@
             };
 
             // ---- New Scorers Group ----
-            scorers = new List<IScorer>();
+            scorers = new List<IContextualScorer>();
             //
             // ---- New Scorers ----
             scorer = new IsGunLoaded() { score = 20 };
@@ -91,10 +91,10 @@
             };
 
             // ---- New Scorers Group ----
-            scorers = new List<IScorer>();
+            scorers = new List<IContextualScorer>();
             //
             // ---- New Scorers ----
-            scorer = new HasEnemiesInRange() { score = 10, range = 10 };
+            scorer = new HasEnemiesInRange() { score = 15, range = 10 };
             scorers.Add(scorer);
             // ---- New Scorer ----
             scorer = new IsTargetInSight() { score = 0 };

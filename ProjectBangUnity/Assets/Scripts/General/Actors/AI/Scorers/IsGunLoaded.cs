@@ -1,4 +1,4 @@
-namespace Bang
+﻿namespace Bang
 {
     using UnityEngine;
     using AtlasAI;
@@ -6,7 +6,7 @@ namespace Bang
     /// <summary>
     /// Returns score if gun has no ammo.  If not is set to true, it will return 0 if gun has no ammo.
     /// </summary>
-    public class IsGunLoaded : ScorerBase
+    public class IsGunLoaded : ContextualScorerBase
     {
 
 

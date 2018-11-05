@@ -11,12 +11,12 @@
     /// Visualizing the scores for each option used by an ActionWithOptions<TOption>. Provides an abstract method for getting the 
     /// desired options through the Context object.
     /// </summary>
-    public abstract class ActionWithOptionsVisualizerComponent<T, TOption> : CustomGizmoGUIVisualizerComponent<T, List<OptionScorer<TOption>>> where T : ActionWithOptions<TOption>
+    public abstract class ActionWithOptionsVisualizerComponent<T, TOption> : CustomGizmoGUIVisualizerComponent<T, List<ScoredOption<TOption>>> where T : ActionWithOptions<TOption>
     {
         //
         // Fields
         //
-        private List<OptionScorer<TOption>> _scoredBuffer = new List<OptionScorer<TOption>>();
+        private List<ScoredOption<TOption>> _scoredBuffer = new List<ScoredOption<TOption>>();
 
         //
         // Constructors
@@ -31,11 +31,11 @@
         //
         // Methods
         //
-        protected override List<OptionScorer<TOption>> GetDataForVisualization(T aiEntity, IAIContext context, Guid aiId)
+        protected override List<ScoredOption<TOption>> GetDataForVisualization(T aiEntity, IAIContext context, Guid aiId)
         {
-            //var scoredOptions = new List<OptionScorer<TOption>>();
-            _scoredBuffer = aiEntity.GetAllScorers(context, GetOptions(context), _scoredBuffer);
-            Debug.Log(_scoredBuffer.Count);
+            //var scoredOptions = new List<ScoredOption<TOption>>();
+            //_scoredBuffer = aiEntity.GetAllScorers(context, GetOptions(context), _scoredBuffer);
+            //Debug.Log(_scoredBuffer.Count);
             return _scoredBuffer;
         }
 
@@ -51,7 +51,7 @@
   //  /// </summary>
   //  /// <typeparam name="T">The concrete ActionWithOptions type</typeparam>
   //  /// <typeparam name = "TOption" > The type of the options.</typeparam>
-  //  //public class ActionWithOptionsVisualizerComponent<T, TOption> : CustomGizmoGUIVisualizer<List<OptionScorer<TOption>>, TOption>
+  //  //public class ActionWithOptionsVisualizerComponent<T, TOption> : CustomGizmoGUIVisualizer<List<ScoredOption<TOption>>, TOption>
   //  //    where T : ActionWithOptions<TOption>
   //  //{
   //  public abstract class ActionWithOptionsVisualizerComponent<T, TOption> : MonoBehaviour, ICustomVisualizer
@@ -62,12 +62,12 @@
   //      protected bool drawGUI = true;
   //      [SerializeField]
   //      protected bool drawGizmo = true;
-  //      protected List<OptionScorer<TOption>> data;
+  //      protected List<ScoredOption<TOption>> data;
 
 
   //      private void OnEnable()
   //      {
-  //          data = new List<OptionScorer<TOption>>();
+  //          data = new List<ScoredOption<TOption>>();
   //          VisualizerManager.RegisterVisualizer<T>(this);
   //      }
 
@@ -110,9 +110,9 @@
     //    /// <param name="aiEntity">Ai entity.</param>
     //    /// <param name="context">Context.</param>
     //    /// <param name="aiID">Ai identifier.</param>
-    //    protected List<OptionScorer<TOption>> GetDataForVisualization(T aiEntity, IAIContext context)
+    //    protected List<ScoredOption<TOption>> GetDataForVisualization(T aiEntity, IAIContext context)
     //    {
-    //        var scoredOptions = new List<OptionScorer<TOption>>();
+    //        var scoredOptions = new List<ScoredOption<TOption>>();
     //        scoredOptions = aiEntity.GetAllScorers(context, GetOptions(context), scoredOptions);
 
     //        if(data != null){
@@ -120,7 +120,7 @@
     //            data = scoredOptions;
     //        }
     //        else{
-    //            data = new List<OptionScorer<TOption>>(scoredOptions);
+    //            data = new List<ScoredOption<TOption>>(scoredOptions);
     //        }
 
     //        //IContext c = context as AIContext;
@@ -162,9 +162,9 @@
 
 
 
-    //    protected abstract void DrawGUI(List<OptionScorer<TOption>> data);
+    //    protected abstract void DrawGUI(List<ScoredOption<TOption>> data);
 
-    //    protected abstract void DrawGizmos(List<OptionScorer<TOption>> data);
+    //    protected abstract void DrawGizmos(List<ScoredOption<TOption>> data);
 
 
     //}

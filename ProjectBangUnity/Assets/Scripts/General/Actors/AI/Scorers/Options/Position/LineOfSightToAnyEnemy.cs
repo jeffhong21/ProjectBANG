@@ -6,7 +6,7 @@
     /// <summary>
     /// Returns a score if position is within line of sight any enemy.
     /// </summary>
-    public class LineOfSightToAnyEnemy : ScorerOptionBase<Vector3>
+    public class LineOfSightToAnyEnemy : OptionScorerBase<Vector3>
     {
         public float score = 50f;
         public float YHeightOffset = 0.5f;

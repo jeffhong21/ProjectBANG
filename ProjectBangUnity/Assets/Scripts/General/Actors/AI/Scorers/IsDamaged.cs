@@ -6,7 +6,7 @@
     /// <summary>
     /// If agent has reached destination, than return score.
     /// </summary>
-    public class IsDamaged : ScorerBase
+    public class IsDamaged : ContextualScorerBase
     {
         
         public override float Score(IAIContext context)

@@ -7,27 +7,57 @@
     [Serializable]
     public class ActorManager
     {
-        
-        public string name;
+        //
+        //  Fields
+        //
+        public string playerName;
 
         public int teamID;
 
-        public bool isBot;
+        private GameObject instance;
 
-        public GameObject prefab;
-        [HideInInspector]
-        public GameObject instance;
-        [HideInInspector]
-        public int lives;
+        private ActorController controller;
+        [SerializeField]
+        private int deaths;
 
-        public void Reset(){
-            
+
+
+        //
+        //  Properties
+        //
+        public GameObject Instance{
+            get { return instance; }
+        }
+
+        public int Deaths{
+            get { return deaths; }
+        }
+
+
+        //
+        //  Methods
+        //
+
+        public void SetInstance(GameObject instance){
+            this.instance = instance;
         }
 
 
         public void InitializeActor()
         {
-            instance.GetComponent<ActorController>().Init(this);   
+            controller = instance.GetComponent<ActorController>();
+            controller.InitializeActor(this);
+            playerName = instance.name;
+            RegisterEvents();
+        }
+
+
+        public void RegisterEvents(){
+            controller.OnDeathEvent += OnDeath;
+        }
+
+        public void UnregisterEvents(){
+            controller.OnDeathEvent -= OnDeath;
         }
 
 
@@ -35,6 +65,20 @@
         {
             //instance.tag = teamID;
             //instance.layer = LayerMask.NameToLayer(teamID);
+        }
+
+
+        private void OnRespawn(Vector3 position){
+            RegisterEvents();
+        }
+
+
+        private void OnDeath(GameObject attacker)
+        {
+            //Debug.LogFormat("{0} was killed by {1}", instance.name, attacker.name);
+            deaths++;
+
+            UnregisterEvents();
         }
 
 

@@ -3,56 +3,29 @@ namespace Bang
     using UnityEngine;
 
 
-    public class ProjectileBase : MonoBehaviour, IProjectile
+    public class ProjectileBase : MonoBehaviour, IPooled
     {
-        protected ActorController _owner;
+        protected ActorController owner;
         [SerializeField]
-        protected float _damage = 1f;
+        protected float damage = 1f;
         [SerializeField]
-        protected float _lifeDuration = 2f;
+        protected float force = 300f;
         [SerializeField]
-        protected Vector3 _spawnLocation;
+        protected float maxRange = 50f;
         [SerializeField]
-        protected float _maxRange = 50f;
+        protected float velocity = 100f;
         [SerializeField]
-        protected float _velocity = 100f;
-
-
-
-        public float damage{
-            get{
-                return _damage;
-            }
-            set{
-                _damage = value;
-            }
-        }
-            
-        public Vector3 spawnLocation{
-            get{
-                return _spawnLocation;
-            }
-            //set{
-            //    _spawnLocation = value;
-            //}
-        }
-
-        public float velocity{
-            get { 
-                return _velocity; 
-            }
-            set{
-                _velocity = value;
-            }
-        }
-
+        protected float lifeDuration = 2f;
 
         private float spawnTime;
 
 
+
+
+
         public void Init(ActorController actorCtrl)
 		{
-            _owner = actorCtrl;
+            owner = actorCtrl;
 		}
 
 
@@ -75,15 +48,13 @@ namespace Bang
 
         protected virtual void Update()
         {
-            float moveDistance = _velocity * Time.deltaTime;
+            float moveDistance = velocity * Time.deltaTime;
             CheckCollisions(moveDistance);
             transform.Translate(Vector3.forward * moveDistance);
 
-            if(Time.time > spawnTime + _lifeDuration){
+            if(Time.time > spawnTime + lifeDuration){
                 PoolManager.instance.Return(PoolTypes.Projectile, this);
             }
-
-            //Destroy(gameObject, _lifeDuration);
         }
 
 
@@ -104,36 +75,24 @@ namespace Bang
         private void OnHitObject(Collider c, Vector3 hitPoint)
         {
             //Debug.Log(hit.collider.gameObject.name);
-            IHasHealth damageableObject = c.GetComponent<IHasHealth>();
+            ActorHealth damageableObject = c.GetComponent<ActorHealth>();
 
             //  Hit a damagable object.
-            if (damageableObject != null)
-            {
-                damageableObject.TakeDamage(_damage, hitPoint, transform.forward);
+            if (damageableObject != null){
+                damageableObject.TakeDamage(damage, hitPoint, transform.forward * force, owner.gameObject);
             }
-            ////  Hit a cover layer
-            //else if (c.gameObject.layer == LayerMask.NameToLayer("Cover"))  // LayerMask.NameToLayer("WorldObjects")
-            //{
-            //    ParticlePoolManager.instance.SpawnParticleSystem(ParticlesType.ImpactHit, hitPoint, Quaternion.FromToRotation(Vector3.forward, -transform.forward));
-            //}
-
-            else
-            {
+            else{
                 ParticlePoolManager.instance.SpawnParticleSystem(ParticlesType.ImpactHit, hitPoint, Quaternion.FromToRotation(Vector3.forward, -transform.forward));
             }
 
+
             //  Return projectile to pool.
             PoolManager.instance.Return(PoolTypes.Projectile, this);
-
             //  Reset the owner of projectile.
-            _owner = null;
+            owner = null;
         }
 
 
-        private void NotifyOwner(ActorController owner)
-        {
-            
-        }
 
     }
 }

@@ -15,7 +15,7 @@ namespace Bang
         }
 
 
-        public void SetHealth(int currentHealth)
+        public void SetHealth(float currentHealth)
         {
             _text.text = currentHealth.ToString();
         }

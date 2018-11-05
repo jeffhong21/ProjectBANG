@@ -7,7 +7,7 @@
     /// Score returned is the score minus the distance of the point * factor.
     /// Ensures the Agent will not move towards undesirable locations.
     /// </summary>
-    public class OverRangeToAnyEnemySpawner : ScorerOptionBase<Vector3>
+    public class OverRangeToAnyEnemySpawner : OptionScorerBase<Vector3>
     {
         
         public float multiplier = 1f;

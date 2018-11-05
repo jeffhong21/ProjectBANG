@@ -7,7 +7,7 @@
     /// Returns a score for each hostile based on the distance minus the score.  (score is like a minimum range).
     /// The further away the Agent is from the player, the lower the score.
     /// </summary>
-    public sealed class EnemyProximityToSelf : ScorerOptionBase<ActorHealth>
+    public sealed class EnemyProximityToSelf : OptionScorerBase<ActorHealth>
     {
         public float multiplier = 1f;
         public float score = 50f;
