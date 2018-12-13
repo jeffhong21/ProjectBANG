@@ -10,22 +10,22 @@ namespace ActorSkins
         private readonly string holderName = "Accessories";
 
         public ActorSkin skin;
-
         public bool randomSkin;
-
         public AccessorySlots slots = new AccessorySlots();
 
         [SerializeField]
         private Animator anim;
         [SerializeField]
         private SkinnedMeshRenderer meshRenderer;
-
         private List<GameObject> instancedObj;
-
         private GameObject holder;
 
 
 
+
+        public SkinnedMeshRenderer MeshRenderer{
+            get { return meshRenderer; }
+        }
 
 
 

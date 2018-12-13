@@ -16,14 +16,15 @@
         public Transform anchor;
         //  The offset between the anchor and the camera.
         public Vector3 anchorOffset;
-
+       
         public bool smoothFollow;
 
         public bool canZoom;
 
         public CameraSettings values;
 
-        public PlayerCrosshairs crosshairs;
+        public Crosshairs crosshairs;
+
 
 
         private Vector3 targetPosition;
@@ -46,15 +47,16 @@
             cam = camTransform.GetComponent<Camera>();
             //cam = GetComponentInChildren<Camera>();
             crosshairs = Instantiate(crosshairs, transform.position, crosshairs.transform.rotation, transform);
+
 		}
 
 
-		private void OnEnable()
+		private void Start()
 		{
-            distanceFromTarget = values.distanceFromTarget;
             newDistance = values.distanceFromTarget;
             Cursor.visible = enableCursor;
 		}
+
 
 
 		private void Update()
@@ -73,11 +75,12 @@
             if (target){
                 MovetoTarget();
                 LookAtTarget();
+                //OrbitCamera();
             }
 
             if(crosshairs){
                 ray = cam.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out hitInfo)){
+                if (Physics.Raycast(ray, out hitInfo, 100, Layers.ground, QueryTriggerInteraction.Ignore)){
                     cursorPosition = hitInfo.point;
                     cursorPosition.y = 0.05f;
                     crosshairs.transform.position = cursorPosition;
@@ -91,8 +94,7 @@
         private void DrawDebugRay(Vector3 cursorPosition){
             Vector3 lookAtPoint = camTransform.position;
             Vector3 direction = cursorPosition - lookAtPoint;
-
-            Debug.DrawRay(lookAtPoint, direction, Color.red);
+            //Debug.DrawRay(lookAtPoint, direction, Color.red);
         }
 
 
@@ -112,7 +114,7 @@
         private void MovetoTarget()
         {
             targetPosition = target.position;
-            targetPosition += Quaternion.Euler(values.xRotation, values.yRotation, 0) * -Vector3.forward * distanceFromTarget;
+            targetPosition += Quaternion.Euler(values.xRotation, values.yRotation, 0) * -Vector3.forward * values.distanceFromTarget;
 
             if(smoothFollow){
                 camTransform.position = Vector3.SmoothDamp(camTransform.position, targetPosition, ref cameraVelocity, values.smooth);
@@ -134,7 +136,17 @@
 
         }
 
+        //Quaternion camTargetRotation;
+        //float angle;
+        //private void OrbitCamera()
+        //{
+        //    angle = Mathf.Atan2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        //    angle = Mathf.Rad2Deg * angle;
+        //    angle += target.eulerAngles.y;
 
+        //    transform.rotation = Quaternion.Slerp(transform.rotation, camTargetRotation, values.turnSpeed * Time.deltaTime);
+
+        //}
 
 
 
@@ -142,17 +154,17 @@
         {
             newDistance += values.zoomStep * zoomInput;
 
-            distanceFromTarget = Mathf.Lerp(distanceFromTarget, newDistance, values.zoomSmooth * Time.deltaTime);
+            values.distanceFromTarget = Mathf.Lerp(values.distanceFromTarget, newDistance, values.zoomSmooth * Time.deltaTime);
 
-            if(distanceFromTarget > values.maxZoom)
+            if(values.distanceFromTarget > values.maxZoom)
             {
-                distanceFromTarget = values.maxZoom;
+                values.distanceFromTarget = values.maxZoom;
                 newDistance = values.maxZoom;
             }
 
-            if (distanceFromTarget < values.minZooom)
+            if (values.distanceFromTarget < values.minZooom)
             {
-                distanceFromTarget = values.minZooom;
+                values.distanceFromTarget = values.minZooom;
                 newDistance = values.minZooom;
             }
         }

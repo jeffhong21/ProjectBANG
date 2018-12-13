@@ -12,22 +12,24 @@
     [Serializable]
     public class AIStorage : ScriptableObject
     {
-        [SerializeField]
-        private bool debug;
-
-        [Multiline]
+        //
+        // Fields
+        //
+        [TextArea(1, 20)]
         public string description;
         [ReadOnly]
         public float version = 1.0f;
         [ReadOnly]
-        public string aiId;
-
-
+        public string aiId;                 //  Is the name of the ai.  The aiId should have a unique guid associated with it.
         [HideInInspector]
-        public UtilityAI configuration;
-        //[ReadOnly]
-        //public string guid;
+        public string configuration;        
+        [HideInInspector]
+        public string editorConfiguration;
 
+
+        //
+        // Properties
+        //
 
         public string friendlyName{
             get{
@@ -45,28 +47,16 @@
         ///<returns></returns>
         public static AIStorage CreateAsset(string aiId, string aiName, bool isSelect = false)
         {
-            AIStorage asset = ScriptableObject.CreateInstance<AIStorage>();
+            AIStorage asset = CreateInstance<AIStorage>();
 
             string assetDir = AssetDatabase.GenerateUniqueAssetPath(AIManager.StorageFolder + "/" + aiName + ".asset");
 
-            //  Generate unique friendly name.
-            //asset.friendlyName = Path.GetFileNameWithoutExtension(assetDir);
             asset.aiId = aiId;
-            //asset.aiId = AINameMap.GenerateUniqueID(aiId);
-            asset.configuration = new UtilityAI(asset.aiId);
-
 
             AssetDatabase.CreateAsset(asset, assetDir);
             AssetDatabase.SaveAssets();
 
-            //asset.guid = AssetDatabase.AssetPathToGUID(assetDir);
-            //AINameMap.Register(AssetDatabase.AssetPathToGUID(assetDir), asset.aiId);
-
-
-            if (isSelect){
-                Selection.activeObject = asset;
-            }
-
+            if (isSelect) Selection.activeObject = asset;
             return asset;
         }
 

@@ -38,7 +38,6 @@
                 if (scorerScore > threshold)
                 {
                     score += scorerScore;
-                    _score += scorerScore;  //  For CompareTo()
                 }
                 else
                 {

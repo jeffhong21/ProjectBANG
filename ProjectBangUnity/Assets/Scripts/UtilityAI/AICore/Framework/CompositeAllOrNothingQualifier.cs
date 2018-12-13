@@ -33,7 +33,6 @@
                 score += scorers[i].Score(context);
             }
 
-            _score = score;  //  For CompareTo()
 
             if(score >= threshold)
             {

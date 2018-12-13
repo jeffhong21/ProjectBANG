@@ -41,16 +41,26 @@
 
 
 
-            #region MoveToCover
+
+
+            #region Move to Cover Positiion
 
             //// ---- New Action ----
             //a = new CompositeAction()
             //{
-            //    name = "MoveToCover",
+            //    name = "Move to Cover Positiion",
             //    actions = new List<IAction>()
             //    {
-            //        new FindClosestCover(){name = "FindClosestCover"},
-            //        new MoveToCover(){name = "MoveToCover"}
+            //        new GetCoverPositions(){ name = "Get Cover Positions" },
+            //        new MoveToCover()
+            //        {
+            //            name = "Move to Cove Position",
+            //            scorers = new List<IOptionScorer<Vector3>>()
+            //            {
+            //                new PositionProximityToSelf() { score = 10, factor = 0.01f },      //  How close each point is to agent.
+            //                new OverRangeToClosestEnemy() { desiredRange = 8f, score = 100f },      //  If point is over a certain range to each enemy.
+            //            }
+            //        }
             //    }
             //};
             //actions.Add(a);  // --  Add to Actions Group
@@ -59,82 +69,31 @@
             //scorers = new List<IContextualScorer>();
             ////
             //// ---- New Scorer ----
-            //scorer = new ShouldFindCover() { score = 15 };
+            //scorer = new IsDamaged() { score = 0};
+            //scorers.Add(scorer);
+            //// ---- New Scorer ----
+            //scorer = new HasCoverPosition() { score = 50 };
+            //scorers.Add(scorer);
+            //// ---- New Scorer ----
+            //scorer = new HealthBelowThreshold() { score = 15, threshold = 2 };
             //scorers.Add(scorer);
             //// ---- New Scorer ----
             //scorer = new HasEnemiesInRange() { score = 50, range = 10 };
             //scorers.Add(scorer);
             //// ---- New Scorer ----
-            //scorer = new HasCoverPosition() { score = 45 };
+            //scorer = new AmmoBelowThreshold() { score = 0, threshold = 0.5f };
             //scorers.Add(scorer);
             //// ---- New Scorer ----
-            //scorer = new HealthBelowThreshold() { score = 20, threshold = 2 };
+            //scorer = new ShouldFindCover() { score = 15 };
             //scorers.Add(scorer);
-
             ////
             //// ---- Add All Scorers to Scorers Group ----
             //allScorers.Add(scorers.ToArray());
 
             //// ---- New Qualifier ----
-            ////q = new CompositeAllOrNothingQualifier() { threshold = 35 };
-            //q = new CompositeScoreQualifier();
+            //q = new CompositeAllOrNothingQualifier() { threshold = 100 };
+            ////q = new CompositeScoreQualifier();
             //qualifiers.Add(q);
-
-            #endregion
-
-
-
-            #region Move to Cover Positiion
-
-            // ---- New Action ----
-            a = new CompositeAction()
-            {
-                name = "Move to Cover Positiion",
-                actions = new List<IAction>()
-                {
-                    new GetCoverPositions(){ name = "Get Cover Positions" },
-                    new MoveToCover()
-                    {
-                        name = "Move to Cove Position",
-                        scorers = new List<IOptionScorer<Vector3>>()
-                        {
-                            new PositionProximityToSelf() { score = 10, factor = 0.01f },      //  How close each point is to agent.
-                            new OverRangeToClosestEnemy() { desiredRange = 8f, score = 100f },      //  If point is over a certain range to each enemy.
-                        }
-                    }
-                }
-            };
-            actions.Add(a);  // --  Add to Actions Group
-
-            // ---- New Scorers Group ----
-            scorers = new List<IContextualScorer>();
-            //
-            // ---- New Scorer ----
-            scorer = new IsDamaged() { score = 0};
-            scorers.Add(scorer);
-            // ---- New Scorer ----
-            scorer = new HasCoverPosition() { score = 50 };
-            scorers.Add(scorer);
-            // ---- New Scorer ----
-            scorer = new HealthBelowThreshold() { score = 15, threshold = 2 };
-            scorers.Add(scorer);
-            // ---- New Scorer ----
-            scorer = new HasEnemiesInRange() { score = 50, range = 10 };
-            scorers.Add(scorer);
-            // ---- New Scorer ----
-            scorer = new AmmoBelowThreshold() { score = 0, threshold = 0.5f };
-            scorers.Add(scorer);
-            // ---- New Scorer ----
-            scorer = new ShouldFindCover() { score = 15 };
-            scorers.Add(scorer);
-            //
-            // ---- Add All Scorers to Scorers Group ----
-            allScorers.Add(scorers.ToArray());
-
-            // ---- New Qualifier ----
-            q = new CompositeAllOrNothingQualifier() { threshold = 100 };
-            //q = new CompositeScoreQualifier();
-            qualifiers.Add(q);
 
             #endregion
 
@@ -148,7 +107,7 @@
                 name = "MoveToBestAttackPosition",
                 scorers = new List<IOptionScorer<Vector3>>()
                 {
-                    new PositionProximityToSelf() { score = 10, factor = 0.01f },      //  How close each point is to agent.
+                    new PositionProximityToSelf() { score = 10, factor = 0.1f },      //  How close each point is to agent.
                     new ProximityToNearestEnemy() { desiredRange = 14f, score = 10f },      //  How close each point is to each enemy.
                     new OverRangeToClosestEnemy() { desiredRange = 5f, score = 100f },      //  If point is over a certain range to each enemy.
                     new LineOfSightToAnyEnemy() { score = 50f },        //  Does each point have line of sight to each enemy.
@@ -185,26 +144,26 @@
 
             #region Move In Cover
 
-            // ---- New Action ----
-            a = new MoveToPeekPosition()
-            {
-                name = "Move To Peek Position",
-            };
-            actions.Add(a);  // --  Add to Actions Group
+            //// ---- New Action ----
+            //a = new MoveToPeekPosition()
+            //{
+            //    name = "Move To Peek Position",
+            //};
+            //actions.Add(a);  // --  Add to Actions Group
 
-            // ---- New Scorers Group ----
-            scorers = new List<IContextualScorer>();
-            //
-            // ---- New Scorer ----
-            scorer = new IsInCover() { score = 125 };
-            scorers.Add(scorer);
-            //
-            // ---- Add All Scorers to Scorers Group ----
-            allScorers.Add(scorers.ToArray());
+            //// ---- New Scorers Group ----
+            //scorers = new List<IContextualScorer>();
+            ////
+            //// ---- New Scorer ----
+            //scorer = new IsInCover() { score = 125 };
+            //scorers.Add(scorer);
+            ////
+            //// ---- Add All Scorers to Scorers Group ----
+            //allScorers.Add(scorers.ToArray());
 
-            // ---- New Qualifier ----
-            q = new CompositeAllOrNothingQualifier() { threshold = 100 };
-            qualifiers.Add(q);
+            //// ---- New Qualifier ----
+            //q = new CompositeAllOrNothingQualifier() { threshold = 100 };
+            //qualifiers.Add(q);
 
 
             #endregion

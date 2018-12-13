@@ -10,29 +10,21 @@
         //  Fields
         //
         [SerializeField]
-        private PoolManager _poolManager;
+        public bool doNotDestroyOnLoad;
         [SerializeField]
-        private HUDState _hudState;
-        [SerializeField]
-        private PauseMenu _pauseManager;
+        private PoolManager poolManager;
         [SerializeField]
         private WeaponManager weaponManager;
+        [SerializeField]
+        private string[] assetsWithTagsToRemove;
+
 
         //
         //  Properties
         //
         public PoolManager PoolManager{
-            get { return _poolManager; }
+            get { return poolManager; }
         }
-
-        public HUDState HudState{ 
-            get { return _hudState;}
-        }
-
-        public PauseMenu PauseManager { 
-            get { return _pauseManager; } 
-        }
-
 
         public WeaponManager WeaponManager
         {
@@ -51,75 +43,45 @@
            // if(removeAssetsWithTag) RemoveAssetsWithTag(Tags.Player);
 
             if (FindObjectOfType<PoolManager>() == null){
-                _poolManager = Instantiate(PoolManager);
+                poolManager = Instantiate(PoolManager);
             }
 
-            if(FindObjectOfType<HUDState>() == null){
-                _hudState = Instantiate(HudState);
-            }
-
-            if (FindObjectOfType<PauseMenu>() == null){
-                _pauseManager = Instantiate(PauseManager);
-            }
-
-
-
-
-            //if (_defaultWeapon == null) throw new ArgumentNullException("GameManager has no default weapon.");
-
-            //InstantiatePlayers();
-
+            //if(doNotDestroyOnLoad){
+            //    DontDestroyOnLoad(this.gameObject);
+            //}
 		}
 
 
-		//private void Start()
-		//{
-        //   //InstantiatePlayers();
-		//}
 
 
-		////  Removes any Gameobject with designated tag.
-		//private void RemoveAssetsWithTag(string assetTag, bool debugLog = false)
-  //      {
-  //          string assetsRemoved = "Assets with tag ("+ assetTag + ") that were removed:\n";
-  //          GameObject[] assets = GameObject.FindGameObjectsWithTag(assetTag);
-  //          if (assets.Length > 0){
-  //              foreach (GameObject asset in assets){
-  //                  assetsRemoved += asset.name + "\n";
-  //                  Destroy(asset);
-  //              }
-  //          }
-  //          else{
-  //              assetsRemoved = "No assets with tag (" + assetTag + ") removed.";
-  //          }
-  //          if(debugLog) Debug.Log(assetsRemoved);
-  //      }
 
 
-		//private void InstantiatePlayers()
-        //{
-        //    if(players.doNotSpawn == false)
-        //        players.playerInstance = Instantiate(players.playerPrefab, Vector3.zero, Quaternion.Euler(0,180,0));
-        //}
+		//  Removes any Gameobject with designated tag.
+		private void RemoveAssetsWithTag(string assetTag, bool debugLog = false)
+        {
+            string debug_msg = "Assets with tag ("+ assetTag + ") that were removed:\n";
+            GameObject[] assets = GameObject.FindGameObjectsWithTag(assetTag);
+
+            if (assets.Length > 0){
+                for (int i = 0; i < assets.Length; i++)
+                {
+                    debug_msg += assets[i].name + "\n";
+                    Destroy(assets[i]);
+                }
+            }
+            else{
+                debug_msg = "No assets with tag (" + assetTag + ") removed.";
+            }
+
+            if(debugLog) Debug.Log(debug_msg);
+        }
+
 
 
 
 	}
 
 
-
-
-    //[Serializable]
-    //public class PlayerManager
-    //{
-    //    public bool doNotSpawn;
-    //    //public string playerName;
-    //    public PlayerInput playerPrefab;
-    //    //[HideInInspector]
-    //    public PlayerInput playerInstance;
-    //    public float startingHealth = 4f;
-
-    //}
 }
 
 

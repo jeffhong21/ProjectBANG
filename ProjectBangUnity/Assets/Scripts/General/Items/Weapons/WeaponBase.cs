@@ -1,24 +1,23 @@
-namespace Bang
-{
-    using UnityEngine;
+//namespace Bang
+//{
+//    using UnityEngine;
 
 
-    public class WeaponBase : MonoBehaviour
-    {
+//    public class WeaponBase : MonoBehaviour
+//    {
         
-        protected ActorController owner;
-        [SerializeField]
-        protected string nameID;
-        [SerializeField]
-        protected WeaponTypes weaponType;
+//        protected ActorController owner;
+//        [SerializeField]
+//        protected string nameID;
 
 
 
-        public string NameID{
-            get { return nameID; }
-            set { nameID = value; }
-        }
-    }
-}
+
+//        public string NameID{
+//            get { return nameID; }
+//            set { nameID = value; }
+//        }
+//    }
+//}
 
 

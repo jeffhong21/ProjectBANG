@@ -6,8 +6,11 @@
 
     public static class WeaponNameIDs
     {
-        public static string Revolver_01 = "Revolver_01";
-        public static string Rifle_01 = "Rifle_01";
+        public static string Revolver_01 = "Single Action Revolver";
+        public static string Revolver_02 = "Colt Action Revolver";
+        public static string Rifle_01 = "Springfield Rifle";
+        public static string IK_Rifle = "IK_Rifle";
+        public static string Shotgun = "Shotgun";
     }
 
 
@@ -15,42 +18,44 @@
     [CreateAssetMenu(menuName = "Resources Manager/WeaponsManager")]
     public class WeaponManager : ScriptableObject
     {
-        [Header("******* Guns ********")]
-        public Weapon[] weapons;
+        [SerializeField]
+        private WeaponObject[] weapons;
 
 
-        private static Dictionary<string, int> weaponLookup = new Dictionary<string, int>();
+        private static Dictionary<string, int> weaponLookup;
 
 
-		private void OnEnable()
-		{
-            Init();
+		private void OnEnable(){
+            Initialize();
 		}
 
 
-		public void Init()
+		public void Initialize()
         {
+            if(weaponLookup == null){
+                weaponLookup = new Dictionary<string, int>();
+            }
+
             for (int i = 0; i < weapons.Length; i ++)
             {
-                if(weaponLookup.ContainsKey(weapons[i].id))
+                if(weaponLookup.ContainsKey(weapons[i].nameID))
                 {
                     
                 }
                 else
                 {
-                    weaponLookup.Add(weapons[i].id, i);
+                    weaponLookup.Add(weapons[i].nameID, i);
                 }
             }
 
         }
 
 
-        public Weapon GetWeapon(string id)
+        public WeaponObject GetWeapon(string id)
         {
-            Weapon obj = null;
+            WeaponObject obj = null;
             int index = -1;
-            if(weaponLookup.TryGetValue(id, out index))
-            {
+            if(weaponLookup.TryGetValue(id, out index)){
                 obj = weapons[index];
             }
 
@@ -63,21 +68,6 @@
 
     }
 
-
-
-    [System.Serializable]
-    public class Weapon
-    {
-        public string id;
-
-        public Gun prefab;
-
-        public float fireRate = 1f;
-
-        public int ammo = 6;
-
-        public int maxAmmo = 6;
-    }
 
 }
 

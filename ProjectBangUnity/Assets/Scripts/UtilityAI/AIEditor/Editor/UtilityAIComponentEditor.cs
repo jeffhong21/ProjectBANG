@@ -73,7 +73,6 @@
 
         public void DoAddNew(AIStorage[] aiAsset, Type type)
         {
-
             _target.aiConfigs = GrowArray(_target.aiConfigs, aiAsset.Length);
 
             for (int idx = 0; idx < aiAsset.Length; idx++)
@@ -187,7 +186,7 @@
                                     //Debug.Log("Currently cannot debug at the moment.");
                                     if(_target.clients != null)
                                     {
-                                        if(_target.clients.Count == _target.aiConfigs.Length)
+                                        if(_target.clients.Length == _target.aiConfigs.Length)
                                         {
                                             var qualifiers = _target.clients[i].ai.rootSelector.qualifiers.Count;
                                             Debug.LogFormat("{0} Qualifier count:  {1}", aiConfig.aiId, qualifiers);

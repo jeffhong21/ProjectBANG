@@ -12,22 +12,24 @@
         //
         //  Fields
         //
-        public Gun weapon;
-        public Transform weaponHolder;
-        [SerializeField]
-        private ActorStates states;
+        public int teamId;
+        public ShootableWeapon weapon;
+        public LayerMask targetLayerMask;               //  Specifies the layers that the targets are in
+        public LayerMask ignoreLayerMask;               //  Specifies any layers that the sight check should ignore
+        public Transform lookTransform;                 //  Optionally specify a transform to determine where to check the line of sight from
 
-
-        private ActorHealth health;
-        private AnimationHandler animHandler;
-        private Rigidbody myRigidbody;
-        private CapsuleCollider controllerCollider;
+        protected ActorManager aManager;
+        protected Rigidbody myRigidbody;
+        protected CapsuleCollider controllerCollider;
+        protected ActorHealth health;
+        protected AnimationHandler animHandler;
+        protected CharcterIK characterIK;
+        protected CharacterRagdoll ragdoll;
 
         private float delta;
         private float aimHeight = 1.25f;
         private Vector3 aimPosition;
-        protected float shootingCooldown;
-        protected float reloadCooldown;
+        private float reloadTime;
 
 
         public event Action<GameObject> OnDeathEvent;
@@ -42,11 +44,6 @@
 
         public ActorHealth Health{
             get { return health; }
-        }
-
-
-        public ActorStates States{
-            get { return states; }
         }
 
         public Vector3 AimOrigin{
@@ -80,16 +77,15 @@
             health = GetComponent<ActorHealth>();
             myRigidbody = GetComponent<Rigidbody>();
             controllerCollider = GetComponent<CapsuleCollider>();
-            states = new ActorStates();
+            characterIK = GetComponent<CharcterIK>();
+            ragdoll = GetComponent<CharacterRagdoll>();
 
-            InitializeCoverMarkers();
         }
 
 
         protected void OnEnable()
 		{
             AimPosition = transform.position + transform.forward * 15;
-            States.CanShoot = true;
 
             myRigidbody.isKinematic = false;
             controllerCollider.enabled = true;
@@ -99,7 +95,10 @@
 
 		public void InitializeActor(ActorManager manager)
         {
-            EquipWeapon(WeaponNameIDs.Rifle_01);
+            aManager = manager;
+            teamId = manager.teamId;
+            EquipWeapon(WeaponNameIDs.Revolver_01);
+            GetComponent<ActorSkins.ActorSkinComponent>().LoadActorSkin();
         }
 
 
@@ -108,10 +107,7 @@
 		{
             delta = Time.deltaTime;
 
-            HandleShootingCooldown(delta);
-            HandleReloadCooldown(delta);
-
-
+            //  Execute abstract method.
             ExecuteUpdate(delta);
 		}
 
@@ -120,82 +116,73 @@
 		{
             delta = Time.fixedDeltaTime;
 
-            if (weapon != null){
-                if(States.IsReloading == false){
-                    weapon.transform.LookAt(AimPosition);
-                }
-            }
-
-
+            //  Execute abstract method.
             ExecuteFixedUpdate(delta);
 		}
-
-
-        private void HandleShootingCooldown(float time)
-        {
-            if (shootingCooldown > 0){
-                shootingCooldown -= time;
-                if (shootingCooldown <= 0){
-                    States.CanShoot = true;
-                }
-            }
-        }
-
-        private void HandleReloadCooldown(float time)
-        {
-            if (reloadCooldown > 0){
-                reloadCooldown -= time;
-                if (reloadCooldown <= 0){
-                    States.IsReloading = false;
-                    AnimHandler.PlayReload(States.IsReloading);
-                }
-            }
-        }
-
 
 
 
 
 		public virtual void EquipWeapon(string weaponID)
         {
-            
-            Weapon w = GameManager.instance.WeaponManager.GetWeapon(weaponID);
-            //weapon = Instantiate(w.prefab, weaponHolder.position, weaponHolder.rotation, weaponHolder);
+            UnequipWeapon();
 
-            //weapon = Instantiate(w.prefab);
-            //weapon.transform.parent = AnimHandler.rightHandState.hand;
-            //weapon.transform.position = AnimHandler.rightHandState.hand.position;
-            //weapon.transform.rotation = AnimHandler.rightHandState.hand.rotation;
+            WeaponObject w = GameManager.instance.WeaponManager.GetWeapon(weaponID);
+            if(w != null)
+            {
+                weapon = Instantiate(w.prefab);
+                weapon.transform.parent = AnimHandler.Anim.GetBoneTransform(HumanBodyBones.RightHand);
+                weapon.transform.localPosition = w.mainHandIK.position;
+                weapon.transform.localEulerAngles = w.mainHandIK.rotation;
+                //  Initialize Shootable weapon stats.  Do this before setting up animations and IK.
+                weapon.EquipWeapon(w, this);
+                //  Set IK.
+                //characterIK.EquidWeapon(weapon.MainHandIK, 1f, weapon.OffhandIK, 1f);
+                characterIK.EquidWeapon(weapon.MainHandIK, weapon.OffhandIK);
+                //  Set animtor weapon index.
+                AnimHandler.EquipWeapon((int)weapon.WeaponType);
+                //  Execute abstract method.
+                OnEquipWeapon(weapon); 
+            }
+            else{
+                Debug.Log("Weapon Manager has no weapon to equip.");
+            }
+        }
 
-            weapon = Instantiate(w.prefab);
-            weapon.transform.parent = weaponHolder.transform;
-            weapon.transform.position = weaponHolder.position;
-            weapon.transform.rotation = weaponHolder.rotation;
 
-            AnimHandler.EquidWeapon(weapon.MainHandIK, weapon.OffhandIK);
-            weapon.Init(this, weaponID, w.ammo, w.maxAmmo);
-
-            OnEquipWeapon(weapon);
+        public virtual void UnequipWeapon()
+        {
+            if(weapon != null){
+                Destroy(weapon.gameObject);
+            }
         }
 
 
         public void ShootWeapon(Vector3 target)
         {
-            if(States.CanShoot)
+            if(weapon.CurrentAmmo > 0 && weapon.CanShoot)
             {
                 AimPosition = target;
                 //Debug.DrawLine(weapon.ProjectileSpawn.position, weapon.ProjectileSpawn.position + (weapon.ProjectileSpawn.forward * 10), Color.red, 1f);
                 //Debug.DrawLine(weapon.ProjectileSpawn.position, AimPosition, Color.magenta, 1f);
+
+                //  Aim Weapon.
+                weapon.transform.LookAt(AimPosition);
+                // Shoot weapon.
+                weapon.Shoot();
+                //  Play Animation.
+                AnimHandler.PlayShootAnim();
+
+                //  Execute abstract method.
                 OnShootWeapon();
-                shootingCooldown = weapon.Cooldown;
-                States.CanShoot = false;
             }
         }
 
 
         public void Reload()
         {
-            if (weapon == null) return;
+            if (weapon == null || weapon.IsReloading) return;
+
 
             //  Get the amount of ammo needed to reload.
             int ammoToReload = weapon.MaxAmmo - weapon.CurrentAmmo;
@@ -203,28 +190,45 @@
 
             //  If there's enough ammo, tan reload.
 
-            reloadCooldown = 2f;
-            States.IsReloading = true;
-            AnimHandler.PlayReload(States.IsReloading);
 
-            weapon.Reload(2f);
-            //  Add it to the weapon current ammo.
-            weapon.CurrentAmmo += ammoToReload;
+            reloadTime = animHandler.AnimationLength("rifle_reload_still");
+            var speedModifier = 2f;
+            //Debug.Log("Rifle Reload Animation Length: " + reloadTime);
 
+
+            //  Play Weapon Reload animation.  The weapon will add the correct amount of ammo.
+            weapon.Reload(reloadTime / speedModifier, ammoToReload);
+            //  Play Character Reload animation.
+            AnimHandler.PlayReload(weapon.IsReloading);
+            //  Set animation Reload paremeter.
+            StartCoroutine(ReloadDelay(reloadTime / speedModifier));
+
+            //  Execute abstract method.
             OnReload();
         }
 
 
-        public void TakeDamage(Vector3 hitLocation, Vector3 hitDirection, GameObject attacker)
+        public void TakeDamage(Vector3 hitLocation, Vector3 force, GameObject attacker)
         {
-            myRigidbody.AddForce(hitDirection, ForceMode.Impulse);
-            OnTakeDamage(hitDirection);
+            //myRigidbody.AddForce(hitDirection, ForceMode.Impulse);
+            myRigidbody.AddForceAtPosition(force, hitLocation, ForceMode.Impulse);
+            //  Execute abstract method.
+            OnTakeDamage(force);
+
+            AnimHandler.PlayTakeDamage(hitLocation);
         }
 
 
-        public void Death(Vector3 position, Vector3 force, GameObject attacker)
+        public void Death(Vector3 hitLocation, Vector3 force, GameObject attacker)
         {
+            myRigidbody.AddForceAtPosition(force, hitLocation, ForceMode.Impulse);
+
+            if(ragdoll){
+                ragdoll.EnableRagdoll(0.6f);
+            }
+
             if (OnDeathEvent != null){
+                //  Calls the Event if OnDeathEvent is not null.
                 OnDeathEvent?.Invoke(attacker);
             }
             else{
@@ -233,11 +237,19 @@
 
             myRigidbody.isKinematic = true;
             controllerCollider.enabled = false;
-            //states.IsDead = true;
 
+            AnimHandler.Death(hitLocation);
+            //  Execute abstract method.
             OnDeath();
         }
 
+
+
+        private IEnumerator ReloadDelay(float time)
+        {
+            yield return new WaitForSeconds(time);
+            AnimHandler.PlayReload(false);
+        }
 
         //
         //  Abstract
@@ -247,7 +259,7 @@
 
         protected abstract void ExecuteFixedUpdate(float deltaTime);
 
-        protected abstract void OnEquipWeapon(Gun weapon);
+        protected abstract void OnEquipWeapon(ShootableWeapon weapon);
 
         protected abstract void OnShootWeapon();
 
@@ -262,147 +274,9 @@
         public abstract void EnableControls();
 
 
-        # region Cover 
-
-        protected Transform leftHelper;
-        protected Transform rightHelper;
-
-        private void InitializeCoverMarkers()
-        {
-            leftHelper = new GameObject().transform;
-            leftHelper.name = "Left cover Helper";
-            leftHelper.parent = transform;
-            leftHelper.localPosition = Vector3.zero;
-            leftHelper.localEulerAngles = Vector3.zero;
-
-            rightHelper = new GameObject().transform;
-            rightHelper.name = "Right cover Helper";
-            rightHelper.parent = transform;
-            rightHelper.localPosition = Vector3.zero;
-            rightHelper.localEulerAngles = Vector3.zero;
-        }
-
-
-        public void EnterCover(CoverObject cover)
-        {
-            Color debugColor = Color.red;
-            if (cover == null) return;
-
-            float minCoverHeight = AimOrigin.y * 0.75f;
-            float maxDistance = 1f;     //  Max distance away from cover.
-
-            Vector3 origin = AimOrigin;
-            Vector3 directionToCover = -(transform.position - cover.transform.position);
-            //directionToCover.y = minCoverHeight;
-            RaycastHit hit;
 
 
 
-            if (Physics.Raycast(origin, directionToCover, out hit, maxDistance, Layers.cover))
-            {
-                //  We hit a box collider
-                if (hit.transform.GetComponent<BoxCollider>())
-                {
-                    Quaternion targetRot = Quaternion.FromToRotation(transform.forward, hit.normal) * transform.rotation;
-                    float angel = Vector3.Angle(hit.normal, -transform.forward);
-                    //Debug.Log(angel);
-                    transform.rotation = targetRot;
-
-                    States.CanShoot = true;
-                    States.InCover = true;
-
-                    AnimHandler.EnterCover();
-                    Debug.Log("Agent is taking cover");
-                    debugColor = Color.green;
-                }
-            }
-
-            Debug.DrawRay(origin, directionToCover, debugColor, 0.5f);
-            //Debug.Break();
-        }
-
-
-
-		public void ExitCover()
-        {
-            States.InCover = false;
-            States.CanShoot = true;
-            AnimHandler.ExitCover();
-            Debug.Log("Agent is leaving cover");
-        }
-
-
-
-        #endregion
-
-
-
-
-
-        [Serializable]
-        public class ActorStates
-        {
-            [SerializeField]
-            private bool canShoot;
-            [SerializeField]
-            private bool isAiming;
-            [SerializeField]
-            private bool isReloading;
-            [SerializeField]
-            private bool inCover;
-            [SerializeField]
-            private bool isDead;
-
-
-            public bool CanShoot{
-                get{
-                    return canShoot;
-                }
-                set{
-                    canShoot = value;
-                }
-            }
-
-            public bool IsAiming
-            {
-                get{
-                    return isAiming;
-                }
-                set{
-                    isAiming = value;
-                }
-            }
-
-            public bool IsReloading{
-                get{
-                    return isReloading;
-                }
-                set{
-                    isAiming = !value;
-                    canShoot = !value;
-                    isReloading = value;
-                }
-            }
-
-            public bool InCover{
-                get{
-                    return inCover;
-                }
-                set{
-                    inCover = value;
-                }
-            }
-
-            public bool IsDead{
-                get{
-                    return isDead;
-                }
-                set{
-                    canShoot = !value;
-                    isDead = value;
-                }
-            }
-        }
     }
 }
 

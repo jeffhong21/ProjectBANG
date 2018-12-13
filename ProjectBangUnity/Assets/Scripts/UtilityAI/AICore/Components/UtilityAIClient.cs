@@ -2,10 +2,10 @@
 {
     using UnityEngine;
     using UnityEditor;
+
     using System;
-    using System.Collections;
     using System.Collections.Generic;
-    using Visualization;
+    using AtlasAI.Scheduler;
 
     public enum UtilityAIClientState
     {
@@ -17,31 +17,17 @@
     /// <summary>
     /// This is the decision maker.
     /// </summary>
-    [Serializable]
-    public class UtilityAIClient : IUtilityAIClient
+    public class UtilityAIClient : IUtilityAIClient, IClientScheduler
     {
         //  ContextProvider from BANG.
-        [SerializeField, HideInInspector]
         private Bang.AIContextProvider contextProvider;
 
-        [SerializeField]
+
+        private ISchedulerHandle _handle;
         private IUtilityAI _ai;
-        [SerializeField]
         private UtilityAIClientState _state;
-        [SerializeField]
         private IAction _activeAction;
 
-        [SerializeField]
-        private float _intervalMin;
-        [SerializeField]
-        private float _intervalMax;
-        [SerializeField]
-        private float _startDelayMin;
-        [SerializeField]
-        private float _startDelayMax;
-
-        //private float interval;
-        //private float nextUpdate;
 
 
         public IUtilityAI ai{ 
@@ -61,92 +47,36 @@
 
 
         public float intervalMin { 
-            get{
-                //if (_intervalMin > _intervalMax){
-                //    _intervalMin = _intervalMax;
-                //}
-                return _intervalMin;
-            }
-            set { _intervalMin = value; }
+            get;
+            set;
         }
 
         public float intervalMax{
-            get{
-                //if (_intervalMax < _intervalMin){
-                //    _intervalMax = _intervalMin;
-                //}
-                return _intervalMax;
-            }
-            set { _intervalMax = value; }
+            get;
+            set;
         }
 
         public float startDelayMin{
-            get{
-                //if (_startDelayMin > _startDelayMax){
-                //    _startDelayMin = _startDelayMax;
-                //}
-                return _startDelayMax;
-            }
-            set{_startDelayMin = value;}
+            get;
+            set;
         }
 
         public float startDelayMax{
-            get { 
-                //if(_startDelayMax < _startDelayMin){
-                //    _startDelayMax = _startDelayMin;
-                //}
-                return _startDelayMax;
-            }
-            set { _startDelayMax = value; }
+            get;
+            set;
         }
-
-
-
-
-        //  For Debuging.
-        public bool _debugClient;
-        public bool debugClient{
-            get{ return _debugClient; }
-            set{
-                _debugClient = value;
-                ((UtilityAI)this.ai).debug = _debugClient;
-            }
-        }
-        public Dictionary<IQualifier, float> selectorResults;
 
 
 
         #region Constructors
 
         public UtilityAIClient(Guid aiId, IContextProvider contextProvider) 
-        {
-            this.contextProvider = contextProvider as Bang.AIContextProvider;
-
-            string path = AssetDatabase.GUIDToAssetPath(aiId.ToString("N"));
-            AIStorage aiStorage = AssetDatabase.LoadMainAssetAtPath(path) as AIStorage;
-            ai = new UtilityAI()
-            {
-                name = aiStorage.aiId
-            };
-            //ai = aiStorage.configuration;
-
-            intervalMin = intervalMax = 1f;
-            startDelayMin = startDelayMax = 0f;
-            state = UtilityAIClientState.Stopped;
-
-            Debug.Log("Constructing UtilityAIClient with aiId - v1");
+            : this(aiId, contextProvider, 1, 1, 0, 0){
         }
 
-        public UtilityAIClient(UtilityAI ai, IContextProvider contextProvider)
-        {
-            this.ai = ai;
-            this.contextProvider = contextProvider as Bang.AIContextProvider;
 
-            intervalMin = intervalMax = 1f;
-            startDelayMin = startDelayMax = 0f;
-            state = UtilityAIClientState.Stopped;
-
-            //Debug.LogFormat("this.IContextProvider:  {0}  |  param IContextProvider:  {1}", this.contextProvider, contextProvider);
+        public UtilityAIClient(IUtilityAI ai, IContextProvider contextProvider)
+            : this(ai, contextProvider, 1, 1, 0, 0){
         }
 
 
@@ -172,7 +102,7 @@
         }
 
 
-        public UtilityAIClient(UtilityAI ai, IContextProvider contextProvider, float intervalMin, float intervalMax, float startDelayMin, float startDelayMax)
+        public UtilityAIClient(IUtilityAI ai, IContextProvider contextProvider, float intervalMin, float intervalMax, float startDelayMin, float startDelayMax)
         {
             this.ai = ai;
             this.contextProvider = contextProvider as Bang.AIContextProvider;
@@ -183,7 +113,14 @@
             this.startDelayMax = startDelayMax;
             state = UtilityAIClientState.Stopped;
 
+            var interval = UnityEngine.Random.Range(intervalMin, intervalMax);
+            var delay = UnityEngine.Random.Range(startDelayMin, startDelayMax);
+            var manager = Utilities.ComponentHelper.FindFirstComponentInScene<UtilityAIManager>();
+            _handle = manager.scheduler.Add(this, interval, delay);
             //Debug.Log("Contructor with all variables");
+
+            var random = new System.Random();
+            debugColor = String.Format("#{0:X6}", random.Next(0x1000000)); // = "#A197B9"
         }
 
         #endregion
@@ -194,28 +131,10 @@
         /// </summary>
         public void Execute()
         {
-            switch(_state)
-            {
-                case UtilityAIClientState.Running:
-                    activeAction = ai.Select(contextProvider.GetContext());
-
-                    if(debugClient) Debug.LogFormat("Executing {0}.  Action is of type {1}", activeAction.name, activeAction.GetType());
-
-
-
-                    activeAction.Execute(contextProvider.GetContext());
-
-                    ////  Call event for GetDataForVisualization(activeAction, contextProvider.GetContext())
-                    //VisualizerManager.UpdateVisualizer(activeAction, contextProvider.GetContext());
-                    break;
-
-                case UtilityAIClientState.Pause:
-                    
-                    break;
-
-                case UtilityAIClientState.Stopped:
-                    
-                    break;
+            if(state == UtilityAIClientState.Running){
+                activeAction = ai.Select(contextProvider.GetContext());
+                activeAction.Execute(contextProvider.GetContext());
+                if (debugClient) Debug.LogFormat("Executing {0}.  Action is of type {1}", activeAction.name, activeAction.GetType());
             }
         }
 
@@ -232,22 +151,33 @@
         /// </returns>
         public float? ExecuteUpdate(float deltaTime, float nextInterval)
         {
-            float _nextInterval = nextInterval;
-            _nextInterval -= deltaTime;
-
-            if(_nextInterval <= 0)
-            {
+            if (state == UtilityAIClientState.Running){
+                //Debug.LogFormat("<color={0}>AI {1}</color> is Executing Update. | LastUpdate: {2} | NextUpdate: {3}", debugColor, ai.name, deltaTime, nextInterval);
                 activeAction = ai.Select(contextProvider.GetContext());
-
-                //if(debugClient) Debug.Log("Executing " + activeAction.name);
                 activeAction.Execute(contextProvider.GetContext());
+                //if(deltaTime < nextInterval)
+                    //nextInterval = UnityEngine.Random.Range(intervalMin, intervalMax);
 
-                ////  Call event for GetDataForVisualization(activeAction, contextProvider.GetContext())
-                //VisualizerManager.UpdateVisualizer(activeAction, contextProvider.GetContext());
+                Visualization.ICustomVisualizer visualizer = null;
+                if(activeAction is CompositeAction){
+                    for (int i = 0; i < ((CompositeAction)activeAction).actions.Count; i++){
+                        if (Visualization.VisualizerManager.TryGetVisualizerFor(((CompositeAction)activeAction).actions[i].GetType(), out visualizer)){
+                            visualizer.EntityUpdate(activeAction, contextProvider.GetContext());
+                            break;
+                        }
+                    }
+                }
+                else{
+                    if (Visualization.VisualizerManager.TryGetVisualizerFor(activeAction.GetType(), out visualizer)){
+                        visualizer.EntityUpdate(activeAction, contextProvider.GetContext());
+                    }
+                }
 
-                return null;
+                //if (debugClient) Debug.LogFormat("Executing {0}.  Action is of type {1}", activeAction.name, activeAction.GetType());
+                return UnityEngine.Random.Range(intervalMin, intervalMax);
             }
-            return _nextInterval;
+            Debug.LogFormat("AI: {0} | State: {1}",ai.name, state);
+            return null;
         }
 
 
@@ -256,23 +186,36 @@
         /// </summary>
         public void Start()
         {
-            if (state != UtilityAIClientState.Stopped)
+            //  UtilityAIClient trying to start, but it not in the correct state.
+            if (state != UtilityAIClientState.Stopped){
+                //Console.WriteLine(" ** UtilityAIClient trying to start, but it not in the correct state.");
                 return;
-            
+            }
+            //  Set the correct client state.
             state = UtilityAIClientState.Running;
-            OnStart();
+            //  Register the client to the AIManager.
             AIManager.Register(this);
+            //  Call OnStart.
+            OnStart();
         }
 
 
         public void Stop()
         {
-            if (state == UtilityAIClientState.Stopped)
+            //  UtilityAIClient trying to stop, but is currently stopped.
+            if (state == UtilityAIClientState.Stopped){
+                //Console.WriteLine(" ** UtilityAIClient trying to stop, but is currently stopped.");
                 return;
-            
+            }
+            //  Set the correct client state.
             state = UtilityAIClientState.Stopped;
-            OnStop();
+            //  Unregister the client to the AIManager.
             AIManager.UnRegister(this);
+            //  Remove itself from the scheduler.
+            //var manager = Utilities.ComponentHelper.FindFirstComponentInScene<UtilityAIManager>();
+            //manager.scheduler.Remove(this);
+            //  Call OnStop.
+            OnStop();
         }
 
 
@@ -320,7 +263,17 @@
 
 
 
-
+        //  For Debuging.
+        private string debugColor;
+        public bool _debugClient;
+        public bool debugClient{
+            get { return _debugClient; }
+            set{
+                _debugClient = value;
+                ((UtilityAI)this.ai).debug = _debugClient;
+            }
+        }
+        public Dictionary<IQualifier, float> selectorResults;
 
         /// <summary>
         /// For Debugging

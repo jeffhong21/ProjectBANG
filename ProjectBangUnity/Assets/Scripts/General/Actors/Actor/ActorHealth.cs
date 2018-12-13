@@ -4,29 +4,37 @@
     using System;
     using System.Collections;
 
-    public class ActorHealth : MonoBehaviour
+    public class ActorHealth : MonoBehaviour, IHasHealth
     {
         //
         //  Fields
         //
-        [SerializeField]
-        protected bool invinsible;
+        public bool invinsible;
         [SerializeField]
         protected float currentHealth;
         [SerializeField]
         protected float maxHealth = 4f;
         [SerializeField]
         protected float timeInvincibleAfterRespawn;
+
+        public GameObject[] spawnedObjectsOnDeath;
+        public GameObject[] destroyedObjectsOnDeath;
+
+        [Header("Character Health UI")]
+        [SerializeField]
+        private CharacterHealthUI healthUI;
+
+
         [SerializeField]
         protected float sinkSpeed = 0.5f;
         [SerializeField]
         protected float delaySinkTime = 3f;
-
-        private ActorController controller;
         private float startSinkingTime;
         private WaitForSeconds sinkDelay;
         [SerializeField]
         private bool isDead;
+        private ActorController controller;
+
 
 
         public event Action<float, Vector3, Vector3, GameObject> OnHealthDamage;
@@ -45,12 +53,6 @@
                 return this.transform.position;
             }
         }
-
-        public bool Invinsible
-        {
-            get { return invinsible; }
-        }
-
 
         public float MaxHealth
         {
@@ -84,6 +86,13 @@
         {
             controller = GetComponent<ActorController>();
             sinkDelay = new WaitForSeconds(delaySinkTime);
+
+            if(healthUI != null){
+                //healthUI = GetComponentInChildren<CharacterHealthUI>();
+                healthUI.Initialize(maxHealth);
+                healthUI.gameObject.SetActive(true);
+            }
+
         }
 
 
@@ -102,6 +111,11 @@
                     currentHealth -= damage;
                     //OnHealthDamage(damage, hitDirection, hitDirection, attacker);
                     controller.TakeDamage(hitDirection, hitDirection, attacker);
+
+
+                    if(healthUI != null){
+                        healthUI.SetHealthUI(currentHealth);   
+                    }
                 }
 
                 if(currentHealth <= 0){
@@ -112,11 +126,11 @@
         }
 
 
-        private void Die(Vector3 position, Vector3 force, GameObject attacker){
+        private void Die(Vector3 location, Vector3 force, GameObject attacker){
             isDead = true;
             //OnDeath(position, force, attacker);
-            controller.Death(position, force, attacker);
-            Debug.LogFormat("{0} was killed by {1}", gameObject.name, attacker.name);
+            controller.Death(location, force, attacker);
+            //Debug.LogFormat("{0} was killed by {1}", gameObject.name, attacker.name);
             StartCoroutine(StartSinking());
         }
 

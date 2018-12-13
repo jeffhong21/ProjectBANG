@@ -38,7 +38,7 @@
 
         void AddSelector(Selector s);
 
-        Selector FindSelector(Selector s);
+        Selector FindSelector(Guid id);
 
         void RemoveSelector(Selector s);
 

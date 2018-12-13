@@ -4,60 +4,32 @@ namespace Bang
     using System;
     using System.Collections.Generic;
 
+
+    public static class HashID
+    {
+        public static readonly int InputX = Animator.StringToHash("InputX");
+        public static readonly int InputY = Animator.StringToHash("InputY");
+        public static readonly int Speed = Animator.StringToHash("Speed");
+        public static readonly int Moving = Animator.StringToHash("Moving");
+        public static readonly int Aiming = Animator.StringToHash("Aiming");
+        public static readonly int WeaponID = Animator.StringToHash("WeaponID");
+        public static readonly int AnimationIndex = Animator.StringToHash("AnimationIndex");
+
+        public static readonly int ShootWeapon = Animator.StringToHash("ShootWeapon");
+        public static readonly int Damage = Animator.StringToHash("Damage");
+        public static readonly int IsReloading = Animator.StringToHash("IsReloading");
+        public static readonly int Die = Animator.StringToHash("Die");
+    }
+
     //[RequireComponent(typeof(PlayerController))]
     public class AnimationHandler : MonoBehaviour
     {
-        public enum MainHandEnum{ Right, Left}
-
-        private class HashID
-        {
-            public readonly int InputX = Animator.StringToHash("InputX");
-            public readonly int InputY = Animator.StringToHash("InputY");
-            public readonly int IsWalking = Animator.StringToHash("IsWalking");
-            public readonly int Reload = Animator.StringToHash("Reload");
-            public readonly int EnterCover = Animator.StringToHash("EnterCover");
-            public readonly int InCover = Animator.StringToHash("IsInCover");
-            public readonly int ExitCover = Animator.StringToHash("ExitCover");
-            public readonly int IsDead = Animator.StringToHash("IsDead");
-            public readonly int IsReloading = Animator.StringToHash("IsReloading");
-        }
-
-        [Serializable]
-        public class BaseState
-        {
-            public float lookAtWeight;
-            public float bodyWeight;
-        }
-
-        [Serializable]
-        public class HandState
-        {
-            public Transform hand;
-            public Transform target;
-            public float weight;
-            public Vector3 offset;
-            public bool disableIK;
-            [HideInInspector]
-            public float savedWeight;
-
-            public HandState(Transform hand){
-                this.hand = hand;
-            }
-        }
-
-
 
         [SerializeField]
         private bool debugTransition;
-        [SerializeField]
-        private MainHandEnum mainHandEnum;
-
-        public HandState leftHandState;
-        public HandState rightHandState;
 
         private ActorController actor;
         private Animator anim;
-        private HashID hashID;
         private Transform aimPivot;
 
         private Vector3 velocity;
@@ -66,26 +38,7 @@ namespace Bang
         private float rightDotProduct;
         private AnimatorStateInfo currentAnimation;
 
-        private Transform shoulder;
 
-
-        public Transform MainHand{
-            get{
-                if(mainHandEnum == MainHandEnum.Left){
-                    return leftHandState.hand;
-                }
-                return rightHandState.hand;
-            }
-        }
-
-        public Transform Offhand{
-            get{
-                if (mainHandEnum == MainHandEnum.Left){
-                    return rightHandState.hand;
-                }
-                return leftHandState.hand;
-            }
-        }
 
 
         private float PercentComplete{
@@ -95,11 +48,12 @@ namespace Bang
             }
         }
 
-
-
         public Animator Anim{
             get { return anim;}
         }
+
+
+
 
 
         private void Awake()
@@ -107,26 +61,8 @@ namespace Bang
             actor = GetComponent<ActorController>();
             anim = GetComponent<Animator>();
 
-            leftHandState = new HandState(anim.GetBoneTransform(HumanBodyBones.LeftHand));
-            rightHandState = new HandState(anim.GetBoneTransform(HumanBodyBones.RightHand));
-
-            hashID = new HashID();
             currentAnimation = anim.GetCurrentAnimatorStateInfo(0);
-
-            InitializeAimPivot();
         }
-
-
-        private void InitializeAimPivot()
-        {
-            shoulder = anim.GetBoneTransform(HumanBodyBones.RightShoulder).transform;
-
-            aimPivot = new GameObject().transform;
-            aimPivot.name = "Aim Pivot";
-            aimPivot.transform.parent = this.gameObject.transform;
-            aimPivot.position = shoulder.position;
-        }
-
 
 
         private void FixedUpdate()
@@ -134,41 +70,6 @@ namespace Bang
             CalculateMovement();
             Locomotion(fwdDotProduct, rightDotProduct);
 
-            HandleShoulder();
-
-        }
-
-
-		private void OnAnimatorIK()
-		{
-            //  Update offhand
-            UpdateIK(AvatarIKGoal.LeftHand, leftHandState.target, leftHandState.weight);
-
-            //  Update mainhand
-            UpdateIK(AvatarIKGoal.RightHand, rightHandState.target, rightHandState.weight);
-		}
-
-
-		private void UpdateIK(AvatarIKGoal goal, Transform target, float w)
-        {
-            if(target != null){
-                anim.SetIKPositionWeight(goal, w);
-                anim.SetIKRotationWeight(goal, w);
-                anim.SetIKPosition(goal, target.position);
-                anim.SetIKRotation(goal, target.rotation);
-            }
-        }
-
-
-        private void HandleShoulder()
-        {
-            aimPivot.position = shoulder.position;
-
-            Vector3 targetDir = actor.AimPosition - aimPivot.position;
-            if (targetDir == Vector3.zero)
-                targetDir = aimPivot.forward;
-            Quaternion tr = Quaternion.LookRotation(targetDir);
-            aimPivot.rotation = Quaternion.Slerp(aimPivot.rotation, tr, Time.deltaTime * 15);
         }
 
 
@@ -187,21 +88,30 @@ namespace Bang
 
         private void Locomotion(float _fwdDotProduct, float _rightDotProduct)
         {
-            anim.SetFloat(hashID.InputX, _rightDotProduct);
-            anim.SetFloat(hashID.InputY, _fwdDotProduct);
-            //anim.SetBool("IsMoving", isMoving);
+            anim.SetFloat(HashID.InputX, _rightDotProduct);
+            anim.SetFloat(HashID.InputY, _fwdDotProduct);
+
+            //if(_fwdDotProduct == 0 && _rightDotProduct == 0)
+                //anim.SetBool("IsMoving", true);
         }
 
 
-
-
-
-        public void EquidWeapon(Transform mainHand, Transform offHand)
+        public float AnimationLength(string clipName)
         {
-            rightHandState.target = mainHand;
-            rightHandState.weight = 0f;
-            leftHandState.target = offHand;
-            leftHandState.weight = 1f;
+            float time = 0;
+            RuntimeAnimatorController ac = anim.runtimeAnimatorController;
+
+            for (int i = 0; i < ac.animationClips.Length; i++)
+                if (ac.animationClips[i].name == clipName)
+                    time = ac.animationClips[i].length;
+            
+            return time;
+        }
+
+
+        public void EquipWeapon(int index)
+        {
+            anim.SetInteger(HashID.WeaponID, index);
         }
 
 
@@ -213,56 +123,88 @@ namespace Bang
 
         public void WalkingState(bool state)
         {
-            anim.SetBool(hashID.IsWalking, state);
+            anim.SetBool(HashID.Moving, state);
         }
 
 
         public void PlayReload(bool isPlaying)
         {
-            if(isPlaying){ //  If is playing, store the weights.
-                leftHandState.savedWeight = leftHandState.weight;
-                leftHandState.weight = 0f;
+            anim.SetBool(HashID.IsReloading, isPlaying);
+        }
+
+
+        public void PlayTakeDamage(Vector3 hitLocation)
+        {
+            float fwd = Vector3.Dot(transform.forward, hitLocation);
+            float right = Vector3.Dot(transform.right, hitLocation);
+
+            int index = 0;
+
+            if(fwd >= 0.45 || fwd <= -0.45){
+                if (fwd >= 0.45){
+                    index = 0;
+                } else {
+                    index = 3;
+                }
             }
-            else{  // If not playing, restore the weights.
-                leftHandState.weight = leftHandState.savedWeight;
+
+            if (right <= -0.45){
+                index = 1;
             }
-            anim.SetBool(hashID.IsReloading, isPlaying);
+            else if (right >= 0.45){
+                index = 2;
+            }
+            else{
+                index = 0;
+            }
+
+            anim.SetInteger(HashID.AnimationIndex, index);
+            anim.SetTrigger(HashID.Damage);
+            //Debug.Log(index);
         }
 
 
-        public void PlayTakeDamage(Vector3 hitDirection)
+        public void SetAim(bool isAiming)
         {
-            
+            anim.SetBool(HashID.Aiming, isAiming);
         }
 
 
-        public void EnterCover()
+        public void PlayShootAnim()
         {
-            anim.SetBool(hashID.InCover, true);
-            anim.SetTrigger(hashID.EnterCover);
-            anim.SetBool(hashID.IsWalking, false);
+            anim.SetTrigger(HashID.ShootWeapon);
         }
 
 
-        public void CoverState()
+
+        public void Death(Vector3 hitLocation)
         {
-            anim.SetBool(hashID.InCover, true);
-            anim.SetBool(hashID.IsWalking, false);
-        }
+            float fwd = Vector3.Dot(transform.forward, hitLocation);
+            float right = Vector3.Dot(transform.right, hitLocation);
 
+            int index = 0;
 
-        public void ExitCover()
-        {
-            anim.SetBool(hashID.InCover, false);
-            anim.SetTrigger(hashID.EnterCover);
-            anim.SetBool(hashID.IsWalking, true);
-        }
+            if (fwd >= 0.45 || fwd <= -0.45){
+                if (fwd >= 0.45){
+                    index = 0;
+                } else {
+                    index = 3;
+                }
+            }
 
+            if (right <= -0.45){
+                index = 1;
+            }
+            else if (right >= 0.45){
+                index = 2;
+            }
+            else{
+                index = 0;
+            }
 
-        public void Death()
-        {
-            anim.SetBool(hashID.IsWalking, false);
-            anim.SetBool(hashID.IsDead, true);
+            anim.SetBool(HashID.Moving, false);
+            anim.SetInteger(HashID.AnimationIndex, index);
+            anim.SetTrigger(HashID.Die);
         }
 
 

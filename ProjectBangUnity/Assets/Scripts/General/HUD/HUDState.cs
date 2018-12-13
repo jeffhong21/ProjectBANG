@@ -14,6 +14,8 @@ namespace Bang
         private ScoreUI _scoreUI;
         private MessageUI _messageUI;
         private SideMessageUI _sideMessageUI;
+        private GameScore _gameScore;
+
 
         public Canvas Canvas{ get { return _canvas; }}
 
@@ -28,6 +30,7 @@ namespace Bang
             _scoreUI = GetComponentInChildren<ScoreUI>();
             _messageUI = GetComponentInChildren<MessageUI>();
             _sideMessageUI = GetComponentInChildren<SideMessageUI>();
+            _gameScore = GetComponentInChildren<GameScore>();
 
             _canvas = GetComponent<Canvas>();
         }
@@ -70,6 +73,10 @@ namespace Bang
 
             UpdatePlayer(player.name);
             UpdateHealth(player.Health.CurrentHealth);
+            UpdateAmmo(player.weapon.CurrentAmmo, player.weapon.MaxAmmo);
+            UpdateWeapon(player.weapon.NameID);
+
+            _gameScore.Initialize();
         }
 
 
@@ -115,6 +122,11 @@ namespace Bang
         public void UpdateSideMessage(string message)
         {
             _sideMessageUI.SetMessage(message);
+        }
+
+        public void UpdateGameScore(ActorManager player)
+        {
+            _gameScore.UpdateScore(player);
         }
 	}
 }

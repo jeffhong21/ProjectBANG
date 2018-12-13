@@ -91,18 +91,17 @@ namespace Bang
 
         private void RotateTowardsTarget()
         {
-            if(agent.States.InCover == false)
-                if (target != null)
+            if (target != null)
+            {
+                Vector3 lookRotation = (target.position - transform.position);
+                //  Errors out when roation method is called towards a vector zero.
+                if (lookRotation != Vector3.zero)
                 {
-                    Vector3 lookRotation = (target.position - transform.position);
-                    //  Errors out when roation method is called towards a vector zero.
-                    if(lookRotation != Vector3.zero)
-                    {
-                        // Create a quaternion (rotation) based on looking down the vector from the player to the target.
-                        Quaternion newRotatation = Quaternion.LookRotation(lookRotation);
-                        transform.rotation = Quaternion.Slerp(transform.rotation, newRotatation, Time.fixedDeltaTime * agent.stats.turnSpeed);
-                    }
+                    // Create a quaternion (rotation) based on looking down the vector from the player to the target.
+                    Quaternion newRotatation = Quaternion.LookRotation(lookRotation);
+                    transform.rotation = Quaternion.Slerp(transform.rotation, newRotatation, Time.fixedDeltaTime * agent.stats.turnSpeed);
                 }
+            }
         }
 
 

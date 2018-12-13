@@ -9,6 +9,7 @@ namespace Bang
     [RequireComponent(typeof(TeamManager))]
     public class DeathmatchManager : SingletonMonoBehaviour<DeathmatchManager>
     {
+        
         private readonly string[] roundStartingText = { " 3 ", " 2 ", " 1 ", "Draw!" };
         protected readonly string respawnPointTag = "RespawnPoint";
         private readonly float startDelay = 0.75f;
@@ -27,17 +28,14 @@ namespace Bang
         public HUDState hud;
         public string parentName = "Players";
 
-
-        public DeathmatchSettings settings;
         public PrimaryTeamColors primaryColorSettings;
         public DeathmatchDebug debug;
 
-        [SerializeField]
-        private PlayerController player;
-        [SerializeField]
-        private ActorManager[] actors;
+        private PlayerController _player;
+        public ActorManager[] players;
 
-
+        [HideInInspector]
+        public TeamManager teamManager;
         private GameObject parentObject;
         private GameObject[] spawnPoints;
         private WaitForSeconds startWait;
@@ -48,17 +46,15 @@ namespace Bang
         protected override void Awake()
 		{
             base.Awake();
+            //if (GameManager.instance.doNotDestroyOnLoad){
+            //    DontDestroyOnLoad(this.gameObject);
+            //}
+
+            hud = Instantiate(hud) as HUDState;
+            cameraPrefab = Instantiate(cameraPrefab) as CameraController;
 
             if (playerCount <= 0) playerCount = 1;
-
-
-            startWait = new WaitForSeconds(startDelay);
-            endWait = new WaitForSeconds(endDelay);
-
-            //playerCount = playerCount + 1;
-            actors = new ActorManager[playerCount];
-            spawnPoints = GameObject.FindGameObjectsWithTag(respawnPointTag);
-
+            players = new ActorManager[playerCount];
             //  Setup parent object.
             if (parentObject == null){
                 if(string.IsNullOrWhiteSpace(parentName) == false){
@@ -68,26 +64,24 @@ namespace Bang
                     parentObject.transform.localEulerAngles = Vector3.zero;
                     parentObject.transform.localScale = Vector3.one;
                 }
-                //else{
-                //    Debug.Log("There was no ParentObject Name specified.  No ParentObject created.");
-                //}
             }
+
+
+            if(teamGame) teamManager = GetComponent<TeamManager>();
+           
+            startWait = new WaitForSeconds(startDelay);
+            endWait = new WaitForSeconds(endDelay);
+
+            //  Get spawn points.
+            spawnPoints = GameObject.FindGameObjectsWithTag(respawnPointTag);
+
+
 		}
 
 
 		private void Start()
 		{
-            //  Setup Teams.
-            SetupTeams();
-            //  Spawn players.
-            SpawnPlayers();
-            //  Initiate cameraa.
-            SetupCamera(player.transform);
-            //  Initiate Player.
-            SetupHUD(player);
-            //  Initiate Actors.
-            SetupActors();
-
+            Initialize();
 
 
             if (debug.doNotStartGameLoop){
@@ -98,9 +92,7 @@ namespace Bang
             StartCoroutine(GameLoop());
 		}
 
-
-
-        private void SetupTeams()
+        void Team()
         {
             if (teamCount < 2) teamCount = 2;
             int remainderPlayers = playerCount % teamCount;
@@ -109,84 +101,76 @@ namespace Bang
         }
 
 
-
-
-        private void SpawnPlayers()
+        private void Initialize()
         {
-            Vector3 spawnLocation;
+            if(teamGame){
+                teamManager.CreateTeam("Team 1");
+                teamManager.CreateTeam("Team 2");
+            }
 
-            for (int i = 0; i < actors.Length; i++)
+            Vector3 spawnLocation;
+            for (int i = 0; i < players.Length; i++)
             {
-                actors[i] = new ActorManager();
+                players[i] = new ActorManager();
+                players[i].playerId = i;
+                players[i].teamId = teamGame ? i % 2 : -1;
+                teamManager.teams[players[i].teamId].playerCount++;
 
                 //  Check if there are spawn points.
                 if (spawnPoints.Length > 0 || spawnPoints[i] != null){
                     spawnLocation = spawnPoints[i].transform.position;
-                }
-                else{
+                } else {
                     spawnLocation = Random.insideUnitCircle * 5;
                     spawnLocation.y = 0;
                 }
 
-                //  Instantiate actors.
-                if (i == 0)
+                var prefab = i == 0 ? playerPrefab : agentPrefab;
+                var position = spawnLocation;
+                var rotation = Quaternion.AngleAxis(Random.Range(0, 359), Vector3.up);
+
+                var go = Instantiate(prefab, position, rotation);
+                players[i].SetInstance(go);
+
+                //if (teamGame) teamManager.AssignTeam(players[i]);
+
+
+                //  Set controls.
+                players[i].InitializeActor();
+                players[i].DisableControls();
+                if (parentObject != null) players[i].Instance.transform.parent = parentObject.transform;
+
+                //  Set human player variable.
+                if (i == 0) _player = players[0].Instance.GetComponent<PlayerController>();
+            }
+            //  Initialize Player HUD and Camera
+            hud.InitializeHUD(_player);
+            cameraPrefab.SetTarget(_player.transform);
+
+
+
+            if(teamGame){
+                Color teamColor1 = primaryColorSettings.teamColor1;
+                Color teamColor2 = primaryColorSettings.teamColor2;
+                for (int i = 0; i < players.Length; i++)
                 {
-                    var go = Instantiate(playerPrefab, spawnLocation, Quaternion.Euler(0, 180, 0));
-                    actors[i].SetInstance(go);
-                    player = actors[i].Instance.GetComponent<PlayerController>();
-                }
-                else
-                {
-                    var go = Instantiate(agentPrefab, spawnLocation, Quaternion.Euler(0, 180, 0));
-                    actors[i].SetInstance(go);
-                    //actors[i].instance = Instantiate(agentPrefab, spawnPoints[i].transform.position, Quaternion.Euler(0, 180, 0));
-                }
-
-                //  Disable controls.
-                actors[i].DisableControls();
-
-
-                if(parentObject != null){
-                    //  Parent the Actors.
-                    actors[i].Instance.transform.parent = parentObject.transform;
+                    if (players[i].teamId == 0)
+                        players[i].SetTeamColor(teamColor1);
+                    else
+                        players[i].SetTeamColor(teamColor2);
                 }
             }
-
-            //  Disable controls.
-            SetActorControls(false);
         }
-
-
-        private void SetupHUD(PlayerController p){
-            hud.InitializeHUD(p);
-        }
-
-
-        private void SetupCamera(Transform t){
-            cameraPrefab.SetTarget(t);
-        }
-
-
-        private void SetupActors(){
-            for (int i = 0; i < actors.Length; i++)
-            {
-                //  Initialize Actors:
-                actors[i].InitializeActor();
-            }
-        }
-
-
 
 
 
         private IEnumerator GameLoop()
         {
-            yield return StartCoroutine(RoundStarting());
+            if (debug.skipIntro == false){
+                yield return StartCoroutine(RoundStarting());
+            }
 
             yield return StartCoroutine(RoundPlaying());
-
             yield return StartCoroutine(RoundEnding());
-
 
             yield return null;
         }
@@ -194,52 +178,86 @@ namespace Bang
 
         private IEnumerator RoundStarting()
         {
-            yield return new WaitForSeconds(0.5f);
-            //Debug.Log(roundStartingText[0]);
-            hud.SetMessage(roundStartingText[0]);
-            yield return startWait;
-            //Debug.Log(roundStartingText[1]);
-            hud.SetMessage(roundStartingText[1]);
-            yield return startWait;
-            //Debug.Log(roundStartingText[2]);
-            hud.SetMessage(roundStartingText[2]);
-            yield return startWait;
+            int count = 0;
+            while (count < 3){
+                hud.SetMessage(roundStartingText[count]);
+                yield return startWait;
+                count++;
+            }
             //Debug.Log(roundStartingText[3]);
             hud.SetMessage(roundStartingText[3]);
             yield return startWait;
             hud.SetMessage("");
-
             yield return null;
+
         }
 
 
-
+        string winMessage;
         private IEnumerator RoundPlaying()
         {
-            UpdateSideMEssage();
-
             SetActorControls(true);
 
-            while(OnePlayerLeft() == false)
-            {
-                yield return null;
+            bool matchEnd = false;
+
+            if(teamGame){
+                while(matchEnd == false)
+                {
+                    //for (int i = 0; i < players.Length; i++){
+                    //    var player = players[i];
+                    //    if(player.IsDead){
+                    //        OnPlayerKilled(player, player.killedBy);
+                    //    }
+                    //}
+
+                    if (teamManager.teams[0].playerCount == 0){
+                        matchEnd = true;
+                        winMessage = "Team 2 WINS";
+                    }
+                    if (teamManager.teams[1].playerCount == 0){
+                        matchEnd = true;
+                        winMessage = "Team 1 WINS";
+                    }
+
+                    if (teamManager.teams[0].playerCount == 0 && teamManager.teams[1].playerCount == 0){
+                        matchEnd = true;
+                        winMessage = "Draw";
+                    }
+                    yield return null;
+                }
+
+
             }
+            else{
+                int numPlayersLeft = playerCount;
+                while (matchEnd == false)
+                {
+                    for (int i = 0; i < players.Length; i++){
+                        if (players[i].deaths > 0)
+                            numPlayersLeft--;
+                    }
+                    if(numPlayersLeft <= 1){
+                        matchEnd = true;
+                        winMessage = "DRAW";
+                    }
+                        
+                    yield return null;
+                }
+            }
+
         }
+
 
 
         private IEnumerator RoundEnding()
         {
-            Debug.Log("Round Ending");
-            UpdateSideMEssage();
-
-
             SetActorControls(false);
             yield return new WaitForSeconds(1);
 
             ActorManager roundWinner = null;
             roundWinner = GetRoundWinner();
 
-            string endMessage = roundWinner.Instance.name + " WINS!";
+            string endMessage = winMessage;
 
             hud.SetMessage(endMessage);
 
@@ -247,51 +265,38 @@ namespace Bang
         }
 
 
-        private string sideMessage = "";
-        private void UpdateSideMEssage()
-        {
-            sideMessage = "";
-            for (int i = 0; i < actors.Length; i++)
-            {
-                var actorHealth = actors[i].Instance.GetComponent<ActorHealth>();
-                sideMessage += string.Format("{0} | Is Dead:  {1}\n", actors[i].Instance.name, actorHealth.IsDead);
-            }
-            hud.UpdateSideMessage(sideMessage);
-        }
 
-
-        /// <summary>
-        /// Enables or disables actors controls.
-        /// </summary>
-        /// <param name="enable">If set to <c>true</c> enable.</param>
-        private void SetActorControls(bool enable)
+        public void OnPlayerKilled(ActorManager victim, ActorManager killer)
         {
-            for (int i = 0; i < actors.Length; i++){
-                if (enable){
-                    actors[i].EnableControls();}
-                else{
-                    actors[i].DisableControls();
+            if(killer != null){
+                if(killer.teamId != victim.teamId){
+                    killer.score++;
+                    teamManager.teams[killer.teamId].score++;
                 }
             }
         }
 
 
+        private void SetActorControls(bool enable){
+            for (int i = 0; i < players.Length; i++){
+                if (enable){
+                    players[i].EnableControls();}
+                else{
+                    players[i].DisableControls();
+                }
+            }
+        }
 
-        private bool OnePlayerLeft()
-        {
+
+        private bool OnePlayerLeft(){
             int numPlayersLeft = playerCount;
             // Go through all the players...
-            for (int i = 0; i < actors.Length; i++)
+            for (int i = 0; i < players.Length; i++)
             {
                 // ... and if they are active, increment the counter.
                 // if (players[i].playerInstance.activeSelf){
-                if (actors[i].Deaths > 0)
+                if (players[i].deaths > 0)
                     numPlayersLeft--;
-                
-                //if (actors[i].lives == 0)
-                //{
-                //    numPlayersLeft--;
-                //}
             }
             // If there are one or fewer players remaining return true, otherwise return false.
             return numPlayersLeft <= 1; ;
@@ -300,13 +305,19 @@ namespace Bang
 
         private ActorManager GetRoundWinner()
         {
-            for (int i = 0; i < actors.Length; i++)
+            for (int i = 0; i < players.Length; i++)
             {
-                if (actors[i].Deaths == 0)
-                    return actors[i];
+                if (players[i].deaths == 0)
+                    return players[i];
             }
             return null;
         }
+
+
+
+
+
+
 
 
 
@@ -320,8 +331,8 @@ namespace Bang
         [System.Serializable]
         public class PrimaryTeamColors
         {
-            public Color redTeam = Color.red;
-            public Color blueTeam = Color.blue;
+            public Color teamColor1 = new Color(1, 0, 0, 1);
+            public Color teamColor2 = new Color(0, 0, 1, 1);
         }
 
 
@@ -332,6 +343,31 @@ namespace Bang
             public bool doNotStartGameLoop;
         }
 
+
+
+
+        //  Killer, Killed, Color1, Colro2
+        static string[] KillMessages = new string[]
+        {
+        "<color={2}>{0}</color> killed <color={3}>{1}</color>",
+        "<color={2}>{0}</color> terminated <color={3}>{1}</color>",
+        "<color={2}>{0}</color> ended <color={3}>{1}</color>",
+        "<color={2}>{0}</color> owned <color={3}>{1}</color>",
+        };
+
+        static string[] SuicideMessages = new string[]
+        {
+        "<color={1}>{0}</color> rebooted",
+        "<color={1}>{0}</color> gave up",
+        "<color={1}>{0}</color> slipped and accidently killed himself",
+        "<color={1}>{0}</color> wanted to give the enemy team an edge",
+        };
+
+        static string[] TeamColors = new string[]
+        {
+        "#1EA00000", //"#FF19E3FF",
+        "#1EA00001", //"#00FFEAFF",
+        };
 	}
 
 }

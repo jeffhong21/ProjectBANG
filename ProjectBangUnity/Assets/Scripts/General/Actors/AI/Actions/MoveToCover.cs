@@ -60,43 +60,43 @@
 
 
 
-            Vector3 coverPosition = GetBest(c, c.CoverPositions);
+            //Vector3 coverPosition = GetBest(c, c.CoverPositions);
 
-            //  Move to the best position...
-            if (coverPosition.sqrMagnitude == 0f){
-                return;
-            }
-
-            c.coverPosition = coverPosition;
-
-            //float distance = Vector3.Distance(c.coverPosition, agent.position);
-            //if(distance <= 2)
-            //{
-            //    agent.EnterCover();
+            ////  Move to the best position...
+            //if (coverPosition.sqrMagnitude == 0f){
             //    return;
             //}
+
+            //c.coverPosition = coverPosition;
+
+            ////float distance = Vector3.Distance(c.coverPosition, agent.position);
+            ////if(distance <= 2)
+            ////{
+            ////    agent.EnterCover();
+            ////    return;
+            ////}
+            ////agent.MoveTo(coverPosition);
+
+
+
+            //if(c.coverTarget != null){
+            //    //  if agent is within range of a cover spot.
+            //    if(c.coverTarget.IsInRange(agent.transform)){
+            //        //  if agent cant take a spot.
+            //        if(c.coverTarget.TakeCoverSpot(agent.gameObject)){
+            //            agent.EnterCover(c.coverTarget);
+            //            return;
+            //        }
+            //    }
+            //    if(agent.States.InCover && c.coverTarget.IsInRange(agent.transform) == false){
+            //        c.coverTarget.LeaveCoverSpot(agent.gameObject);
+            //        agent.ExitCover();
+            //    }
+            //}
+
+
             //agent.MoveTo(coverPosition);
 
-
-
-            if(c.coverTarget != null){
-                //  if agent is within range of a cover spot.
-                if(c.coverTarget.IsInRange(agent.transform)){
-                    //  if agent cant take a spot.
-                    if(c.coverTarget.TakeCoverSpot(agent.gameObject)){
-                        agent.EnterCover(c.coverTarget);
-                        return;
-                    }
-                }
-                if(agent.States.InCover && c.coverTarget.IsInRange(agent.transform) == false){
-                    c.coverTarget.LeaveCoverSpot(agent.gameObject);
-                    agent.ExitCover();
-                }
-            }
-
-
-            agent.MoveTo(coverPosition);
-            //c.agent.GetComponent<PositionScoreVisualizer>().EntityUpdate(this, context);
         }
 
 

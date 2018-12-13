@@ -17,7 +17,7 @@
         {
             if(InputManager.ESC)
             {
-                _canvas.enabled = !_canvas.enabled;
+                //_canvas.enabled = !_canvas.enabled;
                 Pause();
             }
         }

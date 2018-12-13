@@ -22,6 +22,10 @@
         public string jsonData;  //  Serialization data.
 
 
+
+        //
+        // Fields
+        //
         [SerializeField, HideInInspector]
         private Guid _rootSelectorId;
 
@@ -51,8 +55,8 @@
 
         public Selector rootSelector
         {
-            get{ return _rootSelector;}
-            set{ _rootSelector = value;}
+            get { return _rootSelector; }
+            set { _rootSelector = value; }
         }
 
         public int selectorCount
@@ -85,25 +89,45 @@
             name = aiName;
         }
 
+
         public void AddSelector(Selector s)
         {
-            throw new NotImplementedException();
+            _selectors.Add(s);
         }
 
-        public Selector FindSelector(Selector s)
+
+        public Selector FindSelector(Guid id)
         {
-            throw new NotImplementedException();
+            for (int i = 0; i < _selectors.Count; i++){
+                if(_selectors[i].id == id){
+                    return _selectors[i];
+                }
+            }
+            return null;
         }
+
 
         public void RemoveSelector(Selector s)
         {
-            throw new NotImplementedException();
+            for (int index = 0; index < _selectors.Count; index++){
+                //  If selector id matches given selector id, remove the selector.
+                if (_selectors[index].id == s.id){
+                    //  If the root selector is to be removed, replace the rootSelector field with the next selector.
+                    if (index == 0){
+                        rootSelector = _selectors[1];
+                    }
+                    _selectors.RemoveAt(index);
+                    return;
+                }
+            }
         }
+
 
         public bool ReplaceSelector(Selector current, Selector replacement)
         {
             throw new NotImplementedException();
         }
+
 
         public void RegenerateIds()
         {
@@ -125,12 +149,7 @@
         /// <param name="context">Context.</param>
         public IAction Select(IAIContext context)
         {
-            
-            IList<IQualifier> qualifiers = rootSelector.qualifiers;
-            IDefaultQualifier defaultQualifier = rootSelector.defaultQualifier;
-            IQualifier winner = rootSelector.Select(context, qualifiers, defaultQualifier);
-            IAction action = winner.action;
-
+            IAction action = rootSelector.Select(context);
 
             //if (debug)
             //{
@@ -152,11 +171,11 @@
 
 
 
-        //
-        // Serialization
-        //
-        int count = 0;
 
+
+        #region Serialization
+
+        int count = 0;
 
         public void PrepareForSerialization()
         {
@@ -209,15 +228,13 @@
         }
 
 
+        #endregion
 
 
 
 
 
-
-
-
-        #region Serialization
+        #region Old Serialization
 
         //public byte[] PrepareForSerialize()
         //{

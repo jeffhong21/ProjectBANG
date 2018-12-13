@@ -20,7 +20,7 @@ namespace Bang
 
 		private void Awake()
 		{
-            this.gameObject.tag = "RespawnPoint";
+            gameObject.tag = "RespawnPoint";
 		}
 
 

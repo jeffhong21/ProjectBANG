@@ -1,12 +1,9 @@
 ﻿namespace AtlasAI
 {
-    using UnityEngine;
     using System;
     using System.Collections.Generic;
     using System.IO;
-
-    using System.Linq;
-
+    using UnityEngine;
 
     /// <summary>
     /// Given a Guid, AIManager can look up AIData or a List of IUtilityAIClient.
@@ -16,14 +13,29 @@
         public delegate IUtilityAIClient AIClientResolver(GameObject host, Guid aiId);
 
 
+        //
+        // Static Fields
+        //
         public static string StorageFolder = Path.GetDirectoryName("Assets/Scripts/AtlasAI/Resources/AIStorage/");
 
+        /// <summary>
+        /// Lookup for each UtilityAI and which StoredData to use.  Uses the Guid of the UtilityAI.
+        /// </summary>
         private static Dictionary<Guid, AIData> _aiLookup;
-        //  UtilityAIComponent and its list of UtilityAIClients
+
+        /// <summary>
+        /// Lookup for each gameobject that contains a list of UtilityAIClients.
+        /// </summary>
         private static Dictionary<Guid, List<IUtilityAIClient>> _aiClients;
 
 
-        public static AIClientResolver GetAIClient;
+        public static AIClientResolver GetAIClient = 
+            (GameObject host, Guid aiId) => {
+            if(host.GetComponent<UtilityAIComponent>())
+                    return host.GetComponent<UtilityAIComponent>().GetClient(aiId);
+            else
+                return null;
+            };
 
 
 
@@ -33,24 +45,24 @@
         public static IEnumerable<IUtilityAIClient> allClients
         {
             get{
-                if (_aiClients != null)
-                {
-                    List<IUtilityAIClient> clients = new List<IUtilityAIClient>();
-                    foreach (KeyValuePair<Guid, List<IUtilityAIClient>> client in _aiClients)
-                    {
-                        clients.Concat(client.Value);
-                    }
-                    return clients.ToArray();
+                var allComponents = Utilities.ComponentHelper.FindAllComponentsInScene<UtilityAIComponent>();
+                foreach (var utilityAIComponent in allComponents){
+                    for (int i = 0; i < utilityAIComponent.clients.Length; i++)
+                        yield return utilityAIComponent.clients[i];
                 }
-                else 
-                { 
-                    return null; 
-                }
-
-
             }
         }
 
+
+
+        /// <summary>
+        /// Loads and initializes all AIs. This means that calling <see cref="M:Apex.AI.AIManager.GetAI(System.Guid)"/> 
+        /// will never load AIs on demand and thus won't allocate memory.
+        /// </summary>
+        public static void EagerLoadAll()
+        {
+            
+        }
 
 
         //<summary>
@@ -71,35 +83,41 @@
         }
 
 
-
-        /// <summary>
-        /// Gets the list of clients for a given AI through the AIStorage aiId.
-        /// </summary>
-        /// <param name="aiId">Ai identifier.</param>
-        ///<returns> The list of clients for the specified AI. </returns>
-        public static List<IUtilityAIClient> GetAllClients(Guid aiId)
-        {
-            if (_aiClients.ContainsKey(aiId))
-            {
-                return _aiClients[aiId];
-            }
-            else
-            {
-                return null;
-            }
-
-        }
-
         ///<summary>
-        ///Gets a AtlasAI
+        ///  Gets a UtilityAI via its id
         ///</summary>
         ///<param name = "id" > The ID.</param>
         ///<returns> The AI with the specified ID, or null if no match is found.</returns>
         public static IUtilityAI GetAI(Guid id)
         {
-            if(_aiLookup.ContainsKey(id))
-            {
+            if (_aiLookup == null){
+                _aiLookup = new Dictionary<Guid, AIData>();
+                return null;
+            }
+
+            if(_aiLookup.ContainsKey(id)){
                 return _aiLookup[id].ai;
+            }
+            else{
+                return null;
+            }
+        }
+
+
+        /// <summary>
+        /// Gets the list of clients for a given AI. Please note that this is a live list that should not be modified directly.
+        /// </summary>
+        /// <param name="aiId">Ai identifier.</param>
+        ///<returns> The list of clients for the specified AI. </returns>
+        public static IList<IUtilityAIClient> GetAllClients(Guid aiId)
+        {
+            if (_aiClients == null){
+                _aiClients = new Dictionary<Guid, List<IUtilityAIClient>>();
+                return null;
+            }
+
+            if (_aiClients.ContainsKey(aiId)){
+                return _aiClients[aiId];
             }
             else{
                 return null;
@@ -110,15 +128,14 @@
         public static void Register(IUtilityAIClient client)
         {
             if(_aiLookup == null) _aiLookup = new Dictionary<Guid, AIData>();
-            if (_aiClients == null) _aiClients = new Dictionary<Guid, List<IUtilityAIClient>>();
 
-
+            //  If aiLookup does not have a client registered.
             if(_aiLookup.ContainsKey(client.ai.id) == false) // || _aiLookup[client.ai.id] == null)
             {
-                AIData aiData = new AIData()
-                {
-                    ai = client.ai
-                };
+                AIData aiData = new AIData();
+                aiData.ai = client.ai;
+                aiData.storedData = null;
+                //  Add AIData to aiLookup.
                 _aiLookup.Add(aiData.ai.id, aiData);
             }
 
@@ -127,15 +144,9 @@
 
         public static void UnRegister(IUtilityAIClient client)
         {
-            if (_aiLookup == null)
-            {
-                return;
-            }
-
-            if (_aiLookup.ContainsKey(client.ai.id) == true) // || _aiLookup[client.ai.id] != null)
-            {
+            //  If aiLookup has a client registered.
+            if (_aiLookup.ContainsKey(client.ai.id)){
                 _aiLookup.Remove(client.ai.id);
-
             }
         }
 
@@ -149,9 +160,9 @@
 
             public AIData()
             {
-                
+                ai = null;
+                storedData = null;
             }
-
         }
 
 

@@ -10,6 +10,7 @@
         
         public float moveSpeed = 9;
 
+        public float turnSpeed = 8;
 
         public float distanceFromTarget = -16;
 

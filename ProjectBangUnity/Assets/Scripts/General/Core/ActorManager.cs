@@ -10,15 +10,17 @@
         //
         //  Fields
         //
+        public int playerId;
         public string playerName;
+        public int teamId;
 
-        public int teamID;
+        public int score;
+        public int deaths;
+
+        public GameObject killedBy;
 
         private GameObject instance;
-
         private ActorController controller;
-        [SerializeField]
-        private int deaths;
 
 
 
@@ -29,10 +31,10 @@
             get { return instance; }
         }
 
-        public int Deaths{
-            get { return deaths; }
+        public bool IsDead{
+            get;
+            private set;
         }
-
 
         //
         //  Methods
@@ -52,6 +54,17 @@
         }
 
 
+        public void SetTeamColor(Color teamColor)
+        {
+            var charHealthUI = instance.GetComponentInChildren<CharacterHealthUI>();
+            if(charHealthUI != null){
+                charHealthUI.useTeamColor = true;
+                charHealthUI.teamColor = teamColor;
+            }
+
+        }
+
+
         public void RegisterEvents(){
             controller.OnDeathEvent += OnDeath;
         }
@@ -68,25 +81,36 @@
         }
 
 
-        private void OnRespawn(Vector3 position){
+        private void OnRespawn(Vector3 position)
+        {
+            killedBy = null;
+            IsDead = false;
+
             RegisterEvents();
         }
 
 
         private void OnDeath(GameObject attacker)
         {
-            //Debug.LogFormat("{0} was killed by {1}", instance.name, attacker.name);
+            Debug.LogFormat("<color=#008000ff>{0}</color> was killed by <color=#008000ff>{1}</color>", instance.name, attacker.name);
             deaths++;
+            IsDead = true;
+            killedBy = attacker;
 
+            DeathmatchManager.instance.hud.UpdateGameScore(this);
+            DeathmatchManager.instance.teamManager.teams[teamId].playerCount--;
             UnregisterEvents();
         }
+
+
+
+
 
 
         public void EnableControls()
         {
             instance.GetComponent<IActorController>().EnableControls();
         }
-
 
         public void DisableControls()
         {

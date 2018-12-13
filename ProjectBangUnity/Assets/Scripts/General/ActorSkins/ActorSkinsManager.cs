@@ -9,7 +9,7 @@ namespace ActorSkins
     [CreateAssetMenu(fileName = "ActorSkinManager", menuName = "ActorSkins/Manager")]
     public class ActorSkinsManager : ScriptableObject
     {
-        public static string path = Path.GetDirectoryName("Assets/Prefabs/Characters/Skins");
+        public static string path = Path.GetDirectoryName("Assets/ScriptableObjects/Skins/");
 
         public SkinMesh[] skins;
 

@@ -11,12 +11,14 @@ namespace Bang
         public LayerMask coverLayer;
         public LayerMask hitableObjectsLayer;
         public LayerMask entitiesLayer;
+        public LayerMask groundLayer;
 
         private void Awake()
         {
             Layers.cover = coverLayer;
             Layers.hitableObjects = hitableObjectsLayer;
             Layers.entites = entitiesLayer;
+            Layers.ground = groundLayer;
         }
     }
 
@@ -27,6 +29,7 @@ namespace Bang
         public static LayerMask cover;
         public static LayerMask hitableObjects;   //  Used for projectiles
         public static LayerMask entites;
+        public static LayerMask ground;
     }
 
 

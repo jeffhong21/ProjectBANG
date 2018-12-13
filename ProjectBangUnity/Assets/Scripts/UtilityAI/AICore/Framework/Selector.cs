@@ -84,6 +84,7 @@
         /// <param name="context">Context.</param>
         public virtual IAction Select(IAIContext context)
         {
+            //  Return the action of the selected IQualifier.
             return Select(context, qualifiers, defaultQualifier).action;
         }
 

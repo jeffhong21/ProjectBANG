@@ -44,7 +44,7 @@
                 }
 
 
-                if (hit.CompareTag(Tags.Actor))
+                if (hit.GetComponent<ActorController>().teamId != agent.teamId)
                 {
                     bool canSeeTarget = agent.CanSeeTarget(agent.lookTransform.position, hit.transform.position, true);
 

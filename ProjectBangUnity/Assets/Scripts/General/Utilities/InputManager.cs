@@ -50,7 +50,30 @@ namespace Bang
             get { return Input.GetKeyDown(KeyCode.F); }
         }
 
+        public static bool Alpha1
+        {
+            get { return Input.GetKeyDown(KeyCode.Alpha1); }
+        }
 
+        public static bool Alpha2
+        {
+            get { return Input.GetKeyDown(KeyCode.Alpha2); }
+        }
+
+        public static bool Alpha3
+        {
+            get { return Input.GetKeyDown(KeyCode.Alpha3); }
+        }
+
+        public static bool Alpha4
+        {
+            get { return Input.GetKeyDown(KeyCode.Alpha4); }
+        }
+
+        public static bool Alpha5
+        {
+            get { return Input.GetKeyDown(KeyCode.Alpha5); }
+        }
 
         public static bool ESC
         {

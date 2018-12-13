@@ -4,36 +4,44 @@
     using UnityEngine;
 
 
-    public class Revolver : Gun
+    public class Revolver : ShootableWeapon
     {
 
+		//public override void Shoot()
+		//{
+		//	base.Shoot();
 
-        protected override IEnumerator ReloadAnim(float time)
+		//}
+
+
+
+		protected override IEnumerator PlayReloadAnim(float time)
         {
-            Material material = GetComponentInChildren<MeshRenderer>().material;
-            Color originalColor = material.color;
-            Color tempColor = Color.red;
-            material.color = tempColor;
+            //Material material = GetComponentInChildren<MeshRenderer>().material;
+            //Color originalColor = material.color;
+            //Color tempColor = Color.red;
+            //material.color = tempColor;
 
-            float remainingTime = time;
+            //float remainingTime = time;
 
-            while(remainingTime > 0)
-            {
-                //Debug.Log(remainingTime + " before done rreloading");
-                material.color = Color.Lerp(tempColor, originalColor, Time.deltaTime);
-                remainingTime -= Time.deltaTime;
-                yield return null;
-            }
+            //while(remainingTime > 0)
+            //{
+            //    //Debug.Log(remainingTime + " before done rreloading");
+            //    material.color = Color.Lerp(tempColor, originalColor, Time.deltaTime);
+            //    remainingTime -= Time.deltaTime;
+            //    yield return null;
+            //}
 
-            material.color = originalColor;
+            //material.color = originalColor;
 
-            yield return null;
+
+            yield return new WaitForSeconds(time);
         }
 
 
 
 
-        protected override IEnumerator Shoot(float time)
+        protected override IEnumerator PlayShootAnim(float time)
         {
             throw new System.NotImplementedException();
         }

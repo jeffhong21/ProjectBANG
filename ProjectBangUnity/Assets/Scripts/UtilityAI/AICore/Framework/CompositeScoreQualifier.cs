@@ -28,12 +28,9 @@
             
             //Debug.Log(this.GetType().ToString() + " is scoring");
 
-            foreach (IContextualScorer scorer in scorers)
-            {
+            foreach (IContextualScorer scorer in scorers){
                 score += scorer.Score(context);
             }
-            _score = score;  //  For CompareTo()
-
 
             return score;
         }

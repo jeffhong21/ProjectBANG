@@ -5,16 +5,11 @@
 
     public class AgentController : ActorController
     {
-        protected readonly static float minimumAttackSpeed = 0.25f;
         protected readonly static Collider[] colliders = new Collider[50];
 
         private AgentContext context;
         private NavMeshAgentBridge navMeshAgent;
 
-
-        public LayerMask targetLayerMask;               //  Specifies the layers that the targets are in
-        public LayerMask ignoreLayerMask;               //  Specifies any layers that the sight check should ignore
-        public Transform lookTransform;                 //  Optionally specify a transform to determine where to check the line of sight from
         public AgentStats stats;
 
 
@@ -27,7 +22,7 @@
         private float damageTakenCooldown;
 
         private float checkRateTimer;           //  Timer for when to check scanning.
-        private int missCount;                  //  Cache how many shots agent has missed.
+
 
 
         [Header("Agent States")]
@@ -77,6 +72,10 @@
                 checkRateTimer = 0;
                 //  Handle scanning or perception stuff.
             }
+
+            weapon.transform.LookAt(AimPosition);
+
+
             //  Set damage taken cooldown timer.
             HandleDamageTaken(deltaTime);
 
@@ -113,24 +112,15 @@
         }
 
 
-		private void OnTargetMiss()
-        {
-            missCount++;
-            if(missCount > Random.Range(1, 5)){
-                missCount = 0;
-                //  Handle something.  Set a bool ito be true.
-            }
-        }
 
 
-        protected override void OnEquipWeapon(Gun weapon)
+        protected override void OnEquipWeapon(ShootableWeapon weapon)
         {
 
         }
 
         protected override void OnShootWeapon()
         {
-            weapon.Shoot();
             lastShotFired = Time.timeSinceLevelLoad;
         }
 
@@ -140,13 +130,13 @@
 
         }
 
+
         protected override void OnTakeDamage(Vector3 hitDirection)
         {
             lastDamageTaken = Time.timeSinceLevelLoad;
             //damageTakenCooldown += cooldownTime;
             isUnderFire = true;
 
-            AnimHandler.PlayTakeDamage(hitDirection);
         }
 
 
@@ -155,10 +145,6 @@
             context.destination = destination;
             navMeshAgent.SetDestination(destination);
 
-
-            if(States.InCover){
-                ExitCover();
-            }
 
             AnimHandler.WalkingState(true);
         }
@@ -224,7 +210,6 @@
 
         protected override void OnDeath()
         {
-            AnimHandler.Death();
             navMeshAgent.enabled = false;
             GetComponent<AtlasAI.UtilityAIComponent>().enabled = false;
         }
