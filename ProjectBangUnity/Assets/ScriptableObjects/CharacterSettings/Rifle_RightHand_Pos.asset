@@ -1,0 +1,15 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 420c83f1dcaa64e9fbb25a73d2cebbd3, type: 3}
+  m_Name: Rifle_RightHand_Pos
+  m_EditorClassIdentifier: 
+  position: {x: 0.027, y: 0.031, z: -0.052}
+  rotation: {x: -3.63, y: 67.72, z: -90}

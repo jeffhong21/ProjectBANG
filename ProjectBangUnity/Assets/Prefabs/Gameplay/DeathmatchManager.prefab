@@ -1,0 +1,88 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 1519867001414480}
+  m_IsPrefabAsset: 1
+--- !u!1 &1519867001414480
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4157401319108264}
+  - component: {fileID: 114187247001489940}
+  - component: {fileID: 114818642925961604}
+  m_Layer: 0
+  m_Name: DeathmatchManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4157401319108264
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1519867001414480}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114187247001489940
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1519867001414480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5502bd3a1b214437ebcc77bfed1fb3a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerCount: 6
+  playersPerTeam: 1
+  teamCount: 2
+  teamGame: 1
+  playerPrefab: {fileID: 1141768220188808, guid: 48d5d63a725454afdb444de203f800d6,
+    type: 2}
+  cameraPrefab: {fileID: 114463585125693472, guid: deeba395645a049aca07e0b186f8406a,
+    type: 2}
+  agentPrefab: {fileID: 1141768220188808, guid: 524b3f62425274c108406e9734681a99,
+    type: 2}
+  hud: {fileID: 114051188668219278, guid: bd45d85d145c24e88828a9f28f5984b9, type: 2}
+  parentName: 
+  primaryColorSettings:
+    teamColor1: {r: 1, g: 0.43159482, b: 0.023584902, a: 1}
+    teamColor2: {r: 0.18396229, g: 0.80440366, b: 1, a: 1}
+  debug:
+    skipIntro: 1
+    doNotStartGameLoop: 0
+  players: []
+  teamManager: {fileID: 0}
+--- !u!114 &114818642925961604
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1519867001414480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c82da1e973a54498c9abf27b7248a5d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  teams: []
+  teamName0: 
+  teamName1: 
