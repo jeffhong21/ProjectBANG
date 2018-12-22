@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 
+
 namespace AtlasAI.DataStructures
 {
     public class BinaryHeap<T>
@@ -102,20 +103,46 @@ namespace AtlasAI.DataStructures
         public T Remove()
         {
             if (count == 0) throw new Exception();
-            T heap = _heap[0];
+            T temp = _heap[0];
             //  Take last element of array and move it to the first element.
             _heap[0] = _heap[count - 1];
             //  Shrink the size of the array.
             _count--;
 
             HeapifyDown();
-            return heap;
+            return temp;
         }
 
 
         public T Remove(T item)
         {
-            throw new NotImplementedException();
+            int index = Array.IndexOf(heap, item);
+
+            T temp = _heap[index];
+
+            //UnityEngine.Debug.LogFormat("Index {0} | {1}", index, temp);
+            //UnityEngine.Debug.Break();
+
+            //  If item was the last one.
+            if(index == count - 1){
+                _heap[count] = default(T);
+                _count--;
+                return temp;
+            }
+
+
+            Swap(index, count-1);
+            _heap[count-1] = default(T);
+            _count--;
+            int parent = index >> 1;
+
+            if (parent > 0 && _comparer.Compare(_heap[index], _heap[parent]) < 0)
+                HeapifyUp();
+            else
+                HeapifyDown();
+
+            return temp;
+            //throw new NotImplementedException();
         }
 
 
@@ -150,6 +177,9 @@ namespace AtlasAI.DataStructures
         }
 
 
+
+
+
         private void HeapifyUp()
         {
             //  Start with the last element.
@@ -164,6 +194,9 @@ namespace AtlasAI.DataStructures
                 index = GetParentIndex(index);
             }
         }
+
+
+
 
 
         private void Swap(int indexOne, int indexTwo)
@@ -181,9 +214,56 @@ namespace AtlasAI.DataStructures
                 Array.Resize(ref newArray, _heap.Length + 1);
                 _heap = newArray;
             }
-
         }
 
+
+
+        //private void HeapifyDown(int i)
+        //{
+        //    while (true)
+        //    {
+        //        int smallest = i;
+        //        int left = i << 1;
+        //        int right = (i << 1) | 1;
+        //
+        //        if (left <= _count)
+        //        {
+        //            var cmp = _comparer.Compare(_heap[left], _heap[i]);
+        //            if (cmp < 0 || cmp == 0 && _heap[left].Handle.Order < _heap[i].Handle.Order)
+        //                smallest = left;
+        //        }
+        //
+        //        if (right <= _count)
+        //        {
+        //            var cmp = _comparer.Compare(_heap[right], _heap[smallest]);
+        //            if (cmp < 0 || cmp == 0 && _heap[right].Handle.Order < _heap[smallest].Handle.Order)
+        //                smallest = right;
+        //        }
+        //
+        //        if (smallest == i)
+        //            return;
+        //
+        //        Swap(i, smallest);
+        //        i = smallest;
+        //    }
+        //}
+        //
+        //private void HeapifyUp(int i)
+        //{
+        //    if (i < 1)
+        //        return;
+        //
+        //    int parent = i >> 1;
+        //    while (parent > 0)
+        //        if (_comparer.Compare(_heap[i], _heap[parent]) < 0)
+        //        {
+        //            Swap(parent, i);
+        //            i = parent;
+        //            parent = parent >> 1;
+        //        }
+        //        else
+        //            break;
+        //}
     }
 }
 

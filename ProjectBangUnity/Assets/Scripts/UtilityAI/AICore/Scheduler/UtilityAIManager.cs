@@ -4,7 +4,6 @@
     using UnityEngine;
 
 
-
     public class UtilityAIManager : SingleInstanceComponent<UtilityAIManager>
     {
         //
@@ -27,6 +26,9 @@
             get { return _scheduler; }
         }
 
+        [Header("Misc Info")]
+        public string timeSinceLevelLoaded;
+        public SchedulerQueue.SchedulerItem[] heap;
 
         //
         // Methods
@@ -35,14 +37,20 @@
         {
             base.OnAwake();
 
+            //  Load all AIs
+            AIManager.EagerLoadAll();
+
+
             _configurations = new SchedulerConfig();
-            _scheduler = new SchedulerQueue(128, 
+            _scheduler = new SchedulerQueue(16, 
                                             configurations.updateInterval, 
                                             configurations.maxUpdatesPerFrame, 
                                             configurations.maxUpdateTimeInMillisecondsPerUpdate);
             
             //  Set the configurations scheduler.
             configurations.ApplyTo(scheduler);
+
+            heap = _scheduler._queue.heap;
 		}
 
 
@@ -50,6 +58,8 @@
 		{
             scheduledItemCount = scheduler.itemCount;
             scheduler.Update(Time.timeSinceLevelLoad);
+
+            timeSinceLevelLoaded = Time.timeSinceLevelLoad.ToString();
 		}
 
 

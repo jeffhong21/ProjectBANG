@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 
+using AtlasAI.Utilities;
+
+
 namespace AtlasAI.Visualization
 {
     public class UtilityAIVisualizer : IUtilityAI, ISelect
@@ -9,9 +12,7 @@ namespace AtlasAI.Visualization
         // Fields
         //
         private IUtilityAI _ai;
-
         private List<Action> _postExecute;
-
         private SelectorVisualizer _visualizerRootSelector;
 
         private List<SelectorVisualizer> _selectorVisualizers;
@@ -22,19 +23,22 @@ namespace AtlasAI.Visualization
         //
         // Properties
         //
+        public IUtilityAI ai{
+            get { return _ai; }
+        }
+
         public Guid id{
-            get;
-            private set;
+            get { return _ai.id; }
         }
 
         public string name{
-            get;
-            set;
+            get { return _ai.name; }
+            set { _ai.name = value; }
         }
 
         public Selector rootSelector{
-            get;
-            set;
+            get { return _ai.rootSelector; }
+            set { _ai.rootSelector = value; }
         }
 
         public int selectorCount{
@@ -55,15 +59,12 @@ namespace AtlasAI.Visualization
         //
         public UtilityAIVisualizer(IUtilityAI ai)
         {
-            id = ai.id;
+            _ai = ai;
+            _visualizerRootSelector = new SelectorVisualizer(ai.rootSelector, this);
             name = ai.name;
             rootSelector = ai.rootSelector;
 
-            _ai = ai;
-            _visualizerRootSelector = new SelectorVisualizer(ai.rootSelector, this);
-
-
-            UnityEngine.Debug.LogFormat("Initializing UtilityAI Visualizer.");
+            DebugLogger.LogFormat("Initializing UtilityAI Visualizer.");
         }
 
 
@@ -80,11 +81,13 @@ namespace AtlasAI.Visualization
         //
         // Methods
         //
-        void IUtilityAI.AddSelector(Selector s)
+        public IAction Select(IAIContext context)
         {
-            _selectorVisualizers.Add(new SelectorVisualizer(s, this));
-        }
+            //  Get action to perform.
+            IAction action = ai.Select(context);
 
+            return action;
+        }
 
         public ActionVisualizer FindActionVisualizer(IAction target)
         {
@@ -95,17 +98,6 @@ namespace AtlasAI.Visualization
         public IQualifierVisualizer FindQualifierVisualizer(IQualifier target)
         {
             throw new NotImplementedException();
-        }
-
-
-        public Selector FindSelector(Guid id)
-        {
-            for (int i = 0; i < _selectorVisualizers.Count; i++){
-                if (_selectorVisualizers[i].selector.id == id){
-                    return _selectorVisualizers[i].selector;
-                }
-            }
-            return null;
         }
 
 
@@ -120,10 +112,34 @@ namespace AtlasAI.Visualization
             throw new NotImplementedException();
         }
 
+        public void Reset()
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public void Unhook(Action postExecute)
+        {
+            throw new NotImplementedException();
+        }
+
+
+
+
+        public Selector FindSelector(Guid id)
+        {
+            return ai.FindSelector(id);
+        }
+
+        void IUtilityAI.AddSelector(Selector s)
+        {
+            _selectorVisualizers.Add(new SelectorVisualizer(s, this));
+            ai.AddSelector(s);
+        }
 
         void IUtilityAI.RegenerateIds()
         {
-            throw new NotImplementedException();
+            ai.RegenerateIds();
         }
 
 
@@ -140,31 +156,17 @@ namespace AtlasAI.Visualization
                     return;
                 }
             }
+            ai.RemoveSelector(s);
         }
 
 
         bool IUtilityAI.ReplaceSelector(Selector current, Selector replacement)
         {
-            throw new NotImplementedException();
+            return ai.ReplaceSelector(current, replacement);
         }
 
 
-        public void Reset()
-        {
-            throw new NotImplementedException();
-        }
 
-
-        public IAction Select(IAIContext context)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        public void Unhook(Action postExecute)
-        {
-            throw new NotImplementedException();
-        }
 
 
     }

@@ -11,7 +11,7 @@ namespace AtlasAI.Scheduler
         //
         // Fields
         //
-        private BinaryHeap<SchedulerItem> _queue;
+        public BinaryHeap<SchedulerItem> _queue;
         private Stopwatch _watch;
 
 
@@ -89,6 +89,13 @@ namespace AtlasAI.Scheduler
         //
         // Methods
         //
+
+        /// <summary>
+        /// Create a new SchedulerItem and add the Client to it.
+        /// </summary>
+        /// <returns>The add.</returns>
+        /// <param name="item">Item.</param>
+        /// <param name="interval">Interval.</param>
         public ISchedulerHandle Add(IClientScheduler item, float interval)
         {
             //  Initialize a SchedulerItem.
@@ -208,13 +215,8 @@ namespace AtlasAI.Scheduler
         {
             public static readonly IComparer<SchedulerItem> instance;
 
-            public int Compare(SchedulerItem x, SchedulerItem y)
-            {
-                //return x.nextUpdate.CompareTo(y.nextUpdate);
-                if (x.nextUpdate > y.nextUpdate)return 1;
-                if (x.nextUpdate == y.nextUpdate) return 0;
-                if (x.nextUpdate < y.nextUpdate) return -1;
-                return 0;
+            public int Compare(SchedulerItem x, SchedulerItem y){
+                return x.nextUpdate.CompareTo(y.nextUpdate);
             }
 
             public SchedulerComparer(){
@@ -222,8 +224,8 @@ namespace AtlasAI.Scheduler
             }
         }
 
-
-        private class SchedulerItem : ISchedulerHandle
+        [Serializable]
+        public class SchedulerItem : ISchedulerHandle
         {
             public SchedulerQueue parent;
             //  When the next update will occur.
@@ -242,7 +244,7 @@ namespace AtlasAI.Scheduler
 
 
             public void Stop(){
-                
+                parent._queue.Remove(this);
             }
 
             public void Pause()
@@ -252,7 +254,7 @@ namespace AtlasAI.Scheduler
 
                 lastUpdate = nextUpdate - time;
                 nextUpdate = float.PositiveInfinity;
-                parent.Remove(this);
+                //parent.Remove(this);
             }
 
             public void Resume()
@@ -262,7 +264,7 @@ namespace AtlasAI.Scheduler
 
                 lastUpdate = time;
                 nextUpdate = time + interval;
-                parent.Add(item, interval);
+                //parent.Add(item, interval);
             }
 
             public SchedulerItem(){

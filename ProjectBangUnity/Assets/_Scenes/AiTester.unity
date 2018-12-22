@@ -114,6 +114,63 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 23800000, guid: 26f4208ee583a454b9c7917e40fdea2b, type: 2}
+--- !u!1001 &16628855
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 224617615703274352, guid: 524b3f62425274c108406e9734681a99,
+        type: 2}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224617615703274352, guid: 524b3f62425274c108406e9734681a99,
+        type: 2}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4800368842353962, guid: 524b3f62425274c108406e9734681a99, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4800368842353962, guid: 524b3f62425274c108406e9734681a99, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4800368842353962, guid: 524b3f62425274c108406e9734681a99, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4800368842353962, guid: 524b3f62425274c108406e9734681a99, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4800368842353962, guid: 524b3f62425274c108406e9734681a99, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4800368842353962, guid: 524b3f62425274c108406e9734681a99, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4800368842353962, guid: 524b3f62425274c108406e9734681a99, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4800368842353962, guid: 524b3f62425274c108406e9734681a99, type: 2}
+      propertyPath: m_RootOrder
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 137273167682607102, guid: 524b3f62425274c108406e9734681a99,
+        type: 2}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 4300006, guid: ad9b136e9ac104c66b5fb99ea52cfb13, type: 3}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 524b3f62425274c108406e9734681a99, type: 2}
+  m_IsPrefabAsset: 0
 --- !u!1 &26116554
 GameObject:
   m_ObjectHideFlags: 0
@@ -332,7 +389,7 @@ Prefab:
     - target: {fileID: 114187247001489940, guid: 4b3d35125cdfd468289a3e6f86ac0c10,
         type: 2}
       propertyPath: playerCount
-      value: 2
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 114187247001489940, guid: 4b3d35125cdfd468289a3e6f86ac0c10,
         type: 2}
@@ -1230,6 +1287,8 @@ MonoBehaviour:
     maxUpdateTimeInMillisecondsPerUpdate: 4
     targetScheduler: default scheduler
   scheduledItemCount: 0
+  timeSinceLevelLoaded: 
+  heap: []
 --- !u!4 &427366205
 Transform:
   m_ObjectHideFlags: 0
@@ -1332,7 +1391,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &444805262
 Transform:
   m_ObjectHideFlags: 0
@@ -4486,7 +4545,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1570678997}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ecfcf8be752b8446e8a91a3d07241665, type: 3}
   m_Name: 
@@ -4939,7 +4998,7 @@ Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: pb_Mesh-1148
+  m_Name: pb_Mesh-1178
   serializedVersion: 9
   m_SubMeshes:
   - serializedVersion: 2
@@ -5235,7 +5294,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1805013165
 Transform:
   m_ObjectHideFlags: 0
@@ -6067,7 +6126,7 @@ Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: pb_Mesh-1150
+  m_Name: pb_Mesh-1180
   serializedVersion: 9
   m_SubMeshes:
   - serializedVersion: 2

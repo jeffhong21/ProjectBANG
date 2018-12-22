@@ -11,8 +11,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af1fc1e6d897f4da89612470171cd033, type: 3}
   m_Name: AgentActionAI
   m_EditorClassIdentifier: 
-  description: 
-  version: 1
+  description: Action AI
+  version: 
   aiId: AgentActionAI
-  configuration: ','
-  editorConfiguration: 

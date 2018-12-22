@@ -1,12 +1,127 @@
-namespace AtlasAI
+namespace AtlasAI.AIEditor
 {
     using UnityEngine;
     using UnityEditor;
 
 
 
-    public class EditorStyling
+    public static class EditorStyling
     {
+        private const int defaultFontSize = 11;
+        private static readonly Color defaultTextColor = Color.black;
+        private static readonly GUIStyle smallButtonBase = new GUIStyle()
+        {
+
+        };
+
+
+        public static class Canvas
+        {
+            public static GUIStyle normalHeader
+            {
+                get;
+                private set;
+            }
+
+            public static GUIStyle defaultNode
+            {
+                get;
+                private set;
+            }
+
+            public static GUIStyle activeNode
+            {
+                get;
+                private set;
+            }
+
+
+
+            public static void Init()
+            {
+                normalHeader = new GUIStyle()
+                {
+                    fontStyle = FontStyle.Bold,
+                    alignment = TextAnchor.MiddleLeft,
+                };
+                defaultNode = new GUIStyle(GUI.skin.box)
+                {
+                    border = new RectOffset(12, 12, 12, 12),
+                    normal = new GUIStyleState(){
+                        background = EditorGUIUtility.Load("Textures/NE_Box.png") as Texture2D
+                    }
+                };
+                activeNode = new GUIStyle("TL SelectionButton PreDropGlow")
+                {
+                    border = new RectOffset(12, 12, 12, 12),
+                    normal = new GUIStyleState(){
+                        background = EditorGUIUtility.Load("Textures/NE_Box.png") as Texture2D
+                    }
+                };
+            }
+
+            public static void SetTextures()
+            {
+                //defaultNode.normal.background = 
+            }
+        }
+
+
+        public static class Skinned
+        {
+            public static GUIStyle AddButtonSmall
+            {
+                get;
+                private set;
+            }
+
+            public static GUIStyle DeleteButtonSmall
+            {
+                get;
+                private set;
+            }
+
+            public static GUIStyle ChangeButtonSmall
+            {
+                get;
+                private set;
+            }
+
+
+            public static void Init()
+            {
+                AddButtonSmall = new GUIStyle(smallButtonBase)
+                {
+                    normal = new GUIStyleState(){
+                        background = EditorGUIUtility.IconContent("Toolbar Plus").image as Texture2D
+                    }
+                };
+
+                DeleteButtonSmall = new GUIStyle(smallButtonBase)
+                {
+                    normal = new GUIStyleState()
+                    {
+                        background = EditorGUIUtility.IconContent("Toolbar Minus").image as Texture2D
+                    }
+                };
+
+                ChangeButtonSmall = new GUIStyle(smallButtonBase)
+                {
+                    normal = new GUIStyleState()
+                    {
+                        background = EditorGUIUtility.IconContent("preAudioLoopOff").image as Texture2D
+                    }
+                };
+            }
+
+        }
+
+
+
+
+
+
+
 
 
         public static class Icons
@@ -22,8 +137,6 @@ namespace AtlasAI
                 AddIcon = EditorGUIUtility.IconContent("Toolbar Plus").image as Texture2D;
             }
         }
-
-
 
         public static class Styles
         {

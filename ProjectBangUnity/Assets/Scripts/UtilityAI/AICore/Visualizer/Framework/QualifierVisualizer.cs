@@ -9,9 +9,7 @@ namespace AtlasAI.Visualization
         // Fields
         //
         private IQualifier _qualifier;
-
         private ActionVisualizer _action;
-
         private SelectorVisualizer _parent;
 
 
@@ -28,8 +26,7 @@ namespace AtlasAI.Visualization
         /// </summary>
         /// <value><c>true</c> if this instance is high scorer; otherwise, <c>false</c>.</value>
         public bool isHighScorer{
-            get;
-            protected set;
+            get { return _parent.lastSelectedQualifier == this; }
         }
 
         /// <summary>
@@ -96,7 +93,6 @@ namespace AtlasAI.Visualization
         public virtual void Reset()
         {
             lastScore = null;
-            isHighScorer = false;
         }
 
 

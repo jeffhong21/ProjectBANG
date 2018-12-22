@@ -1,4 +1,4 @@
-﻿namespace AtlasAI
+﻿namespace AtlasAI.AIEditor
 {
     using System;
     using System.Text.RegularExpressions;

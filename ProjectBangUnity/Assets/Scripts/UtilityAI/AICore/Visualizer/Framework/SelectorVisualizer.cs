@@ -9,7 +9,6 @@ namespace AtlasAI.Visualization
         // Fields
         //
         private Selector _selector;
-
         private UtilityAIVisualizer _parent;
 
 

@@ -1,4 +1,4 @@
-﻿namespace AtlasAI
+﻿namespace AtlasAI.AIEditor
 {
     using System;
     using System.IO;
@@ -36,7 +36,7 @@
 
         public void Init(AddPredefinedAIWindow window, UtilityAIComponentEditor editor)
         {
-            displayTypes = TaskNetworkUtilities.GetAllOptions<UtilityAIAssetConfig>();
+            displayTypes = GetAllOptions<UtilityAIAssetConfig>();
             displayTypes.Reverse();
 
             this.editor = editor;
@@ -104,6 +104,33 @@
             window.Close();
         }
 
+
+        /// <summary>
+        /// Get all available classes of type.
+        /// </summary>
+        /// <returns> All available options. </returns>
+        /// <typeparam name="T"> Is one the AI blocks. </typeparam>
+        private List<Type> GetAllOptions<T>() //where T: Selector, IQualifier, IAction, IContextualScorer
+        {
+            List<Type> availableTypes = new List<Type>();
+            Type type = typeof(T);
+            //  Gets all custom Types in this assembly and adds it to a list.
+            //var optionTypes = Assembly.GetAssembly(type).GetTypes()
+            //.Where(t => t.IsClass && t.Namespace == typeof(AIManager).Namespace)
+            //.ToList();
+            var optionTypes = Assembly.GetAssembly(type).GetTypes()
+                                      .Where(t => t.IsClass).ToList();
+
+            //optionTypes.ForEach(t => Debug.Log(t));
+
+            foreach (Type option in optionTypes)
+            {
+                if (option.BaseType == type)
+                    availableTypes.Add(option);
+            }
+            //availableTypes.ForEach(t => Debug.Log(t));
+            return availableTypes;
+        }
     }
 
 

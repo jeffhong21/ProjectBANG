@@ -46,7 +46,6 @@ namespace AtlasAI.Visualization
         public override void Reset()
         {
             lastScore = null;
-            isHighScorer = false;
             children.Clear();
         }
 
