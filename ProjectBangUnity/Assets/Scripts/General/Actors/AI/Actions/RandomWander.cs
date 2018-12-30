@@ -9,7 +9,7 @@
         float randomWanderRadius = 5f;
 
 
-        public override void Execute(IAIContext context)
+        public override void OnExecute(IAIContext context)
         {
             var c = context as AgentContext;
             var agent = c.agent;

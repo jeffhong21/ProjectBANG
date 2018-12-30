@@ -70,11 +70,10 @@
             //
             rs.defaultQualifier.action = new CompositeAction()
             {
-                name = "Scan",
                 actions = new List<IAction>()
                 {
-                    new ScanForEntities(){name = "ScanForEntitites"},
-                    new ScanForPositions(){ name = "ScanForPositions", samplingRange = 20, samplingDensity = 2.5f }
+                    new ScanForEntities(),
+                    new ScanForPositions(){samplingRange = 20, samplingDensity = 2.5f }
                 }
             };
 

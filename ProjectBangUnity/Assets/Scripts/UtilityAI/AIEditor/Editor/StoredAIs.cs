@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 
 namespace AtlasAI.AIEditor
@@ -11,7 +10,7 @@ namespace AtlasAI.AIEditor
         //
         // Static Fields
         //
-        private static List<AIStorage> _ais;
+        private static List<AIStorage> _ais = new List<AIStorage>();
 
 
         //
@@ -27,23 +26,47 @@ namespace AtlasAI.AIEditor
         //
         public static string EnsureValidName(string name, AIStorage target)
         {
-            throw new NotImplementedException();
+            if(NameExists(name)){
+                int index = 0;
+                string suffix = " ";
+                do
+                {
+                    suffix += index.ToString();
+                    name += suffix;
+                    index++;
+                    if (index > 10) break;
+                }
+                while (NameExists(name) == false);
+            }
+
+            target.aiId = name;
+            return name;
         }
 
 
         public static AIStorage GetById(string aiId)
         {
-            throw new NotImplementedException();
+            for (int i = 0; i < AIs.Count; i++){
+                if(AIs[i].aiId == aiId){
+                    return AIs[i];
+                }
+            }
+            return null;
         }
+
 
         public static bool NameExists(string name)
         {
-            throw new NotImplementedException();
+            for (int i = 0; i < AIs.Count; i++)
+                return AIs[i].aiId == name;
+            return false;
         }
 
         public static void Refresh()
         {
-            throw new NotImplementedException();
+            AIStorage[] storedAIs = UnityEngine.Resources.LoadAll<AIStorage>("AIStorage");
+            AIs.Clear();
+            AIs.AddRange(storedAIs);
         }
 
         //
@@ -51,40 +74,14 @@ namespace AtlasAI.AIEditor
         //
         private class AIStorageComparer : IComparer<AIStorage>
         {
-            public int Compare(AIStorage x, AIStorage y)
-            {
-                throw new NotImplementedException();
+            public int Compare(AIStorage x, AIStorage y){
+                return string.Compare(x.aiId, y.aiId, StringComparison.Ordinal);
             }
 
-            public AIStorageComparer()
-            {
-                
-            }
         }
 
 
 
-        //public static string GenerateUniqueID(string aiId)
-        //{
-        //    string _aiId = aiId;
-        //    int index = 1;
-        //    string suffix = "";
 
-        //    do
-        //    {
-        //        if (aiNameMap.ContainsValue(_aiId))
-        //        {
-        //            suffix = " " + index.ToString();
-        //            _aiId = aiId + suffix;
-        //        }
-
-        //        index++;
-        //        if (index > 10)
-        //            break;
-        //    }
-        //    while (aiNameMap.ContainsValue(_aiId) == true);
-
-        //    return _aiId;
-        //}
     }
 }

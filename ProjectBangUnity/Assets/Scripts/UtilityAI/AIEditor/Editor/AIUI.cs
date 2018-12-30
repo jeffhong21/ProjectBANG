@@ -1,85 +1,75 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 using AtlasAI.Visualization;
 
 namespace AtlasAI.AIEditor
 {
-    public class AIUI
-    {
-        public string name;
-        public AICanvas canvas;
-        private List<TopLevelNode> _selectedNodes;
-        private AIStorage _aiStorage;
-        private IUtilityAI _visualizedAI;
-        private IUtilityAI _ai;
 
+    public class AIUI : ScriptableObject
+    {
+        public AICanvas canvas;
+        public Node selectedNode;
+        public bool isDirty;
+
+
+        private SelectorNode _currentSelector;
+        private QualifierNode _currentQualifier;
+        private AIStorage _aiStorage;
+
+
+        //private string _tempEditorConfiguration;
+        //private bool _useTempConfiguration;
         //
         // Properties
         //
-        public IUtilityAI ai{
-            get { return _ai; }
+
+        public SelectorNode currentSelector{
+            get { return _currentSelector; }
         }
 
-        public UtilityAIVisualizer visualizedAI{
-            get { return _visualizedAI as UtilityAIVisualizer; }
-        }
-
-        public Selector rootSelector{
-            get { return ai.rootSelector; }
-        }
-
-
-        public INode selectedNode{
-            get;
-            set;
-        }
-
-        public List<TopLevelNode> selectedNodes{
-            get { return _selectedNodes; }
-        }
-
-        public bool isDirty{
-            get;
-            set;
-        }
-
-
-
-
-        //
-        // Constructors
-        //
-        private AIUI()
+        public QualifierNode currentQualifier
         {
-            _selectedNodes = new List<TopLevelNode>();
-            canvas = new AICanvas();
-
+            get { return _currentQualifier; }
         }
+
+
 
         //
         // Static Methods
         //
         public static AIUI Create(string name)
         {
-            AIUI aiui= new AIUI();
+            //AIUI aiui= new AIUI();
+            AIUI aiui = CreateInstance<AIUI>();
             aiui.InitNew(name);
+            aiui.InitAI();
             return aiui;
         }
+
+
 
         public static AIUI Load(string aiId, bool refreshState)
         {
-            AIUI aiui = Create(aiId);
-            //AINameMapGenerator.WriteNameMapFile();
-            var field = typeof(AINameMapHelper).GetField(aiId, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-            Guid id = (Guid)field.GetValue(null);
-            aiui._ai = AIManager.GetAI(id);
+            //AIUI aiui = Create(aiId);
+            AIUI aiui = CreateInstance<AIUI>();
+            aiui.InitAI();
 
-            //aiui._aiStorage = new AIStorage();
-            Debug.LogFormat("Loading AIUI.  UtilityAI is {0} |", id);
+
+
+            aiui._aiStorage = StoredAIs.GetById(aiId);
+            if (aiui._aiStorage != null)
+                aiui.LoadFrom(aiui._aiStorage, refreshState);
+            else
+                Debug.LogFormat("Could not load ai.  aiId was {0} |", aiId);
+
+
+            //Debug.LogFormat("Loading AIUI.  UtilityAI is {0} |", aiId);
             return aiui;
         }
+
 
 
         //
@@ -87,14 +77,28 @@ namespace AtlasAI.AIEditor
         //
         public void InitAI()
         {
-            
+            _currentSelector = null;
+            selectedNode = null;
         }
 
-        private void InitNew(string name)
+        private void InitNew(string aiName)
         {
-            this.name = name;
-            //_ai = new UtilityAI(name);
-            //_visualizedAI = new UtilityAIVisualizer(_ai);
+            canvas = new AICanvas();
+            //name = aiName;
+            if(_aiStorage != null)
+                _aiStorage.editorConfiguration = GuiSerializer.Serialize(canvas);
+
+            //_tempEditorConfiguration = GuiSerializer.Serialize(canvas);
+            //_useTempConfiguration = true;
+        }
+
+
+
+        private bool LoadFrom(AIStorage data, bool refreshState)
+        {
+            canvas = GuiSerializer.Deserialize(this, data.editorConfiguration);
+            Debug.Log(canvas);
+            return true;
         }
 
 
@@ -105,14 +109,43 @@ namespace AtlasAI.AIEditor
         }
 
 
-
-        public SelectorNode AddSelector(Vector2 position, Type selectorType)
+        public bool Connect(QualifierNode qn, TopLevelNode targetNode)
         {
-            Rect rect = new Rect(position.x, position.y, 250, 100);
+            throw new NotImplementedException();
+        }
+
+
+        public void Save(string newName)
+        {
+            _aiStorage.editorConfiguration = GuiSerializer.Serialize(canvas);
+            Debug.Log(_aiStorage.editorConfiguration);
+        }
+
+
+        public void MarkDirty(){
+            if (AIEditorWindow.activeInstance != null)
+                AIEditorWindow.activeInstance.Repaint();
+            if(_aiStorage != null){
+                _aiStorage.editorConfiguration = GuiSerializer.Serialize(canvas);
+                EditorUtility.SetDirty(_aiStorage);
+            }
+
+        }
+
+
+
+
+        #region Add
+
+        public SelectorNode AddSelector(Vector2 position, Type selectorType, int width = 256, int height = 144)
+        {
+            Rect rect = new Rect(position.x, position.y, width, height);
             SelectorNode node = SelectorNode.Create(selectorType, this, rect);
             //  Add node to the canvas.
             canvas.nodes.Add(node);
+            node.name +=  " " + canvas.nodes.Count;
 
+            MarkDirty();
             return node;
         }
 
@@ -120,11 +153,17 @@ namespace AtlasAI.AIEditor
         {
             QualifierNode node = AddQualifier(qualiferType);
             node.parent = parent;
+            parent.qualifierNodes.Add(node);
+
+            MarkDirty();
             return node;
         }
 
         public QualifierNode AddQualifier(QualifierNode qn, SelectorNode parent){
             qn.parent = parent;
+            parent.qualifierNodes.Add(qn);
+
+            MarkDirty();
             return qn;
         }
 
@@ -147,9 +186,10 @@ namespace AtlasAI.AIEditor
             throw new NotImplementedException();
         }
 
+        #endregion
 
 
-
+        #region Replace and Remove
 
         public void ReplaceAction(ActionNode an, IAction replacement)
         {
@@ -186,16 +226,18 @@ namespace AtlasAI.AIEditor
             throw new NotImplementedException();
         }
 
-        public bool RemoveSelector(SelectorNode sn)
-        {
+        public bool RemoveSelector(SelectorNode sn){
             throw new NotImplementedException();
         }
 
-        public bool RemoveNode()
+        public bool RemoveNode(TopLevelNode node)
         {
-            throw new NotImplementedException();
+            bool removed = canvas.nodes.Remove(node);
+            if (removed) MarkDirty();
+            return removed;
         }
 
+        #endregion
 
 
         public void SetRoot(Selector newRoot)
@@ -209,29 +251,25 @@ namespace AtlasAI.AIEditor
             throw new NotImplementedException();
         }
 
-        private bool LoadFrom(AIStorage data, bool refreshState)
-        {
-            throw new NotImplementedException();
-        }
 
-        public void PingAsset()
-        {
-            throw new NotImplementedException();
-        }
+
 
         public void RefreshState()
         {
-            throw new NotImplementedException();
+            //_currentSelector = null;
+            //selectedNode = null;
+
+            for (int i = 0; i < canvas.nodes.Count; i++){
+                canvas.nodes[i].parent = this;
+                canvas.nodes[i].parentUI = this;
+            }
         }
 
-        public void Save(string newName)
-        {
-            throw new NotImplementedException();
-        }
 
         public void Select(SelectorNode sn, QualifierNode qn, ActionNode an)
         {
-            throw new NotImplementedException();
+            _currentSelector = sn;
+            _currentQualifier = qn;
         }
 
 

@@ -67,7 +67,7 @@
             for (int i = 0; i < aiConfigs.Length; i++){
                 //  Get Guid of the aiConfig.
                 string aiClientName = aiConfigs[i].aiId;
-                var field = typeof(AINameMapHelper).GetField(aiClientName, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                var field = typeof(AINameMap).GetField(aiClientName, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
                 Guid guid = (Guid)field.GetValue(null);
                 clients[i] = new UtilityAIClient(guid, GetComponent<IContextProvider>(),
                                  aiConfigs[i].intervalMin, aiConfigs[i].intervalMax,
@@ -81,6 +81,7 @@
                     continue;
                 }
 
+                clients[i].debugClient = aiConfigs[i].debug;
             }
         }
 

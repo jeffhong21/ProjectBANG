@@ -18,8 +18,8 @@
             get;
         }
 
-
-        bool debugClient{
+        bool debugClient
+        {
             get;
             set;
         }

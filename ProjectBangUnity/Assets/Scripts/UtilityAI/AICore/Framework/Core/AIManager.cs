@@ -11,11 +11,12 @@
     {
         public delegate IUtilityAIClient AIClientResolver(GameObject host, Guid aiId);
 
-
         //
         // Static Fields
         //
-        public static string StorageFolder = "Assets/Scripts/AtlasAI/Resources/AIStorage/";
+        public static string TempStorageFolder = "Assets/Scripts/UtilityAI/Resources/AIStorage";
+        public static string StorageFolder = "AIStorage";
+
         private static readonly bool initLock;
         //  Guid == aiID
         private static Dictionary<Guid, AIData> _aiLookup;  //  Uses the Guid of the aiID since each ai should have one utilityAi associated with it.
@@ -39,24 +40,15 @@
         {
             get{
                 if(_aiClients != null){
-                    foreach (var ai in _aiClients)
-                    {
-                        for (int i = 0; i < ai.Value.Count; i++)
-                        {
+                    foreach (var ai in _aiClients){
+                        for (int i = 0; i < ai.Value.Count; i++){
                             yield return ai.Value[i];
                         }
                     }
                 } 
-                else
-                {
+                else{
                     yield return null;
                 }
-
-                //var allComponents = Utilities.ComponentHelper.FindAllComponentsInScene<UtilityAIComponent>();
-                //foreach (var utilityAIComponent in allComponents){
-                //    for (int i = 0; i < utilityAIComponent.clients.Length; i++)
-                //        yield return utilityAIComponent.clients[i];
-                //}
             }
         }
 
@@ -76,7 +68,8 @@
             if (_aiLookup == null) _aiLookup = new Dictionary<Guid, AIData>();
             if (_aiClients == null) _aiClients = new Dictionary<Guid, List<IUtilityAIClient>>();
 
-            AIStorage[] storedAIs = Resources.FindObjectsOfTypeAll<AIStorage>();
+            //AIStorage[] storedAIs = Resources.FindObjectsOfTypeAll<AIStorage>();
+            AIStorage[] storedAIs = Resources.LoadAll<AIStorage>(StorageFolder);
             for (int i = 0; i < storedAIs.Length; i++)
             {
                 //  Cache and Initialize objects.
@@ -97,12 +90,12 @@
                     //  Configure the predefined settings.
                     config.CreateAI(utilityAI);
                 } else {
-                    Debug.LogFormat(" Could not find aiId type. ");
+                    Debug.LogFormat(" ** Could not find aiId type. ");
                     continue;
                 }
 
 
-                var field = typeof(AINameMapHelper).GetField(storedAI.aiId, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                var field = typeof(AINameMap).GetField(storedAI.aiId, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
                 Guid guid = (Guid)field.GetValue(null);
                 //  Add to the ai lookup.
                 if(_aiLookup.ContainsKey(guid) == false){
@@ -114,7 +107,7 @@
                 }
             }
 
-            Debug.LogFormat("Finish loading. Loaded {0} AIs.", _aiLookup.Count);
+            //Debug.LogFormat("Finish loading. Loaded {0} AIs.", _aiLookup.Count);
         }
 
 

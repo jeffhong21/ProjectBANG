@@ -11,7 +11,6 @@
     ///   Selector Gets the Highest Score from the list of qualifiers.
     ///   It needs to know all qualifiers attached to it.
     /// </summary>
-    [Serializable]
     public abstract class Selector : ISelect
     {
         public bool debugScores;
@@ -87,6 +86,8 @@
             //  Return the action of the selected IQualifier.
             return Select(context, qualifiers, defaultQualifier).action;
         }
+
+
 
 
         /// <summary>

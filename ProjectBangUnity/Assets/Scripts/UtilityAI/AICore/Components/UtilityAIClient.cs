@@ -19,6 +19,10 @@
     /// </summary>
     public class UtilityAIClient : IUtilityAIClient, IClientScheduler
     {
+        //  For Debuging.
+        private string debugColor;
+        public bool debugClient{ get; set; }
+
         //  ContextProvider from BANG.
         private Bang.AIContextProvider contextProvider;
 
@@ -137,6 +141,7 @@
         #endregion
 
 
+        Visualization.ICustomVisualizer visualizer;
         /// <summary>
         /// Executes the AI. Typically this is called by whatever manager controls the AI execution cycle.
         /// </summary>
@@ -147,25 +152,41 @@
             activeAction.Execute(contextProvider.GetContext());
 
 
-            Visualization.ICustomVisualizer visualizer = null;
-            if (activeAction is CompositeAction)
+
+
+            if(debugClient)
             {
-                for (int i = 0; i < ((CompositeAction)activeAction).actions.Count; i++)
-                {
-                    if (Visualization.VisualizerManager.TryGetVisualizerFor(((CompositeAction)activeAction).actions[i].GetType(), out visualizer))
-                    {
-                        visualizer.EntityUpdate(activeAction, contextProvider.GetContext());
-                        break;
-                    }
+                //Debug.LogFormat("BaseType: {0}   |   {1}", activeAction.GetType().BaseType, activeAction.GetType().BaseType == typeof(ActionWithOptions<Vector3>));
+                if(activeAction.GetType().BaseType == typeof(ActionWithOptions<Vector3>)){
+                    Debug.LogFormat("BaseType: {0} | Type: {1}", activeAction.GetType().BaseType, activeAction.GetType());
                 }
+
+                //if (activeAction.GetType() == typeof(ActionWithOptions<>)){
+                //    Debug.Log(activeAction.GetType().Name);
+                //}
             }
-            else
+
+            visualizer = null;
+            if (Visualization.VisualizerManager.TryGetVisualizerFor(activeAction.GetType(), out visualizer))
             {
-                if (Visualization.VisualizerManager.TryGetVisualizerFor(activeAction.GetType(), out visualizer))
-                {
-                    visualizer.EntityUpdate(activeAction, contextProvider.GetContext());
-                }
+                //Debug.LogFormat("There is a visualizer for Action {0} |", activeAction.GetType());
+                //visualizer.EntityUpdate(activeAction, contextProvider.GetContext(), ai.id);
             }
+
+            //if (activeAction is CompositeAction){
+            //    for (int i = 0; i < ((CompositeAction)activeAction).actions.Count; i++){
+            //        if (Visualization.VisualizerManager.TryGetVisualizerFor(((CompositeAction)activeAction).actions[i].GetType(), out visualizer)){
+            //            visualizer.EntityUpdate(activeAction, contextProvider.GetContext());
+            //            break;
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    if (Visualization.VisualizerManager.TryGetVisualizerFor(activeAction.GetType(), out visualizer)){
+            //        visualizer.EntityUpdate(activeAction, contextProvider.GetContext());
+            //    }
+            //}
         }
 
 
@@ -208,8 +229,7 @@
             state = UtilityAIClientState.Running;
             //  Register the client to the AIManager.
             AIManager.Register(this);
-            //  Call OnStart.
-            OnStart();
+
         }
 
 
@@ -226,8 +246,7 @@
             _handle.Stop();
             //  Unregister the client to the AIManager.
             AIManager.UnRegister(this);
-            //  Call OnStop.
-            OnStop();
+
         }
 
 
@@ -239,7 +258,7 @@
             state = UtilityAIClientState.Running;
             //  Resume schedule updates.
             //_handle.Resume();
-            OnResume();
+
         }
 
 
@@ -251,44 +270,17 @@
             state = UtilityAIClientState.Pause;
             //  Pause from scheduled updates.
             //_handle.Pause();
-            OnPause();
-        }
-
-
-
-        protected virtual void OnStart()
-        {
-
-        }
-
-        protected virtual void OnStop()
-        {
-
-        }
-
-        protected virtual void OnPause()
-        {
-
-        }
-
-        protected virtual void OnResume()
-        {
 
         }
 
 
 
 
-        //  For Debuging.
-        private string debugColor;
-        public bool _debugClient;
-        public bool debugClient{
-            get { return _debugClient; }
-            set{
-                _debugClient = value;
-                ((UtilityAI)this.ai).debug = _debugClient;
-            }
-        }
+
+
+
+
+        
         public Dictionary<IQualifier, float> selectorResults;
 
         /// <summary>

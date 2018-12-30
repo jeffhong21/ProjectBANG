@@ -1983,13 +1983,13 @@ MonoBehaviour:
     debug: 0
   - aiId: AgentMoveAI
     intervalMin: 1
-    intervalMax: 2
-    startDelayMin: 0.25
-    startDelayMax: 0.5
+    intervalMax: 1.5
+    startDelayMin: 0
+    startDelayMax: 0
     isActive: 1
     isPredefined: 1
     type: Bang.AgentMoveAI
-    debug: 0
+    debug: 1
   - aiId: AgentActionAI
     intervalMin: 1
     intervalMax: 2
@@ -2097,7 +2097,7 @@ SkinnedMeshRenderer:
   m_Quality: 0
   m_UpdateWhenOffscreen: 0
   m_SkinnedMotionVectors: 1
-  m_Mesh: {fileID: 4300010, guid: ad9b136e9ac104c66b5fb99ea52cfb13, type: 3}
+  m_Mesh: {fileID: 4300012, guid: ad9b136e9ac104c66b5fb99ea52cfb13, type: 3}
   m_Bones:
   - {fileID: 4669642702872142}
   - {fileID: 4686553228542010}

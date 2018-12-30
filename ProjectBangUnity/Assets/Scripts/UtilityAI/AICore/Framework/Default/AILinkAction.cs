@@ -35,8 +35,12 @@ namespace AtlasAI
             _aiId = aiId;
         }
 
-
         public void Execute(IAIContext context)
+        {
+            OnExecute(context);
+        }
+
+        public void OnExecute(IAIContext context)
         {
             _linkedAI.Select(context);
         }

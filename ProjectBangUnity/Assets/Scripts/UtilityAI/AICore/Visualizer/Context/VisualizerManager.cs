@@ -52,22 +52,17 @@
         }
 
 
-        private static IEnumerable<Type> GetDerived (Type forType)
-        {
+        //private static IEnumerable<Type> GetDerived (Type forType)
+        //{
+        //    foreach(Type derivedType in _visualizerLookup.Keys){
+        //        if(derivedType == forType){
+        //            yield return derivedType;
+        //        }
+        //    }
+        //}
 
-            foreach(Type derivedType in _visualizerLookup.Keys){
-                if(derivedType == forType){
-                    yield return derivedType;
-                }
-            }
-        }
 
 
-        /// <summary>
-        /// Registers the visualizer.
-        /// </summary>
-        /// <param name="visualizer">Visualizer.</param>
-        /// <typeparam name="TFor">The type visualized by the custom visualizer.</typeparam>
         public static void RegisterVisualizer<TFor>(ICustomVisualizer visualizer)
         {
             if (_visualizerLookup.ContainsKey(typeof(TFor)) == false){
@@ -96,22 +91,13 @@
         /// <param name="visualizer">Visualizer.</param>
         public static bool TryGetVisualizerFor(Type t, out ICustomVisualizer visualizer)  //  internal
         {
-            //if(GetDerived(t) != null){
-            //    visualizer = _visualizerLookup[t];
-            //    return true;
-            //}
             if (_visualizerLookup.ContainsKey(t)){
                 visualizer = _visualizerLookup[t];
                 return true;
             }
-            else{
-                visualizer = null;
-                return false;
-            }
+            visualizer = null;
+            return false;
         }
-
-
-
 
 
 
@@ -127,7 +113,7 @@
 
                     ICustomVisualizer visualizer = null;
                     if (TryGetVisualizerFor(go.GetType(), out visualizer)){
-                        visualizer.EntityUpdate(go, context);
+                        //visualizer.EntityUpdate(go, context);
                         //visualizer.EntityUpdate(go, context, aiId);
                     }
                 }

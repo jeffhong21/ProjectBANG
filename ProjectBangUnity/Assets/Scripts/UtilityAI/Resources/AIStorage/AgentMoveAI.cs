@@ -101,7 +101,6 @@
             // ---- New Action ----
             a = new MoveToBestPosition()
             {
-                name = "MoveToBestAttackPosition",
                 scorers = new List<IOptionScorer<Vector3>>()
                 {
                     new PositionProximityToSelf() { score = 10, factor = 0.1f },      //  How close each point is to agent.
@@ -170,10 +169,7 @@
             #region SearchForTarget
 
             // ---- New Action ----
-            a = new SearchForTargets()
-            {
-                name = "Search For Target",
-            };
+            a = new SearchForTargets();
             actions.Add(a);  // --  Add to Actions Group
 
             // ---- New Scorers Group ----
@@ -206,10 +202,7 @@
             //  Default Qualifier
             //
             rs.defaultQualifier.score = 75;
-            rs.defaultQualifier.action = new EmptyAction() 
-            {
-                name = "Default Null Action"
-            };
+            rs.defaultQualifier.action = new EmptyAction();
 
 
 

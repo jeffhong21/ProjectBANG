@@ -1,70 +1,59 @@
-﻿//namespace AtlasAI.Visualization
-//{
-//    using UnityEngine;
-//    using UnityEditor;
-//    using System;
-//    using System.Collections.Generic;
+﻿namespace AtlasAI.Visualization
+{
+    using UnityEngine;
+    using UnityEditor;
+    using System;
+    using System.Collections.Generic;
 
-//    [ExecuteInEditMode]
-//    public class VisualizerComponent : MonoBehaviour
-//    {
+    [ExecuteInEditMode]
+    public class VisualizerComponent : MonoBehaviour
+    {
+        [HideInInspector, SerializeField]
+        public string relevantAIId;
+        //[HideInInspector, SerializeField]
+        public SceneVisualizationMode mode;
 
-//        [HideInInspector, SerializeField]
-//        public string relevantAIId;
-
-//        //[HideInInspector, SerializeField]
-//        public SceneVisualizationMode mode;
-
-//        private Guid _relevantGuid;
+        private Guid _relevantGuid;
 
 
-//        protected virtual void Awake()
-//        {
+        protected virtual void Awake()
+        {
 
-//        }
-
-
-//        protected void DoDraw(Action<IAIContext> drawer)
-//        {
-
-//        }
+        }
 
 
-//        //  Used to visualize Custom SceneVisualizationMode
-//        protected virtual void GetContextsToVisualize(List<IAIContext> contextsBuffer, Guid relevantAIId)
-//        {
-//            var ai = new List<IContextProvider>();
-//            if (ai != null)
-//            {
-//                var count = ai.Count;
-//                for (int i = 0; i < count; i++)
-//                {
-//                    contextsBuffer.Add(ai[i].GetContext(relevantAIId));
-//                }
-//            }
+        protected void DoDraw(Action<IAIContext> drawer)
+        {
 
-//        }
+        }
 
 
-//        private void OnEnable()
-//        {
-//            object[] selection = UnityEditor.Selection.GetFiltered<IContextProvider>(UnityEditor.SelectionMode.Editable | UnityEditor.SelectionMode.TopLevel);
+        //  Used to visualize Custom SceneVisualizationMode
+        protected virtual void GetContextsToVisualize(List<IAIContext> contextsBuffer, Guid relevantAIId)
+        {
+            var ai = new List<IContextProvider>();
+            if (ai != null)
+            {
+                var count = ai.Count;
+                for (int i = 0; i < count; i++)
+                {
+                    contextsBuffer.Add(ai[i].GetContext(relevantAIId));
+                }
+            }
+
+        }
 
 
-//            //Debug.Log(selection + " | Count: " + selection.Length);
-
-//        }
-
-//    }
+        private void OnEnable()
+        {
+            object[] selection = UnityEditor.Selection.GetFiltered<IContextProvider>(UnityEditor.SelectionMode.Editable | UnityEditor.SelectionMode.TopLevel);
 
 
+            //Debug.Log(selection + " | Count: " + selection.Length);
 
-//    public enum SceneVisualizationMode
-//    {
-//        SingleSelectedGameObject,
-//        AllSelectedGameObjects,
-//        Custom
-//    }
-//}
+        }
+
+    }
 
 
+}

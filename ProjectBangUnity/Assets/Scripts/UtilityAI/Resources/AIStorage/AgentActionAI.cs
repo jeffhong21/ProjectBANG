@@ -41,9 +41,7 @@
 
 
             // ---- New Action ----
-            a = new ReloadGun(){
-                name = "Reload Weapon.",
-            };
+            a = new ReloadGun();
 
             // ---- New Scorers Group ----
             scorers = new List<IContextualScorer>();
@@ -72,13 +70,11 @@
             // ---- New Action ----
             a = new CompositeAction()
             {
-                name = "Fire At Target",
                 actions = new List<IAction>()
                 {
                     //new StopMovement(){ name = "StopMovement"},
                     new SetBestAttackTarget()
                     {
-                        name = "Set Best Attack Target",
                         scorers = new List<IOptionScorer<ActorHealth>>()
                         {
                             new IsTargetAlive(){ score = 100f},
@@ -87,7 +83,7 @@
                             new IsCurrentTargetScorer()
                         }
                     },
-                    new FireAtAttackTarget(){ name = "Fire At Target" }
+                    new FireAtAttackTarget()
                 }
             };
 
@@ -122,10 +118,7 @@
             //  Default Qualifier
             //
             rs.defaultQualifier.score = 12;
-            rs.defaultQualifier.action = new EmptyAction()
-            {
-                name = "Null Action"
-            };
+            rs.defaultQualifier.action = new EmptyAction();
 
 
             //  

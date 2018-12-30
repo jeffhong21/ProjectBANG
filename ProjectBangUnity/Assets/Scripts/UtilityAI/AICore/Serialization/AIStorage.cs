@@ -22,9 +22,9 @@
         [ReadOnly]
         public string aiId;                 //  The name of the ai.  aiId has a Guid associated with it made through the NameMapGenerator.
         [HideInInspector]
-        public IUtilityAI configuration;        
-
-
+        public IUtilityAI configuration;
+        [ReadOnly]
+        public string editorConfiguration;
 
         //
         // Properties
@@ -49,7 +49,7 @@
         public static AIStorage CreateAsset(string aiId, string aiName, bool isSelect = false)
         {
             AIStorage asset = CreateInstance<AIStorage>();
-            string assetDir = AssetDatabase.GenerateUniqueAssetPath(AIManager.StorageFolder + "/" + aiName + ".asset");
+            string assetDir = AssetDatabase.GenerateUniqueAssetPath(AIManager.TempStorageFolder + "/" + aiName + ".asset");
 
             asset.aiId = aiId;
             asset.version = Application.version;

@@ -22,7 +22,7 @@
         private Vector3 position;
 
 
-        public override void Execute(IAIContext context)
+        public override void OnExecute(IAIContext context)
         {
             var c = context as AgentContext;
 

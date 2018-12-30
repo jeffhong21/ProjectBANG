@@ -45,12 +45,10 @@
 
             a = new CompositeAction()
             {
-                name = "Move to Cover Positiion",
                 actions = new List<IAction>()
                 {
                     new MoveToCover()
                     {
-                        name = "Move to Cove Position",
                         scorers = new List<IOptionScorer<Vector3>>(){
                             new PositionProximityToSelf() { score = 10, factor = 0.01f },      //  How close each point is to agent.
                             new OverRangeToClosestEnemy() { desiredRange = 5f, score = 100f },      //  If point is over a certain range to each enemy.
@@ -102,13 +100,11 @@
             // ---- New Action ----
             a = new CompositeAction()
             {
-                name = "MoveToBestAttackPosition",
                 actions = new List<IAction>()
                 {
-                    new ScanForPositions(){ name = "ScanForPositions", samplingRange = 20, samplingDensity = 2.5f },
+                    new ScanForPositions(){samplingRange = 20, samplingDensity = 2.5f },
                     new MoveToBestPosition()
                     {
-                        name = "MoveToBestAttackPosition",
                         scorers = new List<IOptionScorer<Vector3>>()
                         {
                             new PositionProximityToSelf(),      //  How close each point is to agent.
@@ -147,13 +143,11 @@
             // ---- New Action ----
             a = new CompositeAction()
             {
-                name = "Fire At Target",
                 actions = new List<IAction>()
                 {
                     //new StopMovement(){ name = "StopMovement"},
                     new SetBestAttackTarget()
                     {
-                        name = "Set Best Attack Target",
                         scorers = new List<IOptionScorer<ActorHealth>>()
                         {
                             new IsTargetAlive(){ score = 100f},
@@ -162,7 +156,7 @@
                             new IsCurrentTargetScorer()
                         }
                     },
-                    new FireAtAttackTarget(){ name = "Fire At Target" }
+                    new FireAtAttackTarget()
                 }
             };
 
@@ -200,9 +194,7 @@
             #region IsAmmoLow
 
             // ---- New Action ----
-            a = new ReloadGun(){
-                name = "Reload Weapon.",
-            };
+            a = new ReloadGun();
 
             // ---- New Scorers Group ----
             scorers = new List<IContextualScorer>();
@@ -232,10 +224,7 @@
             //
             //  Default Qualifier
             //
-            rs.defaultQualifier.action = new ScanForEntities()
-            { 
-                name = "ScanForEntitites" 
-            };
+            rs.defaultQualifier.action = new ScanForEntities();
             #endregion
 
 

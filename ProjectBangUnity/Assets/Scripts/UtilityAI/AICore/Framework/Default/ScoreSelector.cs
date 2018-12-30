@@ -45,7 +45,7 @@
 
                 //  Debug Scorers
                 if (debugScores)
-                    scoresInfo[index] = string.Format("{0} | {1} (<color=#800080ff>{2}</color>)\n", q.GetType().Name, q.action.name, score);
+                    scoresInfo[index] = string.Format("{0} | {1} (<color=#800080ff>{2}</color>)\n", q.GetType().Name, q.action, score);
                 
             }
 
@@ -56,12 +56,12 @@
                 best = defaultQualifier as IQualifier;
 
                 if(debugIfDefault) 
-                    info = string.Format(" ** Default Action Picked: {0} (<color=#00ff00ff>{1}</color>)\n", best.action.name, score);
+                    info = string.Format(" ** Default Action Picked: {0} (<color=#00ff00ff>{1}</color>)\n", best.action, score);
             }
             else
             {
                 if (debugScores) 
-                    info = string.Format(" - Best Qualifier: {0} (<color=#00ff00ff>{1}</color>)\n", best.action.name, score);
+                    info = string.Format(" - Best Qualifier: {0} (<color=#00ff00ff>{1}</color>)\n", best.action, score);
             }
 
 
@@ -69,7 +69,7 @@
             if (debugScores)
             {
                 //  Get Default Qualifiers scorers info.
-                scoresInfo[qualifiers.Count] = string.Format("{0} | {1} (<color=#800080ff>{2}</color>)\n", defaultQualifier.GetType().Name, defaultQualifier.action.name, defaultQualifier.Score(context));
+                scoresInfo[qualifiers.Count] = string.Format("{0} | {1} (<color=#800080ff>{2}</color>)\n", defaultQualifier.GetType().Name, defaultQualifier.action, defaultQualifier.Score(context));
 
 
                 for (int i = 0; i < scoresInfo.Length; i++){

@@ -17,30 +17,44 @@ namespace AtlasAI.AIEditor
         private static readonly Color _majorGridColor = new Color(0.5f, 0.5f, 0.5f, 0.8f);
         private static readonly Color _minorGridColor = new Color(0.5f, 0.5f, 0.5f, 0.4f);
         private static readonly Color _gridBackground = Color.gray;
-        private static readonly Color _connectorLineColor;
-        private static readonly Color _connectorLineActiveColor;
+        private static readonly Color _connectorLineColor = Color.white;
+        private static readonly Color _connectorLineActiveColor = Color.green;
+        private const float _curveCurvature = 50f;
         private const float _minimumDragDelta = 25f;
+        private const float _saveAsWindowHeight = 70f;
+        private const float _saveAsWindowWidth = 220f;
         public static AIEditorWindow activeInstance;
 
         //
         // Fields
         //
-        private GameObject _visualizedEntity;
-        private GUIContent _title = new GUIContent("<DefaultTitle>");
-        private GUIContent _label = new GUIContent("<DefaultLabel>");
-        private DragData _drag;
-        private AIUI _ui;
+        private GameObject visualizedEntity;
+        private GUIContent _title = new GUIContent();               //  Used for Current AI in toolbar.
+        private NodeSettings nodeSettings;
+        private NodeRenderer nodeRenderer;
+        private MouseState mouseState;
+        private DragData drag;
+        private Vector2 dragPos;
+        private AIUI aiui;
+        private bool focused;
+
+        [HideInInspector, SerializeField]
+        private string _lastOpenAI;
+        private float _topPadding = 28;
+        private float _footerPadding = 28;
+
 
         //
         // Properties
         //
-        private float _topPadding = 18;
-
 
         private float topPadding{
-            get{
-                return _topPadding + 2f;
-            }
+            get { 
+                return _topPadding; }
+        }
+
+        private float footerPadding{
+            get{ return _footerPadding; }
         }
 
 
@@ -53,18 +67,10 @@ namespace AtlasAI.AIEditor
             //  Initialize window
             activeInstance = GetWindow<AIEditorWindow>();
             activeInstance.minSize = new Vector2(400, 200);
-            Texture2D _icon = EditorGUIUtility.Load(EditorGUIUtility.isProSkin ? "Textures/Icon_Dark.png" : "Textures/Icon_Light.png") as Texture2D;
-            activeInstance._title.text = "AI Editor";
-            activeInstance._title.image = _icon;
-            activeInstance.titleContent = activeInstance._title;
+            Texture2D _icon = Resources.Load<Texture2D>("Icon_Light"); 
+            activeInstance.titleContent = new GUIContent("AI Editor", _icon);
             //  Show window
             activeInstance.Show();
-
-            //  Initialize variables.
-            activeInstance._drag = new DragData(activeInstance);
-            activeInstance._ui = AIUI.Create("DefaultAI");
-
-
             return activeInstance;
         }
 
@@ -82,291 +88,425 @@ namespace AtlasAI.AIEditor
             return new GUIContent(text, tooltip);
         }
 
+        private GUIContent GetAITitle(){
+            if (_title == null) _title = new GUIContent();
+
+            if(string.IsNullOrEmpty(_lastOpenAI) == false){
+                _title.text = _lastOpenAI;
+
+            }
+            return _title;
+        }
+
+
 
 		private void OnEnable()
 		{
-            //EditorStyling.Canvas.Init();
-            //EditorStyling.Skinned.Init();
+            Reload();
 
             activeInstance = this;
-            EditorApplication.update -= OnEditorUpdate;
-            EditorApplication.update += OnEditorUpdate;
+            if (nodeSettings == null) nodeSettings = new NodeSettings();
+            if (nodeRenderer == null) nodeRenderer = new NodeRenderer(nodeSettings);
+            if (mouseState == null) mouseState = new MouseState();
+            if (drag == null) drag = new DragData(this);
 
-            if(_drag == null) _drag = new DragData(activeInstance);
-            if (_ui == null) _ui = AIUI.Create("DefaultAI");
+            if (string.IsNullOrEmpty(_lastOpenAI) == false) 
+                Load(_lastOpenAI, true);
+            else{
+                aiui = AIUI.Create("DefaultAI");
+                Selection.activeObject = aiui;
+                Editor newInspector = Editor.CreateEditor(aiui);
+                if (newInspector != null)
+                {
+                    AIInspectorEditor.instance = newInspector as AIInspectorEditor;
+                    AIInspectorEditor.instance.Repaint();
+                }
+            }
+                
+
+
 		}
-
 
 		private void OnDisable()
 		{
-            EditorApplication.update -= OnEditorUpdate;
+
 		}
 
 		private void OnDestroy()
 		{
-            EditorApplication.update -= OnEditorUpdate;
+            if (aiui != null)
+                DestroyImmediate(aiui);
 		}
 
 
 		private void OnGUI()
         {
-            DrawToolbar();
+            Matrix4x4 m = GUI.matrix;
+            //  Draw the Editor Window.
             DrawBackgroundGrid();
+            DrawToolbar();
+            DrawFooter();
 
-            DrawNodes(GetViewport());
+
+            if(aiui != null){
+                //  Draw the nodes and connections.
+                DrawNodes(GetViewport());
+                DrawActionConnections(GetViewport());
+                //  Process all the events.
+                DrawUI();
+            }
 
 
-            DrawUI();
+
+            GUI.matrix = m;
             if (GUI.changed) Repaint();
         }
 
 
+        #region Draw Editor
+
         private void DrawBackgroundGrid()
         {
             Color _oldColor = Handles.color;
-
             Handles.color = _majorGridColor;
-            DrawGridLines(_ui.canvas.offset, position.width, position.height, 100);
+            DrawGridLines(position.width, position.height, 100);
             Handles.color = _minorGridColor;
-            DrawGridLines(_ui.canvas.offset, position.width, position.height, 20);
+            DrawGridLines(position.width, position.height, 20);
             Handles.color = _oldColor;
-
-            //Handles.color = _majorGridColor;
-            //DrawGridLines(_drag.offset, position.width, position.height, 100);
-            //Handles.color = _minorGridColor;
-            //DrawGridLines(_drag.offset, position.width, position.height, 20);
-            //Handles.color = _oldColor;
+            //DrawGrid(position, 1, aiui == null ? Vector2.zero : aiui.canvas.offset);
         }
 
 
-        private void DrawGridLines(Vector2 offset, float width, float height, float size)
+        private void DrawGridLines(float width, float height, float size)
         {
             int widthDivs = Mathf.CeilToInt(width / size);
-            int heightDivs = Mathf.CeilToInt(height / size);
+            int heightDivs = Mathf.CeilToInt(height - topPadding - footerPadding / size);
 
             Handles.BeginGUI();
 
-            offset += _drag.dragStart * _minimumDragDelta;
-            Vector3 newOffset = new Vector3(offset.x % size, offset.y % size, 0);
+            Vector2 panOffset = aiui.canvas == null ? Vector2.zero : (aiui.canvas.offset + dragPos) * 0.5f;
+            Vector3 newOffset = new Vector3(panOffset.x % size, panOffset.y % size, 0);
 
-            //  Draw lines for height.
+            // Draws the vertical lines.
             for (int i = 0; i < widthDivs; i++){
-                Vector3 p1 = new Vector3(size * i, -size + topPadding + size, 0) ; // + newOffset;
-                Vector3 p2 = new Vector3(size * i, position.height, 0f); // + newOffset;
+                Vector3 p1 = new Vector3(size * i, topPadding, 0) + newOffset;                          // (100 * 1, 18)
+                Vector3 p2 = new Vector3(size * i, height - footerPadding, 0f) + newOffset;    //  (100 * i, 400
                 Handles.DrawLine(p1, p2);
             }
+            //  Draws the horizontal lines.
             for (int i = 0; i < heightDivs; i++){
-                Vector3 p1 = new Vector3(-size, size * i, 0); // + newOffset;
-                Vector3 p2 = new Vector3(position.width, size * i, 0f) ; // + newOffset;
+                Vector3 p1 = new Vector3(-size, size * i, 0) + newOffset;                   //  (-100, 100 * 1)
+                Vector3 p2 = new Vector3(width, size * i, 0f)  + newOffset;        //  (350, 100 * 1)
                 Handles.DrawLine(p1, p2);
             }
             Handles.EndGUI();
         }
 
 
+
         private void DrawToolbar()
         {
-            GUIContent newButton = DoLabel("New", "Creates a new AI");
-            GUIContent saveButton = DoLabel("Save", "Saves current AI");
-            GUIContent loadButton = DoLabel("Load", "Loads a saved AI");
-            GUIContent reloadButton = DoLabel("Reload", "Reloads an AI");
-
-            Rect rect = new Rect(0, 2, position.width, topPadding);
+            Rect rect = new Rect(0, 0, position.width, topPadding);
             GUILayout.BeginArea(rect, EditorStyles.toolbar);
             using (new EditorGUILayout.HorizontalScope())
             {
-                
-                if(GUILayout.Button(newButton, EditorStyles.toolbarButton, GUILayout.Width(48)))
+                if (GUILayout.Button(DoLabel("New", "Creates a new AI"), EditorStyles.toolbarButton, GUILayout.Width(48)))
                 {
-                    Debug.Log(newButton.tooltip);
+                    Debug.Log("Creates a new AI");
                 }
                 GUILayout.Space(5);
-                if (GUILayout.Button(saveButton, EditorStyles.toolbarButton, GUILayout.Width(48)))
+                if (GUILayout.Button(DoLabel("Load", "Loads a saved AI"), EditorStyles.toolbarButton, GUILayout.Width(48)))
                 {
-                    Debug.Log(saveButton.tooltip);
+                    StoredAIs.Refresh();
+                    if (StoredAIs.AIs != null)
+                    {
+                        GenericMenu storedAIs = new GenericMenu();
+                        for (int i = 0; i < StoredAIs.AIs.Count; i++)
+                        {
+                            string aiId = StoredAIs.AIs[i].aiId;
+                            storedAIs.AddItem(new GUIContent(aiId), false, () => Load(aiId, true));
+                        }
+                        storedAIs.ShowAsContext();
+                    }
                 }
                 GUILayout.Space(5);
-                if (GUILayout.Button(loadButton, EditorStyles.toolbarButton, GUILayout.Width(48)))
+                if (GUILayout.Button(DoLabel("Save", "Saves current AI"), EditorStyles.toolbarButton, GUILayout.Width(48)))
                 {
-                    Debug.Log(loadButton.tooltip);
-                }
-                GUILayout.Space(5);
-                if (GUILayout.Button(reloadButton, EditorStyles.toolbarButton, GUILayout.Width(48)))
-                {
-                    Debug.Log(reloadButton.tooltip);
+                    Save(_lastOpenAI);
                 }
 
-                //  Window Rect
-                GUILayout.Space(5);
+
+
+                //  Draw current loaded AI.
                 GUILayout.FlexibleSpace();
-                Rect windowRect = GetViewport();
-                GUILayout.Label(string.Format("Position: ({0}, {1}) | Width: {2} | Height: {3}", 
-                                              windowRect.x, windowRect.y, windowRect.width, windowRect.height));
-                //  Number of Nodes.
-                if(_ui != null){
+                GUILayout.Label(GetAITitle(), EditorStyling.Skinned.boldTitle);
+                GUILayout.FlexibleSpace();
+
+                if (aiui != null)
+                {
+                    //  Window Rect
                     GUILayout.Space(5);
                     GUILayout.FlexibleSpace();
-                    GUILayout.Label(string.Format("Number of Nodes: {0} ", _ui.canvas.nodes.Count));
+                    Rect windowRect = GetViewport();
+                    GUILayout.Label(string.Format("Canvas offset: {0}", aiui.canvas.offset));
                 }
 
-                //  Mouse Position
-                GUILayout.Space(5);
-                GUILayout.FlexibleSpace();
-                GUILayout.Label(string.Format("Mouse Position: ({0}, {1})", Event.current.mousePosition.x, Event.current.mousePosition.y));
 
-                //  Mouse Delta
-                GUILayout.Space(5);
-                GUILayout.FlexibleSpace();
-                GUILayout.Label(string.Format("Is Dragging: {0}", _drag.isDragging));
-                GUILayout.Space(5);
             }
             GUILayout.EndArea();
         }
 
 
-        private void DrawCompleteQualifier(Vector2 pos, float totalWidth, QualifierNode qualifierNode, SelectorLayout layout)
+        private void DrawFooter()
         {
-
-        }
-
-        private void DrawSelectorUI(SelectorNode selectorNode, SelectorLayout layout)
-        {
-            Rect nodeRect = selectorNode.viewArea;
-            Vector2 pos = _drag.offset;
-            nodeRect.position = new Vector2(nodeRect.x + pos.x, nodeRect.y + pos.y);
-
-
-            // Create a headerRect out of the previous rect and draw it, marking the selected node as such by making the header bold
-            var titleHeight = layout.titleHeight;
-            Rect headerRect = new Rect(nodeRect.x, nodeRect.y, nodeRect.width, titleHeight);
-            GUI.Box(headerRect, GUIContent.none, GUI.skin.box);
-            GUI.Label(headerRect, string.Format(" Position: ({0}, {1}) | Is Selected : {2}", selectorNode.viewArea.x, selectorNode.viewArea.y, selectorNode.isSelected));
-            //GUI.Label(headerRect, string.Format(" Position: ({0}, {1}) | Is Selected : {2}", nodeRect.x, nodeRect.y, selectorNode.isSelected));
-
-            // Begin the body frame around the Node
-            Rect bodyRect = new Rect(nodeRect.x, nodeRect.y + titleHeight, nodeRect.width, nodeRect.height - titleHeight);
-            GUI.BeginGroup(bodyRect, GUI.skin.box);
-            //GUI.BeginGroup(bodyRect, selectorNode.isSelected ? EditorStyling.Canvas.activeNode : EditorStyling.Canvas.defaultNode);
-            bodyRect.position = Vector2.zero;
-            GUILayout.BeginArea(bodyRect);
-
-            GUI.changed = false;
-
-
-            // End NodeGUI frame
-            GUILayout.EndArea();
-            GUI.EndGroup();
-            //selectorNode.viewArea = nodeRect;
-
-        }
-
-
-        private void DrawUI()
-        {
-            Event evt = Event.current;
-
-            // Process all node events.
-            for (int i = _ui.canvas.nodes.Count - 1; i >= 0; i--)
+            Rect rect = new Rect(0, position.height - footerPadding + 10, position.width, footerPadding);
+            GUILayout.BeginArea(rect, EditorStyles.toolbar);
+            using (new EditorGUILayout.HorizontalScope())
             {
-                var node = _ui.canvas.nodes[i];
-                switch (evt.type)
+                if (GUILayout.Button(DoLabel("Refresh", "Refreshes the ai editor.  Also refreshes all StoredAIs"), EditorStyles.toolbarButton, GUILayout.Width(48)))
                 {
-                    case EventType.MouseDown:
-                        //  If left mouse button is clicked
-                        if(evt.button == 0)
-                        {
-                            //TopLevelNode nodeAtPosition = _ui.canvas.NodeAtPosition(evt.mousePosition);
-                            //if (node == nodeAtPosition)
-                            if(node.isSelected){
-                                //  That means node is selected.
-                                _drag.StartNodeDrag(node, evt.delta);
-                            }
-                            else{
-                                //_drag.EndDrag(evt.delta);
-                            }
-                            GUI.changed = true;
-                        }
-                        //  If right mouse button is clicked and the node is selected.
-                        if (evt.button == 1 && node.isSelected && node.viewArea.Contains(evt.mousePosition))
-                        {
-                            GenericMenu menu = new GenericMenu();
-                            menu.AddItem(new GUIContent("Add Selector"), false, _TestAddSelector, evt.mousePosition);
-                            menu.ShowAsContext();
-                            evt.Use();
-                        }
-                        break;
+                    //if(aiui != null){
+                    //    string data = GuiSerializer.Serialize(aiui.canvas);
+                    //    Debug.Log(data);
+                    //    //GuiSerializer.Deserialize(aiui, data);
+                    //}
 
-                    case EventType.MouseUp:
-                        //if (evt.button == 0 && _drag.isDragging){
-                        //    _drag.EndDrag(evt.delta);
-                        //}
+                    Debug.Log(StoredAIs.GetById(_lastOpenAI));
 
-                        break;
+                    //Repaint();
+                }
 
-                    case EventType.MouseDrag:
-                        if (evt.button == 0 && _drag.isDragging)
-                        {
-                            _drag.DoDrag(evt.delta);
-                            //node.viewArea.position += evt.delta;
-                            evt.Use();
-                            GUI.changed = true;
-                        }
-                        break;
+                if (GUILayout.Button(DoLabel("Clear", "Clear all nodes from the graph."), EditorStyles.toolbarButton, GUILayout.Width(48)))
+                {
+                    aiui.canvas.nodes.Clear();
+                }
+
+                //  Number of Nodes.
+                if (aiui != null)
+                {
+                    GUILayout.Space(5);
+                    GUILayout.FlexibleSpace();
+                    GUILayout.Label(string.Format("| Selected Node: {0} ", aiui.selectedNode == null ? "< None >" : aiui.selectedNode.name));
+                    GUILayout.Label(string.Format(" {0} ", aiui.currentSelector == null ? "" : aiui.currentSelector.viewArea.position.ToString()));
+                }
+
+
+                GUILayout.FlexibleSpace();
+                if (GUILayout.Button(DoLabel("Close", "Close window"), EditorStyles.toolbarButton, GUILayout.Width(48)))
+                {
+                    activeInstance.Close();
                 }
             }
-
-
-            //  Process canvas events.
-            switch (evt.type)
-            {
-                case EventType.MouseDown:
-                    if (evt.button == 0)
-                    {
-                        //ClearConnectionSelection();
-                    }
-
-                    if (evt.button == 1)
-                    {
-                        GenericMenu menu = new GenericMenu();
-                        menu.AddItem(new GUIContent("Add Selector"), false, _TestAddSelector, evt.mousePosition);
-                        menu.ShowAsContext();
-                        evt.Use();
-                    }
-                    if(evt.button == 2)
-                    {
-                        
-                    }
-                    break;
-
-                case EventType.MouseDrag:
-                    if (evt.button == 0)
-                    {
-                        _ui.canvas.offset += _drag.offset;
-                        var nodes = _ui.canvas.nodes;
-                        if (nodes != null){
-                            for (int i = 0; i < nodes.Count; i++){
-                                nodes[i].viewArea.position += evt.delta;
-                            }
-                        }
-                        GUI.changed = true;
-                    }
-                    break;
-            }
-
+            GUILayout.EndArea();
         }
+
+
+        #endregion
+
+
+
+        #region Draw Nodes
+
+
+        private void DrawConnectionCurve(Vector3 startPos, Vector3 endPos, bool visualizedSelected)
+        {
+            Vector3 startTan = startPos + Vector3.left * _curveCurvature;
+            Vector3 endTan = endPos - Vector3.left * _curveCurvature;
+            Handles.DrawBezier( startPos, endPos, startTan, endTan, _connectorLineColor, null, 2f );
+
+            GUI.changed = true;
+        }
+
+
+        private void DrawCompleteQualifier(Vector2 pos, float totalWidth, QualifierNode qualifierNode , NodeSettings settings)
+        {
+            Rect viewRect = new Rect(pos.x, pos.y, totalWidth, settings.qualifierHeight + settings.actionHeight);
+            Rect iconAreaRect;
+            Rect toggleAreaRect;
+
+            // Draw Node contents
+            viewRect.height = settings.qualifierHeight;
+            GUI.Box(viewRect, GUIContent.none, EditorStyling.Canvas.normalQualifier);
+            GUI.Label(viewRect, qualifierNode.friendlyName, EditorStyling.NodeStyles.normalBoxText);
+
+            viewRect.y += settings.qualifierHeight;
+            viewRect.height = settings.actionHeight;
+            GUI.Box(viewRect, GUIContent.none, EditorStyling.Canvas.normalAction);
+
+            //  Connector Icon
+            iconAreaRect = new Rect(viewRect.width - settings.anchorAreaWidth, viewRect.y + (settings.anchorAreaWidth / 2), settings.anchorAreaWidth, settings.qualifierHeight);
+            toggleAreaRect = new Rect(settings.toggleAreaWidth, viewRect.y + 4, settings.toggleAreaWidth, settings.actionHeight);
+            GUI.Label(toggleAreaRect, EditorStyling.ExpandIcon);
+
+            viewRect.x += toggleAreaRect.width;
+            GUI.Label(viewRect, "Action Name", EditorStyling.NodeStyles.normalBoxText);
+
+            GUI.Label(iconAreaRect, EditorStyling.ConnectorOpen);
+        }
+
+
+        private void DrawSelectorUI (SelectorNode selectorNode, NodeSettings settings)
+        {
+            selectorNode.RecalcHeight(settings);
+            Rect nodeRect = selectorNode.viewArea;
+
+            nodeRect.height = settings.titleHeight;
+            GUI.Box(nodeRect, GUIContent.none, EditorStyling.Canvas.normalHeader);
+            GUI.Label(nodeRect, selectorNode.friendlyName, selectorNode.isSelected ? EditorStyling.NodeStyles.nodeTitleActive : EditorStyling.NodeStyles.nodeTitle);
+
+            nodeRect.y = nodeRect.y + settings.titleHeight;
+            nodeRect.height = selectorNode.viewArea.height + settings.titleHeight;
+            // Begin the body frame around the Node
+            using(new GUI.GroupScope(nodeRect))
+            {
+                nodeRect.position = Vector2.zero;
+                using(new GUILayout.AreaScope(nodeRect))
+                {
+                    GUI.Box(nodeRect, new GUIContent(nodeRect.height.ToString()), EditorStyling.Canvas.normalSelector);
+                    GUI.changed = false;
+
+                    Vector2 pos = new Vector2(nodeRect.x, nodeRect.y);
+                    //GUI.Label(contentAreaRect, nodeInfo, EditorStyling.NodeStyles.normalBoxText);
+                    if(selectorNode.qualifierNodes.Count > 0)
+                    {
+                        for (int i = 0; i < selectorNode.qualifierNodes.Count; i++)
+                        {
+                            pos.y = i * (settings.qualifierHeight + settings.actionHeight);
+                            DrawCompleteQualifier(pos, nodeRect.width, selectorNode.qualifierNodes[i], settings);
+                        }
+                    }
+
+                    pos.y = (selectorNode.qualifierNodes.Count) * (settings.qualifierHeight + settings.actionHeight);  //  + settings.actionHeight
+                    // Draw Node contents
+                    DrawCompleteQualifier(pos, nodeRect.width, selectorNode.defaultQualifierNode, settings);
+                    selectorNode.RecalcHeight(settings);
+                }
+            }
+        }
+
+
+
+
+
+        #endregion
+
 
 
         private void DrawNodes(Rect viewPort)
         {
-            GUI.BeginGroup(viewPort);
+            using (new GUILayout.AreaScope(viewPort))
+            {
+                foreach (SelectorNode node in aiui.canvas.selectorNodes)
+                {
+                    //DrawSelectorUI(node, nodeSettings);
+                    nodeRenderer.DrawNodes(node, new NodeLayout(node, nodeSettings));
+                }
+            }
+        }
 
-            var canvas = _ui.canvas;
-            foreach (SelectorNode node in canvas.selectorNodes){
-                DrawSelectorUI(node, new SelectorLayout(node, 20f));
+        private void DrawActionConnections(Rect viewPort)
+        {
+
+        }
+
+
+
+
+        private void DrawUI()
+        {
+            if (aiui == null) return;
+
+            Event evt = Event.current;
+            //  Update MosueState.
+            mouseState.Update(evt);
+            Vector2 offset = new Vector2(evt.mousePosition.x, evt.mousePosition.y - nodeSettings.titleHeight + 4);
+            TopLevelNode node = aiui.canvas.NodeAtPosition(offset);
+            //  Mouse button is down.
+            if (mouseState.isMouseDown)
+            {
+                
+                if (node != null)
+                {
+                    var layout = new NodeLayout((SelectorNode)node, nodeSettings);
+                    if(layout.InTitleArea(evt.mousePosition))
+                    {
+                        drag.StartNodeDrag(node, evt.mousePosition);
+                    }
+                    else
+                    {
+                        var hitInfo = layout.GetQualifierAtPosition(evt.mousePosition);
+                        if(hitInfo.InAnchorArea){
+                            Debug.Log("In anchor area.");
+
+                        }
+                        else if (hitInfo.qualifier != null){
+                            Debug.Log(hitInfo.qualifier.friendlyName);
+                        }
+
+                    }
+                    //  If anchor is selected, start Connection.
+
+                    //  If DragHandle is selected.
+
+                    //  
+                    //drag.StartNodeDrag(node, evt.mousePosition);
+                    GUI.changed = true;
+                }
+                //  Mouse down on the canvas background enables panning.
+                else {
+                    drag.StartPan(evt.mousePosition);
+                }
+            }
+            //  LMB button is dragging.
+            if (mouseState.isMouseDrag && mouseState.isLeftButton)
+            {
+                if(drag.isDragging){
+                    drag.DoDrag(evt.delta);
+                    GUI.changed = true;
+                }
+            }
+            //  Mouse button is up.
+            if (mouseState.isMouseUp)
+            {
+                //  Select node
+                if (mouseState.isLeftButton)
+                {
+                    if(drag.isDragging){
+                        drag.EndDrag(evt.mousePosition);
+                    }
+
+                    if(node != null){
+                        aiui.selectedNode = node;
+                        aiui.Select((SelectorNode)node, null, null);
+                    } else {
+                        aiui.selectedNode = null;
+                        aiui.Select(null, null, null);
+                    }
+
+                    GUI.changed = true;
+                }
+                else if (mouseState.isRightButton)
+                {
+                    ShowLoadMenu(evt.mousePosition);
+                    evt.Use();
+                    GUI.changed = true;
+                }
+
+                //// Resize canvas after a drag
+                //else if(){
+                //    // GUI.changed = true;
+                //}
+
+                else
+                {
+                    //  mode is set to none.
+                }
+
+                //if (mouseState.isLeftButton) Debug.LogFormat("Mouse Position : {0}", evt.mousePosition);
             }
 
-            GUI.EndGroup();
-            //Repaint();
+
+
         }
 
 
@@ -375,44 +515,88 @@ namespace AtlasAI.AIEditor
         private Rect GetViewport()
         {
             Rect rect = position;
-            rect.height = position.height - topPadding;
-            rect.x = (position.width / 2) - (position.width / 2);
-            rect.y = ((position.height / 2) - (position.height / 2)) + topPadding;
+            rect.height = position.height - topPadding - footerPadding;
+            rect.x = 0;
+            rect.y = topPadding;
+
             return rect;
         }
 
 
+        #region Load and Save
 
         private void Load(string aiId, bool forceRefresh)
         {
-            
+            //  Do stuff...
+            aiui = AIUI.Load(aiId, forceRefresh);
+            _lastOpenAI = aiId;
+
+            Selection.activeObject = aiui;
+            Editor newInspector = Editor.CreateEditor(aiui);
+            if(newInspector != null){
+                AIInspectorEditor.instance = newInspector as AIInspectorEditor;
+                AIInspectorEditor.instance.Repaint();
+            }
         }
 
+
+        private void Save(string newName)
+        {
+            aiui.Save(newName);
+            EditorUtility.SetDirty(aiui);
+            AssetDatabase.SaveAssets();
+        }
+
+        #endregion
+
+        #region Misc functions
 
         private void OnAIExecute()
         {
             
         }
 
-        private void OnEditorUpdate()
-        {
-            
-        }
-
-
-		private void OnSelectionChange()
+		private void OnFocus()
 		{
-            _lastSelectedGameObject = _visualizedEntity;
-            _visualizedEntity = Selection.activeGameObject;
 
-            if (GUI.changed) Repaint();
 		}
 
 
-        private void ShowLoadMenu()
+		private void OnSelectionChange()
         {
-            Debug.Log("Test menu");
+            SetVisualizedEntity(Selection.activeGameObject);
+            Repaint();
         }
+
+
+        private void SetVisualizedEntity(GameObject entity)
+        {
+            //  If Selection returns a GameObject.
+            if (entity != null)
+            {
+                //  If GameObject contains UtilityAIComponent.
+                if (entity.GetComponent<UtilityAIComponent>())
+                {
+                    visualizedEntity = entity;
+                    GUI.changed = true;
+                }
+                //  If GameObject does not contains UtilityAIComponent.
+                else
+                {
+                    _lastSelectedGameObject = visualizedEntity;
+                    visualizedEntity = null;
+                    GUI.changed = true;
+                }
+            }
+            //  Nothing was selected.
+            else
+            {
+                if (visualizedEntity != null)
+                    _lastSelectedGameObject = visualizedEntity;
+                visualizedEntity = null;
+            }
+        }
+
 
 		private void UpdateVisualizedEntity(bool forceUpdate)
         {
@@ -420,15 +604,50 @@ namespace AtlasAI.AIEditor
         }
 
 
-        private void _TestAddSelector(object mousePos)
+        private void Reload()
         {
-            Debug.Log((Vector2)mousePos);
-            _ui.AddSelector((Vector2)mousePos, typeof(ScoreSelector));
+            StoredAIs.Refresh();
+        }
+
+
+        #endregion
+
+
+
+
+
+        public void ShowLoadMenu(Vector2 mousePos)
+        {
+            if (Application.isPlaying) return;
+
+            var menu = new GenericMenu();
+
+            if(aiui.selectedNode == null)
+            {
+                //  Add Selectors
+                menu.AddItem(new GUIContent("Add Selector"), false, () => aiui.AddSelector(mousePos, typeof(ScoreSelector)));
+            }
+
+            if(aiui.selectedNode != null)
+            {
+                if(aiui.currentSelector != null)
+                {
+                    menu.AddItem(new GUIContent("Add Qualifier"), false, () => aiui.AddQualifier(typeof(CompositeScoreQualifier), aiui.currentSelector));
+                    menu.AddDisabledItem(new GUIContent("Connect to Selector"));
+                    menu.AddSeparator("");
+                    menu.AddItem(new GUIContent("Remove Selector"), false, () => aiui.RemoveNode(aiui.currentSelector));
+                }
+            }
+
+            menu.AddSeparator("");
+            menu.AddDisabledItem(new GUIContent("Save"));
+
+            menu.DropDown(new Rect(mousePos.x, mousePos.y, 0, 0));
         }
 
 
 
-        private class DragData
+        public class DragData
         {
             public enum DragType
             {
@@ -441,64 +660,35 @@ namespace AtlasAI.AIEditor
                 Pan
             }
 
-            //
-            //  Fields
-            //
+            public bool lastMouseDownOnCanvas;
+
             private AIEditorWindow _parent;
-            private DragType _type;
+            private DragType _dragType;
+
             private TopLevelNode _node;
-            private SelectorNode _selector;
-            private QualifierNode _qualifier;
-            private SelectorLayout _layout;
-            private int _qualifierIndex;
-            private Rect _startPositionAndSize;
+
             private Vector2 _offset;
             private Vector2 _dragStart;
             private Vector2 _dragLast;
             private Vector3 _dragAnchor;
 
 
-            //
-            //  Properties
-            //
             public bool isDragging{
-                get { return IsDraggingType(_type); }
+                get { return isDraggingType(_dragType); }
             }
 
-            public int qualifierIndex{
-                get { return _qualifierIndex; }
-            }
+            public Vector2 dragStart { get { return _dragStart; } }
 
-            public Vector2 dragStart{
-                get {
-                    _dragStart = Event.current.mousePosition;
-                    return _dragStart; }
-            }
-
-            public Vector2 offset{
-                get { return _offset; }
-            }
-
-            public Vector3 anchor{
-                get { return _dragAnchor; }
-            }
+            public Vector2 offset { get { return _offset; } }
+           
+            public Vector3 anchor { get { return _dragAnchor; } }
 
 
-            //
-            //  Constructor
-            //
-            public DragData(AIEditorWindow parent){
-                _parent = parent;
-            }
 
-
-            //
-            //  Methods
-            //
-
-            public bool IsDraggingType(DragType t)
+            public bool isDraggingType(DragType type)
             {
-                switch(t){
+                switch(type)
+                {
                     case DragType.None:
                         return false;
                     case DragType.Node:
@@ -507,10 +697,6 @@ namespace AtlasAI.AIEditor
                         return true;
                     case DragType.Connector:
                         return true;
-                    case DragType.Resize:
-                        return false;
-                    case DragType.MassSelect:
-                        return false;
                     case DragType.Pan:
                         return true;
                 }
@@ -521,33 +707,252 @@ namespace AtlasAI.AIEditor
             public void StartNodeDrag(TopLevelNode target, Vector2 mousePos)
             {
                 _node = target;
-                _type = DragType.Node;
-                //_node.viewArea.position += mousePos;
+                _dragLast = mousePos;
+                _dragStart = mousePos;
+                //_offset = mousePos - target.viewArea.position;
+                _dragType = DragType.Node;
             }
 
-            private void DoNodeDrag(Vector2 mousePos)
+            public void StartConnectorDrag(Vector2 mousePos)
             {
-                //  Do something else with the node.
-                _node.viewArea.position += mousePos;
+                _parent.wantsMouseMove = false;
+                _dragLast = mousePos;
+                _dragStart = mousePos;
+                _dragType = DragType.Connector;
+            }
+
+            public void StartPan(Vector2 mousePos)
+            {
+                _dragLast = mousePos;
+                _dragStart = mousePos;
+                _dragType = DragType.Pan;
             }
 
 
-            public void DoDrag(Vector2 mousePos)
+
+
+            public void DoDrag(Vector2 delta)
             {
-                if(_type == DragType.Node){
-                    DoNodeDrag(mousePos);
+                switch (_dragType)
+                {
+                    case DragType.None:
+                        break;
+                    case DragType.Node:
+                        DoNodeDrag(delta);
+                        break;
+                    case DragType.Qualifier:
+                        break;
+                    case DragType.Connector:
+                        DoConnectorDrag(delta);
+                        break;
+                    case DragType.Pan:
+                        DoPan(delta);
+                        break;
                 }
-                _offset += mousePos;
             }
+
+            private void DoNodeDrag(Vector2 delta)
+            {
+                //Vector2 newPosition = delta - _offset;
+                _node.viewArea.position += delta;
+                if (Application.isPlaying) 
+                    return;
+            }
+
+
+            private void DoConnectorDrag(Vector2 delta)
+            {
+
+            }
+
+            private void DoPan(Vector2 delta)
+            {
+                _parent.aiui.canvas.offset += delta;
+                if (_parent.aiui.canvas.nodes != null){
+                    for (int i = 0; i < _parent.aiui.canvas.nodes.Count; i++){
+                        _parent.aiui.canvas.nodes[i].viewArea.position += delta;
+                    }
+                }
+            }
+
+
 
 
             public void EndDrag(Vector2 mousePos)
             {
-                _type = DragType.None;
+                switch (_dragType)
+                {
+                    case DragType.None:
+                        break;
+                    case DragType.Node:
+                        EndNodeDrag(mousePos);
+                        break;
+                    case DragType.Qualifier:
+                        break;
+                    case DragType.Connector:
+                        EndConnectorDrag(mousePos);
+                        break;
+                    case DragType.Pan:
+                        EndPan(mousePos);
+                        break;
+                }
+                _dragType = DragType.None;
             }
+
+            public void CancelDrag()
+            {
+                _parent.wantsMouseMove = false;
+                _dragType = DragType.None;
+            }
+
+
+            private void EndNodeDrag(Vector2 mousePos)
+            {
+                _node = null;
+                //_offset = Vector2.zero; ;
+                _dragLast = Vector2.zero;
+                _dragStart = Vector2.zero;
+            }
+
+            private void EndConnectorDrag(Vector2 mousePos)
+            {
+
+            }
+
+            private void EndPan(Vector2 mousePos)
+            {
+
+                _dragLast = Vector2.zero;
+                _dragStart = Vector2.zero;
+            }
+
+
+
+
+            public DragData(AIEditorWindow parent)
+            {
+                _parent = parent;
+            }
+
+
+
+
         }
-
-
-
     }
 }
+
+
+
+
+
+#region DrawUI
+
+//private void DrawUI()
+//{
+//    if (aiui == null) return;
+//    Event evt = Event.current;
+//    //  Update MosueState.
+//    mouseState.Update(evt);
+//    TopLevelNode node = aiui.canvas.NodeAtPosition(evt.mousePosition);
+//    if (node != null)
+//    {
+//        if (mouseState.isLeftButton)
+//        {
+//            if (mouseState.isMouseDown)
+//            {
+//                aiui.selectedNode = node;
+//                GUI.changed = true;
+//            }
+//            if (mouseState.isMouseDrag)
+//            {
+//                //  If node is selected than, than update position of selected node.
+//                if (node.isSelected)
+//                {
+//                    node.viewArea.position += evt.delta;
+//                    evt.Use();
+//                    GUI.changed = true;
+//                }
+//            }
+//            if (mouseState.isMouseUp)
+//            {
+//                //  Not being dragged anymore.
+//            }
+//        }
+//        //  If RMB is clicked down.
+//        if (mouseState.isRightButton)
+//        {
+//            if (mouseState.isMouseDown)
+//            {
+//                //  If node is selected, show context menu.
+//                if (node.isSelected)
+//                {
+//                    GenericMenu menu = new GenericMenu();
+//                    if (node.InTitleArea(evt.mousePosition, nodeSettings))
+//                    {
+//                        menu.AddItem(new GUIContent("Add Qualifier"), false, () => aiui.AddQualifier(typeof(CompositeScoreQualifier), (SelectorNode)node));
+//                    }
+//                    else
+//                    {
+//                        menu.AddItem(new GUIContent("Remove Selector"), false, () => aiui.RemoveNode(node));
+//                    }
+//                    menu.ShowAsContext();
+//                    GUI.changed = true;
+//                    evt.Use();
+//                }
+//            }
+//        }
+//    }
+//    //  Process all canvas events.  Only process events if no node is seelcted.
+//    mouseState.Update(evt);
+//    dragPos = Vector2.zero;
+//    //  If LMB is clicked down.
+//    if (mouseState.isLeftButton)
+//    {
+//        if (mouseState.isMouseDown)
+//        {
+//            //  If no nodes were selected.
+//            if (node == null)
+//            {
+//                aiui.selectedNode = null;
+//                GUI.changed = true;
+//            }
+//        }
+//        if (mouseState.isMouseDrag)
+//        {
+//            if (GetViewport().Contains(evt.mousePosition))
+//            {
+//                //  If mouse click is not on a node, than can start drag.
+//                dragPos = evt.delta;
+//                if (aiui.canvas.nodes != null)
+//                {
+//                    for (int i = 0; i < aiui.canvas.nodes.Count; i++)
+//                    {
+//                        aiui.canvas.nodes[i].viewArea.position += dragPos;
+//                    }
+//                }
+//                GUI.changed = true;
+//            }
+//        }
+//        if (mouseState.isMouseUp)
+//        {
+//            //  Stop dragging.  use Event?
+//            //aiui.selectedNode = null;
+//            //GUI.changed = true;
+//            //Debug.Log(aiui.selectedNode);
+//        }
+//    }
+//    //  If RMB is clicked down.
+//    if (mouseState.isRightButton)
+//    {
+//        if (mouseState.isMouseDown)
+//        {
+//            //  If node is selected, show context menu.
+//            GenericMenu menu = new GenericMenu();
+//            menu.AddItem(new GUIContent("Add Selector"), false, () => aiui.AddSelector(evt.mousePosition, typeof(ScoreSelector)));
+//            menu.ShowAsContext();
+//            evt.Use();
+//        }
+//    }
+//}
+
+#endregion

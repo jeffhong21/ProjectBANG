@@ -6,6 +6,9 @@
     using Serialization;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// This Action connects to another Selector.
+    /// </summary>
     public class SelectorAction : IAction //, ISerializationCallbackReceiver, IPrepareForSerialization, IInitializeAfterDeserialization
     {
         //
@@ -46,6 +49,11 @@
         // Methods
         //
         public void Execute(IAIContext context)
+        {
+            OnExecute(context);
+        }
+
+        public void OnExecute(IAIContext context)
         {
             selector.Select(context, selector.qualifiers, selector.defaultQualifier);
         }

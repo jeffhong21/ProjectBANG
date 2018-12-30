@@ -9,53 +9,52 @@ namespace AtlasAI.AIEditor
     public class AIGeneralSettings : ScriptableObject
     {
         
-        public const string NameMapFileName = "AINameMapHelper.cs";
-        private static AIGeneralSettings _instace;
+        public const string NameMapFileName = "AINameMap.cs";
+        private static AIGeneralSettings _instance;
 
 
         //
         // Fields
         //
         [HideInInspector, SerializeField]
-        private string _storagePath;
+        private string _storagePath = "Assets/Scripts/UtilityAI/Resources/AIStorage";
         [HideInInspector, SerializeField]
-        private string _nameMapPath;
+        private string _nameMapPath = "Assets/Scripts/UtilityAI";
         private bool _isDirty;
 
         //
         // Static Properties
         //
-        internal static AIGeneralSettings instance
+        public static AIGeneralSettings instance
         {
-            get;
+            get{
+                if(_instance == null){
+                    _instance = CreateInstance<AIGeneralSettings>();
+                }
+                return _instance;
+            }
         }
 
         //
         // Properties
         //
-        internal bool isDirty
+        public bool isDirty
         {
             get;
         }
 
-        internal string nameMapPath
+        public string nameMapPath
         {
-            get;
-            set;
+            get { return _nameMapPath; }
+            set { _nameMapPath = value; }
         }
 
-        internal string storagePath
+        public string storagePath
         {
-            get;
-            set;
+            get { return _storagePath; }
+            set { _storagePath = value; }
         }
 
-        //
-        // Constructors
-        //
-        public AIGeneralSettings(){
-            
-        }
 
 
     }

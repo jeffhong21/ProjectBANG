@@ -24,10 +24,7 @@ namespace AtlasAI.Visualization
         }
 
 
-        public string name{
-            get { return action.name; }
-            set { action.name = value; }
-        }
+
 
         public object target{
             get;
@@ -49,11 +46,16 @@ namespace AtlasAI.Visualization
         //
         public virtual void Execute(IAIContext context, bool doCallback)
         {
-            Execute(context);
+            OnExecute(context);
         }
 
 
         public void Execute(IAIContext context)
+        {
+            OnExecute(context);
+        }
+
+        public void OnExecute(IAIContext context)
         {
             UnityEngine.Debug.LogFormat("Action Visualizer Executing action");
         }

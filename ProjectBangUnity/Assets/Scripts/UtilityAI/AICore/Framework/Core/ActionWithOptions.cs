@@ -5,11 +5,9 @@ namespace AtlasAI
 {
     public abstract class ActionWithOptions<TOption> : IAction
     {
-        public string name { get; set; }
         //
         // Fields
         //
-
         protected List<IOptionScorer<TOption>> _scorers;
 
         //
@@ -24,15 +22,17 @@ namespace AtlasAI
         //
         // Constructors
         //
-        protected ActionWithOptions()
-        {
-            
-        }
+        protected ActionWithOptions(){}
 
         //
         // Methods
+        //
 
-        public abstract void Execute(IAIContext context);
+        public void Execute(IAIContext context)
+        {
+            OnExecute(context);
+        }
+
 
 
 
@@ -43,17 +43,18 @@ namespace AtlasAI
             var optionsBuffer = Utilities.ListBufferPool.GetBuffer<ScoredOption<TOption>>(options.Count);
             //UnityEngine.Debug.LogFormat("OptionsBuffer<{2}>: Count: {0} | Capacity: {1}", optionsBuffer.Count, optionsBuffer.Capacity, typeof(TOption));
 
-            //  
             GetAllScores(context, options, optionsBuffer);
             //UnityEngine.Debug.LogFormat("OptionsBuffer<{2}>: Count: {0} | Capacity: {1}", optionsBuffer.Count, optionsBuffer.Capacity, typeof(TOption));
             //  Sort list.
             optionsBuffer.Sort(new ScoredOptionComparer<TOption>());
             var bestOption = optionsBuffer[0].option;
+            //UnityEngine.Debug.LogFormat("Best: Score: {0},  Option {1}    |    Worst Score: {2},  Option {3} ", optionsBuffer[0].score, optionsBuffer[0].option, optionsBuffer[optionsBuffer.Count-1].score, optionsBuffer[optionsBuffer.Count - 1].option);
             //  Return bufer list to pool.
             //DebugOptions(optionsBuffer, 4);
             Utilities.ListBufferPool.ReturnBuffer<ScoredOption<TOption>>(optionsBuffer);
             return bestOption;
         }
+
 
         ///<summary>
         /// Gets all options with the score they received from the<see cref= "P:Apex.AI.ActionWithOptions`1.scorers" />.
@@ -75,6 +76,18 @@ namespace AtlasAI
                 optionsBuffer.Insert(i, new ScoredOption<TOption>(option, score));
             }
         }
+
+
+
+        public abstract void OnExecute(IAIContext context);
+
+
+
+
+
+
+
+
 
 
         private void DebugOptions(List<ScoredOption<TOption>> options, int perLine)

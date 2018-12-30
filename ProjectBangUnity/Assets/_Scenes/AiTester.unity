@@ -114,63 +114,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 23800000, guid: 26f4208ee583a454b9c7917e40fdea2b, type: 2}
---- !u!1001 &16628855
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 224617615703274352, guid: 524b3f62425274c108406e9734681a99,
-        type: 2}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 224617615703274352, guid: 524b3f62425274c108406e9734681a99,
-        type: 2}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4800368842353962, guid: 524b3f62425274c108406e9734681a99, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4800368842353962, guid: 524b3f62425274c108406e9734681a99, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4800368842353962, guid: 524b3f62425274c108406e9734681a99, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4800368842353962, guid: 524b3f62425274c108406e9734681a99, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4800368842353962, guid: 524b3f62425274c108406e9734681a99, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4800368842353962, guid: 524b3f62425274c108406e9734681a99, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4800368842353962, guid: 524b3f62425274c108406e9734681a99, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4800368842353962, guid: 524b3f62425274c108406e9734681a99, type: 2}
-      propertyPath: m_RootOrder
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 137273167682607102, guid: 524b3f62425274c108406e9734681a99,
-        type: 2}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 4300006, guid: ad9b136e9ac104c66b5fb99ea52cfb13, type: 3}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 524b3f62425274c108406e9734681a99, type: 2}
-  m_IsPrefabAsset: 0
 --- !u!1 &26116554
 GameObject:
   m_ObjectHideFlags: 0
@@ -389,7 +332,7 @@ Prefab:
     - target: {fileID: 114187247001489940, guid: 4b3d35125cdfd468289a3e6f86ac0c10,
         type: 2}
       propertyPath: playerCount
-      value: 4
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 114187247001489940, guid: 4b3d35125cdfd468289a3e6f86ac0c10,
         type: 2}
@@ -4555,7 +4498,7 @@ MonoBehaviour:
   drawGizmos: 1
   drawGUI: 1
   sphereSize: 0.25
-  sphereAlpha: 0.5
+  sphereAlpha: 0.99
 --- !u!4 &1570678999
 Transform:
   m_ObjectHideFlags: 0

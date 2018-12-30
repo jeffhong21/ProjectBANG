@@ -31,8 +31,10 @@ namespace AtlasAI.AIEditor
 
         public void AddNew()
         {
-            AddClientWindow window = new AddClientWindow();
-            window.Init(window, this);
+            //AddClientWindow window = new AddClientWindow();
+            //window.Init(window, this);
+
+            var window = AISelectorWindow.Get(Event.current.mousePosition, DoAddNew);
         }
 
 
@@ -173,11 +175,13 @@ namespace AtlasAI.AIEditor
                                 //EditorGUILayout.PropertyField(isActive, GUIContent.none, GUILayout.Width(28f));
 
 
-                                ////  Debug Client toggle
-                                //GUILayout.Space(8f);
-                                //EditorGUILayout.LabelField("Debug Client", GUILayout.Width(75f));
-                                //EditorGUILayout.PropertyField(debug, GUIContent.none, GUILayout.Width(16));
-                                //GUILayout.Space(8f);
+                                //  Debug Client toggle
+                                //GUILayout.FlexibleSpace();
+                                GUILayout.Space(5);
+                                EditorGUILayout.LabelField("Debug Client", GUILayout.Width(75f));
+                                EditorGUILayout.PropertyField(debug, GUIContent.none, GUILayout.Width(16));
+                                GUILayout.Space(5);
+                                //GUILayout.FlexibleSpace();
     
                                 ////  Debug button
                                 //if (GUILayout.Button("Debug", EditorStyles.miniButton, GUILayout.Width(48f)))//  GUILayout.Width(Screen.width * 0.15f)
@@ -193,7 +197,7 @@ namespace AtlasAI.AIEditor
                                 //    }
                                 //    else{
                                 //        string aiClientName = aiConfig.aiId;
-                                //        var field = typeof(AINameMapHelper).GetField(aiClientName, BindingFlags.Public | BindingFlags.Static);
+                                //        var field = typeof(AINameMap).GetField(aiClientName, BindingFlags.Public | BindingFlags.Static);
                                 //        Guid aiId = (Guid)field.GetValue(null);
                                 //        Debug.LogFormat("{0} Guid:  {1}", aiConfig.aiId, aiId);
                                 //    }
@@ -201,16 +205,30 @@ namespace AtlasAI.AIEditor
 
 
                                 //  Add or Switch button
-                                if (InspectorUtility.OptionsPopupButton(InspectorUtility.AddContent))
+                                if (GUILayout.Button(EditorStyling.addTooltip, EditorStyling.Skinned.addButtonSmall, 
+                                                     GUILayout.Width(28f), GUILayout.Height(EditorGUIUtility.singleLineHeight)))
                                 {
                                     Debug.Log("TODO:  Add functionality for changing AIs.");
                                 }
 
                                 //  Delete button
-                                if (InspectorUtility.OptionsPopupButton(InspectorUtility.DeleteContent))
+                                if (GUILayout.Button(EditorStyling.deleteTooltip, EditorStyling.Skinned.deleteButtonSmall,
+                                                     GUILayout.Width(28f), GUILayout.Height(EditorGUIUtility.singleLineHeight)))
                                 {
                                     Delete(i);
                                 }
+
+                                ////  Add or Switch button
+                                //if (InspectorUtility.OptionsPopupButton(InspectorUtility.AddContent))
+                                //{
+                                //    Debug.Log("TODO:  Add functionality for changing AIs.");
+                                //}
+
+                                ////  Delete button
+                                //if (InspectorUtility.OptionsPopupButton(InspectorUtility.DeleteContent))
+                                //{
+                                //    Delete(i);
+                                //}
                             }
 
                             //  Draw the aiconfigs.
@@ -277,7 +295,7 @@ namespace AtlasAI.AIEditor
                         {
                             Delete(index);
                         }
-                        var results = AssetDatabase.FindAssets("t:AIStorage", new string[]{AIManager.StorageFolder} );
+                        var results = AssetDatabase.FindAssets("t:AIStorage", new string[]{AIManager.TempStorageFolder} );
                         foreach(string guid in results)
                         {
                             AssetDatabase.DeleteAsset(AssetDatabase.GUIDToAssetPath(guid));
@@ -350,7 +368,7 @@ namespace AtlasAI.AIEditor
 
             GUILayout.Space(5);
 
-            if (GUILayout.Button("Generate Name Map", EditorStyles.miniButton, GUILayout.Width(65f)))
+            if (GUILayout.Button("Generate Name Map", EditorStyles.miniButton, GUILayout.Width(120f)))
             {
                 AINameMapGenerator.WriteNameMapFile();
 
@@ -432,14 +450,14 @@ namespace AtlasAI.AIEditor
 
             if (qualifier is DefaultQualifier)
             {
-                string _actionName = qualifier.action == null ? "<None>" : qualifier.action.name;
+                string _actionName = qualifier.action == null ? "<None>" : qualifier.action.GetType().Name;
                 actionName = string.Format("<b>{0}</b>{1}", "Action: ", _actionName);
                 networkInfo += string.Format(" -- {0}\n", actionName);
                 return networkInfo;
             }
 
             var action = qualifier.action;
-            actionName = string.Format("<b>{0}</b>{1}", "Action: ", action.name);
+            actionName = string.Format("<b>{0}</b>{1}", "Action: ", action.GetType().Name);
             //networkInfo += string.Format(" -- {0} <{1}>\n", actionName, action.GetType());
             networkInfo += string.Format(" -- {0}\n", actionName);
 

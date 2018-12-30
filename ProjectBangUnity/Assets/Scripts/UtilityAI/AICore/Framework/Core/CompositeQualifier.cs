@@ -46,10 +46,6 @@
         //
         // Methods
         //
-        public virtual void CloneFrom (object other)
-        {
-
-        }
 
 
         public float Score(IAIContext context)

@@ -15,8 +15,15 @@
         public float sphereAlpha = 0.5f;
 
 
+		//  Cached variables.
+		//private Camera cam;
+        //private GUIContent content; // = new GUIContent();
+        //private GUIStyle label; // = new GUIStyle(GUI.skin.label);
 
-        protected override List<Vector3> GetOptions(IAIContext context)
+
+
+
+		protected override List<Vector3> GetOptions(IAIContext context)
         {
             AgentContext c = context as AgentContext;
             return c.sampledPositions;
@@ -25,18 +32,17 @@
 
         protected override void DrawGUI(List<ScoredOption<Vector3>> data)
         {
-            
             var cam = Camera.main;
-
             if (cam == null)
                 return;
 
-            foreach (var scoredOption in data)
-            {
-                var score = scoredOption.score;
 
-                var p = cam.WorldToScreenPoint(scoredOption.option);
-                p.y = Screen.height - p.y;
+            for (int i = 0; i < data.Count; i++)
+            {
+                var score = data[i].score;
+
+                var pos = cam.WorldToScreenPoint(data[i].option);
+                pos.y = Screen.height - pos.y;
 
 
                 if (score < 0f)
@@ -55,21 +61,22 @@
 
                 var content = new GUIContent(score.ToString("F0"));
                 var size = new GUIStyle(GUI.skin.label).CalcSize(content);
-
-                GUI.Label(new Rect(p.x, p.y, size.x, size.y), content);
+                var rect = new Rect(pos.x, pos.y, size.x, size.y);
+                //GUI.Box(rect, content);
+                GUI.Label(rect, content);
             }
+
         }
 
         protected override void DrawGizmos(List<ScoredOption<Vector3>> data)
         {
-            Debug.Log(data.Count);
-
+            
             float maxScore = 0f;
             float minScore = Mathf.Infinity;
 
-            foreach (var scoredOption in data)
+            for (int i = 0; i < data.Count; i++)
             {
-                var value = scoredOption.score;
+                var value = data[i].score;
                 if (value > maxScore)
                 {
                     maxScore = value;
@@ -83,16 +90,18 @@
 
             var diffScore = maxScore - minScore;
 
-            foreach (var scoredOption in data)
+            for (int i = 0; i < data.Count; i++)
             {
-                var pos = scoredOption.option;
-                var score = scoredOption.score;
+                var pos = data[i].option;
+                var score = data[i].score;
 
                 var normScore = score - minScore;
 
                 Gizmos.color = GetColor(normScore, diffScore, sphereAlpha);
                 Gizmos.DrawSphere(pos, sphereSize);
             }
+
+
         }
 
 

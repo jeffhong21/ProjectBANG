@@ -17,11 +17,11 @@
         {
             if (x.score > y.score)
             {
-                return descending ? -1 : 1;
+                return descending ? 1 : -1;
             }
             if (x.score < y.score)
             {
-                return descending ? 1 : -1;
+                return descending ? -1 : 1;
             }
             else
             {

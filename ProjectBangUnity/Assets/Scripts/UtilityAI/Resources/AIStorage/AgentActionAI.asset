@@ -11,6 +11,46 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af1fc1e6d897f4da89612470171cd033, type: 3}
   m_Name: AgentActionAI
   m_EditorClassIdentifier: 
-  description: Action AI
-  version: 
+  description: 
+  version: 0.1
   aiId: AgentActionAI
+  editorConfiguration: "{\n  \"$id\": \"1\",\n  \"nodes\": {\n    \"$id\": \"2\",\n
+    \   \"$values\": [\n      {\n        \"$id\": \"3\",\n        \"$type\": \"AtlasAI.AIEditor.SelectorNode,
+    Assembly-CSharp-Editor\",\n        \"qualifierNodes\": {\n          \"$id\": \"4\",\n
+    \         \"$values\": [\n            {\n              \"$id\": \"5\",\n              \"parent\":
+    {\n                \"$ref\": \"3\"\n              },\n              \"friendlyName\":
+    \"CompositeScoreQualifier\",\n              \"isDefault\": false,\n              \"isExpanded\":
+    false,\n              \"isHighScorer\": false,\n              \"name\": \"CompositeScoreQualifier\",\n
+    \             \"hideFlags\": 61\n            },\n            {\n              \"$id\":
+    \"6\",\n              \"parent\": {\n                \"$ref\": \"3\"\n              },\n
+    \             \"friendlyName\": \"CompositeScoreQualifier\",\n              \"isDefault\":
+    false,\n              \"isExpanded\": false,\n              \"isHighScorer\":
+    false,\n              \"name\": \"CompositeScoreQualifier\",\n              \"hideFlags\":
+    61\n            }\n          ]\n        },\n        \"defaultQualifierNode\":
+    {\n          \"$id\": \"7\",\n          \"friendlyName\": \"DefaultQualifier\",\n
+    \         \"isDefault\": false,\n          \"isExpanded\": false,\n          \"isHighScorer\":
+    false,\n          \"name\": \"DefaultQualifier\",\n          \"hideFlags\": 61\n
+    \       },\n        \"parent\": {\n          \"$id\": \"8\",\n          \"canvas\":
+    {\n            \"$ref\": \"1\"\n          },\n          \"selectedNode\": {\n
+    \           \"$ref\": \"3\"\n          },\n          \"isDirty\": false,\n          \"currentSelector\":
+    {\n            \"$ref\": \"3\"\n          },\n          \"name\": \"\",\n          \"hideFlags\":
+    0\n        },\n        \"viewArea\": {\n          \"$id\": \"9\",\n          \"x\":
+    238.0,\n          \"y\": 118.0,\n          \"position\": {\n            \"x\":
+    238.0,\n            \"y\": 118.0\n          },\n          \"center\": {\n            \"x\":
+    366.0,\n            \"y\": 188.0\n          },\n          \"min\": {\n            \"x\":
+    238.0,\n            \"y\": 118.0\n          },\n          \"max\": {\n            \"x\":
+    494.0,\n            \"y\": 258.0\n          },\n          \"width\": 256.0,\n
+    \         \"height\": 140.0,\n          \"size\": {\n            \"x\": 256.0,\n
+    \           \"y\": 140.0\n          },\n          \"xMin\": 238.0,\n          \"yMin\":
+    118.0,\n          \"xMax\": 494.0,\n          \"yMax\": 258.0,\n          \"left\":
+    238.0,\n          \"right\": 494.0,\n          \"top\": 118.0,\n          \"bottom\":
+    258.0\n        },\n        \"AllQualifierNodes\": {\n          \"$type\": \"AtlasAI.AIEditor.SelectorNode+<>c__Iterator0,
+    Assembly-CSharp-Editor\",\n          \"$values\": [\n            {\n              \"$ref\":
+    \"5\"\n            },\n            {\n              \"$ref\": \"6\"\n            }\n
+    \         ]\n        },\n        \"friendlyName\": \"ScoreSelector 1\",\n        \"isRoot\":
+    false,\n        \"isSelected\": true,\n        \"parentUI\": {\n          \"$ref\":
+    \"8\"\n        },\n        \"name\": \"ScoreSelector 1\",\n        \"hideFlags\":
+    61\n      }\n    ]\n  },\n  \"offset\": {\n    \"x\": 108.0,\n    \"y\": 169.0\n
+    \ },\n  \"zoom\": 1.0,\n  \"selectorNodes\": {\n    \"$type\": \"AtlasAI.AIEditor.AICanvas+<>c__Iterator0,
+    Assembly-CSharp-Editor\",\n    \"$values\": [\n      {\n        \"$ref\": \"3\"\n
+    \     }\n    ]\n  }\n}"

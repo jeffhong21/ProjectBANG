@@ -1,31 +1,29 @@
 ﻿namespace AtlasAI
 {
-    
-    [System.Serializable]
+    using System;
+
     public abstract class ActionBase : IAction
     {
-        
-        public string name { get; set; }
-
-
-
-        public abstract void Execute(IAIContext context);
-
-
-    
-        public void CloneFrom(ActionBase other){
-            //utilityAIComponent = other.utilityAIComponent;
-        }
+        //public event Action OnExecuteComplete;
 
 
         public ActionBase(){
             //Debug.Log(actionStatus);
         }
 
-        protected ActionBase(ActionBase other){
-            //utilityAIComponent = other.utilityAIComponent;
+
+
+        public void Execute(IAIContext context)
+        {
+            OnExecute(context);
+
+            //if(OnExecuteComplete != null){
+            //    OnExecuteComplete();
+            //}
         }
 
+
+        public abstract void OnExecute(IAIContext context);
 
     }
 

@@ -36,6 +36,21 @@ namespace AtlasAI.Utilities
             return returnVal.ToArray();
         }
 
+
+        public static IEnumerable<Type> GetRelevantTypes(){
+
+            foreach (Assembly a in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                Type[] assemblyTypes = a.GetTypes();
+                for (int j = 0; j < assemblyTypes.Length; j++){
+                    if (assemblyTypes[j].GetType() == typeof(Type)){
+                        yield return assemblyTypes[j];
+                    }
+                }
+            }
+        }
+
+
         ///// <summary>
         ///// Get all available classes of type.
         ///// </summary>
