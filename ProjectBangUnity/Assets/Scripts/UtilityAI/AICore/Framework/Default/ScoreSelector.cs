@@ -9,7 +9,7 @@
     /// <summary>
     ///   Selector Gets the Highest Score from the list of qualifiers.
     /// </summary>
-    [Serializable]
+
     [FriendlyName("Highest Score Wins", "The qualifier with the highest score is selected")]
     public class ScoreSelector : Selector
     {

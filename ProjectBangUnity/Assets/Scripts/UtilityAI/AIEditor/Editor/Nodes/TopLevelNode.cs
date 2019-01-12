@@ -24,12 +24,9 @@ namespace AtlasAI.AIEditor
     public abstract class TopLevelNode : Node
     {
         public AIUI parent;
-        [SerializeField]
         public Rect viewArea;
         //  Guid 
         public string id;
-
-
 
 
         public bool isSelected{
@@ -39,13 +36,10 @@ namespace AtlasAI.AIEditor
         }
 
 
-
-
         public Vector3 ConnectorAnchorIn(NodeSettings settings)
         {
             throw new NotImplementedException();
         }
-
 
 
         public virtual void RecalcHeight(NodeSettings settings)
@@ -54,13 +48,6 @@ namespace AtlasAI.AIEditor
         }
 
 
-        //public bool InTitleArea(Vector2 position, NodeSettings settings)
-        //{
-        //    Rect header = viewArea;
-        //    header.y = header.y + (settings.titleHeight / 2) + 4;
-        //    header.height = settings.titleHeight;
-        //    return header.Contains(position);
-        //}
 
     }
 

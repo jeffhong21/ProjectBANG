@@ -7,18 +7,17 @@ namespace Bang
     {
 
         public float arrivalDistance = 1;
+        public bool autoBraking;
 
-        public bool hideNavMeshAgentComponent;
+        [Header("Hide NavMeshAgent Component")]
+        public bool hideNavMeshAgent;
 
         private AgentController agent;
-
         private NavMeshAgent navAgent;
-
         private Transform target;
-
         private float distance;
-
         private Vector3[] corners;
+
 
 
 
@@ -32,7 +31,7 @@ namespace Bang
         private void OnEnable()
         {
             navAgent.stoppingDistance = arrivalDistance;
-            navAgent.autoBraking = true;
+            navAgent.autoBraking = autoBraking;
             // we give the unit a random avoidance priority so as to ensure that units will actually avoid each other (since same priority units will not try to avoid each other)
             navAgent.avoidancePriority = UnityEngine.Random.Range(0, 99);
 

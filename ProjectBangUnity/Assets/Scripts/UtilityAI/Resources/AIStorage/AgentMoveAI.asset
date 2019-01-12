@@ -15,6 +15,6 @@ MonoBehaviour:
   version: 0.1
   aiId: AgentMoveAI
   editorConfiguration: "{\n  \"$id\": \"1\",\n  \"nodes\": {\n    \"$id\": \"2\",\n
-    \   \"$values\": []\n  },\n  \"offset\": {\n    \"x\": -63.0,\n    \"y\": 139.0\n
+    \   \"$values\": []\n  },\n  \"offset\": {\n    \"x\": -62.0,\n    \"y\": 140.0\n
     \ },\n  \"zoom\": 1.0,\n  \"selectorNodes\": {\n    \"$type\": \"AtlasAI.AIEditor.AICanvas+<>c__Iterator0,
     Assembly-CSharp-Editor\",\n    \"$values\": []\n  }\n}"

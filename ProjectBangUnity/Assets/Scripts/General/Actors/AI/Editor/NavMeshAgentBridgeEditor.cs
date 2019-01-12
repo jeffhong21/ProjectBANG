@@ -16,16 +16,16 @@
         {
             castedTarget = target as NavMeshAgentBridge;
 
-            if(castedTarget.hideNavMeshAgentComponent){
+            if(castedTarget.hideNavMeshAgent){
                 if(castedTarget.GetComponent<NavMeshAgent>()){
                     castedTarget.GetComponent<NavMeshAgent>().hideFlags = HideFlags.HideInInspector;
                 }
             }
-            else{
-                if (castedTarget.GetComponent<NavMeshAgent>()){
-                    castedTarget.GetComponent<NavMeshAgent>().hideFlags = HideFlags.None;
-                }
-            }
+            //else{
+            //    if (castedTarget.GetComponent<NavMeshAgent>()){
+            //        castedTarget.GetComponent<NavMeshAgent>().hideFlags = HideFlags.None;
+            //    }
+            //}
 
         }
 

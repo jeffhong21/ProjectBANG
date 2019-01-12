@@ -12,7 +12,7 @@ namespace AtlasAI.AIEditor
         private NodeSettings nodeSettings;
         private NodeLayout nodeLayout;
 
-        ReorderableList listElement;
+        ReorderableList list;
         bool useReorderableList = false;
 
 
@@ -28,7 +28,104 @@ namespace AtlasAI.AIEditor
         public void DrawNodes(SelectorNode selectorNode, NodeLayout layout)
         {
             DrawSelectorUI(selectorNode, layout);
+            //DrawSelectorNode(selectorNode, layout);
         }
+
+
+
+        private void DrawSelectorNode(SelectorNode selectorNode, NodeLayout layout)
+        {
+            Rect nodeRect = new Rect(selectorNode.viewArea);
+            Rect headerRect = new Rect(nodeRect.x, nodeRect.y, nodeRect.width, layout.titleHeight);
+            Rect contentRect = new Rect(nodeRect.x, nodeRect.y + layout.titleHeight, 
+                                        nodeRect.width, nodeRect.height - layout.titleHeight);
+
+            SerializedObject serializedNode = new SerializedObject(selectorNode);
+
+
+            //  Header.
+            GUI.Box(headerRect, GUIContent.none, EditorStyling.Canvas.normalHeader);
+            if (selectorNode.isSelected)
+                GUI.Label(headerRect, selectorNode.friendlyName, EditorStyling.NodeStyles.nodeTitleActive);
+            else
+                GUI.Label(headerRect, selectorNode.friendlyName, EditorStyling.NodeStyles.nodeTitle);
+
+            GUI.Box(contentRect, GUIContent.none, EditorStyling.Canvas.normalSelector);
+            DrawListElement(serializedNode, contentRect);
+            ////  Body.
+            //using (new GUI.GroupScope(contentRect))
+            //{
+            //    // Begin the body frame around the Node
+            //    contentRect.position = Vector2.zero;
+            //    using (new GUILayout.AreaScope(contentRect))
+            //    {
+            //        GUI.Box(contentRect, GUIContent.none, EditorStyling.Canvas.normalSelector);
+            //        DrawListElement(serializedNode, contentRect);
+
+            //    }
+            //}
+        }
+
+
+        private void DrawListElement(SerializedObject so, Rect pos)
+        {
+            list = new ReorderableList(so, so.FindProperty("qualifierNodes"), true, false, false, false);
+
+            //list.onReorderCallback += new ReorderableList.ReorderCallbackDelegate()
+            list.elementHeight = nodeSettings.qualifierHeight;
+            list.draggable = true;
+            list.showDefaultBackground = false;
+            list.headerHeight = 0;
+            list.footerHeight = 0;
+
+
+            list.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
+            {
+                var element = list.serializedProperty.GetArrayElementAtIndex(index);
+                //SerializedObject serializedElement = 
+                rect.y += 2;
+                //EditorGUI.PropertyField(new Rect(rect.x, rect.y, rect.width - 20, EditorGUIUtility.singleLineHeight),
+                                        //element.FindPropertyRelative("name"), GUIContent.none);
+
+
+                //SerializedProperty elementName = element.FindPropertyRelative("name");
+                GUI.Box(rect, GUIContent.none, EditorStyling.Canvas.normalQualifier);
+                GUI.Label(rect, index.ToString(), EditorStyling.NodeStyles.normalBoxText);
+            };
+
+
+            list.drawElementBackgroundCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
+            {
+                //SerializedProperty list_element = list.serializedProperty.GetArrayElementAtIndex(index);
+            };
+
+
+            list.onSelectCallback = (ReorderableList l) =>
+            {
+                Debug.Log(l.index);
+            };
+
+
+            list.DoList(pos);
+            //list.DoLayoutList();
+            so.ApplyModifiedProperties();
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         private void DrawSelectorUI(SelectorNode selectorNode, NodeLayout layout)
@@ -99,81 +196,38 @@ namespace AtlasAI.AIEditor
 
 
 
+        //private void DrawListElement<T>(IList list, Rect pos)
+        //{
+        //    list = new ReorderableList(list, typeof(T), true, false, false, false);
+
+        //    //list.onReorderCallback += new ReorderableList.ReorderCallbackDelegate()
+        //    list.elementHeight = nodeSettings.qualifierHeight;
+        //    list.showDefaultBackground = false;
+        //    list.headerHeight = 0;
+        //    list.footerHeight = 0;
 
 
+        //    list.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
+        //    {
+        //        GUI.Box(rect, GUIContent.none, EditorStyling.Canvas.normalQualifier);
+        //        GUI.Label(rect, list.list[index].ToString(), EditorStyling.NodeStyles.normalBoxText);
+        //    };
 
 
-
-        private void DrawListElement(SerializedObject so, Rect pos)
-        {
-            listElement = new ReorderableList(so, so.FindProperty("qualifierNodes"), true, false, false, false);
-
-            //listElement.onReorderCallback += new ReorderableList.ReorderCallbackDelegate()
-            listElement.elementHeight = nodeSettings.qualifierHeight;
-            listElement.showDefaultBackground = false;
-            listElement.headerHeight = 0;
-            listElement.footerHeight = 0;
+        //    list.drawElementBackgroundCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
+        //    {
+        //        //SerializedProperty list_element = list.serializedProperty.GetArrayElementAtIndex(index);
+        //    };
 
 
-            listElement.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
-            {
-                SerializedProperty element = listElement.serializedProperty.GetArrayElementAtIndex(index);
-                SerializedProperty elementName = element.FindPropertyRelative("friendlyName");
-                GUI.Box(rect, GUIContent.none, EditorStyling.Canvas.normalQualifier);
-                //GUI.Label(rect, elementName.stringValue, EditorStyling.NodeStyles.normalBoxText);
-            };
+        //    list.onSelectCallback = (ReorderableList l) =>
+        //    {
+
+        //    };
 
 
-            listElement.drawElementBackgroundCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
-            {
-                //SerializedProperty list_element = list.serializedProperty.GetArrayElementAtIndex(index);
-            };
-
-
-            listElement.onSelectCallback = (ReorderableList l) =>
-            {
-
-            };
-
-
-            listElement.DoList(pos);
-            so.ApplyModifiedProperties();
-        }
-
-
-
-        private void DrawListElement<T>(IList list, Rect pos)
-        {
-            listElement = new ReorderableList(list, typeof(T), true, false, false, false);
-
-            //listElement.onReorderCallback += new ReorderableList.ReorderCallbackDelegate()
-            listElement.elementHeight = nodeSettings.qualifierHeight;
-            listElement.showDefaultBackground = false;
-            listElement.headerHeight = 0;
-            listElement.footerHeight = 0;
-
-
-            listElement.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
-            {
-                GUI.Box(rect, GUIContent.none, EditorStyling.Canvas.normalQualifier);
-                GUI.Label(rect, listElement.list[index].ToString(), EditorStyling.NodeStyles.normalBoxText);
-            };
-
-
-            listElement.drawElementBackgroundCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
-            {
-                //SerializedProperty list_element = list.serializedProperty.GetArrayElementAtIndex(index);
-            };
-
-
-            listElement.onSelectCallback = (ReorderableList l) =>
-            {
-
-            };
-
-
-            listElement.DoList(pos);
-        }
+        //    list.DoList(pos);
+        //}
 
 
 

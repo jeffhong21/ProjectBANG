@@ -151,9 +151,10 @@ namespace AtlasAI.AIEditor
 
         public QualifierNode AddQualifier(Type qualiferType, SelectorNode parent)
         {
-            QualifierNode node = AddQualifier(qualiferType);
+            QualifierNode node = QualifierNode.Create(qualiferType);
             node.parent = parent;
             parent.qualifierNodes.Add(node);
+            Debug.Log("Adding " + qualiferType.Name);
 
             MarkDirty();
             return node;
@@ -167,8 +168,11 @@ namespace AtlasAI.AIEditor
             return qn;
         }
 
-        public QualifierNode AddQualifier(Type qualiferType){
-            return QualifierNode.Create(qualiferType);
+        public QualifierNode AddQualifier(Type qualiferType)
+        {
+            QualifierNode node = QualifierNode.Create(qualiferType);
+            MarkDirty();
+            return node;
         }
 
         public ActionNode SetAction(ActionNode an, QualifierNode parent)
@@ -213,13 +217,16 @@ namespace AtlasAI.AIEditor
 
         public void RemoveAction(ActionNode an)
         {
-            throw new NotImplementedException();
+            //currentQualifier.actionNode.action = null;
         }
 
         public void RemoveQualifier(QualifierNode qn)
         {
-            throw new NotImplementedException();
+            currentSelector.qualifierNodes.Remove(qn);
+            MarkDirty();
         }
+
+
 
         public bool RemoveSelected()
         {

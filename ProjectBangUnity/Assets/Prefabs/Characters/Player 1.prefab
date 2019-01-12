@@ -135,8 +135,9 @@ GameObject:
   - component: {fileID: 114464352963231710}
   - component: {fileID: 114687661708546344}
   - component: {fileID: 114745730279457626}
+  - component: {fileID: 114300087279187518}
   m_Layer: 10
-  m_Name: Player_V3
+  m_Name: Player 1
   m_TagString: Actor
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1638,7 +1639,7 @@ Animator:
   m_GameObject: {fileID: 1141768220188808}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: ad9b136e9ac104c66b5fb99ea52cfb13, type: 3}
-  m_Controller: {fileID: 9100000, guid: a39c10ddd4694437b82d159df69bff23, type: 2}
+  m_Controller: {fileID: 9100000, guid: 1a7266db8318147ca9b026e6cd3143ec, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -1738,6 +1739,18 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
+--- !u!114 &114300087279187518
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 247314798877e4deab3c8769fe108c46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  anim: {fileID: 0}
 --- !u!114 &114349542487033608
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1931,7 +1944,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bd5b239c492134dec834a5dfd9339dd8, type: 3}
   m_Name: 
@@ -1991,7 +2004,7 @@ SkinnedMeshRenderer:
   m_Quality: 0
   m_UpdateWhenOffscreen: 0
   m_SkinnedMotionVectors: 1
-  m_Mesh: {fileID: 4300000, guid: ad9b136e9ac104c66b5fb99ea52cfb13, type: 3}
+  m_Mesh: {fileID: 4300008, guid: ad9b136e9ac104c66b5fb99ea52cfb13, type: 3}
   m_Bones:
   - {fileID: 4060261611074538}
   - {fileID: 4062153608772630}

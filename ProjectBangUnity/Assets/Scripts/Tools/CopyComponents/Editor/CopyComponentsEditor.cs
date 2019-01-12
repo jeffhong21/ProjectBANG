@@ -29,6 +29,8 @@ namespace CopyComponents
     
     public class CopyComponentsWindow : EditorWindow
     {
+        private readonly bool showDebugButton = false;
+
 
         private enum CopyOptions { AllComponents, OnlyNew, OnlyValues };
         
@@ -54,7 +56,7 @@ namespace CopyComponents
         private bool debug = true;
 
         #region Window Functions
-        [MenuItem("JH Tools/Copy Components")]
+        [MenuItem("Tools/JH Toolbox/Copy Components")]
         private static void OpenWindow()
         {
             CopyComponentsWindow window = (CopyComponentsWindow)GetWindow(typeof(CopyComponentsWindow));
@@ -353,9 +355,12 @@ namespace CopyComponents
                 if (GUILayout.Button("Copy Components", GUILayout.Height(24))){
                     CopyComponentsToTarget();
                 }
-                if (GUILayout.Button("PRINT DEBUG", GUILayout.Height(24))){
-                    DebugMessage();
+                if(showDebugButton){
+                    if (GUILayout.Button("PRINT DEBUG", GUILayout.Height(24))){
+                        DebugMessage();
+                    }
                 }
+
 
                 EditorGUILayout.EndHorizontal();
             }

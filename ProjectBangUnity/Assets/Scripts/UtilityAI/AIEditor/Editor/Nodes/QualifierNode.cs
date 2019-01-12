@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System.Reflection;
 
 namespace AtlasAI.AIEditor
 {
@@ -30,7 +30,9 @@ namespace AtlasAI.AIEditor
 
         public string friendlyName{
             get{
-                if (_qualifierType != null)
+                if (Attribute.GetCustomAttribute(_qualifierType, typeof(FriendlyNameAttribute)) != null)
+                    return _qualifierType.GetCustomAttribute<FriendlyNameAttribute>().name;
+                else if (_qualifierType != null)
                     return _qualifierType.Name;
                 return name;
             }

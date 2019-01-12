@@ -14,8 +14,8 @@
         public float samplingRange = 20;
         [SerializeField]
         public float samplingDensity = 3f;
-
-
+        [SerializeField]
+        private bool debug = false;
 
         public override void OnExecute(IAIContext context)
         {
@@ -46,7 +46,7 @@
 
                 if (hit.GetComponent<ActorController>().teamId != agent.teamId)
                 {
-                    bool canSeeTarget = agent.CanSeeTarget(agent.lookTransform.position, hit.transform.position, true);
+                    bool canSeeTarget = agent.CanSeeTarget(agent.lookTransform.position, hit.transform.position, debug);
 
                     if(canSeeTarget)
                     {

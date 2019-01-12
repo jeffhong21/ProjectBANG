@@ -27,7 +27,9 @@
         }
 
         [Header("Misc Info")]
+        [HideInInspector]
         public string timeSinceLevelLoaded;
+        [HideInInspector]
         public SchedulerQueue.SchedulerItem[] heap;
 
         //

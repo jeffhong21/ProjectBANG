@@ -170,7 +170,7 @@
             if (Visualization.VisualizerManager.TryGetVisualizerFor(activeAction.GetType(), out visualizer))
             {
                 //Debug.LogFormat("There is a visualizer for Action {0} |", activeAction.GetType());
-                //visualizer.EntityUpdate(activeAction, contextProvider.GetContext(), ai.id);
+                visualizer.EntityUpdate(activeAction, contextProvider.GetContext(), ai.id);
             }
 
             //if (activeAction is CompositeAction){

@@ -8,7 +8,7 @@
     /// <summary>
     /// Simply has a fixed score.  So whatever score is set, it will always return that score.
     /// </summary>
-    [Serializable]
+    [FriendlyName("Fixed Score", "Always scores a fixed score.")]
     public class FixedScoreQualifier : QualifierBase
     {
         [SerializeField]

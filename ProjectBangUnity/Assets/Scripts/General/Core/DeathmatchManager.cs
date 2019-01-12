@@ -92,13 +92,13 @@ namespace Bang
             StartCoroutine(GameLoop());
 		}
 
-        void Team()
-        {
-            if (teamCount < 2) teamCount = 2;
-            int remainderPlayers = playerCount % teamCount;
-            int actorsPerTeam = (playerCount - remainderPlayers) / 2;
-            //Debug.LogFormat(" Number of Players: {0} \n Players Per Team: {1} \n Remainder of Players: {2}", playerCount, actorsPerTeam, remainderPlayers);
-        }
+        //void Team()
+        //{
+        //    if (teamCount < 2) teamCount = 2;
+        //    int remainderPlayers = playerCount % teamCount;
+        //    int actorsPerTeam = (playerCount - remainderPlayers) / 2;
+        //    //Debug.LogFormat(" Number of Players: {0} \n Players Per Team: {1} \n Remainder of Players: {2}", playerCount, actorsPerTeam, remainderPlayers);
+        //}
 
 
         private void Initialize()

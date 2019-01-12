@@ -14,7 +14,7 @@ namespace AtlasAI.AIEditor
         private Selector _selector;
         private Type _selectorType;
 
-        public List<QualifierNode> qualifierNodes = new List<QualifierNode>();
+        public List<QualifierNode> qualifierNodes;
         public QualifierNode defaultQualifierNode;
 
         //
@@ -56,12 +56,14 @@ namespace AtlasAI.AIEditor
         {
             //var node = new SelectorNode(viewArea);
             var node = CreateInstance<SelectorNode>();
+            node._selector = Activator.CreateInstance(selectorType) as Selector;
             node._selectorType = selectorType;
             node.name = selectorType.Name;
             node.parent = parent;
             node.parentUI = parent;
             node.viewArea = viewArea;
             node.defaultQualifierNode = QualifierNode.Create(typeof(DefaultQualifier));
+            node.qualifierNodes = new List<QualifierNode>();
             return node;
         }
 

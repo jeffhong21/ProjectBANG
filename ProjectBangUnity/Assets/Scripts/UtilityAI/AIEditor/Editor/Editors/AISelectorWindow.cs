@@ -4,9 +4,6 @@ namespace AtlasAI.AIEditor
     using System.Collections.Generic;
     using UnityEngine;
 
-
-
-
     public sealed class AISelectorWindow : SelectorWindow<AIStorage>
     {
         //
@@ -14,8 +11,6 @@ namespace AtlasAI.AIEditor
         //
         private GUIContent _listItemContent;
         private Action<AIStorage[]> _multiCallback;
-
-
 
         //
         // Static Methods

@@ -122,10 +122,8 @@ namespace AtlasAI.AIEditor
                     AIInspectorEditor.instance.Repaint();
                 }
             }
-                
-
-
 		}
+
 
 		private void OnDisable()
 		{
@@ -214,7 +212,6 @@ namespace AtlasAI.AIEditor
                 {
                     Debug.Log("Creates a new AI");
                 }
-                GUILayout.Space(5);
                 if (GUILayout.Button(DoLabel("Load", "Loads a saved AI"), EditorStyles.toolbarButton, GUILayout.Width(48)))
                 {
                     StoredAIs.Refresh();
@@ -229,7 +226,6 @@ namespace AtlasAI.AIEditor
                         storedAIs.ShowAsContext();
                     }
                 }
-                GUILayout.Space(5);
                 if (GUILayout.Button(DoLabel("Save", "Saves current AI"), EditorStyles.toolbarButton, GUILayout.Width(48)))
                 {
                     Save(_lastOpenAI);
@@ -242,21 +238,21 @@ namespace AtlasAI.AIEditor
                 GUILayout.Label(GetAITitle(), EditorStyling.Skinned.boldTitle);
                 GUILayout.FlexibleSpace();
 
-                if (aiui != null)
-                {
-                    //  Window Rect
-                    GUILayout.Space(5);
-                    GUILayout.FlexibleSpace();
-                    Rect windowRect = GetViewport();
-                    GUILayout.Label(string.Format("Canvas offset: {0}", aiui.canvas.offset));
-                }
+                //if (aiui != null)
+                //{
+                //    //  Window Rect
+                //    GUILayout.Space(5);
+                //    GUILayout.FlexibleSpace();
+                //    Rect windowRect = GetViewport();
+                //    GUILayout.Label(string.Format("Canvas offset: {0}", aiui.canvas.offset));
+                //}
 
 
             }
             GUILayout.EndArea();
         }
 
-
+        bool showBuildingblocksOption;
         private void DrawFooter()
         {
             Rect rect = new Rect(0, position.height - footerPadding + 10, position.width, footerPadding);
@@ -265,21 +261,26 @@ namespace AtlasAI.AIEditor
             {
                 if (GUILayout.Button(DoLabel("Refresh", "Refreshes the ai editor.  Also refreshes all StoredAIs"), EditorStyles.toolbarButton, GUILayout.Width(48)))
                 {
-                    //if(aiui != null){
-                    //    string data = GuiSerializer.Serialize(aiui.canvas);
-                    //    Debug.Log(data);
-                    //    //GuiSerializer.Deserialize(aiui, data);
-                    //}
-
                     Debug.Log(StoredAIs.GetById(_lastOpenAI));
-
                     //Repaint();
+                    //Debug.Log(AIBuildingBlocks.Instance.GetForType(typeof(QualifierBase)));
                 }
 
                 if (GUILayout.Button(DoLabel("Clear", "Clear all nodes from the graph."), EditorStyles.toolbarButton, GUILayout.Width(48)))
                 {
                     aiui.canvas.nodes.Clear();
                 }
+
+                showBuildingblocksOption = GUILayout.Toggle(showBuildingblocksOption, GUIContent.none);
+                if(showBuildingblocksOption)
+                {
+                    if (GUILayout.Button(DoLabel("Selector"), EditorStyles.toolbarButton, GUILayout.Width(48)))
+                        AIEntitySelectorWindow.Get<Selector>(Event.current.mousePosition, null);
+                    if (GUILayout.Button(DoLabel("IQualifier"), EditorStyles.toolbarButton, GUILayout.Width(48)))
+                        AIEntitySelectorWindow.Get<IQualifier>(Event.current.mousePosition, null );
+                }
+
+
 
                 //  Number of Nodes.
                 if (aiui != null)
@@ -318,77 +319,6 @@ namespace AtlasAI.AIEditor
         }
 
 
-        private void DrawCompleteQualifier(Vector2 pos, float totalWidth, QualifierNode qualifierNode , NodeSettings settings)
-        {
-            Rect viewRect = new Rect(pos.x, pos.y, totalWidth, settings.qualifierHeight + settings.actionHeight);
-            Rect iconAreaRect;
-            Rect toggleAreaRect;
-
-            // Draw Node contents
-            viewRect.height = settings.qualifierHeight;
-            GUI.Box(viewRect, GUIContent.none, EditorStyling.Canvas.normalQualifier);
-            GUI.Label(viewRect, qualifierNode.friendlyName, EditorStyling.NodeStyles.normalBoxText);
-
-            viewRect.y += settings.qualifierHeight;
-            viewRect.height = settings.actionHeight;
-            GUI.Box(viewRect, GUIContent.none, EditorStyling.Canvas.normalAction);
-
-            //  Connector Icon
-            iconAreaRect = new Rect(viewRect.width - settings.anchorAreaWidth, viewRect.y + (settings.anchorAreaWidth / 2), settings.anchorAreaWidth, settings.qualifierHeight);
-            toggleAreaRect = new Rect(settings.toggleAreaWidth, viewRect.y + 4, settings.toggleAreaWidth, settings.actionHeight);
-            GUI.Label(toggleAreaRect, EditorStyling.ExpandIcon);
-
-            viewRect.x += toggleAreaRect.width;
-            GUI.Label(viewRect, "Action Name", EditorStyling.NodeStyles.normalBoxText);
-
-            GUI.Label(iconAreaRect, EditorStyling.ConnectorOpen);
-        }
-
-
-        private void DrawSelectorUI (SelectorNode selectorNode, NodeSettings settings)
-        {
-            selectorNode.RecalcHeight(settings);
-            Rect nodeRect = selectorNode.viewArea;
-
-            nodeRect.height = settings.titleHeight;
-            GUI.Box(nodeRect, GUIContent.none, EditorStyling.Canvas.normalHeader);
-            GUI.Label(nodeRect, selectorNode.friendlyName, selectorNode.isSelected ? EditorStyling.NodeStyles.nodeTitleActive : EditorStyling.NodeStyles.nodeTitle);
-
-            nodeRect.y = nodeRect.y + settings.titleHeight;
-            nodeRect.height = selectorNode.viewArea.height + settings.titleHeight;
-            // Begin the body frame around the Node
-            using(new GUI.GroupScope(nodeRect))
-            {
-                nodeRect.position = Vector2.zero;
-                using(new GUILayout.AreaScope(nodeRect))
-                {
-                    GUI.Box(nodeRect, new GUIContent(nodeRect.height.ToString()), EditorStyling.Canvas.normalSelector);
-                    GUI.changed = false;
-
-                    Vector2 pos = new Vector2(nodeRect.x, nodeRect.y);
-                    //GUI.Label(contentAreaRect, nodeInfo, EditorStyling.NodeStyles.normalBoxText);
-                    if(selectorNode.qualifierNodes.Count > 0)
-                    {
-                        for (int i = 0; i < selectorNode.qualifierNodes.Count; i++)
-                        {
-                            pos.y = i * (settings.qualifierHeight + settings.actionHeight);
-                            DrawCompleteQualifier(pos, nodeRect.width, selectorNode.qualifierNodes[i], settings);
-                        }
-                    }
-
-                    pos.y = (selectorNode.qualifierNodes.Count) * (settings.qualifierHeight + settings.actionHeight);  //  + settings.actionHeight
-                    // Draw Node contents
-                    DrawCompleteQualifier(pos, nodeRect.width, selectorNode.defaultQualifierNode, settings);
-                    selectorNode.RecalcHeight(settings);
-                }
-            }
-        }
-
-
-
-
-
-        #endregion
 
 
 
@@ -409,7 +339,7 @@ namespace AtlasAI.AIEditor
 
         }
 
-
+        #endregion
 
 
         private void DrawUI()
@@ -630,9 +560,12 @@ namespace AtlasAI.AIEditor
 
             if(aiui.selectedNode != null)
             {
+                
                 if(aiui.currentSelector != null)
                 {
                     menu.AddItem(new GUIContent("Add Qualifier"), false, () => aiui.AddQualifier(typeof(CompositeScoreQualifier), aiui.currentSelector));
+                    ///menu.AddItem(new GUIContent("Add Qualifier"), false, () => ShowSelectorWindow<IQualifier>(null) );
+
                     menu.AddDisabledItem(new GUIContent("Connect to Selector"));
                     menu.AddSeparator("");
                     menu.AddItem(new GUIContent("Remove Selector"), false, () => aiui.RemoveNode(aiui.currentSelector));
@@ -643,6 +576,12 @@ namespace AtlasAI.AIEditor
             menu.AddDisabledItem(new GUIContent("Save"));
 
             menu.DropDown(new Rect(mousePos.x, mousePos.y, 0, 0));
+        }
+
+
+        public void ShowSelectorWindow<T>(Action<Type> callback)
+        {
+            AIEntitySelectorWindow.Get<T>(Event.current.mousePosition, callback);
         }
 
 

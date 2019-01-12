@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace AtlasAI.AIEditor
 {
-
+    [Serializable]
     public class ActionNode : Node
     {
         public QualifierNode parent;
