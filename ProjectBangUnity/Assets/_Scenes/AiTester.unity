@@ -332,7 +332,7 @@ Prefab:
     - target: {fileID: 114187247001489940, guid: 4b3d35125cdfd468289a3e6f86ac0c10,
         type: 2}
       propertyPath: playerCount
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 114187247001489940, guid: 4b3d35125cdfd468289a3e6f86ac0c10,
         type: 2}

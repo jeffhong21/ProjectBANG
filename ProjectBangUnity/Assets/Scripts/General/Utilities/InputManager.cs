@@ -30,6 +30,11 @@ namespace Bang
             get { return Input.GetKeyDown(KeyCode.Space); }
         }
 
+        public static bool ShiftDown
+        {
+            get { return Input.GetKey(KeyCode.LeftShift); }
+        }
+
         public static bool E
         {
             get { return Input.GetKeyDown(KeyCode.E); }

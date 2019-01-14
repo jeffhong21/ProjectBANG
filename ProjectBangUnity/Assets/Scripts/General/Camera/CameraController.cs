@@ -40,7 +40,7 @@
         private Camera cam;
         private Ray ray;
         private RaycastHit hitInfo;
-        private Vector3 cursorPosition;
+        private Vector3 mousePosition;
 
 		private void Awake()
 		{
@@ -55,6 +55,7 @@
 		{
             newDistance = values.distanceFromTarget;
             Cursor.visible = enableCursor;
+            crosshairs.gameObject.SetActive(!enableCursor);
 		}
 
 
@@ -77,23 +78,23 @@
                 LookAtTarget();
                 //OrbitCamera();
             }
-
-            if(crosshairs){
+            //  If there is a crosshairs object and enable cursor is false.
+            if(crosshairs && !enableCursor){
                 ray = cam.ScreenPointToRay(Input.mousePosition);
                 if (Physics.Raycast(ray, out hitInfo, 100, Layers.ground, QueryTriggerInteraction.Ignore)){
-                    cursorPosition = hitInfo.point;
-                    cursorPosition.y = 0.05f;
-                    crosshairs.transform.position = cursorPosition;
+                    mousePosition = hitInfo.point;
+                    mousePosition.y = 0.1f;
+                    crosshairs.transform.position = mousePosition;
 
-                    //DrawDebugRay(cursorPosition);
+                    //DrawDebugRay(mousePosition);
                 }
             }
-
 		}
 
-        private void DrawDebugRay(Vector3 cursorPosition){
+
+        private void DrawDebugRay(Vector3 _cursorPosition){
             Vector3 lookAtPoint = camTransform.position;
-            Vector3 direction = cursorPosition - lookAtPoint;
+            Vector3 direction = _cursorPosition - lookAtPoint;
             //Debug.DrawRay(lookAtPoint, direction, Color.red);
         }
 

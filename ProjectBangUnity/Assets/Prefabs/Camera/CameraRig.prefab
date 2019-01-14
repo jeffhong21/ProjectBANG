@@ -158,7 +158,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 572c22c6c132d4038929bb697761ad1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enableCursor: 0
+  enableCursor: 1
   camTransform: {fileID: 4831666746393168}
   target: {fileID: 0}
   anchor: {fileID: 4250276846210122}
