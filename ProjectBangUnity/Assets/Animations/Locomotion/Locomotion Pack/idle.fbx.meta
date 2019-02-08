@@ -104,6 +104,7 @@ ModelImporter:
     400096: UpperLeg_L
     400098: UpperLeg_R
     7400000: idle
+    7400002: Root
     9500000: //RootNode
   externalObjects: {}
   materials:
@@ -137,15 +138,15 @@ ModelImporter:
       name: idle
       takeName: mixamo.com
       firstFrame: 0
-      lastFrame: 250
+      lastFrame: 48
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
-      loop: 1
+      loop: 0
       hasAdditiveReferencePose: 0
       loopTime: 1
-      loopBlend: 0
+      loopBlend: 1
       loopBlendOrientation: 0
       loopBlendPositionY: 1
       loopBlendPositionXZ: 0
