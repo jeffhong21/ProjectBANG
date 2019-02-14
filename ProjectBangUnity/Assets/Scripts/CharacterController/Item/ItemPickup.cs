@@ -1,0 +1,258 @@
+﻿namespace CharacterController
+{
+    using UnityEngine;
+    using System.Collections;
+
+    public class ItemPickup : MonoBehaviour
+    {
+        [Header("--  Item Pickup Settings --")]
+        [SerializeField]
+        protected Item[] m_Items;
+        [SerializeField]
+        protected Transform m_ObjectHolder;
+        [SerializeField]
+        protected ParticleSystem m_DefaultVFX;
+        [SerializeField]
+        protected ParticleSystem m_PickupVFX;
+        [SerializeField]
+        protected Material m_DefaultMaterial;
+        [SerializeField]
+        protected Material m_DropMaterial;
+        [SerializeField, Tooltip("Has the item been dropped ablready.")]
+        protected bool m_Dropped;
+        [Header("--  Animation Settings --")]
+        [SerializeField]
+        protected bool m_PlayDefaultAnimation = true;
+        [SerializeField]
+        protected bool m_IsRotating = true;
+        [SerializeField]
+        protected bool m_RotateCounterClockwise;
+        [SerializeField, Range(-360, 360)]
+        protected float m_DegreesPerSseconod = 30f;
+        [SerializeField]
+        protected bool m_IsBouncing = true;
+        [SerializeField, Range(0, 1), Tooltip("How high the itemHolder bobbles up and down.  Value should be the same or greater than the itemHolder Y position.")]
+        protected float m_Amplitude = 0.25f;
+        [SerializeField, Range(0,2), Tooltip("How fast the itemHolder bobbles up and down.")]
+        protected float m_Frequency = .75f;
+
+        //[SerializeField]
+        //private AnimationCurve plot = new AnimationCurve();
+
+
+        protected Collider m_Trigger;
+        protected Rigidbody m_Rigidbody;
+        protected Animator m_Animator;
+        protected Transform m_Transform;
+        protected ParticleSystem[] m_ParticleSystems;
+
+
+        float m_DeltaTime;
+        Vector3 m_DefaultPosition;
+        Vector3 m_PositionOffset;
+        Vector3 m_TargetRotation;
+        Vector3 m_TargetPosition;
+
+
+
+        public Item[] Items{
+            get { return m_Items; }
+            set { m_Items = value; }
+        }
+
+        public bool Dropped
+        {
+            get{ return m_Dropped; }
+            set{
+                if(value == false && m_Dropped == true){
+                    m_Dropped = true;
+                }
+                else{
+                    m_Dropped = value; 
+                }
+            }
+        }
+
+        public Collider Trigger{
+            get { return m_Trigger; }
+        }
+
+
+
+
+
+
+
+        protected virtual void Awake()
+        {
+            m_Trigger = GetComponent<Collider>();
+            m_Rigidbody = GetComponent<Rigidbody>();
+            m_Animator = GetComponent<Animator>();
+            m_Transform = transform;
+            m_ParticleSystems = transform.GetComponentsInChildren<ParticleSystem>();
+
+            m_DeltaTime = Time.deltaTime;
+
+            m_DefaultPosition = m_ObjectHolder.localPosition;
+            m_DefaultPosition.y += m_Amplitude;
+
+            Initialize(false);
+        }
+
+
+        public void Initialize(bool isDropped)
+        {
+            //  Set starting random default values.
+            SetMaterials(isDropped ? m_DropMaterial : m_DefaultMaterial);
+            m_Transform.eulerAngles = new Vector3(0, Random.Range(-360, 360), 0);
+            m_ObjectHolder.localPosition = m_DefaultPosition;
+
+            // Store the starting position & rotation of the object
+            m_PositionOffset = m_ObjectHolder.transform.position;
+            //m_Transform.localScale = Vector3.one;
+
+        }
+
+
+        protected virtual void OnEnable()
+		{
+
+		}
+
+        protected virtual void OnDisable()
+        {
+
+        }
+
+
+        protected virtual void Update()
+        {
+            if(m_PlayDefaultAnimation)
+            {
+                if (m_IsRotating)
+                {
+                    UpdateRotation(m_DegreesPerSseconod, m_RotateCounterClockwise);
+                }
+
+                if (m_IsBouncing)
+                {
+                    UpdateYPosition(m_Frequency, m_Amplitude);
+                }
+            }
+
+
+        }
+
+
+        protected void UpdateRotation(float degrees, bool rotateCounterClockwise, Space space = Space.World)
+        {
+            m_TargetRotation.x = 0;
+            m_TargetRotation.y = degrees * m_DeltaTime;
+            m_TargetRotation.z = 0;
+
+            if (rotateCounterClockwise)
+                m_TargetRotation = -m_TargetRotation;
+
+            // Spin object around Y-Axis
+            //itemHolder.transform.Rotate(new Vector3(0f, Time.deltaTime * degreesPerSecond, 0f), Space.World);
+            m_ObjectHolder.transform.Rotate(m_TargetRotation, space);
+        }
+
+
+        protected void UpdateYPosition(float frequency, float amplitude)
+        {
+            // Float up/down with a Sin()
+            var height = Mathf.Sin(Time.fixedTime * Mathf.PI * frequency) * amplitude;
+            m_TargetPosition = m_PositionOffset;
+            m_TargetPosition.y += height;
+
+            //  Set the itemHolder group position.
+            m_ObjectHolder.transform.position = m_TargetPosition;
+
+            //plot.AddKey(Time.realtimeSinceStartup, height);
+        }
+
+
+
+        private void DisableParticleSystems(ParticleSystem[] ps)
+        {
+            for (int i = 0; i < ps.Length; i++)
+            {
+                ps[i].gameObject.SetActive(false);
+            }
+        }
+
+
+		private void SetMaterials(Material material)
+        {
+            if (material == null) return;
+
+            MeshRenderer[] meshRenderers = m_ObjectHolder.GetComponentsInChildren<MeshRenderer>();
+            for (int i = 0; i < meshRenderers.Length; i++)
+            {
+                meshRenderers[i].material = material;
+            }
+        }
+
+
+
+
+        public bool AddItemsToInventory(Inventory inventory)
+        {
+            bool itemAdded = false;
+            int amount = 1;
+            if (inventory != null)
+            {
+                for (int i = 0; i < m_Items.Length; i++)
+                {
+                    if (m_Items[i] is ConsumableItem)
+                        amount = ((ConsumableItem)m_Items[i]).Amount;
+
+                    if (inventory.PickupItem(m_Items[i], amount, false))
+                        itemAdded = true;
+                }
+            }
+
+            return itemAdded;
+        }
+
+
+        protected virtual void OnTriggerEnter(Collider other)
+        {
+            Inventory inventory = other.GetComponent<Inventory>();
+
+            if(AddItemsToInventory(inventory)){
+                StartCoroutine(ExitAnimation(new Vector3(0.15f, 0.15f, 0.15f), 0.5f, 2f));
+            }
+            else{
+                //  Nothing has been added to the inventory.
+            }
+        }
+
+
+
+        protected virtual void OnTriggerExit(Collider other)
+		{
+			
+		}
+
+
+
+
+        private IEnumerator ExitAnimation(Vector3 targetScale, float time, float speed)
+        {
+            float i = 0.0f;
+            float rate = (1.0f / time) * speed;
+            Vector3 startScale = transform.localScale;
+            while (i < 1.0f)
+            {
+                i += Time.deltaTime * rate;
+                transform.localScale = Vector3.Lerp(startScale, targetScale, i);
+                yield return null;
+            }
+
+            gameObject.SetActive(false);
+        }
+	}
+
+}

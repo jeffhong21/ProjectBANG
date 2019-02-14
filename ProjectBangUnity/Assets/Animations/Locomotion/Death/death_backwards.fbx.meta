@@ -137,8 +137,8 @@ ModelImporter:
     - serializedVersion: 16
       name: death_backwards
       takeName: mixamo.com
-      firstFrame: 0
-      lastFrame: 141
+      firstFrame: 24
+      lastFrame: 124
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

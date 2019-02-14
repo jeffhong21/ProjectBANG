@@ -28,7 +28,7 @@ GameObject:
   - component: {fileID: 19885060}
   - component: {fileID: 19970182}
   m_Layer: 0
-  m_Name: GunShot_Smoke_FX
+  m_Name: gunshot_smoke_fx
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

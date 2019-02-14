@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 19951176}
   - component: {fileID: 114563361975759522}
   m_Layer: 0
-  m_Name: BloodSplat_FX
+  m_Name: bloodsplat_fx
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

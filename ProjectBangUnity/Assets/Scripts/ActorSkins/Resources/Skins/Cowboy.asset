@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46f8790718f2049ea8d7bce9037afdca, type: 3}
+  m_Name: Cowboy
+  m_EditorClassIdentifier: 
+  nameID: Cowboy
+  mesh: {fileID: 13700004, guid: ad9b136e9ac104c66b5fb99ea52cfb13, type: 3}
+  guid: 
+  manager: {fileID: 11400000, guid: 76c44903960904e888c99ce752d71159, type: 2}
