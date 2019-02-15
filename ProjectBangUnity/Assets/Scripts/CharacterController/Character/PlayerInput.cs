@@ -107,9 +107,7 @@ namespace CharacterController
                 m_Ray = new Ray(m_CameraController.Camera.transform.position, m_CameraController.Camera.transform.forward);
                 m_Controller.LookPosition = m_Ray.GetPoint(m_RayLookDistance);
 
-
                 //Debug.DrawRay(m_Ray.origin, m_Ray.direction * 20, Color.red);
-
                 if(Physics.Raycast(m_Ray.origin, m_Ray.direction, out m_RaycastHit, 50, m_LayerMask)){
                     m_Controller.LookPosition = m_RaycastHit.point;
                 }
@@ -124,7 +122,18 @@ namespace CharacterController
             m_MousePosition = Input.mousePosition;
 
 
+            if(Input.GetButtonDown("mouse0")){
 
+            }
+            else if(Input.GetButtonDown("mouse2")){
+
+            }
+            else if(Input.GetButtonDown("space")){
+                
+            }
+            else if(Input.GetButtonDown("leftshift")){
+                
+            }
 
 
 
