@@ -53,6 +53,7 @@
 
         protected override void ActionStarted()
         {
+
             m_Inventory.UseItem(m_Inventory.EquippedItemType, 1);
             //Debug.LogFormat("{0} action.  Shooting a {1} | Iventory: {2} |", GetType().Name, m_Inventory.EquippedItemType, m_Inventory);
         }

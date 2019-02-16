@@ -37,7 +37,7 @@ namespace CharacterController
             m_IsActive = true;
             ActionStarted();
             EventHandler.ExecuteEvent(m_GameObject, "OnCharacterActionActive", this, true);
-            m_Animator.CrossFade(Animator.StringToHash(GetDestinationState(m_LayerIndex)), m_TransitionDuration, m_LayerIndex);
+            //m_Animator.CrossFade(Animator.StringToHash(GetDestinationState(m_LayerIndex)), m_TransitionDuration, m_LayerIndex);
         }
 
         public override void StopAction()
@@ -53,12 +53,6 @@ namespace CharacterController
 
         public override bool CanStartAction()
         {
-            
-            if (Input.GetKeyDown(KeyCode.Alpha0))
-            {
-                Debug.Log(m_Inventory.GetNextItem(true));
-            }
-
 
             if (Input.GetKeyDown(KeyCode.Q))
             {
@@ -73,44 +67,45 @@ namespace CharacterController
 
         protected override void ActionStarted()
         {
+            m_Inventory.SwitchItem(true);
+            m_AnimatorMonitor.SetItemID(m_Inventory.CurrentItemID);
+
             //Debug.LogFormat("Starting EquipUnequip");
+            //var currentItem = m_Inventory.EquippedItemType;
+            //var nextItem = m_Inventory.GetNextItem(true);
+            ////  If no item is equipped, than equip next item.
+            //if (currentItem == null && nextItem != null)
+            //{
+            //    //Debug.LogFormat("Equipping {0}", nextItem.name);
+            //    m_IsSwitching = false;
+            //    m_AnimatorMonitor.SetItemID(m_Inventory.GetItem(nextItem).ItemID);
+            //    //m_AnimatorMonitor.SetItemStateIndex(m_EquipStateID);
 
-            var currentItem = m_Inventory.EquippedItemType;
-            var nextItem = m_Inventory.GetNextItem(true);
+            //    m_Inventory.EquipItem(nextItem);
+            //}
+            ////  Switching Items
+            //else if (currentItem != null && nextItem != null)
+            //{
+            //    //Debug.LogFormat("{0} is switching to {1}", currentItem.name, nextItem.name);
+            //    m_IsSwitching = true;
+            //    m_AnimatorMonitor.SetItemID(m_Inventory.GetItem(nextItem).ItemID);
+            //    //m_AnimatorMonitor.SetItemStateIndex(m_EquipStateID);
 
-            //  If no item is equipped, than equip next item.
-            if (currentItem == null && nextItem != null)
-            {
-                //Debug.LogFormat("Equipping {0}", nextItem.name);
-                m_IsSwitching = false;
-                m_AnimatorMonitor.SetItemID(m_Inventory.GetItem(nextItem).ItemID);
-                m_AnimatorMonitor.SetItemStateIndex(m_EquipStateID);
+            //    m_Inventory.SwitchItem(true);
+            //}
+            ////  Unequipping.
+            //else if (nextItem == null)
+            //{
+            //    //Debug.LogFormat("Unequipping {0}", currentItem.name);
+            //    m_Inventory.UnequipCurrentItem();
+            //    m_IsSwitching = false;
+            //    m_AnimatorMonitor.SetItemID(m_Inventory.GetItem(currentItem).ItemID);
+            //    //m_AnimatorMonitor.SetItemStateIndex(m_UnequipStateID);
+            //}
+            //else
+            //{
 
-                m_Inventory.EquipItem(nextItem);
-            }
-            //  Switching Items
-            else if (currentItem != null && nextItem != null)
-            {
-                //Debug.LogFormat("{0} is switching to {1}", currentItem.name, nextItem.name);
-                m_IsSwitching = true;
-                m_AnimatorMonitor.SetItemID(m_Inventory.GetItem(nextItem).ItemID);
-                m_AnimatorMonitor.SetItemStateIndex(m_EquipStateID);
-
-                m_Inventory.SwitchItem(true);
-            }
-            //  Unequipping.
-            else if (nextItem == null)
-            {
-                //Debug.LogFormat("Unequipping {0}", currentItem.name);
-                m_Inventory.UnequipCurrentItem();
-                m_IsSwitching = false;
-                m_AnimatorMonitor.SetItemID(m_Inventory.GetItem(currentItem).ItemID);
-                m_AnimatorMonitor.SetItemStateIndex(m_UnequipStateID);
-            }
-            else
-            {
-
-            }
+            //}
         }
 
 
@@ -136,8 +131,8 @@ namespace CharacterController
         protected override void ActionStopped()
         {
             //Debug.LogFormat("Done Equipping Unequipping.");
-            m_AnimatorMonitor.SetItemStateIndex(0);
-            m_IsSwitching = false;
+            //m_AnimatorMonitor.SetItemStateIndex(0);
+            //m_IsSwitching = false;
 
 
 
@@ -148,28 +143,28 @@ namespace CharacterController
             //}
         }
 
-        public override void ActionWillStart(CharacterAction nextAction)
-        {
-            if(nextAction.CanStartAction()){
-                nextAction.StartAction();
-            }
-        }
+        //public override void ActionWillStart(CharacterAction nextAction)
+        //{
+        //    if(nextAction.CanStartAction()){
+        //        nextAction.StartAction();
+        //    }
+        //}
 
 
 
         public override string GetDestinationState(int layer)
         {
-            var currentItem = m_Inventory.GetCurrentItem();
-            var nextItem = m_Inventory.GetNextItem(true);
+            //var currentItem = m_Inventory.GetCurrentItem();
+            //var nextItem = m_Inventory.GetNextItem(true);
 
-
-            if (currentItem == null){
-                if (nextItem == null)
-                    return null;
-                return m_Inventory.GetItem(nextItem).ItemName;
-                //return null;
-            }
-            return currentItem.ItemName;
+            //if (currentItem == null){
+            //    if (nextItem == null)
+            //        return null;
+            //    return m_Inventory.GetItem(nextItem).ItemName;
+            //    //return null;
+            //}
+            //return currentItem.ItemName;
+            return "";
         }
 
 
@@ -188,6 +183,8 @@ namespace CharacterController
             var itemID = itemObject.ItemID;
             return itemID;
         }
+
+
 
 
     }

@@ -1885,6 +1885,7 @@ MonoBehaviour:
   m_StateName: 
   m_ActionID: 0
   m_StateHash: 0
+  m_IsActive: 0
 --- !u!114 &114211499918439720
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2014,6 +2015,7 @@ MonoBehaviour:
   m_StateName: Take Damage
   m_ActionID: 9
   m_StateHash: 0
+  m_IsActive: 0
   m_MinDamageAmount: 0
 --- !u!114 &114493252323806430
 MonoBehaviour:
@@ -2043,6 +2045,7 @@ MonoBehaviour:
   m_StateName: Die
   m_ActionID: 4
   m_StateHash: 0
+  m_IsActive: 0
   m_IsDead: 0
 --- !u!114 &114752500204725904
 MonoBehaviour:
@@ -2062,14 +2065,14 @@ MonoBehaviour:
   - m_Item: {fileID: 0}
     m_Amount: 10
     m_Equip: 0
-  m_EquippedItem: {fileID: 0}
-  m_CurrentItem: {fileID: 0}
   m_Loadout: []
+  m_EquipPoints:
+    m_RightHandSlot: {fileID: 0}
+    m_LeftHandSlot: {fileID: 0}
+  m_EquippedItem: {fileID: 0}
   m_EquippedItemIndex: -1
-  m_Switching: 0
   m_LastEquippedItem: {fileID: 0}
-  m_RightHandSlot: {fileID: 0}
-  m_LeftHandSlot: {fileID: 0}
+  m_Switching: 0
 --- !u!114 &114933608758217926
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2099,7 +2102,6 @@ MonoBehaviour:
   m_DebugActiveActions: 0
   m_Aim: 0
   m_SelectedAction: {fileID: 0}
-  m_SelectedItemAction: {fileID: 0}
   m_DrawDebugLine: 0
   m_ShowComponents: 1
 --- !u!114 &114999616151661266

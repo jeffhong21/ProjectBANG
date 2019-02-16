@@ -16,8 +16,6 @@ namespace CharacterController
 
 
         [SerializeField, DisplayOnly]
-        private float m_MoveAmount;
-        [SerializeField, DisplayOnly]
         private float m_Horizontal;
         [SerializeField, DisplayOnly]
         private float m_Vertical;
@@ -40,7 +38,7 @@ namespace CharacterController
         [SerializeField]
         private CameraController m_CameraController;
         private CharacterLocomotion m_Controller;
-        private ItemAction m_ItemAction;
+        private ItemActionManager m_ItemAction;
         private LayerManager m_LayerManager;
         private Inventory m_Inventory;
 
@@ -63,7 +61,7 @@ namespace CharacterController
             m_Controller = GetComponent<CharacterLocomotion>();
             m_LayerManager = GetComponent<LayerManager>();
             m_Inventory = GetComponent<Inventory>();
-            m_ItemAction = GetComponent<ItemAction>();
+            m_ItemAction = GetComponent<ItemActionManager>();
 
             if (m_CameraController)
             {
@@ -86,6 +84,7 @@ namespace CharacterController
 
 
         public virtual Vector2 GetMousePosition(){
+            m_MousePosition = Input.mousePosition;
             return Input.mousePosition;
         }
 
@@ -93,22 +92,99 @@ namespace CharacterController
 
         private void Update()
         {
+            SetInputVector(true);
+
+            SetCameraPosition();
+
+
+            if (Input.GetKeyDown(KeyCode.Mouse0))
+            {
+                UseItem();
+            }
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                Reload();
+            }
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                SwitchItem(false);
+            }
+            else if (Input.GetKeyDown(KeyCode.E))
+            {
+                SwitchItem(true);
+            }
+            //else if (Input.GetKeyDown(KeyCode.F))
+            //{
+                
+            //}
+            //else if (Input.GetKeyDown(KeyCode.C))
+            //{
+                
+            //}
+            //else if (Input.GetKeyDown(KeyCode.V))
+            //{
+
+            //}
+            //else if (Input.GetKeyDown(KeyCode.B))
+            //{
+
+            //}
+
+
+            //if (Input.GetKeyDown(KeyCode.Alpha1))
+            //{
+            //    m_Inventory.EquipItem(0);
+            //}
+            //else if (Input.GetKeyDown(KeyCode.Alpha2))
+            //{
+            //    m_Inventory.EquipItem(1);
+            //}
+            //else if (Input.GetKeyDown(KeyCode.Alpha3))
+            //{
+            //    m_Inventory.EquipItem(2);
+            //}
+            //else if (Input.GetKeyDown(KeyCode.Alpha4))
+            //{
+            //    m_Inventory.EquipItem(3);
+            //}
+            //else if (Input.GetKeyDown(KeyCode.Alpha5))
+            //{
+            //    m_Inventory.EquipItem(4);
+            //}
+            //else if (Input.GetKeyDown(KeyCode.Alpha6))
+            //{
+            //    m_Inventory.EquipItem(5);
+            //}
+
+
+
+
+            LockCameraRotation();
+
+            //  For Debugging.
+            DebugButtonPress();
+        }
+
+
+        private void SetInputVector(bool useGetAxis)
+        {
             m_Horizontal = GetAxis(m_HorizontalInputName);
             m_Vertical = GetAxis(m_VerticalInputName);
 
-            m_MoveAmount = Mathf.Clamp01(Mathf.Abs(m_Horizontal) + Mathf.Abs(m_Vertical));
-
             m_InputVector.Set(m_Horizontal, 0, m_Vertical);
             m_Controller.InputVector = m_InputVector;
+        }
 
+
+        private void SetCameraPosition()
+        {
             //  Find where the camera is looking.
-            if(m_Controller.Aiming)
-            {
+            if (m_Controller.Aiming){
                 m_Ray = new Ray(m_CameraController.Camera.transform.position, m_CameraController.Camera.transform.forward);
                 m_Controller.LookPosition = m_Ray.GetPoint(m_RayLookDistance);
 
                 //Debug.DrawRay(m_Ray.origin, m_Ray.direction * 20, Color.red);
-                if(Physics.Raycast(m_Ray.origin, m_Ray.direction, out m_RaycastHit, 50, m_LayerMask)){
+                if (Physics.Raycast(m_Ray.origin, m_Ray.direction, out m_RaycastHit, 50, m_LayerMask)){
                     m_Controller.LookPosition = m_RaycastHit.point;
                 }
                 else{
@@ -118,30 +194,45 @@ namespace CharacterController
             else{
                 m_Controller.LookPosition = m_Controller.transform.position + (m_Controller.transform.forward * 10) + (m_Controller.transform.up * 1.35f);
             }
-
-            m_MousePosition = Input.mousePosition;
-
-
-            if(Input.GetButtonDown("mouse0")){
-
-            }
-            else if(Input.GetButtonDown("mouse2")){
-
-            }
-            else if(Input.GetButtonDown("space")){
-                
-            }
-            else if(Input.GetButtonDown("leftshift")){
-                
-            }
-
-
-
-            LockCameraRotation();
-
-            //  For Debugging.
-            DebugButtonPress();
         }
+
+
+
+        public void UseItem()
+        {
+            m_ItemAction.UseItem();
+        }
+
+
+        public void Reload()
+        {
+            m_ItemAction.Reload();
+        }
+
+
+        public void SwitchItem(bool next)
+        {
+            m_ItemAction.SwitchItem(next);
+        }
+
+
+        public void EquipItem(int index)
+        {
+            m_ItemAction.EquipItem(index);
+        }
+
+        //public void ToggleItem()
+        //{
+
+        //}
+
+
+        //public void DropItem(int itemID)
+        //{
+
+        //}
+
+
 
 
         private void LockCameraRotation()
@@ -170,6 +261,13 @@ namespace CharacterController
                 Debug.Break();
             }
         }
+
+
+
+
+
+
+
 
 
 

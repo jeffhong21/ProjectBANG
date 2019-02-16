@@ -11,8 +11,8 @@ namespace CharacterController
     [CustomEditor(typeof(CharacterLocomotion))]
     public class CharacterLocomotionEditor : Editor
     {
-        //private static readonly string[] m_DontIncude = new string[] { "m_Script", "m_Actions" };
-        private static readonly string[] m_DontIncude = new string[] { "m_Script" };
+        private static readonly string[] m_DontIncude = new string[] { "m_Script", "m_Actions" };
+        //private static readonly string[] m_DontIncude = new string[] { "m_Script" };
 
         CharacterLocomotion m_Controller;
 

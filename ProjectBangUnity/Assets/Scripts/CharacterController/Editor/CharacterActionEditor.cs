@@ -21,13 +21,12 @@
             if (target == null) return;
             m_Action = (CharacterAction)target;
 
-
+            m_Action.hideFlags = HideFlags.HideInInspector;
         }
 
 
         public override void OnInspectorGUI()
         {
-            m_Action.hideFlags = HideFlags.HideInInspector;
             serializedObject.Update();
 
             DrawPropertiesExcluding(serializedObject, m_DontIncude);

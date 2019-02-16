@@ -5,7 +5,7 @@ AnimatorController:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: CharLocomotion_01
+  m_Name: Character Locomotion 02
   serializedVersion: 5
   m_AnimatorParameters:
   - m_Name: HorizontalInput
@@ -8355,9 +8355,9 @@ AnimatorStateMachine:
   - {fileID: 1101786338356723938}
   m_EntryTransitions: []
   m_StateMachineTransitions:
-  - first: {fileID: 1107525709268244460}
-    second: []
   - first: {fileID: 1107939034092718390}
+    second: []
+  - first: {fileID: 1107525709268244460}
     second: []
   m_StateMachineBehaviours: []
   m_AnyStatePosition: {x: 50, y: 20, z: 0}
@@ -8435,12 +8435,12 @@ AnimatorStateMachine:
   m_AnyStateTransitions: []
   m_EntryTransitions: []
   m_StateMachineTransitions:
-  - first: {fileID: 1107452493565737286}
-    second:
-    - {fileID: 1109841625495802142}
   - first: {fileID: 1107990464225844384}
     second:
     - {fileID: 1109666151012330292}
+  - first: {fileID: 1107452493565737286}
+    second:
+    - {fileID: 1109841625495802142}
   m_StateMachineBehaviours: []
   m_AnyStatePosition: {x: -204, y: 312, z: 0}
   m_EntryPosition: {x: -144, y: 432, z: 0}

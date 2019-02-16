@@ -35,6 +35,8 @@
         private CharacterAction[] m_ActiveActions;
         private CharacterAction m_CurrentAction;
 
+
+
         [SerializeField]
         private bool m_DebugActiveActions;
 
@@ -50,8 +52,7 @@
         [Header("Debug")]
         [SerializeField, HideInInspector]
         private CharacterAction m_SelectedAction;
-        [SerializeField, HideInInspector]
-        private ItemAction m_SelectedItemAction;
+
 
 
         PlayerInput m_Input;

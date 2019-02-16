@@ -4,44 +4,38 @@
     using System;
     using System.Collections.Generic;
 
-
+    using JH_Utils;
 
     public class Inventory : MonoBehaviour
     {
         //[Header("-- Default Loadout --")]
-        //[SerializeField, HideInInspector]
         [SerializeField]
         protected ItemAmount[] m_DefaultLoadout;
-        [Header("-- Inventory --")]
-        [SerializeField]
-        protected Item m_EquippedItem;
-        [SerializeField]
-        protected ItemObject m_CurrentItem;
         [SerializeField]
         protected Item[] m_Loadout;
-        [SerializeField]
-        protected int m_EquippedItemIndex = -1;
         //[SerializeField]
         protected int m_NextInventorySlot;
         [SerializeField]
-        protected bool m_Switching;
-        [SerializeField]
+        protected CharacterEquipPoints m_EquipPoints;
+
+        [Header("-- Equipped Item --")]
+        [SerializeField, DisplayOnly]
+        protected Item m_EquippedItem;
+        [SerializeField, DisplayOnly]
+        protected int m_EquippedItemIndex = -1;
+        [SerializeField, DisplayOnly]
         protected Item m_LastEquippedItem;
+        [SerializeField]
+        protected bool m_Switching;
+
 
         protected Dictionary<Item, ItemObject> m_Inventory;
-
-        [Header("-- Item Equip Slots --")]
-        [SerializeField]
-        protected ItemEquipSlot m_RightHandSlot;
-        [SerializeField]
-        protected ItemEquipSlot m_LeftHandSlot;
-
         protected AnimatorMonitor m_AnimatorMonitor;
         protected Animator m_Animator;
         protected Transform m_ItemHolder;
 
 
- 
+    
         //
         // Properties
         //
@@ -55,10 +49,7 @@
         }
 
         public int EquippedItemIndex{
-            get{
-                //m_EquippedItemIndex = Array.IndexOf(m_Loadout, m_EquippedItem);
-                return m_EquippedItemIndex;
-            }
+            get{ return m_EquippedItemIndex; }
             private set{
                 if (m_EquippedItem == null)
                     m_EquippedItemIndex = -1;
@@ -87,7 +78,13 @@
             get { return m_EquippedItem; }
         }
 
-
+        public int CurrentItemID{
+            get{
+                if (m_EquippedItem == null)
+                    return 0;
+                return GetCurrentItem(m_EquippedItem).ItemID;
+            }
+        }
 
         //
         // Methods
@@ -117,8 +114,8 @@
             //  Setup item hands slots.
             ItemEquipSlot[] itemSlots = GetComponentsInChildren<ItemEquipSlot>();
             for (int i = 0; i < itemSlots.Length; i++){
-                if (itemSlots[i].ID == 0) m_RightHandSlot = itemSlots[i];
-                if (itemSlots[i].ID == 1) m_LeftHandSlot = itemSlots[i];
+                if (itemSlots[i].ID == 0) m_EquipPoints.RightHandSlot = itemSlots[i];
+                if (itemSlots[i].ID == 1) m_EquipPoints.LeftHandSlot = itemSlots[i];
             }
 		}
 
@@ -173,17 +170,18 @@
                     itemAddedToInventory = true;
                 }
 
+                //Debug.LogFormat("{0} is already in inventory. ", item);
             }
             //  Pickup item not in inventory.
             else
             {
                 if (item is PrimaryItem)
                 {
-                    var parent = m_RightHandSlot.transform;
+                    var parent = m_EquipPoints.RightHandSlot.transform;
                     var customEquipPoint = ((PrimaryItem)item).CustomEquipPoint;
                     if( !string.IsNullOrWhiteSpace(customEquipPoint)){
-                        if (m_RightHandSlot.GetEquipPoint(customEquipPoint) != null)
-                            parent = m_RightHandSlot.GetEquipPoint(customEquipPoint);
+                        if (m_EquipPoints.RightHandSlot.GetEquipPoint(customEquipPoint) != null)
+                            parent = m_EquipPoints.RightHandSlot.GetEquipPoint(customEquipPoint);
                     }
 
                     ItemObject itemObject = InstantiateItem(item, parent);
@@ -202,8 +200,7 @@
 
                     itemAddedToInventory = true;
                 }
-
-
+                //Debug.LogFormat("Adding {0} to inventory. ", item);
             }
 
 
@@ -327,10 +324,7 @@
 
         public void SwitchItem(bool next)
         {
-            // Cache last equipped item.
-            m_LastEquippedItem = m_EquippedItem;
-
-
+            
             // If the current equipped item is the last in the inventory, than unequip item.
             if((next && m_EquippedItemIndex == m_Loadout.Length) || (next == false && m_EquippedItemIndex == 0)){
                 UnequipCurrentItem();
@@ -361,7 +355,6 @@
         {
             if (m_Inventory.ContainsKey(item)){
                 if (item.GetType() == typeof(PrimaryItem)){
-                    //m_EquippedItem = item as PrimaryItem;
                     var itemIndex = Array.IndexOf(m_Loadout, (PrimaryItem)item);
                     EquipItem(itemIndex);
                 }
@@ -376,11 +369,12 @@
                 return;
             }
 
+            m_LastEquippedItem = m_EquippedItem;
+
             //Debug.LogFormat("{0} is {1}", m_Loadout[itemIndex], m_Loadout[itemIndex] is PrimaryItem);
             if (m_Loadout[itemIndex] is PrimaryItem)
             {
-
-
+                
                 //  Turn item object off.
                 ItemObject itemObject = GetCurrentItem(m_LastEquippedItem);
                 if (itemObject != null)
@@ -392,26 +386,27 @@
                 m_Inventory[m_EquippedItem].SetActive(true);
                 //GetItem(m_EquippedItem).transform.parent = m_RightHandSlot.transform;
 
-
                 EventHandler.ExecuteEvent(gameObject, "OnInventoryEquip", GetItem(m_Loadout[itemIndex]));
+                return;
             }
         }
 
 
         public void UnequipCurrentItem()
         {
+            m_LastEquippedItem = m_EquippedItem;
+
             ItemObject itemObject = GetCurrentItem();
             if (itemObject != null)
                 itemObject.SetActive(false);
             
-            m_LastEquippedItem = m_EquippedItem;
+
             m_EquippedItem = null;
             m_EquippedItemIndex = -1;
 
 
             EventHandler.ExecuteEvent(gameObject, "OnInventoryEquip", (ItemObject)null);
         }
-
 
 
 
@@ -428,18 +423,6 @@
             //Debug.LogFormat("**  Toggling item. **");
         }
 
-
-
-
-        protected int GetItemID()
-        {
-            if (m_EquippedItem == null)
-                return 0;
-
-            var itemObject = GetCurrentItem(m_EquippedItem);
-            var itemID = itemObject.ItemID;
-            return itemID;
-        }
 
 
 
@@ -488,24 +471,39 @@
 
 
         [Serializable]
+        public class CharacterEquipPoints
+        {
+            [SerializeField] protected ItemEquipSlot m_RightHandSlot;
+            [SerializeField] protected ItemEquipSlot m_LeftHandSlot;
+
+            public ItemEquipSlot RightHandSlot
+            {
+                get { return m_RightHandSlot; }
+                set { m_RightHandSlot = value; }
+            }
+            public ItemEquipSlot LeftHandSlot
+            {
+                get { return m_LeftHandSlot; }
+                set { m_LeftHandSlot = value; }
+            }
+        }
+
+
+
+        [Serializable]
         public class ItemAmount
         {
-            [SerializeField]
-            protected Item m_Item;
-            [SerializeField]
-            protected int m_Amount = 1;
-            [SerializeField]
-            protected bool m_Equip = true;
+            [SerializeField] protected Item m_Item;
+            [SerializeField] protected int m_Amount = 1;
+            [SerializeField] protected bool m_Equip = true;
 
 
-            public Item Item
-            {
+            public Item Item{
                 get { return m_Item; }
                 private set { m_Item = value; }
             }
 
-            public int Amount
-            {
+            public int Amount{
                 get { return Mathf.Clamp(m_Amount, 0, m_Item.GetCapacity()); }
                 set { m_Amount = Mathf.Clamp(value, 0, m_Item.GetCapacity()); }
             }
@@ -521,13 +519,11 @@
             }
 
 
-            public ItemAmount(Item itemType, int amount)
-            {
+            public ItemAmount(Item itemType, int amount){
                 Initialize(itemType, amount);
             }
 
-            public void Initialize(Item itemType, int amount)
-            {
+            public void Initialize(Item itemType, int amount){
                 Item = itemType;
                 Amount = amount;
             }

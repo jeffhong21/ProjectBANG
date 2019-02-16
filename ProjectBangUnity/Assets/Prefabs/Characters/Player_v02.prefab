@@ -137,12 +137,10 @@ GameObject:
   - component: {fileID: 114311917172092944}
   - component: {fileID: 114673553875157940}
   - component: {fileID: 114433684837544554}
-  - component: {fileID: 114104959605895126}
   - component: {fileID: 114518044546574396}
-  - component: {fileID: 114110930745583396}
-  - component: {fileID: 114638021678816336}
   - component: {fileID: 114608634134138704}
-  - component: {fileID: 114515291612546400}
+  - component: {fileID: 114134402579393908}
+  - component: {fileID: 114786276463712790}
   m_Layer: 10
   m_Name: Player_v02
   m_TagString: Player
@@ -1705,7 +1703,7 @@ MonoBehaviour:
   - {fileID: 4215629344895060}
   - {fileID: 4869774699660034}
   - {fileID: 4406298832063842}
---- !u!114 &114104959605895126
+--- !u!114 &114134402579393908
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1713,33 +1711,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 1141768220188808}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 71ef423fd12324200af4be6a57653a06, type: 3}
+  m_Script: {fileID: 11500000, guid: f15908e6ff250438aaac6278e4c04723, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_InputName: Reload
+  m_InputName: Fire2
   m_StartType: 2
-  m_StopType: 0
-  m_StateName: Reload
-  m_ActionID: 0
-  m_StateHash: 0
---- !u!114 &114110930745583396
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c80c40f5762314aa88bd0a12e74b5d0d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_InputName: Fire1
-  m_StartType: 2
-  m_StopType: 2
+  m_StopType: 3
   m_StateName: 
   m_ActionID: 0
   m_StateHash: 0
-  m_EquipedItem: {fileID: 0}
+  m_IsActive: 0
+  m_ItemID: 0
+  m_ItemName: 
+  m_Aiming: 0
 --- !u!114 &114145946620604510
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1879,26 +1863,7 @@ MonoBehaviour:
   m_StateName: Jump
   m_ActionID: 1
   m_StateHash: 0
---- !u!114 &114515291612546400
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2a1e63f2cb81d4df5ae55ed717478319, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_InputName: 
-  m_StartType: 2
-  m_StopType: 0
-  m_StateName: 
-  m_ActionID: 0
-  m_StateHash: 0
-  m_ItemID: 0
-  m_ItemName: 
-  m_IsSwitching: 0
+  m_IsActive: 0
 --- !u!114 &114518044546574396
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1916,6 +1881,7 @@ MonoBehaviour:
   m_StateName: 
   m_ActionID: 3
   m_StateHash: 0
+  m_IsActive: 0
   m_IsCrouching: 0
   m_IsConcurrent: 1
   m_Height: 0.5
@@ -1936,27 +1902,8 @@ MonoBehaviour:
   m_StateName: 
   m_ActionID: 9
   m_StateHash: 0
+  m_IsActive: 0
   m_MinDamageAmount: 0
---- !u!114 &114638021678816336
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f15908e6ff250438aaac6278e4c04723, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_InputName: Fire2
-  m_StartType: 2
-  m_StopType: 3
-  m_StateName: 
-  m_ActionID: 0
-  m_StateHash: 0
-  m_ItemID: 0
-  m_ItemName: 
-  m_Aiming: 0
 --- !u!114 &114673553875157940
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1974,6 +1921,7 @@ MonoBehaviour:
   m_StateName: 
   m_ActionID: 12
   m_StateHash: 0
+  m_IsActive: 0
   m_TakeCoverDistance: 1
   m_CoverLayer:
     serializedVersion: 2
@@ -2014,20 +1962,38 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_DefaultLoadout:
-  - m_Item: {fileID: 11400000, guid: 29d47eb19b2d3474080e5b333f73e67f, type: 2}
+  - m_Item: {fileID: 11400000, guid: eff795c8b6e0c4b26b47624a847107c9, type: 2}
     m_Amount: 1
     m_Equip: 0
   - m_Item: {fileID: 11400000, guid: 6c5d9ac65e6844feb81b0131f2050c07, type: 2}
     m_Amount: 1
     m_Equip: 0
-  m_EquippedItem: {fileID: 0}
-  m_CurrentItem: {fileID: 0}
+  - m_Item: {fileID: 11400000, guid: 29d47eb19b2d3474080e5b333f73e67f, type: 2}
+    m_Amount: 1
+    m_Equip: 0
   m_Loadout: []
+  m_EquipPoints:
+    m_RightHandSlot: {fileID: 114077551664450782}
+    m_LeftHandSlot: {fileID: 114684986398083596}
+  m_EquippedItem: {fileID: 0}
   m_EquippedItemIndex: -1
-  m_Switching: 0
   m_LastEquippedItem: {fileID: 0}
-  m_RightHandSlot: {fileID: 114077551664450782}
-  m_LeftHandSlot: {fileID: 114684986398083596}
+  m_Switching: 0
+--- !u!114 &114786276463712790
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c5fd0207bf574ec3bed3dfa045031d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Item: {fileID: 0}
+  m_LayerIndex: 0
+  m_StateName: 
+  m_TransitionDuration: 0.2
 --- !u!114 &114901688824212290
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2059,7 +2025,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92019d84070ab4ad6939a5a7011333a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_MoveAmount: 0
   m_Horizontal: 0
   m_Vertical: 0
   m_AimPosition: {x: 0, y: 0, z: 0}
@@ -2094,16 +2059,13 @@ MonoBehaviour:
   - {fileID: 114673553875157940}
   - {fileID: 114433684837544554}
   - {fileID: 114518044546574396}
-  - {fileID: 114104959605895126}
-  - {fileID: 114515291612546400}
-  - {fileID: 114638021678816336}
+  - {fileID: 114134402579393908}
   - {fileID: 114608634134138704}
   m_ActiveAction: {fileID: 0}
   m_ActiveActions: []
   m_DebugActiveActions: 0
   m_Aim: 0
   m_SelectedAction: {fileID: 0}
-  m_SelectedItemAction: {fileID: 0}
   m_DrawDebugLine: 0
   m_ShowComponents: 0
 --- !u!136 &136461347018360410
