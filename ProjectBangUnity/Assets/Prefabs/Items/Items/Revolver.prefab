@@ -548,10 +548,11 @@ MonoBehaviour:
   m_RequiredAim: 1
   m_TwoHandedItem: 0
   m_NonDominantHandPosition: {fileID: 4261159963361546}
-  m_PositionOffset: {x: 0.084, y: -0.02, z: 0.516}
-  m_RotationOffset: {x: -6.681, y: 1.304, z: -84.82301}
+  m_PositionOffset: {x: 0.084, y: -0.086, z: 0.362}
+  m_RotationOffset: {x: -3.21, y: -0.9, z: -84.842}
   m_CrosshairsSprite: {fileID: 0}
   m_Character: {fileID: 0}
+  m_Controller: {fileID: 0}
   m_FirePoint: {fileID: 4073399458351486}
   m_FireRate: 1
   m_FireCount: 1
@@ -567,10 +568,10 @@ MonoBehaviour:
   m_HitscanFireRange: 3.4028235e+38
   m_HitscanImpactLayers:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 2817
   m_HitscanDamageEvent: 
   m_HitscanDamageAmount: 10
-  m_HitscanImpactForce: 400
+  m_HitscanImpactForce: 40
   m_Projectile: {fileID: 0}
   m_DrawAimLine: 1
   m_DefaultDecal: {fileID: 166404, guid: 1b9f66cb9bb3047649bf932337e6b03a, type: 2}

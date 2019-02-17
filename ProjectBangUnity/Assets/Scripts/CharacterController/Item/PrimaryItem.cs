@@ -7,8 +7,6 @@
     public class PrimaryItem : Item
     {
         [SerializeField]
-        protected int m_ItemID;
-        [SerializeField]
         protected GameObject m_OriginalObject;
         [SerializeField]
         protected GameObject m_DropObject;
@@ -19,11 +17,6 @@
 
 
 
-        public int ItemID
-        {
-            get { return m_ItemID; }
-            set { m_ItemID = value; }
-        }
 
         public GameObject OriginalObject
         {
@@ -71,8 +64,6 @@
         {
             [SerializeField, Tooltip("The type of consumable item the primary item uses.")]
             protected ConsumableItem m_ItemType;
-            [SerializeField]
-            protected int m_CurrentAmount;
             [SerializeField, Tooltip("The max amount of consumable item type the primary item can hold.")]
             protected int m_Capacity;
 
@@ -81,12 +72,6 @@
             {
                 get { return m_ItemType; }
                 set { m_ItemType = value; }
-            }
-
-            public int CurrentAmount
-            {
-                get { return m_CurrentAmount; }
-                set { m_CurrentAmount = Mathf.Clamp(value, 0, m_Capacity); }
             }
 
             public int Capacity

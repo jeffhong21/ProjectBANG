@@ -9,7 +9,7 @@ namespace CharacterController
 
         bool IsReloading();
 
-        void TryStopReload();
+        //void TryStopReload();
 
 
     }

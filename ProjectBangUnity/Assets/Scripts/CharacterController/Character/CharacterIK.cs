@@ -9,45 +9,33 @@
     {
         private readonly float m_LookAtRayLength = 30;
 
-        [SerializeField]
-        private bool m_DebugDrawLookRay;
-        [SerializeField]
-        private int m_BaseLayerIndex = 0;
-        [SerializeField]
-        private int m_UpperBodyLayerIndex = 1;
-        [SerializeField]
-        private LayerMask m_LayerMask;
-        [Header("Body")]
-        [SerializeField, Range(0, 1)]
-        protected float m_LookAtAimBodyWeight = 1f;
-        [SerializeField, Range(0, 1)]
-        protected float m_LookAtBodyWeight = 0.05f;
-        [SerializeField, Range(0, 1)]
-        protected float m_LookAtHeadWeight = 0.425f;
-        [SerializeField, Range(0, 1)]
-        protected float m_LookAtEyesWeight = 1f;
-        [SerializeField, Range(0, 1)]
-        protected float m_LookAtClampWeight = 0.35f;
-        [SerializeField]
-        protected float m_LookAtAdjustmentSpeed = 0.2f;
-        [SerializeField]
-        private Vector3 m_LookAtOffset;
-        [Header("Hands")]
-        [SerializeField, Range(0, 1)]
-        protected float m_HandIKWeight = 1f;
-        [SerializeField]
-        protected float m_HandIKAdjustmentSpeed = 0.2f;
-        [SerializeField]
-        protected Vector3 m_HandIKOffset;
 
-        [Header("States")]
-        [SerializeField]
-        protected bool m_EnableHandIK;
+        [SerializeField] private bool m_DebugDrawLookRay;
+        [SerializeField] private int m_BaseLayerIndex = 0;
+        [SerializeField] private int m_UpperBodyLayerIndex = 1;
+        [SerializeField] private LayerMask m_LayerMask;
+
+        [Header("-- Body --")]
+        [SerializeField, Range(0, 1)] protected float m_LookAtAimBodyWeight = 1f;
+        [SerializeField, Range(0, 1)] protected float m_LookAtBodyWeight = 0.05f;
+        [SerializeField, Range(0, 1)] protected float m_LookAtHeadWeight = 0.425f;
+        [SerializeField, Range(0, 1)] protected float m_LookAtEyesWeight = 1f;
+        [SerializeField, Range(0, 1)] protected float m_LookAtClampWeight = 0.35f;
+        [SerializeField] protected float m_LookAtAdjustmentSpeed = 0.2f;
+        [SerializeField] private Vector3 m_LookAtOffset;
+
+        [Header("-- Hands --")]
+        [SerializeField, Range(0, 1)] protected float m_HandIKWeight = 1f;
+        [SerializeField] protected float m_HandIKAdjustmentSpeed = 0.2f;
+        [SerializeField] protected Vector3 m_HandIKOffset;
+
+
 
 
 
         private Animator m_Animator;
         private CharacterLocomotion m_Controller;
+        private LayerManager m_LayerManager;
         private Transform m_Transform;
         private GameObject m_GameObject;
 
@@ -57,18 +45,19 @@
         private float m_HandIKAdjustmentVelocity;
         private float m_LookAtAdjustmentVelocity;
 
-        private Transform m_LookAtPoint;
+        private Vector3 rightHandPosition;
+        private Vector3 rightHandIkPosition;
+        private Vector3  rightHandTargetPosition;
+        private Quaternion rightHandRotation, rightHandTargetRotation;
+        private Vector3 leftHandPosition, leftHandIkPosition, leftHandTargetPosition;
+        private Quaternion leftHandRotation, leftHandTargetRotation;
+
+        //private Transform m_LookAtPoint;
         //private Vector3 m_LookAtDirection;
 
-        private Transform m_RightHand;
-        private Transform m_LeftHand;
-        private Transform m_UpperChest;
-        private Transform m_RightShoulder;
-
+        private Transform m_RightHand, m_LeftHand, m_UpperChest, m_RightShoulder;
         private Transform m_AimPivot;
-        [SerializeField]
-        private Transform m_RightHandTarget;
-        [SerializeField]
+        [SerializeField] private Transform m_RightHandTarget;
         private ItemObject m_CurrentItem;
 
 
@@ -80,10 +69,34 @@
         [SerializeField]
         Transform itemSlot;
 
+
+
+
+        private Vector3 rightFootPosition, leftFootPosition, leftFootIkPosition, rightFootIkPosition;
+        private Quaternion leftFootIkRotation, rightFootIkRotation;
+        private float lastPelvisPositionY, lastRightFootPositionY, lastLeftFootPositionY;
+
+        [Header("--  Feet --")]
+        [Range(0, 2)] [SerializeField] private float heightFromGroundRaycast = 1.14f;
+        [Range(0, 2)] [SerializeField] private float raycastDownDistance = 1.5f;
+        [SerializeField] private float m_HipOffset = 0f;
+        [Range(0, 1)] [SerializeField] private float m_HipsMovingPositionAdjustmentSpeed = 0.28f;
+        [Range(0, 1)] [SerializeField] private float m_FootPositionAdjustmentSpeed = 0.5f;
+
+        public string leftFootAnimVariableName = "LeftFootCurve";
+        public string rightFootAnimVariableName = "RightFootCurve";
+
+        public bool useProIkFeature = false;
+        public bool showSolverDebug = true;
+
+
+
+
 		private void Awake()
 		{
             m_Animator = GetComponent<Animator>();
             m_Controller = GetComponent<CharacterLocomotion>();
+            m_LayerManager = GetComponent<LayerManager>();
             m_Transform = transform;
             m_GameObject = gameObject;
 
@@ -94,12 +107,6 @@
             m_UpperChest = m_Animator.GetBoneTransform(HumanBodyBones.UpperChest).transform;
             m_RightShoulder = m_Animator.GetBoneTransform(HumanBodyBones.RightShoulder).transform;
 
-
-            m_LookAtPoint = new GameObject("Look At Point").transform; //.parent = gameObject.transform;
-            m_LookAtPoint.transform.parent = gameObject.transform;
-            m_LookAtPoint.position = (m_Transform.forward * m_LookAtRayLength) + (Vector3.up * m_UpperChest.position.y);
-            //var _position = new Vector3(1, 0, 0);
-            m_LookAtPoint.localPosition = m_LookAtPoint.localPosition;// + _position;
 
             m_AimPivot = new GameObject("Aim Pivot").transform;
             m_AimPivot.transform.parent = gameObject.transform;
@@ -127,6 +134,11 @@
         {
             EventHandler.RegisterEvent<ItemObject>(m_GameObject, "OnInventoryEquip", HandleItem);
             EventHandler.RegisterEvent<bool>(m_GameObject, "OnAimActionStart", OnAim);
+
+            //rightHandPosition = m_RightHand.position;
+            //rightHandRotation = m_RightHand.rotation;
+            //rightHandTargetPosition = m_RightHandTarget.position;
+            //rightHandTargetRotation = m_RightHandTarget.rotation;
         }
 
 
@@ -138,47 +150,11 @@
 
 
 
-		private void FixedUpdate()
-        {
-            m_AimPivot.position = m_RightShoulder.position;
-            m_TargetDirection = m_LookAtPoint.position - m_AimPivot.position;
-            if (m_TargetDirection == Vector3.zero)
-                m_TargetDirection = m_AimPivot.forward;
-
-            m_TargetRotation = Quaternion.LookRotation(m_TargetDirection);
-            m_AimPivot.rotation = Quaternion.Slerp(m_AimPivot.rotation, m_TargetRotation, Time.deltaTime * 15);
-
-        }
-
-
-		private void Update()
-		{
-            if(m_Controller.Aiming){
-                m_LookAtPoint.position = m_Controller.LookPosition;
-            }
-            else{
-                //m_LookAtPoint.position.Set()
-            }
-		}
-
-
-
-		private void OnAnimatorIK()
-		{
-            LookAtTarget();
-            RotateDominantHand();
-            RotateNonDominantHand();
-            PositionHands();
-		}
-
-
-
 
         private void HandleItem(ItemObject item)
         {
             //Debug.LogFormat("{0} currently equipped item is {1}.", gameObject.name, item == null ? "<null>" : item.ItemName);
-
-            if(item == null)
+            if (item == null)
             {
                 m_CurrentItem = null;
                 m_RightHandTarget.localPosition = m_RightHand.localPosition;
@@ -187,19 +163,16 @@
             else
             {
                 m_CurrentItem = item;
-                //m_RightHandTarget.localPosition = item.HandIKPosition.position;
-                //m_RightHandTarget.localEulerAngles = item.HandIKPosition.rotation;
                 m_RightHandTarget.localPosition = item.PositionOffset;
                 m_RightHandTarget.localEulerAngles = item.RotationOffset;
-            }
 
+            }
         }
 
 
         private void OnAim(bool aim)
         {
             //Debug.LogFormat("{0} aiming is {1}.", gameObject.name, aim);
-
             if (aim)
             {
                 m_LookAtAimBodyWeight = 1;
@@ -216,6 +189,64 @@
 
 
 
+
+
+		private void FixedUpdate()
+        {
+            if (m_Animator == null) { return; }
+
+            m_AimPivot.position = m_RightShoulder.position;
+            m_TargetDirection = m_Controller.LookPosition - m_AimPivot.position;
+            if (m_TargetDirection == Vector3.zero)
+                m_TargetDirection = m_AimPivot.forward;
+
+            m_TargetRotation = Quaternion.LookRotation(m_TargetDirection);
+            m_AimPivot.rotation = Quaternion.Slerp(m_AimPivot.rotation, m_TargetRotation, Time.deltaTime * 15);
+
+
+
+
+
+            AdjustFeetTarget(ref rightFootPosition, HumanBodyBones.RightFoot);
+            AdjustFeetTarget(ref leftFootPosition, HumanBodyBones.LeftFoot);
+
+            //find and raycast to the ground to find positions
+            FeetPositionSolver(rightFootPosition, ref rightFootIkPosition, ref rightFootIkRotation); // handle the solver for right foot
+            FeetPositionSolver(leftFootPosition, ref leftFootIkPosition, ref leftFootIkRotation); //handle the solver for the left foot
+
+            //rightHandPosition = m_RightHand.position;
+            //rightHandRotation = m_RightHand.rotation;
+            //rightHandTargetPosition = m_RightHandTarget.position;
+            //rightHandTargetRotation = m_RightHandTarget.rotation;
+        }
+
+
+
+
+
+		private void OnAnimatorIK()
+		{
+            if (m_Animator == null) { return; }
+
+            LookAtTarget();
+            PositionLowerBody();
+            RotateDominantHand();
+            RotateNonDominantHand();
+            PositionHands();
+		}
+
+
+        private void LateUpdate()
+        {
+            //rightHandRotation = m_RightHand.rotation;
+            //rightHandPosition = m_RightHand.position;
+            //rightHandTargetRotation = m_RightHandTarget.rotation;
+            //rightHandTargetPosition = m_RightHandTarget.position;
+
+        }
+
+
+
         protected virtual void LookAtTarget()
         {
             //Vector3 directionTowardsTarget = m_LookAtPoint.position - m_Transform.position;
@@ -226,16 +257,36 @@
             //    m_LookAtAimBodyWeight = 0;
 
 
-            //m_HandIKWeight = Mathf.SmoothDamp(m_HandIKWeight, m_TargetHandWeight, ref m_HandIKAdjustmentVelocity, m_HandIKAdjustmentSpeed);
             m_TargetHandWeight = Mathf.SmoothDamp(m_TargetHandWeight, m_HandIKWeight, ref m_HandIKAdjustmentVelocity, m_HandIKAdjustmentSpeed);
-            //m_LookAtAimBodyWeight = Mathf.SmoothDamp(m_LookAtAimBodyWeight, m_TargetLookAtWeight, ref m_LookAtAdjustmentVelocity, m_LookAtAdjustmentSpeed);
             m_TargetLookAtWeight = Mathf.SmoothDamp(m_TargetLookAtWeight, m_LookAtAimBodyWeight, ref m_LookAtAdjustmentVelocity, m_LookAtAdjustmentSpeed);
 
 
             m_Animator.SetLookAtWeight(m_TargetLookAtWeight, m_LookAtBodyWeight, m_LookAtHeadWeight, m_LookAtEyesWeight, m_LookAtClampWeight);
-            m_Animator.SetLookAtPosition(m_LookAtPoint.position + m_LookAtOffset);
+            m_Animator.SetLookAtPosition(m_Controller.LookPosition + m_LookAtOffset);
         }
 
+
+        protected virtual void PositionLowerBody()
+        {
+            MovePelvisHeight();
+
+            //right foot ik position and rotation -- utilise the pro features in here
+            m_Animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1);
+            if (useProIkFeature)
+            {
+                m_Animator.SetIKRotationWeight(AvatarIKGoal.RightFoot, m_Animator.GetFloat(rightFootAnimVariableName));
+            }
+            MoveFeetToIkPoint(AvatarIKGoal.RightFoot, rightFootIkPosition, rightFootIkRotation, ref lastRightFootPositionY);
+
+
+            //left foot ik position and rotation -- utilise the pro features in here
+            m_Animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1);
+            if (useProIkFeature)
+            {
+                m_Animator.SetIKRotationWeight(AvatarIKGoal.LeftFoot, m_Animator.GetFloat(leftFootAnimVariableName));
+            }
+            MoveFeetToIkPoint(AvatarIKGoal.LeftFoot, leftFootIkPosition, leftFootIkRotation, ref lastLeftFootPositionY);
+        }
 
 
         protected virtual void RotateDominantHand()
@@ -273,15 +324,107 @@
                 }
             }
 
-            Vector3 targetPosition = m_RightHandTarget.position + m_RightHand.rotation * m_HandIKOffset;
-            //targetPosition += m_RightHand.position + m_RightHand.rotation * m_HandIKOffset;
 
             m_Animator.SetIKPositionWeight(AvatarIKGoal.RightHand, m_TargetHandWeight);
-            //m_Animator.SetIKPosition(AvatarIKGoal.RightHand, m_RightHandTarget.TransformPoint(m_RightHandTarget.localPosition));
             m_Animator.SetIKPosition(AvatarIKGoal.RightHand, m_RightHandTarget.position);
-            //m_Animator.SetIKPosition(AvatarIKGoal.RightHand, targetPosition);
 
+
+
+
+
+            //rightHandTargetPosition = rightHandTargetPosition + rightHandTargetRotation * m_HandIKOffset;
+            //rightHandTargetPosition += rightHandPosition + rightHandRotation * m_HandIKOffset - m_RightHand.position;
+            //rightHandTargetPosition += rightHandPosition;
+            //m_Animator.SetIKPosition(AvatarIKGoal.RightHand, rightHandTargetPosition);
+            //m_Animator.SetIKPositionWeight(AvatarIKGoal.RightHand, 1);
         }
+
+
+
+
+
+
+        void MoveFeetToIkPoint(AvatarIKGoal foot, Vector3 positionIkHolder, Quaternion rotationIkHolder, ref float lastFootPositionY)
+        {
+            Vector3 targetIkPosition = m_Animator.GetIKPosition(foot);
+
+            if (positionIkHolder != Vector3.zero)
+            {
+                targetIkPosition = transform.InverseTransformPoint(targetIkPosition);
+                positionIkHolder = transform.InverseTransformPoint(positionIkHolder);
+
+                float yVariable = Mathf.Lerp(lastFootPositionY, positionIkHolder.y, m_FootPositionAdjustmentSpeed);
+                targetIkPosition.y += yVariable;
+
+                lastFootPositionY = yVariable;
+
+                targetIkPosition = transform.TransformPoint(targetIkPosition);
+
+                m_Animator.SetIKRotation(foot, rotationIkHolder);
+            }
+
+            m_Animator.SetIKPosition(foot, targetIkPosition);
+        }
+
+
+        private void MovePelvisHeight()
+        {
+            if (rightFootIkPosition == Vector3.zero || leftFootIkPosition == Vector3.zero || lastPelvisPositionY == 0)
+            {
+                lastPelvisPositionY = m_Animator.bodyPosition.y;
+                return;
+            }
+
+            float lOffsetPosition = leftFootIkPosition.y - transform.position.y;
+            float rOffsetPosition = rightFootIkPosition.y - transform.position.y;
+            float totalOffset = (lOffsetPosition < rOffsetPosition) ? lOffsetPosition : rOffsetPosition;
+
+            Vector3 newPelvisPosition = m_Animator.bodyPosition + Vector3.up * totalOffset;
+
+            newPelvisPosition.y = Mathf.Lerp(lastPelvisPositionY, newPelvisPosition.y, m_HipsMovingPositionAdjustmentSpeed);
+
+            m_Animator.bodyPosition = newPelvisPosition;
+
+            lastPelvisPositionY = m_Animator.bodyPosition.y;
+        }
+
+
+        private void FeetPositionSolver(Vector3 footPosition, ref Vector3 feetIkPositions, ref Quaternion feetIkRotations)
+        {
+            //raycast handling section 
+            RaycastHit feetOutHit;
+
+            if (showSolverDebug)
+                Debug.DrawLine(footPosition, footPosition + Vector3.down * (raycastDownDistance + heightFromGroundRaycast), Color.yellow);
+
+            if (Physics.Raycast(footPosition, Vector3.down, out feetOutHit, raycastDownDistance + heightFromGroundRaycast, m_LayerManager.SolidLayer))
+            {
+                //finding our feet ik positions from the sky position
+                feetIkPositions = footPosition;
+                feetIkPositions.y = feetOutHit.point.y + m_HipOffset;
+                feetIkRotations = Quaternion.FromToRotation(Vector3.up, feetOutHit.normal) * transform.rotation;
+                return;
+            }
+            feetIkPositions = Vector3.zero; //it didn't work :(
+        }
+
+
+
+        private void AdjustFeetTarget(ref Vector3 feetPositions, HumanBodyBones foot)
+        {
+            feetPositions = m_Animator.GetBoneTransform(foot).position;
+            feetPositions.y = transform.position.y + heightFromGroundRaycast;
+        }
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -296,12 +439,14 @@
 		private void OnDrawGizmos()
 		{
             if(m_DebugDrawLookRay){
-                if(m_LookAtPoint){
-                    Gizmos.color = Color.green;
-                    Gizmos.DrawLine(m_UpperChest.position, m_LookAtPoint.position);
-                    Gizmos.DrawSphere(m_LookAtPoint.position, 0.1f);
+                if(m_Controller != null){
+                    if (m_Controller.LookPosition != Vector3.zero)
+                    {
+                        Gizmos.color = Color.green;
+                        Gizmos.DrawLine(m_UpperChest.position, m_Controller.LookPosition);
+                        Gizmos.DrawSphere(m_Controller.LookPosition, 0.1f);
+                    }
                 }
-
             }
 		}
 
@@ -309,62 +454,62 @@
 
 
 
-        private void HandleWeights()
-        {
-            //if (m_Aiming)
-            //{
-            //    Vector3 directionTowardsTarget = m_LookAtPoint.position - m_Transform.position;
-            //    float angle = Vector3.Angle(m_Transform.forward, directionTowardsTarget);
-            //    if (angle < 90)
-            //    {
-            //        m_LookAtAimBodyWeight = 1;
-            //    }
-            //    else
-            //    {
-            //        m_LookAtAimBodyWeight = 0;
-            //    }
-            //}
-            //else
-            //{
-            //    m_LookAtAimBodyWeight = 0;
-            //}
+        //private void HandleWeights()
+        //{
+        //    //if (m_Aiming)
+        //    //{
+        //    //    Vector3 directionTowardsTarget = m_LookAtPoint.position - m_Transform.position;
+        //    //    float angle = Vector3.Angle(m_Transform.forward, directionTowardsTarget);
+        //    //    if (angle < 90)
+        //    //    {
+        //    //        m_LookAtAimBodyWeight = 1;
+        //    //    }
+        //    //    else
+        //    //    {
+        //    //        m_LookAtAimBodyWeight = 0;
+        //    //    }
+        //    //}
+        //    //else
+        //    //{
+        //    //    m_LookAtAimBodyWeight = 0;
+        //    //}
 
-            float targetLookAtWeight = 0;
+        //    float targetLookAtWeight = 0;
 
-            m_LookAtAimBodyWeight = Mathf.Lerp(m_LookAtAimBodyWeight, targetLookAtWeight, Time.deltaTime * 3);
+        //    m_LookAtAimBodyWeight = Mathf.Lerp(m_LookAtAimBodyWeight, targetLookAtWeight, Time.deltaTime * 3);
 
-            float targetMainHandWeight = 0;  //  target main hand weight
+        //    float targetMainHandWeight = 0;  //  target main hand weight
 
-            //if (states.states.isAiming){
-            //    t_m_weight = 1;
-            //    m_LookAtBodyWeight = 0.4f;
-            //}
-            //else{
-            //    m_LookAtBodyWeight = 0.3f;
-            //}
-
-
-            m_LookAtBodyWeight = 0.3f;
+        //    //if (states.states.isAiming){
+        //    //    t_m_weight = 1;
+        //    //    m_LookAtBodyWeight = 0.4f;
+        //    //}
+        //    //else{
+        //    //    m_LookAtBodyWeight = 0.3f;
+        //    //}
 
 
-            //if (lh_target != null) o_h_weight = 1;
-            //else o_h_weight = 0;
+        //    m_LookAtBodyWeight = 0.3f;
 
-            //o_h_weight = 0;
 
-            Vector3 directionTowardsTarget = m_LookAtPoint.position - m_Transform.position;
-            float angle = Vector3.Angle(m_Transform.forward, directionTowardsTarget);
+        //    //if (lh_target != null) o_h_weight = 1;
+        //    //else o_h_weight = 0;
 
-            if (angle < 76)
-                targetLookAtWeight = 1;
-            else
-                targetLookAtWeight = 0;
-            if (angle > 45)
-                targetMainHandWeight = 0;
+        //    //o_h_weight = 0;
 
-            m_LookAtAimBodyWeight = Mathf.Lerp(m_LookAtAimBodyWeight, targetLookAtWeight, Time.deltaTime * 3);
-            m_HandIKWeight = Mathf.Lerp(m_HandIKWeight, targetMainHandWeight, Time.deltaTime * 9);
-        }
+        //    Vector3 directionTowardsTarget = m_Controller.LookDirection - m_Transform.position;
+        //    float angle = Vector3.Angle(m_Transform.forward, directionTowardsTarget);
+
+        //    if (angle < 76)
+        //        targetLookAtWeight = 1;
+        //    else
+        //        targetLookAtWeight = 0;
+        //    if (angle > 45)
+        //        targetMainHandWeight = 0;
+
+        //    m_LookAtAimBodyWeight = Mathf.Lerp(m_LookAtAimBodyWeight, targetLookAtWeight, Time.deltaTime * 3);
+        //    m_HandIKWeight = Mathf.Lerp(m_HandIKWeight, targetMainHandWeight, Time.deltaTime * 9);
+        //}
 
 	}
 }

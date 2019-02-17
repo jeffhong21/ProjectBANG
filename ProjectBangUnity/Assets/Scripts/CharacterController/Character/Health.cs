@@ -7,6 +7,10 @@
 
     public class Health : MonoBehaviour
     {
+        public delegate void OnTakeDamage(float amount, Vector3 position, Vector3 force, GameObject attacker, Collider hitCollider);
+        public delegate void OnHeal(float amount);
+        public delegate void OnDeath(Vector3 hitLocation, Vector3 hitDirection, GameObject attacker);
+
         //
         // Fields
         // 
@@ -66,14 +70,14 @@
 
 		private void OnEnable()
 		{
-            //EventHandler.RegisterEvent<float, Vector3, Vector3, GameObject>(m_GameObject, "OnTakeDamage", TakeDamage);
+            EventHandler.RegisterEvent<float, Vector3, Vector3, GameObject>(m_GameObject, EventIDs.OnTakeDamage, TakeDamage);
             //EventHandler.RegisterEvent<Vector3, Vector3, GameObject>(m_GameObject, "Death", Death);
 		}
 
 
 		private void OnDisable()
 		{
-            //EventHandler.UnregisterEvent<float, Vector3, Vector3, GameObject>(m_GameObject, "OnTakeDamage", TakeDamage);
+            EventHandler.UnregisterEvent<float, Vector3, Vector3, GameObject>(m_GameObject, EventIDs.OnTakeDamage, TakeDamage);
             //EventHandler.UnregisterEvent<Vector3, Vector3, GameObject>(m_GameObject, "Death", Death);
 		}
 
@@ -81,7 +85,7 @@
 
 		public void SetHealth(float value)
         {
-            m_CurrentHealth += value;
+            m_CurrentHealth = Mathf.Clamp(value, 0, m_MaxHealth);
         }
 
 
@@ -90,14 +94,16 @@
             if (m_Invincible) return;
 
             if(m_CurrentHealth > 0){
-                EventHandler.ExecuteEvent(gameObject, "OnTakeDamage", amount, hitLocation, hitDirection, attacker);
+                
+                //EventHandler.ExecuteEvent(gameObject, "OnTakeDamage", amount, hitLocation, hitDirection, attacker);
                 //  Change health amount.
                 m_CurrentHealth -= amount;
 
+                //Debug.LogFormat("-- {0} recieved {1} of damage.", m_GameObject.name, amount);
+
                 //  If current health is zero, call death.
                 if(m_CurrentHealth <= 0){
-                    EventHandler.ExecuteEvent(gameObject, "Death", hitLocation, hitDirection, attacker);
-                    EventHandler.ExecuteEvent(gameObject, "Ragdoll", 0f);
+                    Die(hitLocation, hitDirection, attacker);
                 }
             }
         }
@@ -117,16 +123,20 @@
         {
             if(m_CurrentHealth + amount > m_MaxHealth){
                 m_CurrentHealth = m_MaxHealth;
+                EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnHeal, amount);
+
+                Debug.LogFormat("-- {0} recieved {1} health.", m_GameObject.name, amount);
             }
         }
 
 
-        protected virtual void Death(Vector3 hitLocation, Vector3 hitDirection, GameObject attacker)
+        protected virtual void Die(Vector3 hitLocation, Vector3 hitDirection, GameObject attacker)
         {
             //Debug.LogFormat("{0} killed by {1}", m_GameObject.name, attacker.name);
             //  Deactivate gameobject on death.
 
-
+            EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnDeath, hitLocation, hitDirection, attacker);
+            EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnRagdoll, 1f);
         }
 
 

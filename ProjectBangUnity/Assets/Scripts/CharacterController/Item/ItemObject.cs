@@ -43,6 +43,7 @@
         protected Animator m_Animator;
         [SerializeField, DisplayOnly]
         protected GameObject m_Character;
+        [SerializeField, DisplayOnly]
         protected CharacterLocomotion m_Controller;
         protected Inventory m_Inventory;
 
@@ -97,14 +98,13 @@
         //
         // Methods
         //
-        public virtual void Awake()
+        protected virtual void Awake()
         {
+            m_Animator = GetComponent<Animator>();
 
             m_GameObject = gameObject;
             m_Transform = transform;
 
-            m_Controller = GetComponent<CharacterLocomotion>();
-            m_Animator = GetComponent<Animator>();
 
             if(m_NonDominantHandPosition == null){
                 m_NonDominantHandPosition = new GameObject("nonDominantHandIK").transform;
@@ -115,10 +115,32 @@
         }
 
 
-        public virtual void Initialize(Inventory inventory)
+		protected void OnEnable()
+		{
+            if (m_Controller)
+            {
+                m_Controller.OnAim += OnAim;
+            }
+		}
+
+
+		protected void OnDisable()
+		{
+            if (m_Controller)
+            {
+                m_Controller.OnAim -= OnAim;
+            }
+		}
+
+
+		public virtual void Initialize(Inventory inventory)
         {
             m_Character = inventory.gameObject;
             m_Inventory = inventory;
+            m_Controller = m_Character.GetComponent<CharacterLocomotion>();
+
+            m_Controller.OnAim += OnAim;
+
             //Debug.LogFormat("Initializing Weapon to {0}", m_Character);
         }
 

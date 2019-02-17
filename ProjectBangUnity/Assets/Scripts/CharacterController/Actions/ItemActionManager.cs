@@ -53,10 +53,13 @@ namespace CharacterController
         {
             if (m_Inventory.GetCurrentItem() == null)
                 return;
-            
+
+
+            //if(m_Controller.Aiming)
+                
             m_Animator.CrossFade(Animator.StringToHash(GetFullStateName(ReloadState)), m_TransitionDuration, m_LayerIndex);
-
-
+            m_AnimatorMonitor.SetItemStateIndex(0);
+            m_Animator.SetBool(HashID.Aiming, false);
             m_Inventory.ReloadItem(m_Inventory.EquippedItemType, 1);
         }
 

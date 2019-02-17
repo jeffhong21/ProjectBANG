@@ -14,7 +14,7 @@ MonoBehaviour:
   m_ID: 0
   m_ItemName: Pistol
   m_Description: 
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 21300000, guid: 6dc5c189dee9e40698eb2a8d141b3a1b, type: 3}
   m_Capacity: 1
   m_ItemID: 0
   m_OriginalObject: {fileID: 1639933205854880, guid: b70d4b3f90ce54d088fb47256f057bab,

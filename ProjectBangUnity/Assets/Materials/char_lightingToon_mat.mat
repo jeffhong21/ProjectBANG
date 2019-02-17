@@ -86,7 +86,7 @@ Material:
     - _AOEnable: 1
     - _AOPower: 0
     - _AOuv: 0
-    - _ASEOutlineWidth: 0.01
+    - _ASEOutlineWidth: 0.008
     - _AmbientPower: 0
     - _Brightness: 0
     - _BumpScale: 1

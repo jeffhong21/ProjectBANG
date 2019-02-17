@@ -331,7 +331,7 @@
             float distance = 0.7f;
             RaycastHit hit;
 
-            if (Physics.Raycast(origin, direction, out hit, distance, m_LayerManager.m_SolidLayer))
+            if (Physics.Raycast(origin, direction, out hit, distance, m_LayerManager.SolidLayer))
             {
                 Vector3 targetPosition = hit.point; // targetPosition
                 m_Transform.position = targetPosition;

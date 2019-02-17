@@ -1706,7 +1706,17 @@ MonoBehaviour:
   m_HandIKWeight: 1
   m_HandIKAdjustmentSpeed: 0.2
   m_HandIKOffset: {x: 0, y: 0, z: 0}
-  m_EnableHandIK: 0
+  m_RightHandTarget: {fileID: 0}
+  itemSlot: {fileID: 0}
+  heightFromGroundRaycast: 1.14
+  raycastDownDistance: 1.5
+  m_HipOffset: 0
+  m_HipsMovingPositionAdjustmentSpeed: 0.28
+  m_FootPositionAdjustmentSpeed: 0.5
+  leftFootAnimVariableName: LeftFootCurve
+  rightFootAnimVariableName: RightFootCurve
+  useProIkFeature: 0
+  showSolverDebug: 1
 --- !u!114 &114429236655991950
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1771,6 +1781,7 @@ MonoBehaviour:
   m_StateName: Take Damage
   m_ActionID: 0
   m_StateHash: 0
+  m_IsActive: 0
   m_MinDamageAmount: 0
 --- !u!114 &114616004797550368
 MonoBehaviour:
@@ -1789,6 +1800,7 @@ MonoBehaviour:
   m_StateName: Die
   m_ActionID: 4
   m_StateHash: 0
+  m_IsActive: 0
   m_IsDead: 0
 --- !u!114 &114752500204725904
 MonoBehaviour:
@@ -1802,18 +1814,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_DefaultLoadout:
-  - m_ItemType: {fileID: 11400000, guid: e7601c746142b429383cd2968a4f39d3, type: 2}
-    m_Item: {fileID: 0}
+  - m_Item: {fileID: 0}
     m_Amount: 1
-    m_Capacity: 0
     m_Equip: 1
-  - m_ItemType: {fileID: 11400000, guid: 54de2658576d143869e45c0215347be5, type: 2}
-    m_Item: {fileID: 0}
+  - m_Item: {fileID: 0}
     m_Amount: 10
-    m_Capacity: 0
     m_Equip: 0
-  m_CurrentInventory: []
-  m_EquippedItemType: {fileID: 0}
+  m_Loadout: []
+  m_EquipPoints:
+    m_LeftHandSlot: {fileID: 0}
+    m_RightHandSlot: {fileID: 0}
+  m_EquippedItem: {fileID: 0}
+  m_Switching: 0
 --- !u!114 &114933608758217926
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1839,14 +1851,10 @@ MonoBehaviour:
   - {fileID: 114470667466529952}
   m_ActiveAction: {fileID: 0}
   m_ActiveActions: []
-  m_DebugActiveActions: 0
-  m_Aim: 0
-  m_SelectedAction: {fileID: 0}
-  m_SelectedItemAction: {fileID: 0}
-  m_Velocity: {x: 0, y: 0, z: 0}
-  m_InputVector: {x: 0, y: 0, z: 0}
   m_DrawDebugLine: 0
   m_ShowComponents: 1
+  m_DebugActiveActions: 0
+  m_SelectedAction: {fileID: 0}
 --- !u!114 &114999616151661266
 MonoBehaviour:
   m_ObjectHideFlags: 1

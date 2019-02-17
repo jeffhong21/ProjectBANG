@@ -93,26 +93,17 @@ namespace CharacterController
         private void Update()
         {
             SetInputVector(true);
-
             SetCameraPosition();
 
 
-            if (Input.GetKeyDown(KeyCode.Mouse0))
-            {
-                UseItem();
-            }
-            if (Input.GetKeyDown(KeyCode.R))
-            {
-                Reload();
-            }
-            if (Input.GetKeyDown(KeyCode.Q))
-            {
-                SwitchItem(false);
-            }
-            else if (Input.GetKeyDown(KeyCode.E))
-            {
-                SwitchItem(true);
-            }
+            UseItem(KeyCode.Mouse0);
+
+            Reload(KeyCode.R);
+
+            SwitchItem(KeyCode.Q, true);
+
+            SwitchItem(KeyCode.E, false);
+
             //else if (Input.GetKeyDown(KeyCode.F))
             //{
                 
@@ -198,27 +189,43 @@ namespace CharacterController
 
 
 
-        public void UseItem()
+        public void UseItem(KeyCode keycode)
         {
-            m_ItemAction.UseItem();
+            if (Input.GetKeyDown(keycode))
+            {
+                m_ItemAction.UseItem();
+            }
+
         }
 
 
-        public void Reload()
+        public void Reload(KeyCode keycode)
         {
-            m_ItemAction.Reload();
+            if (Input.GetKeyDown(keycode))
+            {
+                m_ItemAction.Reload();
+            }
+
         }
 
 
-        public void SwitchItem(bool next)
+        public void SwitchItem(KeyCode keycode, bool next)
         {
-            m_ItemAction.SwitchItem(next);
+            if (Input.GetKeyDown(keycode))
+            {
+                m_ItemAction.SwitchItem(next);
+            }
+
         }
 
 
-        public void EquipItem(int index)
+        public void EquipItem(KeyCode keycode, int index)
         {
-            m_ItemAction.EquipItem(index);
+            if (Input.GetKeyDown(keycode))
+            {
+                m_ItemAction.EquipItem(index);
+            }
+
         }
 
         //public void ToggleItem()

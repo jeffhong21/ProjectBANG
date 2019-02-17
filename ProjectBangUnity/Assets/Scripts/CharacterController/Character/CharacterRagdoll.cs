@@ -15,6 +15,9 @@
         List<Collider> m_RagdollColliders = new List<Collider>();
         List<Rigidbody> m_RagdollRigb = new List<Rigidbody>();
 
+        public LayerMask m_RagdollLayer = ~(1 << 11);
+        public LayerMask m_IgnoreForGround = ~(1 << 10 | 1 << 11);
+
 
         private void Awake()
         {
@@ -24,17 +27,20 @@
             m_GameObject = gameObject;
 
             SetupRagdoll();
+
+            //m_RagdollLayer = ~(1 << 11);
+            //m_IgnoreForGround = ~(1 << 10 | 1 << 11);
         }
 
 
 		private void OnEnable()
 		{
-            EventHandler.RegisterEvent<float>(m_GameObject, "Ragdoll", EnableRagdoll);
+            EventHandler.RegisterEvent<float>(m_GameObject, "OnRagdoll", EnableRagdoll);
 		}
 
 		private void OnDisable()
 		{
-            EventHandler.UnregisterEvent<float>(m_GameObject, "Ragdoll", EnableRagdoll);
+            EventHandler.UnregisterEvent<float>(m_GameObject, "OnRagdoll", EnableRagdoll);
 		}
 
 
@@ -55,9 +61,12 @@
                 m_RagdollColliders.Add(col);
                 rigids[i].isKinematic = true;
                 rigids[i].mass *= 10;
-                //r.gameObject.layer = 10;
-            }
+                rigids[i].gameObject.layer = 11;
 
+                if(rigids[i].GetComponent<DamageReciever>() == null){
+                    rigids[i].gameObject.AddComponent<DamageReciever>();
+                }
+            }
         }
 
 

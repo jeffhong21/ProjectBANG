@@ -1,12 +1,18 @@
 ﻿namespace CharacterController
 {
     using UnityEngine;
+    using System;
     using System.Collections;
     using JH_Utils;
+
+
 
     [RequireComponent(typeof(Rigidbody), typeof(LayerManager))]
     public class CharacterLocomotion : MonoBehaviour
     {
+        public event Action<bool> OnAim = delegate {};
+
+
         public enum MovementType {Adventure, TopDown };
 
         [SerializeField, HideInInspector]
@@ -36,23 +42,13 @@
         private CharacterAction m_CurrentAction;
 
 
-
-        [SerializeField]
-        private bool m_DebugActiveActions;
-
-        [Header("States")]
-        private bool m_Moving;
-        [SerializeField]
-        private bool m_Aim;
-        //[SerializeField]
-        private Vector3 m_LookPosition;
+        [Header("-- Debug --")]
+        private bool m_Moving, m_Aim, m_Grounded = true;
         private float m_Speed;
-
-
-        [Header("Debug")]
-        [SerializeField, HideInInspector]
-        private CharacterAction m_SelectedAction;
-
+        private float m_MoveAmount;
+        Vector3 m_Velocity, m_CurrentVelocity, m_TargetVelocity;
+        Vector3 m_InputVector;
+        Quaternion m_LookRotation;
 
 
         PlayerInput m_Input;
@@ -64,35 +60,25 @@
         Camera m_Camera;
         GameObject m_GameObject;
         Transform m_Transform;
+        Transform m_LookAtPoint;
+        float m_DeltaTime;
 
-        //[SerializeField]
-        Vector3 m_Velocity;
-        //[SerializeField]
-        Vector3 m_CurrentVelocity;
-        Vector3 m_TargetVelocity;
-        //[SerializeField]
-        Vector3 m_InputVector;
-        //[SerializeField, DisplayOnly]
-        float m_MoveAmount;
-        bool m_Grounded = true;
-        Quaternion m_LookRotation;
+        bool m_UpdateRotation = true, m_UpdateMovement = true, m_UpdateAnimator = true;
+
+
+
         RaycastHit m_HitInfo;
         float m_SlopeAngle;
-        float m_FwdDotProduct;
-        float m_RightDotProduct;
-        Vector3 m_PreviousPosition;
+        float m_FwdDotProduct, m_RightDotProduct;
 
-        float m_Angle;
-        [SerializeField] 
-        private bool m_DrawDebugLine;
-        [SerializeField] 
-        private bool m_ShowComponents;
-        //[SerializeField]
-        bool m_UpdateRotation = true;
-        //[SerializeField]
-        bool m_UpdateMovement = true;
-        //[SerializeField]
-        bool m_UpdateAnimator = true;
+
+
+
+
+        [SerializeField] bool m_DrawDebugLine;
+        [SerializeField] bool m_ShowComponents;
+        [SerializeField] bool m_DebugActiveActions;
+        [SerializeField, HideInInspector] CharacterAction m_SelectedAction;
 
 
 
@@ -167,14 +153,9 @@
         }
 
 
-        public Vector3 LookPosition
-        {
-            get{
-                if (m_LookPosition == Vector3.zero)
-                    m_LookPosition.Set(m_Transform.position.x, 1.35f, m_Transform.position.x + 10);
-                return m_LookPosition;
-            }
-            set { m_LookPosition = value; }
+        public Vector3 LookPosition{
+            get { return m_LookAtPoint.position; }
+            set { m_LookAtPoint.position = value; }
         }
 
         public CharacterAction[] CharActions
@@ -197,6 +178,13 @@
             m_CapsuleCollider = GetComponent<CapsuleCollider>();
             m_GameObject = gameObject;
             m_Transform = transform;
+            m_DeltaTime = Time.deltaTime;
+
+
+            m_LookAtPoint = new GameObject("LookAtPoint").transform; //.parent = gameObject.transform;
+            m_LookAtPoint.transform.parent = m_GameObject.transform;
+            m_LookAtPoint.position = (m_Transform.forward * 10) + (Vector3.up * 1.35f);
+
 
         }
 
@@ -230,6 +218,9 @@
                 UpdateSpeed();
                 //DebugActiveActions();
             }
+
+
+
 
             if (m_Actions != null)
             {
@@ -333,10 +324,10 @@
             //angle += m_Transform.eulerAngles.y;
             //LookRotation = Quaternion.Euler(0, angle, 0);
 
-            //m_LookRotation *= Quaternion.AngleAxis(m_RotationSpeed * m_InputVector.x * Time.deltaTime, Vector3.up);
+            //m_LookRotation *= Quaternion.AngleAxis(m_RotationSpeed * m_InputVector.x * m_DeltaTime, Vector3.up);
             //m_Rigidbody.MoveRotation(m_LookRotation.normalized);
 
-            m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Transform.rotation, m_LookRotation.normalized, m_RotationSpeed * Time.deltaTime));
+            m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Transform.rotation, m_LookRotation.normalized, m_RotationSpeed * m_DeltaTime));
         }
 
 
@@ -345,7 +336,7 @@
         {
             if (m_UseRootMotion)
             {
-                m_Velocity = (m_Animator.deltaPosition * m_RootMotionSpeedMultiplier) / Time.deltaTime;
+                m_Velocity = (m_Animator.deltaPosition * m_RootMotionSpeedMultiplier) / m_DeltaTime;
             }
             else
             {
@@ -362,7 +353,7 @@
                 {
                     m_TargetVelocity = Vector3.zero;
                 }
-                m_Velocity = Vector3.Lerp(m_CurrentVelocity, m_TargetVelocity, Time.deltaTime * 3);
+                m_Velocity = Vector3.Lerp(m_CurrentVelocity, m_TargetVelocity, m_DeltaTime * 3);
                 m_Rigidbody.velocity = m_Velocity;
 
                 //m_Velocity = m_Transform.forward * m_InputVector.z * m_GroundSpeed.z;
@@ -392,7 +383,7 @@
         {
             //if (Mathf.Abs(horizontalMovement) < 1 && Mathf.Abs(forwardMovement) < 1) return;
 
-            m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Transform.rotation, lookRotation.normalized, m_RotationSpeed * Time.deltaTime));
+            m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Transform.rotation, lookRotation.normalized, m_RotationSpeed * m_DeltaTime));
             if (m_UseRootMotion)
             {
                 //m_MoveAmount = Mathf.Clamp01(Mathf.Abs(horizontalMovement) + Mathf.Abs(forwardMovement));
@@ -455,7 +446,7 @@
         {
             if (m_UseRootMotion)
             {
-                //m_Rigidbody.velocity = (m_Animator.deltaPosition * m_RootMotionSpeedMultiplier) / Time.deltaTime;
+                //m_Rigidbody.velocity = (m_Animator.deltaPosition * m_RootMotionSpeedMultiplier) / m_DeltaTime;
                 m_Rigidbody.velocity = m_Velocity;
                 //Debug.Log(m_Animator.deltaPosition);
             }
@@ -466,6 +457,7 @@
         private void OnAimActionStart(bool aim)
         {
             m_Aim = aim;
+            OnAim(aim);
             //Debug.LogFormat("Aiming is {0}", aim);
         }
 
@@ -477,6 +469,8 @@
                 Debug.Log(action + " activated: " + activated);
             }
         }
+
+
 
 
         public T GetAction<T>() where T : CharacterAction
@@ -689,9 +683,9 @@
 
         //    if(horizontalMovement == 0 && forwardMovement == 0)
         //    {
-        //        //transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * m_RotationSpeed);
+        //        //transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, m_DeltaTime * m_RotationSpeed);
         //        if (lookRotation != Quaternion.identity)
-        //            m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Rigidbody.rotation, lookRotation, Time.deltaTime * m_RotationSpeed));
+        //            m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Rigidbody.rotation, lookRotation, m_DeltaTime * m_RotationSpeed));
         //        m_Velocity = Vector3.zero;
         //        m_Rigidbody.velocity = Vector3.zero;
 
@@ -709,8 +703,8 @@
         //        m_Velocity.Set(m_GroundSpeed.x * m_InputVector.x, m_Rigidbody.velocity.y, m_GroundSpeed.z * m_InputVector.z);
 
         //        if(lookRotation != Quaternion.identity)
-        //            m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Rigidbody.rotation, lookRotation, Time.deltaTime * m_RotationSpeed));
-        //        m_Rigidbody.MovePosition( transform.position + (m_Velocity.normalized * 2 * Time.deltaTime));
+        //            m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Rigidbody.rotation, lookRotation, m_DeltaTime * m_RotationSpeed));
+        //        m_Rigidbody.MovePosition( transform.position + (m_Velocity.normalized * 2 * m_DeltaTime));
 
 
         //        m_FwdDotProduct = Vector3.Dot(transform.forward, m_Velocity);

@@ -7,13 +7,13 @@ namespace CharacterController
         bool TryUse();
 
 
-        bool CanUse();
+        //bool CanUse();
 
 
         bool InUse();
 
 
-        void TryStopUse();
+        //void TryStopUse();
 
 
     }

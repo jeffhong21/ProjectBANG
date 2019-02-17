@@ -128,12 +128,13 @@ GameObject:
   m_Component:
   - component: {fileID: 4800368842353962}
   - component: {fileID: 95278574169747482}
-  - component: {fileID: 136461347018360410}
+  - component: {fileID: 136225588134223648}
   - component: {fileID: 54223540320120752}
   - component: {fileID: 114028017749088726}
+  - component: {fileID: 114933608758217926}
   - component: {fileID: 114220855003856576}
   - component: {fileID: 114752500204725904}
-  - component: {fileID: 114933608758217926}
+  - component: {fileID: 114354157327576536}
   - component: {fileID: 114429236655991950}
   - component: {fileID: 114311917172092944}
   - component: {fileID: 114470667466529952}
@@ -1495,7 +1496,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1141768220188808}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.76, y: 0, z: 3.75}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4370930341478922}
@@ -1931,7 +1932,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3946f6ecb1374ed08bc4fed2edc0265, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_DebugDrawLookRay: 1
+  m_DebugDrawLookRay: 0
   m_BaseLayerIndex: 0
   m_UpperBodyLayerIndex: 1
   m_LayerMask:
@@ -1944,13 +1945,40 @@ MonoBehaviour:
   m_LookAtClampWeight: 0.35
   m_LookAtAdjustmentSpeed: 0.2
   m_LookAtOffset: {x: 0, y: 0, z: 0}
-  m_HandIKWeight: 1
+  m_HandIKWeight: 0
   m_HandIKAdjustmentSpeed: 0.2
   m_HandIKOffset: {x: 0, y: 0, z: 0}
-  m_EnableHandIK: 0
   m_RightHandTarget: {fileID: 0}
-  m_CurrentItem: {fileID: 0}
   itemSlot: {fileID: 0}
+  heightFromGroundRaycast: 1.14
+  raycastDownDistance: 1.5
+  m_HipOffset: 0
+  m_HipsMovingPositionAdjustmentSpeed: 0.28
+  m_FootPositionAdjustmentSpeed: 0.5
+  leftFootAnimVariableName: LeftFootCurve
+  rightFootAnimVariableName: RightFootCurve
+  useProIkFeature: 0
+  showSolverDebug: 1
+--- !u!114 &114354157327576536
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d94df393910d74cbc9eed10d607c4674, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EnemyLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  m_InvisibleLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  m_SolidLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &114429236655991950
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2023,11 +2051,17 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a0ef499cfcf1948d8968608155ab6982, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_RagdollLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  m_IgnoreForGround:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &114616004797550368
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2058,20 +2092,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d57256cc704664975affadb5ba24beca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_DefaultLoadout:
-  - m_Item: {fileID: 0}
-    m_Amount: 1
-    m_Equip: 1
-  - m_Item: {fileID: 0}
-    m_Amount: 10
-    m_Equip: 0
+  m_DefaultLoadout: []
   m_Loadout: []
   m_EquipPoints:
-    m_RightHandSlot: {fileID: 0}
     m_LeftHandSlot: {fileID: 0}
+    m_RightHandSlot: {fileID: 0}
   m_EquippedItem: {fileID: 0}
-  m_EquippedItemIndex: -1
-  m_LastEquippedItem: {fileID: 0}
   m_Switching: 0
 --- !u!114 &114933608758217926
 MonoBehaviour:
@@ -2099,11 +2125,10 @@ MonoBehaviour:
   - {fileID: 114202614410154044}
   m_ActiveAction: {fileID: 0}
   m_ActiveActions: []
-  m_DebugActiveActions: 0
-  m_Aim: 0
-  m_SelectedAction: {fileID: 0}
   m_DrawDebugLine: 0
-  m_ShowComponents: 1
+  m_ShowComponents: 0
+  m_DebugActiveActions: 0
+  m_SelectedAction: {fileID: 0}
 --- !u!114 &114999616151661266
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2141,6 +2166,19 @@ CapsuleCollider:
   m_Height: 0.43154788
   m_Direction: 0
   m_Center: {x: -0.21577394, y: 0, z: 0}
+--- !u!136 &136225588134223648
+CapsuleCollider:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.25
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!136 &136233814665000638
 CapsuleCollider:
   m_ObjectHideFlags: 1
@@ -2154,19 +2192,6 @@ CapsuleCollider:
   m_Height: 0.33947417
   m_Direction: 0
   m_Center: {x: -0.16973709, y: 0, z: 0}
---- !u!136 &136461347018360410
-CapsuleCollider:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1141768220188808}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.4
-  m_Height: 1.9
-  m_Direction: 1
-  m_Center: {x: 0, y: 0.95, z: 0}
 --- !u!136 &136596392996236662
 CapsuleCollider:
   m_ObjectHideFlags: 1
@@ -2260,7 +2285,7 @@ SkinnedMeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: 8b62efc3209cd4052baa23a5777877f5, type: 2}
+  - {fileID: 2100000, guid: f343dcd6a3e4344d6ae1aef064e6d16e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2284,7 +2309,7 @@ SkinnedMeshRenderer:
   m_Quality: 0
   m_UpdateWhenOffscreen: 0
   m_SkinnedMotionVectors: 1
-  m_Mesh: {fileID: 4300010, guid: ad9b136e9ac104c66b5fb99ea52cfb13, type: 3}
+  m_Mesh: {fileID: 4300014, guid: ad9b136e9ac104c66b5fb99ea52cfb13, type: 3}
   m_Bones:
   - {fileID: 4060261611074538}
   - {fileID: 4062153608772630}

@@ -9,8 +9,10 @@
 
 
 
-        protected override void Death(Vector3 hitLocation, Vector3 hitDirection, GameObject attacker)
+        protected override void Die(Vector3 hitLocation, Vector3 hitDirection, GameObject attacker)
         {
+            base.Die(hitLocation, hitDirection, attacker);
+
             //Debug.LogFormat("{0} killed by {1}", m_GameObject.name, attacker.name);
 
             GetComponent<CharacterIK>().enabled = false;
@@ -26,7 +28,7 @@
 
         private IEnumerator DeactivateDelay()
         {
-            yield return new WaitForSeconds(m_DeactivateOnDeathDelay/2); ;
+            yield return new WaitForSeconds(m_DeactivateOnDeathDelay); ;
 
             float startSinkingTime = Time.time;
             float sinkSpeed = 0.5f;

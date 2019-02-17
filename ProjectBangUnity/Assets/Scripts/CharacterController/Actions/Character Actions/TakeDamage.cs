@@ -14,7 +14,7 @@ namespace CharacterController
 
         protected virtual void Start()
         {
-            EventHandler.RegisterEvent<float, Vector3, Vector3, GameObject>(m_GameObject, "OnTakeDamage", OnTakeDamage);
+            EventHandler.RegisterEvent<float, Vector3, Vector3, GameObject>(m_GameObject, EventIDs.OnTakeDamage, OnTakeDamage);
         }
 
 
@@ -49,7 +49,7 @@ namespace CharacterController
 		{
             m_IsDamaged = true;
             m_AnimatorMonitor.SetActionID(m_IsDamaged ? 10 : 0);
-            m_AnimatorMonitor.SetIntDataValue(m_DamageTypeIndex);
+            m_AnimatorMonitor.SetIntDataValue(0);
             //Debug.Log("Damage Type Index: " + m_DamageTypeIndex);
 		}
 
@@ -87,7 +87,7 @@ namespace CharacterController
 
         private void OnTakeDamage(float amount, Vector3 position, Vector3 force, GameObject attacker)
         {
-            
+            //Debug.LogFormat("-- {0} recieved {1} of damage.", m_GameObject.name, amount);
             m_DamageTypeIndex = GetDamageTypeIndex(amount, position, force, attacker);
             m_IsDamaged = true;
 

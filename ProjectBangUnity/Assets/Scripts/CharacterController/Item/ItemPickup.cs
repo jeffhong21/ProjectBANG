@@ -40,7 +40,8 @@
         //private AnimationCurve plot = new AnimationCurve();
 
 
-        protected Collider m_Trigger;
+        protected BoxCollider m_Trigger;
+        protected CapsuleCollider m_Collider;
         protected Rigidbody m_Rigidbody;
         protected Animator m_Animator;
         protected Transform m_Transform;
@@ -85,7 +86,8 @@
 
         protected virtual void Awake()
         {
-            m_Trigger = GetComponent<Collider>();
+            m_Trigger = GetComponent<BoxCollider>();
+            m_Collider = GetComponent<CapsuleCollider>();
             m_Rigidbody = GetComponent<Rigidbody>();
             m_Animator = GetComponent<Animator>();
             m_Transform = transform;
@@ -114,9 +116,31 @@
         }
 
 
+        protected virtual bool ObjectPickup(Collider other)
+        {
+            Inventory inventory = other.GetComponent<Inventory>();
+
+            bool itemAdded = false;
+            int amount = 1;
+            if (inventory != null)
+            {
+                for (int i = 0; i < m_Items.Length; i++)
+                {
+                    if (m_Items[i] is ConsumableItem)
+                        amount = ((ConsumableItem)m_Items[i]).Amount;
+
+                    if (inventory.PickupItem(m_Items[i], amount, false))
+                        itemAdded = true;
+                }
+            }
+            return itemAdded;
+        }
+
+
+
         protected virtual void OnEnable()
 		{
-
+            m_Transform.localScale = Vector3.one;
 		}
 
         protected virtual void OnDisable()
@@ -125,7 +149,7 @@
         }
 
 
-        protected virtual void Update()
+        protected void Update()
         {
             if(m_PlayDefaultAnimation)
             {
@@ -139,8 +163,6 @@
                     UpdateYPosition(m_Frequency, m_Amplitude);
                 }
             }
-
-
         }
 
 
@@ -174,7 +196,7 @@
 
 
 
-        private void DisableParticleSystems(ParticleSystem[] ps)
+        protected void DisableParticleSystems(ParticleSystem[] ps)
         {
             for (int i = 0; i < ps.Length; i++)
             {
@@ -183,7 +205,7 @@
         }
 
 
-		private void SetMaterials(Material material)
+        protected void SetMaterials(Material material)
         {
             if (material == null) return;
 
@@ -197,31 +219,19 @@
 
 
 
-        public bool AddItemsToInventory(Inventory inventory)
+
+        protected void OnTriggerEnter(Collider other)
         {
-            bool itemAdded = false;
-            int amount = 1;
-            if (inventory != null)
+            
+            if(ObjectPickup(other))
             {
-                for (int i = 0; i < m_Items.Length; i++)
-                {
-                    if (m_Items[i] is ConsumableItem)
-                        amount = ((ConsumableItem)m_Items[i]).Amount;
-
-                    if (inventory.PickupItem(m_Items[i], amount, false))
-                        itemAdded = true;
+                if(m_PickupVFX){
+                    m_PickupVFX.gameObject.SetActive(true);
+                    m_PickupVFX.transform.localPosition = Vector3.up * 0.5f;
+                    m_PickupVFX.Play(true);
                 }
-            }
-
-            return itemAdded;
-        }
 
 
-        protected virtual void OnTriggerEnter(Collider other)
-        {
-            Inventory inventory = other.GetComponent<Inventory>();
-
-            if(AddItemsToInventory(inventory)){
                 StartCoroutine(ExitAnimation(new Vector3(0.15f, 0.15f, 0.15f), 0.5f, 2f));
             }
             else{
@@ -231,11 +241,10 @@
 
 
 
-        protected virtual void OnTriggerExit(Collider other)
+        protected void OnTriggerExit(Collider other)
 		{
 			
 		}
-
 
 
 

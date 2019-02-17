@@ -314,14 +314,14 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1660647422615242}
-  m_LocalRotation: {x: 0.079151236, y: -0.08962087, z: 0.9664736, w: 0.22722684}
-  m_LocalPosition: {x: -0.0411, y: 0.0091, z: 0.365}
+  m_LocalRotation: {x: 0.44092473, y: -0.17489189, z: 0.87855613, w: 0.056012798}
+  m_LocalPosition: {x: -0.0787, y: 0.0128, z: 0.1417}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4756434605597622}
   m_Father: {fileID: 4012155142410386}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 12.076, y: 6.5930004, z: 154.23701}
+  m_LocalEulerAnglesHint: {x: 20.898, y: 53.934002, z: 183.42499}
 --- !u!4 &4756434605597622
 Transform:
   m_ObjectHideFlags: 1
@@ -623,10 +623,11 @@ MonoBehaviour:
   m_RequiredAim: 1
   m_TwoHandedItem: 0
   m_NonDominantHandPosition: {fileID: 4726260802812588}
-  m_PositionOffset: {x: 0.112, y: 0.015, z: 0.242}
-  m_RotationOffset: {x: -4.691, y: 2.504, z: -79.304}
+  m_PositionOffset: {x: 0.121, y: -0.09, z: 0.239}
+  m_RotationOffset: {x: -3.757, y: -0.897, z: -90.08401}
   m_CrosshairsSprite: {fileID: 0}
   m_Character: {fileID: 0}
+  m_Controller: {fileID: 0}
   m_FirePoint: {fileID: 4354005002595738}
   m_FireRate: 1
   m_FireCount: 1
@@ -642,10 +643,10 @@ MonoBehaviour:
   m_HitscanFireRange: 3.4028235e+38
   m_HitscanImpactLayers:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 2817
   m_HitscanDamageEvent: 
   m_HitscanDamageAmount: 10
-  m_HitscanImpactForce: 400
+  m_HitscanImpactForce: 40
   m_Projectile: {fileID: 0}
   m_DrawAimLine: 1
   m_DefaultDecal: {fileID: 166404, guid: 1b9f66cb9bb3047649bf932337e6b03a, type: 2}

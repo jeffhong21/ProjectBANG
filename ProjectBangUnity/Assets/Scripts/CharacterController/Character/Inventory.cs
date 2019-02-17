@@ -8,6 +8,13 @@
 
     public class Inventory : MonoBehaviour
     {
+        public delegate void OnInventoryAddItem(ItemObject item);
+        public delegate void OnInventoryPickupItem(ItemObject item, float count, bool immediatePickup, bool forceEquip);
+        public delegate void OnInventoryEquipItem(ItemObject item);
+        public delegate void OnInventoryUnequipItem(ItemObject item);
+        public delegate void OnInventoryRemoveItem(ItemObject item, int slotID);
+
+
         //[Header("-- Default Loadout --")]
         [SerializeField]
         protected ItemAmount[] m_DefaultLoadout;
@@ -21,9 +28,9 @@
         [Header("-- Equipped Item --")]
         [SerializeField, DisplayOnly]
         protected Item m_EquippedItem;
-        [SerializeField, DisplayOnly]
+        //[SerializeField, DisplayOnly]
         protected int m_EquippedItemIndex = -1;
-        [SerializeField, DisplayOnly]
+        //[SerializeField, DisplayOnly]
         protected Item m_LastEquippedItem;
         [SerializeField]
         protected bool m_Switching;
@@ -122,7 +129,7 @@
 
 		private void OnEnable()
 		{
-            EventHandler.RegisterEvent(gameObject, "ItemEquip", OnItemEquip);
+            EventHandler.RegisterEvent(gameObject, "OnItemEquip", OnItemEquip);
 		}
 
 
@@ -238,6 +245,8 @@
                 //itemObject.transform.localPosition = itemObject.PositionOffset;
                 //itemObject.transform.localEulerAngles = itemObject.RotationOffset;
 
+                itemObject.Initialize(this);
+
                 return itemObject;
             }
 
@@ -285,6 +294,8 @@
             return null;
         }
 
+
+        #region Inventory Actions
 
         public void UseItem(Item item, int amount)
         {
@@ -350,7 +361,6 @@
         }
 
 
-
         public void EquipItem(Item item)
         {
             if (m_Inventory.ContainsKey(item)){
@@ -409,7 +419,6 @@
         }
 
 
-
         public void ToggleEquippedItem()
         {
             //  Equip item.
@@ -423,7 +432,30 @@
             //Debug.LogFormat("**  Toggling item. **");
         }
 
+        #endregion
 
+
+
+        public event OnInventoryAddItem onInventoryAddItem = delegate
+        {
+            
+        };
+        public event OnInventoryPickupItem onInventoryPickupItem = delegate
+        {
+            
+        };
+        public event OnInventoryEquipItem onInventoryEquipItem = delegate 
+        {
+            
+        };
+        public event OnInventoryUnequipItem onInventoryUnequipItem = delegate 
+        {
+            
+        };
+        public event OnInventoryRemoveItem onInventoryRemoveItem = delegate
+        { 
+            
+        };
 
 
 
@@ -437,34 +469,7 @@
 
 
 
-        private void OnInventoryAddItem(ItemObject item)
-        {
 
-        }
-
-        private void OnInventoryPickupItem(ItemObject item, float count, bool immediatePickup, bool forceEquip)
-        {
-
-        }
-
-        private void OnInventoryEquipItem(ItemObject item)
-        {
-            ItemObject itemObject = GetCurrentItem();
-            if (itemObject != null)
-                itemObject.SetActive(false);
-
-            item.SetActive(true);
-        }
-
-        private void OnInventoryUnequipItem(ItemObject item)
-        {
-
-        }
-
-        private void OnInventoryRemoveItem(ItemObject item, int slotID)
-        {
-
-        }
 
 
 
@@ -473,19 +478,21 @@
         [Serializable]
         public class CharacterEquipPoints
         {
-            [SerializeField] protected ItemEquipSlot m_RightHandSlot;
             [SerializeField] protected ItemEquipSlot m_LeftHandSlot;
+            [SerializeField] protected ItemEquipSlot m_RightHandSlot;
+
+            public ItemEquipSlot LeftHandSlot
+            {
+                get { return m_LeftHandSlot; }
+                set { m_LeftHandSlot = value; }
+            }
 
             public ItemEquipSlot RightHandSlot
             {
                 get { return m_RightHandSlot; }
                 set { m_RightHandSlot = value; }
             }
-            public ItemEquipSlot LeftHandSlot
-            {
-                get { return m_LeftHandSlot; }
-                set { m_LeftHandSlot = value; }
-            }
+
         }
 
 

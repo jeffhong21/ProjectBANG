@@ -13,7 +13,7 @@ namespace CharacterController
 
         protected virtual void Start()
         {
-            EventHandler.RegisterEvent<Vector3, Vector3, GameObject>(m_GameObject, "Death", OnDeath);
+            EventHandler.RegisterEvent<Vector3, Vector3, GameObject>(m_GameObject, "OnDeath", OnDeath);
         }
 
         //

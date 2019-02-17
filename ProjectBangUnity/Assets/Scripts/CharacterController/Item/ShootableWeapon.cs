@@ -58,65 +58,48 @@
 
 
         private float m_ReloadTime = 3f;
-        private float m_NextUseTime;
+        private float m_NextUseTime = 0;
+        private float m_ImpactForceMultiplier = 10;
+
+        private Quaternion m_Rotation;
 
 
-
-		//
-		// Methods
-		//
-		public override void Awake()
-		{
+        //
+        // Methods
+        //
+        protected override void Awake()
+        {
             base.Awake();
+            if (m_CurrentAmmo > m_MaxAmmo)
+                m_CurrentAmmo = m_MaxAmmo;
 
-            if (m_CurrentAmmo > m_MaxAmmo) m_CurrentAmmo = m_MaxAmmo;
-		}
+        }
 
-		public override void Initialize(Inventory inventory)
+        public override void Initialize(Inventory inventory)
         {
             base.Initialize(inventory);
 
-
+            m_Rotation = m_Transform.parent.localRotation;
         }
 
 
 
 
-
-		public virtual bool TryUse()
+        public virtual bool TryUse()
         {
             if (InUse())
-            {
                 return false;
-            }
-            else
+            
+            if (m_CurrentAmmo > 0)
             {
-                if(m_CurrentAmmo > 0){
-                    //  Shoot weapon.
-                    Fire();
-                    //  Set cooldown variables.
-                    m_NextUseTime = Time.timeSinceLevelLoad + m_FireRate;
-                    //Debug.LogFormat("Shooting | {0}", Time.timeSinceLevelLoad);
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-
-        }
-
-        //  Not used
-        public virtual bool CanUse()
-        {
-            if(InUse())
-            {
-                
-                return false;
-            }
-            else{
-                
+                //  Shoot weapon.
+                Fire();
+                //  Set cooldown variables.
+                m_NextUseTime = Time.timeSinceLevelLoad + m_FireRate;
+                //Debug.LogFormat("Shooting | {0}", Time.timeSinceLevelLoad);
                 return true;
             }
+            return false;
         }
 
 
@@ -125,15 +108,6 @@
             return Time.timeSinceLevelLoad < m_NextUseTime;
         }
 
-        //  Not used
-        public virtual void TryStopUse()
-        {
-
-        }
-
-
-
-
 
 
 
@@ -141,16 +115,12 @@
         public virtual bool TryStartReload()
         {
             if(IsReloading())
-            {
                 return false;
-            }
-            else
-            {
-                m_NextUseTime = Time.timeSinceLevelLoad + m_ReloadTime;
+            
+            m_NextUseTime = Time.timeSinceLevelLoad + m_ReloadTime;
 
-                //Debug.LogFormat("Reloading | {0}", Time.timeSinceLevelLoad);
-                return true;
-            }
+            //Debug.LogFormat("Reloading | {0}", Time.timeSinceLevelLoad);
+            return true;
         }
 
 
@@ -160,19 +130,14 @@
         }
 
 
-        public virtual void TryStopReload()
+
+
+
+
+        protected override void ItemActivated()
         {
 
         }
-
-
-
-
-
-		protected override void ItemActivated()
-		{
-
-		}
 
 
 
@@ -222,37 +187,68 @@
 
             if(Physics.Raycast(m_FirePoint.position, m_FirePoint.forward, out hit, m_HitscanFireRange, m_HitscanImpactLayers)){
 
-                var damagableObject = hit.transform.GetComponent<Health>();
+                //var damagableObject = hit.transform.GetComponent<Health>();
+                var damagableObject = hit.transform.GetComponent<DamageReciever>();
 
                 if(damagableObject)
                 {
                     damagableObject.TakeDamage(m_HitscanDamageAmount, hit.point, hit.normal, m_Character);
 
-                    SpawnParticles(damagableObject.GetType() == typeof(CharacterHealth) ? m_DefaultDecal : m_DefaultDust, hit.point, hit.normal);
-
-
+                    //SpawnParticles(damagableObject.GetType() == typeof(CharacterHealth) ? m_DefaultDecal : m_DefaultDust, hit.point, hit.normal);
+                    SpawnParticles(m_DefaultDecal, hit.point, hit.normal);
                 }
-                SpawnParticles(m_DefaultDust, hit.point, hit.normal);
+                else{
+                    SpawnParticles(m_DefaultDust, hit.point, hit.normal);
+                    //SpawnHitEffects(hit.point, -hit.normal);
+                }
+
             }
+
 
             var rigb = hit.transform.GetComponent<Rigidbody>();
             if (rigb && !hit.transform.gameObject.isStatic){
                 //rigb.AddForce(transform.forward * m_HitscanImpactForce, ForceMode.Impulse);
                 var hitDirection = rigb.transform.position - m_FirePoint.position;
-                rigb.AddForceAtPosition(hitDirection.normalized * m_HitscanImpactForce, hit.point, ForceMode.Impulse);
+                rigb.AddForceAtPosition(hitDirection.normalized * (m_HitscanImpactForce * m_ImpactForceMultiplier), hit.point, ForceMode.Acceleration);
             }
         }
 
 
+
+
         protected override void OnStartAim()
         {
-
+            
         }
 
 
         protected override void OnAim(bool aim)
         {
+            //Debug.Log("Weapon Starting to aim");
+            if(aim){
+                var targetDirection = m_Controller.LookPosition - m_Transform.position;
+                //if(targetDirection == Vector3.zero)
+                    //targetDirection.Set(m_Controller.transform.position.x, 1.35f, m_Controller.transform.position.x + 10);
+                Debug.DrawRay(m_Transform.position, targetDirection, Color.blue, 1);
+                //var targetRotation = Quaternion.LookRotation(targetDirection);
+                //targetRotation *= Quaternion.Euler(0, 90, 90);
+                //m_Transform.rotation = targetRotation;
+                m_Transform.parent.localEulerAngles = new Vector3(0, 90, 90);
+            }else{
+                m_Transform.parent.localRotation = m_Rotation;
+            }
+        }
 
+
+
+        private void SpawnHitEffects(Vector3 collisionPoint, Vector3 collisionPointNormal)
+        {
+            var decal = Instantiate(m_DefaultDecal, collisionPoint, Quaternion.FromToRotation(m_Transform.forward, collisionPointNormal));
+            Destroy(decal, 5);
+            var dust = Instantiate(m_DefaultDust, collisionPoint, Quaternion.FromToRotation(m_Transform.forward, collisionPointNormal));
+            var ps = dust.GetComponentInChildren<ParticleSystem>();
+            ps.Play();
+            Destroy(ps.gameObject, ps.main.duration + 1);
         }
 
 
@@ -273,6 +269,6 @@
             }
         }
 
-	}
+    }
 
 }
