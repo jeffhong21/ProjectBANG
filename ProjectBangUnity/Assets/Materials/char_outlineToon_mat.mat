@@ -100,8 +100,8 @@ Material:
     - _AOuv: 0
     - _ASEOutlineWidth: 0.01
     - _AmbientPower: 0
-    - _BaseCellOffset: 0
-    - _BaseCellSharpness: 0.105
+    - _BaseCellOffset: -0.62
+    - _BaseCellSharpness: 0.093
     - _Brightness: 0
     - _BumpScale: 1
     - _ColorCorrectionEnable: 0
@@ -131,7 +131,7 @@ Material:
     - _HFogEnable: 0
     - _HighlightCellOffset: -0.95
     - _HighlightCellSharpness: 0.01
-    - _IndirectDiffuseContribution: 1
+    - _IndirectDiffuseContribution: 0.62
     - _IndirectSpecularContribution: 1
     - _LMPower: 0
     - _LightSmoothness: 0.557
@@ -180,7 +180,7 @@ Material:
     - _Shading_L: 0
     - _Shading_R: 0
     - _Shading_T: 0
-    - _ShadowContribution: 0.5
+    - _ShadowContribution: 1
     - _ShadowIntensity: 0.641
     - _Shininess: 0.01
     - _ShowAO: 1

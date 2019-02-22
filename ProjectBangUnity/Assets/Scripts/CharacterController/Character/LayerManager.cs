@@ -36,7 +36,13 @@ namespace CharacterController
             set { m_SolidLayer = value; }
         }
 
-    }
+
+
+		private void Awake()
+		{
+			
+		}
+	}
 
 }
 

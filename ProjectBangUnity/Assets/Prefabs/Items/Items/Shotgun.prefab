@@ -611,7 +611,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61dbdf289aad34e608b9aebae0a464a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ItemName: Rifle
+  m_ItemAnimName: 
   m_ItemID: 2
   m_MovementSetID: 1
   m_AnimStates:
@@ -646,9 +646,9 @@ MonoBehaviour:
     m_Bits: 2817
   m_HitscanDamageEvent: 
   m_HitscanDamageAmount: 10
-  m_HitscanImpactForce: 40
+  m_HitscanImpactForce: 600
   m_Projectile: {fileID: 0}
-  m_DrawAimLine: 1
+  m_DrawAimLine: 0
   m_DefaultDecal: {fileID: 166404, guid: 1b9f66cb9bb3047649bf932337e6b03a, type: 2}
   m_DefaultDust: {fileID: 1082194431870132, guid: 69e5544af4a7b4cd6ae33513e78a694e,
     type: 2}

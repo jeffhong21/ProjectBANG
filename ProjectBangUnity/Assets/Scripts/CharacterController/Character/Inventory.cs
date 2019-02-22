@@ -75,7 +75,7 @@
         public bool IsSwitchingItem{
             get {
                 if(GetCurrentItem() != null){
-                    var switching = m_Animator.GetCurrentAnimatorStateInfo(m_AnimatorMonitor.UpperBodyLayerIndex).shortNameHash == Animator.StringToHash(GetCurrentItem().ItemName);
+                    var switching = m_Animator.GetCurrentAnimatorStateInfo(m_AnimatorMonitor.UpperBodyLayerIndex).shortNameHash == Animator.StringToHash(GetCurrentItem().ItemAnimName);
                 }
                 return m_Switching;
             }
@@ -130,13 +130,15 @@
 		private void OnEnable()
 		{
             EventHandler.RegisterEvent(gameObject, "OnItemEquip", OnItemEquip);
+            EventHandler.RegisterEvent(gameObject, "OnItemUnequip", OnItemUnequip);
 		}
 
 
 
         private void OnDisable()
         {
-
+            EventHandler.UnregisterEvent(gameObject, "OnItemEquip", OnItemEquip);
+            EventHandler.UnregisterEvent(gameObject, "OnItemUnequip", OnItemUnequip);
         }
 
 
@@ -216,7 +218,7 @@
             {
                 PrimaryItem primaryItem = (PrimaryItem)item;
                 m_Inventory[item].SetActive(false);
-                //m_Inventory[item].ItemName = primaryItem.ItemName;
+                //m_Inventory[item].ItemAnimName = primaryItem.ItemAnimName;
 
                 if(equip){
                     EquipItem(item);
@@ -385,16 +387,19 @@
             if (m_Loadout[itemIndex] is PrimaryItem)
             {
                 
-                //  Turn item object off.
-                ItemObject itemObject = GetCurrentItem(m_LastEquippedItem);
-                if (itemObject != null)
-                    itemObject.SetActive(false);
+                ////  Turn item object off.
+                //ItemObject itemObject = GetCurrentItem(m_LastEquippedItem);
+                //if (itemObject != null)
+                    //itemObject.SetActive(false);
+                
                 //  Set equipped item and set index.
                 m_EquippedItemIndex = itemIndex;
                 m_EquippedItem = m_Loadout[itemIndex] as PrimaryItem;
-                //Debug.Log(m_Inventory[m_EquippedItem].ItemObject);
-                m_Inventory[m_EquippedItem].SetActive(true);
-                //GetItem(m_EquippedItem).transform.parent = m_RightHandSlot.transform;
+
+
+                ////Debug.Log(m_Inventory[m_EquippedItem].ItemObject);
+                //m_Inventory[m_EquippedItem].SetActive(true);
+                ////GetItem(m_EquippedItem).transform.parent = m_RightHandSlot.transform;
 
                 EventHandler.ExecuteEvent(gameObject, "OnInventoryEquip", GetItem(m_Loadout[itemIndex]));
                 return;
@@ -406,9 +411,9 @@
         {
             m_LastEquippedItem = m_EquippedItem;
 
-            ItemObject itemObject = GetCurrentItem();
-            if (itemObject != null)
-                itemObject.SetActive(false);
+            //ItemObject itemObject = GetCurrentItem();
+            //if (itemObject != null)
+                //itemObject.SetActive(false);
             
 
             m_EquippedItem = null;
@@ -446,7 +451,7 @@
         };
         public event OnInventoryEquipItem onInventoryEquipItem = delegate 
         {
-            
+            Debug.LogFormat("OnInventoryEquipItem delegate has been triggered.");
         };
         public event OnInventoryUnequipItem onInventoryUnequipItem = delegate 
         {
@@ -463,10 +468,21 @@
         private void OnItemEquip()
         {
             //m_Switching = true;
-            //Debug.Log("OnItemEquip");
+            //Debug.LogFormat("<color=magenta> OnItemEquip </color> | EquippedItem: {0}", m_EquippedItem);
 
+            if (m_EquippedItem != null)
+                m_Inventory[m_EquippedItem].SetActive(true);
         }
 
+        private void OnItemUnequip()
+        {
+            //m_Switching = true;
+
+            //Debug.LogFormat("<color=yellow> OnItemUnequip </color> | CurrentItem: {0}", itemObject);
+
+            if (m_LastEquippedItem != null)
+                GetItem(m_LastEquippedItem).SetActive(false);
+        }
 
 
 

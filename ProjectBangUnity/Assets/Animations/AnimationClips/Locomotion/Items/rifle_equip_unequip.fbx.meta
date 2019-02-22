@@ -160,7 +160,7 @@ ModelImporter:
       events:
       - time: 0.34125873
         functionName: ExecuteEvent
-        data: ItemEquip
+        data: OnItemEquip
         objectReferenceParameter: {fileID: 11500000, guid: 4b5b38972af4340e8a362154d8c837df,
           type: 3}
         floatParameter: 0
@@ -193,7 +193,23 @@ ModelImporter:
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
-      events: []
+      events:
+      - time: 0.34470996
+        functionName: ExecuteEvent
+        data: OnItemUnequip
+        objectReferenceParameter: {fileID: 11500000, guid: 4b5b38972af4340e8a362154d8c837df,
+          type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.34374997
+        functionName: ExecuteEvent
+        data: OnItemUnequip
+        objectReferenceParameter: {fileID: 11500000, guid: 4b5b38972af4340e8a362154d8c837df,
+          type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}

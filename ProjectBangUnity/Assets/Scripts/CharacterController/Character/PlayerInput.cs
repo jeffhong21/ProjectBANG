@@ -14,7 +14,12 @@ namespace CharacterController
         private string m_RightMouseInputName = "Fire3";
         private string m_ReloadInputName = "Reload";
 
+        [SerializeField]
+        private KeyCode m_RunInput = KeyCode.LeftShift;
+        [SerializeField]
+        private LayerMask m_LayerMask;
 
+        [Header("-- Debug Settings --")]
         [SerializeField, DisplayOnly]
         private float m_Horizontal;
         [SerializeField, DisplayOnly]
@@ -25,9 +30,8 @@ namespace CharacterController
         private Vector2 m_MousePosition;
         private Vector3 m_InputVector;
         private float m_RayLookDistance = 20f;
-        [SerializeField]
-        private LayerMask m_LayerMask;
-        [Header("-- Debug Settings --")]
+
+
         [SerializeField]
         private bool m_DisplayKeyMapping;
 
@@ -93,13 +97,15 @@ namespace CharacterController
         private void Update()
         {
             SetInputVector(true);
-            SetCameraPosition();
 
+
+
+            SetRunInput(m_RunInput);
 
             UseItem(KeyCode.Mouse0);
 
             Reload(KeyCode.R);
-
+           
             SwitchItem(KeyCode.Q, true);
 
             SwitchItem(KeyCode.E, false);
@@ -122,48 +128,40 @@ namespace CharacterController
             //}
 
 
-            //if (Input.GetKeyDown(KeyCode.Alpha1))
-            //{
-            //    m_Inventory.EquipItem(0);
-            //}
-            //else if (Input.GetKeyDown(KeyCode.Alpha2))
-            //{
-            //    m_Inventory.EquipItem(1);
-            //}
-            //else if (Input.GetKeyDown(KeyCode.Alpha3))
-            //{
-            //    m_Inventory.EquipItem(2);
-            //}
-            //else if (Input.GetKeyDown(KeyCode.Alpha4))
-            //{
-            //    m_Inventory.EquipItem(3);
-            //}
-            //else if (Input.GetKeyDown(KeyCode.Alpha5))
-            //{
-            //    m_Inventory.EquipItem(4);
-            //}
-            //else if (Input.GetKeyDown(KeyCode.Alpha6))
-            //{
-            //    m_Inventory.EquipItem(5);
-            //}
 
 
 
-
-            LockCameraRotation();
 
             //  For Debugging.
             DebugButtonPress();
         }
 
+		private void LateUpdate()
+		{
+            SetCameraPosition();
 
-        private void SetInputVector(bool useGetAxis)
+            LockCameraRotation();
+		}
+
+
+		private void SetInputVector(bool useGetAxis)
         {
             m_Horizontal = GetAxis(m_HorizontalInputName);
             m_Vertical = GetAxis(m_VerticalInputName);
 
             m_InputVector.Set(m_Horizontal, 0, m_Vertical);
             m_Controller.InputVector = m_InputVector;
+        }
+
+
+        private void SetRunInput(KeyCode input)
+        {
+            if (Input.GetKeyDown(input)){
+                m_Controller.Running = true;
+            }
+            else if (Input.GetKeyUp(input)){
+                m_Controller.Running = false;
+            }
         }
 
 

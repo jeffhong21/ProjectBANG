@@ -12,11 +12,10 @@ MonoBehaviour:
   m_Name: Shotgun
   m_EditorClassIdentifier: 
   m_ID: 0
-  m_ItemName: Rifle
-  m_Description: Shotgun
+  m_ItemName: Shotgun
+  m_Description: Default shotgun
   m_Icon: {fileID: 21300000, guid: f2a82f462d2f14775be6bbc61ff5d89c, type: 3}
   m_Capacity: 1
-  m_ItemID: 0
   m_OriginalObject: {fileID: 1653775208639774, guid: eb8f4034014f24f2a8b5f64ecf00caaf,
     type: 2}
   m_DropObject: {fileID: 1664603804014916, guid: a5d7222f4860f40d4832c850332890a6,
@@ -24,5 +23,4 @@ MonoBehaviour:
   m_CustomEquipPoint: rifleEquipPoint
   m_ConsumableItem:
     m_ItemType: {fileID: 11400000, guid: 2e5ced0da118d496a8fe7f5a455e840f, type: 2}
-    m_CurrentAmount: 2
     m_Capacity: 8

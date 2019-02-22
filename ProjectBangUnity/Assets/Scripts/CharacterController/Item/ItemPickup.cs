@@ -226,9 +226,11 @@
             if(ObjectPickup(other))
             {
                 if(m_PickupVFX){
-                    m_PickupVFX.gameObject.SetActive(true);
-                    m_PickupVFX.transform.localPosition = Vector3.up * 0.5f;
-                    m_PickupVFX.Play(true);
+
+                    var pickupVfx = Instantiate(m_PickupVFX, m_Transform.position + m_Transform.up * 0.5f, Quaternion.identity);
+                    var ps = pickupVfx.GetComponentInChildren<ParticleSystem>();
+                    ps.Play();
+                    Destroy(ps.gameObject, ps.main.duration);
                 }
 
 

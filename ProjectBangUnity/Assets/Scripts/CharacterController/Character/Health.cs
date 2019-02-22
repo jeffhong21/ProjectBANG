@@ -136,7 +136,7 @@
             //  Deactivate gameobject on death.
 
             EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnDeath, hitLocation, hitDirection, attacker);
-            EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnRagdoll, 1f);
+            EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnRagdoll, hitLocation, hitDirection, 0f);
         }
 
 

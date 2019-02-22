@@ -10,7 +10,7 @@
     public class ItemManager : ScriptableObject
     {
         private static ItemManager m_Instance;
-        private static string m_StorageFolder = "Assets/Prefabs/Items/";
+        private static string m_StorageFolder = "Assets/Prefabs/Items/Resources";
 
 
         public static ItemManager Instance{
@@ -45,18 +45,31 @@
         {
             if (m_ItemLookup == null) m_ItemLookup = new Dictionary<string, Item>();
 
-            m_Items = Resources.LoadAll<Item>(StorageFolder);
+            m_Items = Resources.LoadAll<Item>("");
 
             for (int i = 0; i < m_Items.Length; i++)
             {
                 if(!m_ItemLookup.ContainsKey(m_Items[i].name)){
                     m_ItemLookup.Add(m_Items[i].name, m_Items[i]);
                 }
+
+                //  Set item's ID.
+                m_ItemLookup[m_Items[i].name].ID = i;
             }
+
+            Debug.LogFormat("** Initializing Item Manager");
         }
 
 
+        public Item GetItem(string itemName)
+        {
+            if (m_ItemLookup.ContainsKey(itemName))
+            {
+                return m_ItemLookup[itemName];
+            }
 
+            return null;
+        }
 
 
 

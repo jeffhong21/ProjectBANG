@@ -33,23 +33,37 @@
         protected float m_SkinWidth = 0.08f;
         [SerializeField, HideInInspector]
         protected float m_SlopeLimit = 120;
+
+        [SerializeField, HideInInspector, Range(0, 0.5f) ]
+        protected float m_StepOffset = 0.2f;
+        [SerializeField, HideInInspector]
+        protected float m_StepSmooth = 4f;
+        [SerializeField, HideInInspector]
+        protected float m_Acceleration = 20f;
+
         [SerializeField]
         protected CharacterAction[] m_Actions;
         [SerializeField]
         private CharacterAction m_ActiveAction;
-        [SerializeField, DisplayOnly]
+        [SerializeField, HideInInspector]
         private CharacterAction[] m_ActiveActions;
         private CharacterAction m_CurrentAction;
 
 
+        protected PhysicMaterial m_MaxFrictionPhysics;  
+        protected PhysicMaterial m_FrictionPhysics;      
+        protected PhysicMaterial m_SlippyPhysics; 
+
         [Header("-- Debug --")]
-        private bool m_Moving, m_Aim, m_Grounded = true;
+        private bool m_Grounded = true;
+        private bool m_Moving, m_Aiming, m_Running;
         private float m_Speed;
         private float m_MoveAmount;
         Vector3 m_Velocity, m_CurrentVelocity, m_TargetVelocity;
+        Vector3 m_MoveDirection;
         Vector3 m_InputVector;
         Quaternion m_LookRotation;
-
+        float m_StepOffsetMax = 0.65f;
 
         PlayerInput m_Input;
         AnimatorMonitor m_AnimationMonitor;
@@ -67,7 +81,10 @@
 
 
 
-        RaycastHit m_HitInfo;
+        RaycastHit m_GroundHit;
+        RaycastHit m_StepHit;
+
+
         float m_SlopeAngle;
         float m_FwdDotProduct, m_RightDotProduct;
 
@@ -77,7 +94,7 @@
 
         [SerializeField] bool m_DrawDebugLine;
         [SerializeField] bool m_ShowComponents;
-        [SerializeField] bool m_DebugActiveActions;
+        bool m_DebugActiveActions;
         [SerializeField, HideInInspector] CharacterAction m_SelectedAction;
 
 
@@ -94,6 +111,11 @@
             set { m_Moving = value; }
         }
 
+        public bool Running{
+            get { return m_Running; }
+            set { m_Running = value; }
+        }
+
         public float RotationSpeed
         {
             get { return m_RotationSpeed; }
@@ -106,15 +128,15 @@
             set { m_AimRotationSpeed = value; }
         }
 
-        public bool Aim
+        public bool AimState
         {
-            get { return m_Aim; }
-            set { m_Aim = value; }
+            get { return m_Aiming; }
+            set { m_Aiming = value; }
         }
 
         public bool Aiming{
             get {
-                if(m_Aim){
+                if(m_Aiming){
                     if(Grounded){
                         return true;
                     }
@@ -173,6 +195,7 @@
         {
             m_Input = GetComponent<PlayerInput>();
             m_AnimationMonitor = GetComponent<AnimatorMonitor>();
+            m_Layers = GetComponent<LayerManager>();
             m_Animator = GetComponent<Animator>();
             m_Rigidbody = GetComponent<Rigidbody>();
             m_CapsuleCollider = GetComponent<CapsuleCollider>();
@@ -206,6 +229,27 @@
         {
             m_ActiveActions = new CharacterAction[m_Actions.Length];
 
+            // slides the character through walls and edges
+            m_FrictionPhysics = new PhysicMaterial();
+            m_FrictionPhysics.name = "frictionPhysics";
+            m_FrictionPhysics.staticFriction = .25f;
+            m_FrictionPhysics.dynamicFriction = .25f;
+            m_FrictionPhysics.frictionCombine = PhysicMaterialCombine.Multiply;
+
+            // prevents the collider from slipping on ramps
+            m_MaxFrictionPhysics = new PhysicMaterial();
+            m_MaxFrictionPhysics.name = "maxFrictionPhysics";
+            m_MaxFrictionPhysics.staticFriction = 1f;
+            m_MaxFrictionPhysics.dynamicFriction = 1f;
+            m_MaxFrictionPhysics.frictionCombine = PhysicMaterialCombine.Maximum;
+
+            // air physics 
+            m_SlippyPhysics = new PhysicMaterial();
+            m_SlippyPhysics.name = "slippyPhysics";
+            m_SlippyPhysics.staticFriction = 0f;
+            m_SlippyPhysics.dynamicFriction = 0f;
+            m_SlippyPhysics.frictionCombine = PhysicMaterialCombine.Minimum;
+
             if (m_Input) m_Camera = CameraController.Instance.Camera;
         }
 
@@ -214,11 +258,14 @@
 
         private void Update()
 		{
-            if(m_Input){
-                UpdateSpeed();
-                //DebugActiveActions();
-            }
+            if (m_DeltaTime == 0) return;
 
+            //if(m_Input){
+            //    UpdateSpeed();
+            //    //DebugActiveActions();
+            //}
+
+            m_Grounded = CheckGround();
 
 
 
@@ -316,6 +363,71 @@
 
 
 
+        private bool CheckGround()
+        {
+
+            Color _stepColor = Color.blue;
+
+            // change the physics material to very slip when not grounded or maxFriction when is
+            if (m_Grounded && m_InputVector == Vector3.zero)
+                m_CapsuleCollider.material = m_MaxFrictionPhysics;
+            else if (m_Grounded && m_InputVector != Vector3.zero)
+                m_CapsuleCollider.material = m_FrictionPhysics;
+            else
+                m_CapsuleCollider.material = m_SlippyPhysics;
+            
+
+            if(m_Grounded)
+            {
+                m_MoveDirection = m_Moving ? Vector3.Cross(m_Transform.right, m_GroundHit.normal) : Vector3.zero;
+                m_SlopeAngle = Vector3.Angle(m_Transform.forward, m_GroundHit.normal);
+            }
+            else{
+                m_MoveDirection = Vector3.zero;
+                m_SlopeAngle = 90;
+            }
+
+            Ray groundCheck = new Ray(m_Transform.position + Vector3.up * m_AlignToGroundDepthOffset, Vector3.down);
+            if(m_DrawDebugLine) Debug.DrawRay(m_Transform.position + Vector3.up * m_AlignToGroundDepthOffset, Vector3.down, Color.white);
+
+            if (Physics.Raycast(groundCheck, out m_GroundHit, m_AlignToGroundDepthOffset + m_SkinWidth, m_Layers.SolidLayer))
+            {
+                var rayStart = (m_Transform.position + Vector3.up * m_StepOffsetMax) + m_Transform.forward * (m_CapsuleCollider.radius + m_SkinWidth);
+                var rayEnd = Vector3.down * (m_StepOffsetMax - m_StepOffset);
+                Ray rayStep = new Ray(rayStart, rayEnd);
+                if (m_DrawDebugLine) Debug.DrawRay(rayStart, rayEnd, Color.yellow);
+
+                if(m_InputVector.sqrMagnitude > 0.1f && m_Grounded)
+                {
+                    if (Physics.Raycast(rayStep, out m_StepHit, m_StepOffsetMax - m_StepOffset, m_Layers.SolidLayer))
+                    {
+                        if (m_StepHit.point.y >= (m_Transform.position.y) && m_StepHit.point.y <= (m_Transform.position.y + m_StepOffset + m_SkinWidth))
+                        {
+                            m_MoveDirection = (m_StepHit.point - m_Transform.position).normalized * m_StepSmooth * (m_Speed > 1 ? m_Speed : 1);
+                            m_Rigidbody.velocity = m_MoveDirection; // * m_StepSmooth * (m_Speed > 1 ? m_Speed : 1);// + (Vector3.up * m_StepOffset);
+
+                            _stepColor = Color.magenta;
+                        }
+                        else
+                        {
+                            _stepColor = Color.cyan;
+                        }
+
+                    }
+                }
+
+                if (m_DrawDebugLine)
+                    Debug.DrawRay( m_Transform.position, m_MoveDirection * m_StepSmooth * (m_Speed > 1 ? m_Speed : 1), _stepColor);
+
+                return true;
+            }
+
+
+            return false;
+        }
+
+
+
         //  Update the rotation forces.
         private void UpdateRotation()
         {
@@ -334,27 +446,65 @@
         //  Apply any movement.
         private void UpdateMovement()
         {
+            //if (m_SlopeAngle >= m_SlopeLimit) return;
+
+
+            if(m_Aiming)
+            {
+                m_Speed = Mathf.Clamp01(Mathf.Abs(m_InputVector.x) + Mathf.Abs(m_InputVector.z));
+                m_Speed = Mathf.Clamp(m_Speed, 0, 1);
+                if (m_Running)
+                    m_Speed += 1f;
+                //m_Speed = Mathf.Clamp(m_InputVector.z, -1, 1);
+                //if (m_Running)
+                    //m_Speed += 1f;
+            }
+            else{
+                m_Speed = Mathf.Clamp01(Mathf.Abs(m_InputVector.x) + Mathf.Abs(m_InputVector.z));
+                m_Speed = Mathf.Clamp(m_Speed, 0, 1);
+                if (m_Running)
+                    m_Speed += 1f;
+            }
+
+
             if (m_UseRootMotion)
             {
                 m_Velocity = (m_Animator.deltaPosition * m_RootMotionSpeedMultiplier) / m_DeltaTime;
+                m_Velocity.y = m_Rigidbody.velocity.y;
+                m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, m_Acceleration * m_DeltaTime);
             }
             else
             {
-                m_CurrentVelocity = m_Rigidbody.velocity;
-                m_MoveAmount = Mathf.Clamp01(Mathf.Abs(m_InputVector.x) + Mathf.Abs(m_InputVector.y));
-                if (m_MoveAmount > 0)
+                if(m_Aiming)
                 {
-                    m_TargetVelocity = m_Transform.forward * m_InputVector.z * m_GroundSpeed.z;
-                    m_TargetVelocity += m_Transform.right * m_InputVector.x * m_GroundSpeed.x;
-                    m_TargetVelocity = m_TargetVelocity.normalized * 2;
-                    m_TargetVelocity.y = 0;
+                    m_Velocity = (m_Transform.TransformDirection(m_InputVector) * m_Speed);
+                    m_Velocity.y = m_Rigidbody.velocity.y;
+                    m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, m_Acceleration * m_DeltaTime);
                 }
                 else
                 {
-                    m_TargetVelocity = Vector3.zero;
+                    m_Velocity = m_MoveDirection + m_Transform.forward * m_Speed;
+                    m_Rigidbody.velocity = m_Velocity;
+                    m_Rigidbody.AddForce(m_MoveDirection * (m_Speed) * m_DeltaTime, ForceMode.VelocityChange);
                 }
-                m_Velocity = Vector3.Lerp(m_CurrentVelocity, m_TargetVelocity, m_DeltaTime * 3);
-                m_Rigidbody.velocity = m_Velocity;
+
+
+
+                //m_CurrentVelocity = m_Rigidbody.velocity;
+                //m_MoveAmount = Mathf.Clamp01(Mathf.Abs(m_InputVector.x) + Mathf.Abs(m_InputVector.y));
+                //if (m_MoveAmount > 0)
+                //{
+                //    m_TargetVelocity = m_Transform.forward * m_InputVector.z * m_GroundSpeed.z;
+                //    m_TargetVelocity += m_Transform.right * m_InputVector.x * m_GroundSpeed.x;
+                //    m_TargetVelocity = m_TargetVelocity.normalized * 2;
+                //    m_TargetVelocity.y = 0;
+                //}
+                //else
+                //{
+                //    m_TargetVelocity = Vector3.zero;
+                //}
+                //m_Velocity = Vector3.Lerp(m_CurrentVelocity, m_TargetVelocity, m_DeltaTime * 3);
+                //m_Rigidbody.velocity = m_Velocity;
 
                 //m_Velocity = m_Transform.forward * m_InputVector.z * m_GroundSpeed.z;
                 //m_Velocity += m_Transform.right * m_InputVector.x * m_GroundSpeed.x;
@@ -362,6 +512,7 @@
                 //m_Rigidbody.velocity = m_Velocity;
             }
 
+            m_Moving = m_InputVector.sqrMagnitude > 0.1f;
         }
 
 
@@ -373,10 +524,8 @@
         }
 
 
-		private void MoveCharacter()
-		{
 
-		}
+
 
 
 		public void MoveCharacter(float horizontalMovement, float forwardMovement, Quaternion lookRotation)
@@ -411,20 +560,6 @@
 
 
 
-        private void UpdateSpeed()
-        {
-            m_MoveAmount = Mathf.Clamp01(Mathf.Abs(m_InputVector.x) + Mathf.Abs(m_InputVector.z));
-            m_Speed = m_MoveAmount;
-            if (Input.GetKey(KeyCode.LeftShift) && m_Speed > 0.5f)
-            {
-                m_Speed = 2;
-            }
-        }
-
-
-
-
-
         public void SetPosition(Vector3 position)
         {
             m_Rigidbody.MovePosition(position);
@@ -444,19 +579,21 @@
 
         private void OnAnimatorMove()
         {
-            if (m_UseRootMotion)
-            {
-                //m_Rigidbody.velocity = (m_Animator.deltaPosition * m_RootMotionSpeedMultiplier) / m_DeltaTime;
-                m_Rigidbody.velocity = m_Velocity;
-                //Debug.Log(m_Animator.deltaPosition);
-            }
+            //if (m_UseRootMotion)
+            //{
+            //    //m_Rigidbody.velocity = (m_Animator.deltaPosition * m_RootMotionSpeedMultiplier) / m_DeltaTime;
+            //    m_Rigidbody.velocity = m_Velocity;
+            //    //Debug.Log(m_Animator.deltaPosition);
+            //}
 
         }
 
 
+
+
         private void OnAimActionStart(bool aim)
         {
-            m_Aim = aim;
+            m_Aiming = aim;
             OnAim(aim);
             //Debug.LogFormat("Aiming is {0}", aim);
         }
@@ -469,6 +606,9 @@
                 Debug.Log(action + " activated: " + activated);
             }
         }
+
+
+
 
 
 
@@ -648,24 +788,24 @@
 
         protected void OnDrawGizmos()
         {
-            if (m_DrawDebugLine)
-            {
-                Gizmos.color = Color.green;
-                Gizmos.DrawRay(transform.position + m_DebugHeightOffset, m_Velocity.normalized );
-                //Gizmos.DrawRay(transform.position + Vector3.up * heightOffset, m_GroundSpeed + Vector3.up * heightOffset);
+            //if (m_DrawDebugLine)
+            //{
+            //    Gizmos.color = Color.green;
+            //    Gizmos.DrawRay(transform.position + m_DebugHeightOffset, m_Velocity.normalized );
+            //    //Gizmos.DrawRay(transform.position + Vector3.up * heightOffset, m_GroundSpeed + Vector3.up * heightOffset);
 
-                Gizmos.color = Color.blue;
-                Gizmos.DrawRay(transform.position + m_DebugHeightOffset, transform.forward );
-                Gizmos.color = Color.yellow;
-                Gizmos.DrawRay(transform.position + m_DebugHeightOffset, transform.right );
-                //Gizmos.DrawRay(transform.position + Vector3.up * heightOffset, transform.right + Vector3.up * heightOffset);
-            }
+            //    Gizmos.color = Color.blue;
+            //    Gizmos.DrawRay(transform.position + m_DebugHeightOffset, transform.forward );
+            //    Gizmos.color = Color.yellow;
+            //    Gizmos.DrawRay(transform.position + m_DebugHeightOffset, transform.right );
+            //    //Gizmos.DrawRay(transform.position + Vector3.up * heightOffset, transform.right + Vector3.up * heightOffset);
+            //}
 
-            if(Aiming && m_DrawDebugLine){
-                Gizmos.color = Color.red;
-                Gizmos.DrawSphere(LookPosition, 0.1f);
-                Gizmos.DrawLine(transform.position + (transform.up * 1.35f), LookPosition);
-            }
+            //if(Aiming && m_DrawDebugLine){
+            //    Gizmos.color = Color.red;
+            //    Gizmos.DrawSphere(LookPosition, 0.1f);
+            //    Gizmos.DrawLine(transform.position + (transform.up * 1.35f), LookPosition);
+            //}
         }
 
         #endregion

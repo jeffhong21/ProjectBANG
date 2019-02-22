@@ -36,9 +36,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4691623370416236}
-  - component: {fileID: 65277158156568696}
   - component: {fileID: 136382737186966452}
-  - component: {fileID: 54470555902540618}
   - component: {fileID: 114877560380499924}
   m_Layer: 0
   m_Name: GenericItem_Pickup
@@ -86,7 +84,7 @@ Transform:
   m_GameObject: {fileID: 1097067235476366}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.3, z: 0}
-  m_LocalScale: {x: 0.68414, y: 0.68414, z: 0.68414}
+  m_LocalScale: {x: 0.4860872, y: 0.4860872, z: 0.4860872}
   m_Children: []
   m_Father: {fileID: 4546381871479846}
   m_RootOrder: 0
@@ -175,33 +173,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1097067235476366}
   m_Mesh: {fileID: 4300000, guid: 57854fb99ba71af4286b47d5771ce020, type: 3}
---- !u!54 &54470555902540618
-Rigidbody:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1664603804014916}
-  serializedVersion: 2
-  m_Mass: 5
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 116
-  m_CollisionDetection: 0
---- !u!65 &65277158156568696
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1664603804014916}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 2, y: 0.5, z: 2}
-  m_Center: {x: 0, y: 0.25, z: 0}
 --- !u!114 &114877560380499924
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -234,7 +205,7 @@ CapsuleCollider:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1664603804014916}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   m_Radius: 0.35
   m_Height: 1.08
@@ -276,7 +247,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: a8c6e3ca155ed443e8c47c138b0cf33b, type: 3}
-  m_Color: {r: 0.20512804, g: 0.9150943, b: 0, a: 1}
+  m_Color: {r: 0.37864897, g: 0.5420979, b: 0.6320754, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

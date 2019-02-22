@@ -293,7 +293,7 @@ namespace AtlasAI.AIEditor
 
 
                 GUILayout.FlexibleSpace();
-                if (GUILayout.Button(DoLabel("Close", "Close window"), EditorStyles.toolbarButton, GUILayout.Width(48)))
+                if (GUILayout.Button(DoLabel("Close", "Close window"), EditorStyles.toolbarButton, GUILayout.Width(88)))
                 {
                     activeInstance.Close();
                 }

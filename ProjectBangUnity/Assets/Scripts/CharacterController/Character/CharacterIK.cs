@@ -153,7 +153,7 @@
 
         private void HandleItem(ItemObject item)
         {
-            //Debug.LogFormat("{0} currently equipped item is {1}.", gameObject.name, item == null ? "<null>" : item.ItemName);
+            //Debug.LogFormat("{0} currently equipped item is {1}.", gameObject.name, item == null ? "<null>" : item.ItemAnimName);
             if (item == null)
             {
                 m_CurrentItem = null;
@@ -268,7 +268,7 @@
 
         protected virtual void PositionLowerBody()
         {
-            MovePelvisHeight();
+            //MovePelvisHeight();
 
             //right foot ik position and rotation -- utilise the pro features in here
             m_Animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1);

@@ -134,7 +134,7 @@
             if (itemObject == null)
                 return null;
 
-            var itemName = itemObject.ItemName;
+            var itemName = itemObject.ItemAnimName;
             return itemName;
         }
     }

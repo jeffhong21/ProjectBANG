@@ -1,4 +1,4 @@
-namespace CharacterController
+﻿namespace CharacterController
 {
     using UnityEngine;
 
@@ -160,10 +160,10 @@ namespace CharacterController
             //if (currentItem == null){
             //    if (nextItem == null)
             //        return null;
-            //    return m_Inventory.GetItem(nextItem).ItemName;
+            //    return m_Inventory.GetItem(nextItem).ItemAnimName;
             //    //return null;
             //}
-            //return currentItem.ItemName;
+            //return currentItem.ItemAnimName;
             return "";
         }
 

@@ -67,7 +67,7 @@
                 return m_ItemName;
                 //if(m_Inventory.EquippedItemType != null){
                 //    var itemObject = m_Inventory.GetCurrentItem(m_Inventory.EquippedItemType);
-                //    var aimState = string.Format("{0}.{1}", itemObject.ItemName, itemObject.AnimStates.AimStateName);
+                //    var aimState = string.Format("{0}.{1}", itemObject.ItemAnimName, itemObject.AnimStates.AimStateName);
                 //    //Debug.Log(aimState);
                 //    return aimState;
                 //}
@@ -107,7 +107,7 @@
             if (itemObject == null)
                 return "Unarmed";
 
-            var itemName = itemObject.ItemName;
+            var itemName = itemObject.ItemAnimName;
             return itemName;
         }
 

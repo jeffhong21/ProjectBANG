@@ -1,4 +1,4 @@
-namespace CharacterController
+﻿namespace CharacterController
 {
     using UnityEngine;
     using UnityEngine.Events;
@@ -369,7 +369,7 @@ namespace CharacterController
         public void DebugHashStates()
         {
             var itemName = string.Format("{0}.{1}", GetItemName(), "Equip");
-            Debug.LogFormat("ItemName: <color=red> {0} </color> | Current Hash: <color=red> {1} </color> | Hash:<color=red> {2} </color>",
+            Debug.LogFormat("ItemAnimName: <color=red> {0} </color> | Current Hash: <color=red> {1} </color> | Hash:<color=red> {2} </color>",
                             itemName, m_Animator.GetCurrentAnimatorStateInfo(m_LayerIndex).fullPathHash, Animator.StringToHash(itemName));
         }
 
@@ -458,7 +458,7 @@ namespace CharacterController
             if (itemObject == null)
                 return "Unarmed";
 
-            var itemName = itemObject.ItemName;
+            var itemName = itemObject.ItemAnimName;
             return itemName;
         }
 

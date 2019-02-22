@@ -11,6 +11,7 @@
         protected Collider m_Collider;
         protected Animator m_Aniimator;
         protected GameObject m_GameObject;
+        protected Transform m_Transform;
 
         List<Collider> m_RagdollColliders = new List<Collider>();
         List<Rigidbody> m_RagdollRigb = new List<Rigidbody>();
@@ -25,7 +26,7 @@
             m_Collider = GetComponent<Collider>();
             m_Aniimator = GetComponent<Animator>();
             m_GameObject = gameObject;
-
+            m_Transform = transform;
             SetupRagdoll();
 
             //m_RagdollLayer = ~(1 << 11);
@@ -35,12 +36,12 @@
 
 		private void OnEnable()
 		{
-            EventHandler.RegisterEvent<float>(m_GameObject, "OnRagdoll", EnableRagdoll);
+            EventHandler.RegisterEvent<Vector3, Vector3, float>(m_GameObject, "OnRagdoll", EnableRagdoll);
 		}
 
 		private void OnDisable()
 		{
-            EventHandler.UnregisterEvent<float>(m_GameObject, "OnRagdoll", EnableRagdoll);
+            EventHandler.UnregisterEvent<Vector3, Vector3, float>(m_GameObject, "OnRagdoll", EnableRagdoll);
 		}
 
 
@@ -70,16 +71,16 @@
         }
 
 
-        public void EnableRagdoll(float t)
+        public void EnableRagdoll(Vector3 position, Vector3 direction, float t)
         {
-            StartCoroutine(EnableRagdoll_AfterDelay(t));
+            StartCoroutine(EnableRagdoll_AfterDelay(position, direction, t));
         }
 
 
-        IEnumerator EnableRagdoll_AfterDelay(float t)
+        IEnumerator EnableRagdoll_AfterDelay(Vector3 position, Vector3 direction, float t)
         {
             yield return new WaitForSeconds(t);
-            EnableRagdoll_Actual();
+            EnableRagdoll_Actual(position, direction);
 
             yield return new WaitForEndOfFrame();
             m_Aniimator.enabled = false; //  this will stop ragdolls from exploding.
@@ -88,13 +89,19 @@
         }
 
 
-        void EnableRagdoll_Actual()
+        void EnableRagdoll_Actual(Vector3 position, Vector3 direction)
         {
+            var dir = position - m_Transform.position;
             for (int i = 0; i < m_RagdollColliders.Count; i++)
             {
-
+                m_RagdollColliders[i].enabled = true;
                 m_RagdollColliders[i].isTrigger = false;
+            }
+            for (int i = 0; i < m_RagdollRigb.Count; i++)
+            {
                 m_RagdollRigb[i].isKinematic = false;
+                m_RagdollRigb[i].useGravity = true;
+                m_RagdollRigb[i].AddExplosionForce(500f, direction, 50f);
             }
         }
     }

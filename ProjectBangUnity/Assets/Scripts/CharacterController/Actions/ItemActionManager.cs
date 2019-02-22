@@ -1,4 +1,4 @@
-namespace CharacterController
+﻿namespace CharacterController
 {
     using UnityEngine;
     using UnityEngine.Events;
@@ -98,7 +98,7 @@ namespace CharacterController
             if (itemObject == null)
                 return null;
             
-            var itemName = itemObject.ItemName;
+            var itemName = itemObject.ItemAnimName;
             var layerName = m_AnimatorMonitor.UpperBodyLayerName;
 
             string stateName = string.Format("{0}.{1}.{2}", layerName, itemName, state);

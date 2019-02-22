@@ -261,6 +261,7 @@
 
         public void ExecuteEvent(string eventName)
         {
+            //Debug.Log(eventName);
             EventHandler.ExecuteEvent(gameObject, eventName);
         }
 

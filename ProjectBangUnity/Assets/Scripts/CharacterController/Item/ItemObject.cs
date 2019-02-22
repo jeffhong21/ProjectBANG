@@ -11,7 +11,7 @@
         //
         [Header("--  States  --")]
         [SerializeField]
-        protected string m_ItemName;
+        protected string m_ItemAnimName;
         [SerializeField]
         protected int m_ItemID;
         [SerializeField]
@@ -51,10 +51,10 @@
 
 
 
-        public string ItemName
+        public string ItemAnimName
         {
-            get { return m_ItemName; }
-            set { m_ItemName = value; }
+            get { return m_ItemAnimName; }
+            set { m_ItemAnimName = value; }
         }
 
         public int ItemID

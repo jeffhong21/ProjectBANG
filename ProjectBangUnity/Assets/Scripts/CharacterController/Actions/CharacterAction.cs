@@ -37,6 +37,7 @@
         protected Transform m_Transform;
         protected Animator m_Animator;
         protected AnimatorMonitor m_AnimatorMonitor;
+        protected LayerManager m_Layers;
         protected CharacterLocomotion m_Controller;
         protected Inventory m_Inventory;
         protected Rigidbody m_Rigidbody;
@@ -109,6 +110,7 @@
             m_Animator = GetComponent<Animator>();
             m_AnimatorMonitor = GetComponent<AnimatorMonitor>();
             m_Controller = GetComponent<CharacterLocomotion>();
+            m_Layers = GetComponent<LayerManager>();
             m_Rigidbody = GetComponent<Rigidbody>();
             m_LayerManager = GetComponent<LayerManager>();
             m_Inventory = GetComponent<Inventory>();
@@ -325,16 +327,8 @@
 
         public virtual bool CheckGround()
         {
-            Vector3 origin = m_Transform.position;
-            origin.y += 0.6f;
-            Vector3 direction = -Vector3.up;
-            float distance = 0.7f;
             RaycastHit hit;
-
-            if (Physics.Raycast(origin, direction, out hit, distance, m_LayerManager.SolidLayer))
-            {
-                Vector3 targetPosition = hit.point; // targetPosition
-                m_Transform.position = targetPosition;
+            if (Physics.Raycast(m_Transform.position + Vector3.up * 0.5f, Vector3.down, out hit, 1, m_Layers.SolidLayer)){
                 return true;
             }
             return false;

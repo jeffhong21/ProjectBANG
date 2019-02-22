@@ -104,9 +104,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4432816029850674}
-  - component: {fileID: 65970580083658030}
   - component: {fileID: 136423084477605376}
-  - component: {fileID: 54293066011238790}
   - component: {fileID: 114426641061349716}
   m_Layer: 0
   m_Name: GenericAmmo_Pickup
@@ -324,33 +322,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1264431640476196}
   m_Mesh: {fileID: 4300000, guid: b0821201167151c44931ea8b840e9faf, type: 3}
---- !u!54 &54293066011238790
-Rigidbody:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1962589335979146}
-  serializedVersion: 2
-  m_Mass: 5
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 116
-  m_CollisionDetection: 0
---- !u!65 &65970580083658030
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1962589335979146}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 2, y: 0.5, z: 2}
-  m_Center: {x: 0, y: 0.25, z: 0}
 --- !u!95 &95416484382316930
 Animator:
   serializedVersion: 3
@@ -439,7 +410,7 @@ CapsuleCollider:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1962589335979146}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   m_Radius: 0.35
   m_Height: 1.08
@@ -481,7 +452,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: a8c6e3ca155ed443e8c47c138b0cf33b, type: 3}
-  m_Color: {r: 0.20512804, g: 0.9150943, b: 0, a: 1}
+  m_Color: {r: 0.37864897, g: 0.5420979, b: 0.6320754, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

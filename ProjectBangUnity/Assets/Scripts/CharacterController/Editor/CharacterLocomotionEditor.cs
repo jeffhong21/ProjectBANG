@@ -38,6 +38,9 @@ namespace CharacterController
         private SerializedProperty m_SkinWidth;
         private SerializedProperty m_SlopeLimit;
 
+        private SerializedProperty m_StepOffset;
+        private SerializedProperty m_StepSmooth;
+        private SerializedProperty m_Acceleration;
 
 
 
@@ -65,6 +68,10 @@ namespace CharacterController
             m_SkinWidth = serializedObject.FindProperty("m_SkinWidth");
             m_SlopeLimit = serializedObject.FindProperty("m_SlopeLimit");
 
+            m_StepOffset = serializedObject.FindProperty("m_StepOffset");
+            m_StepSmooth = serializedObject.FindProperty("m_StepSmooth");
+            m_Acceleration = serializedObject.FindProperty("m_Acceleration");
+
             m_ActionsList = new ReorderableList(serializedObject, serializedObject.FindProperty("m_Actions"), true, true, true, true);
 
 
@@ -90,6 +97,10 @@ namespace CharacterController
                 EditorGUILayout.PropertyField(m_GroundSpeed);
                 EditorGUILayout.PropertyField(m_SkinWidth);
                 EditorGUILayout.PropertyField(m_SlopeLimit);
+
+                EditorGUILayout.PropertyField(m_StepOffset);
+                EditorGUILayout.PropertyField(m_StepSmooth);
+                EditorGUILayout.PropertyField(m_Acceleration);
             }
 
             m_Actions.isExpanded = EditorGUILayout.Foldout(m_Actions.isExpanded, m_Actions.displayName);
@@ -159,6 +170,7 @@ namespace CharacterController
                 SerializedProperty element = l.serializedProperty.GetArrayElementAtIndex(l.index);
                 //m_SelectedAction = new SerializedObject(element.objectReferenceValue);
                 m_SelectedAction = (CharacterAction)element.objectReferenceValue;
+
                 EditorUtility.SetDirty(m_SelectedAction);
             };
 

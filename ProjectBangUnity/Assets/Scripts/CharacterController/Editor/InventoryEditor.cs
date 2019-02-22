@@ -1,4 +1,4 @@
-namespace CharacterController
+﻿namespace CharacterController
 {
     using UnityEngine;
     using UnityEditor;
@@ -152,7 +152,7 @@ namespace CharacterController
             SerializedProperty m_Equip = element.FindPropertyRelative("m_Equip");
             Item itemType = (Item)m_Item.objectReferenceValue;
 
-            //EditorGUI.LabelField(rect, m_Inventory.DefaultLoadout[index].Item.ItemName);
+            //EditorGUI.LabelField(rect, m_Inventory.DefaultLoadout[index].Item.ItemAnimName);
 
             //  Item Scriptableobject
             rect.width = elementRect.width * 0.95f - intFieldWidth - 4;

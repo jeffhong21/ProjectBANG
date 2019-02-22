@@ -209,7 +209,8 @@
             if (rigb && !hit.transform.gameObject.isStatic){
                 //rigb.AddForce(transform.forward * m_HitscanImpactForce, ForceMode.Impulse);
                 var hitDirection = rigb.transform.position - m_FirePoint.position;
-                rigb.AddForceAtPosition(hitDirection.normalized * (m_HitscanImpactForce * m_ImpactForceMultiplier), hit.point, ForceMode.Acceleration);
+                rigb.AddForceAtPosition(hitDirection.normalized * m_HitscanImpactForce, hit.point, ForceMode.Impulse);
+                //rigb.AddExplosionForce(500f, hitDirection, 50f);
             }
         }
 
