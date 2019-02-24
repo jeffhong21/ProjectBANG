@@ -5,9 +5,7 @@
     using System.Collections;
     using JH_Utils;
 
-
-
-    [RequireComponent(typeof(Rigidbody), typeof(LayerManager))]
+    [RequireComponent(typeof(CapsuleCollider), typeof(Rigidbody), typeof(LayerManager))]
     public class CharacterLocomotion : MonoBehaviour
     {
         public event Action<bool> OnAim = delegate {};
@@ -32,12 +30,14 @@
         [SerializeField, HideInInspector]
         protected float m_SkinWidth = 0.08f;
         [SerializeField, HideInInspector]
-        protected float m_SlopeLimit = 120;
+        protected float m_SlopeLimit = 30f;
 
-        [SerializeField, HideInInspector, Range(0, 0.5f) ]
-        protected float m_StepOffset = 0.2f;
         [SerializeField, HideInInspector]
-        protected float m_StepSmooth = 4f;
+        protected float m_MaxStepHeight = 0.65f;
+        [SerializeField, HideInInspector, Range(0, 0.3f) ]
+        protected float m_StepOffset = 0.15f;
+        [SerializeField, HideInInspector]
+        protected float m_StepSpeed = 4f;
         [SerializeField, HideInInspector]
         protected float m_Acceleration = 20f;
 
@@ -50,20 +50,24 @@
         private CharacterAction m_CurrentAction;
 
 
-        protected PhysicMaterial m_MaxFrictionPhysics;  
-        protected PhysicMaterial m_FrictionPhysics;      
-        protected PhysicMaterial m_SlippyPhysics; 
+        protected PhysicMaterial m_GroundedIdleFrictionMaterial; 
+        protected PhysicMaterial m_GroundedMovingFrictionMaterial;
+        protected PhysicMaterial m_StepFrictionMaterial;
+        protected PhysicMaterial m_SlopeFrictionMaterial;
+        protected PhysicMaterial m_AirFrictionMaterial; 
+
+
 
         [Header("-- Debug --")]
         private bool m_Grounded = true;
         private bool m_Moving, m_Aiming, m_Running;
         private float m_Speed;
-        private float m_MoveAmount;
         Vector3 m_Velocity, m_CurrentVelocity, m_TargetVelocity;
         Vector3 m_MoveDirection;
+        [SerializeField]
         Vector3 m_InputVector;
         Quaternion m_LookRotation;
-        float m_StepOffsetMax = 0.65f;
+
 
         PlayerInput m_Input;
         AnimatorMonitor m_AnimationMonitor;
@@ -86,7 +90,7 @@
 
 
         float m_SlopeAngle;
-        float m_FwdDotProduct, m_RightDotProduct;
+
 
 
 
@@ -183,7 +187,7 @@
         public CharacterAction[] CharActions
         {
             get { return m_Actions; }
-            //set { m_Actions = value; }
+            set { m_Actions = value; }
         }
 
 
@@ -202,6 +206,10 @@
             m_GameObject = gameObject;
             m_Transform = transform;
             m_DeltaTime = Time.deltaTime;
+
+
+            if(m_Rigidbody == null) m_Rigidbody = m_GameObject.AddComponent<Rigidbody>();
+            if(m_Layers == null) m_Layers = m_GameObject.AddComponent<LayerManager>();
 
 
             m_LookAtPoint = new GameObject("LookAtPoint").transform; //.parent = gameObject.transform;
@@ -229,26 +237,35 @@
         {
             m_ActiveActions = new CharacterAction[m_Actions.Length];
 
-            // slides the character through walls and edges
-            m_FrictionPhysics = new PhysicMaterial();
-            m_FrictionPhysics.name = "frictionPhysics";
-            m_FrictionPhysics.staticFriction = .25f;
-            m_FrictionPhysics.dynamicFriction = .25f;
-            m_FrictionPhysics.frictionCombine = PhysicMaterialCombine.Multiply;
+            if(m_GroundedMovingFrictionMaterial == null){
+                // slides the character through walls and edges
+                m_GroundedMovingFrictionMaterial = new PhysicMaterial();
+                m_GroundedMovingFrictionMaterial.name = "GroundedMovingPhysics";
+                m_GroundedMovingFrictionMaterial.staticFriction = .25f;
+                m_GroundedMovingFrictionMaterial.dynamicFriction = .25f;
+                m_GroundedMovingFrictionMaterial.frictionCombine = PhysicMaterialCombine.Multiply;
+            }
 
-            // prevents the collider from slipping on ramps
-            m_MaxFrictionPhysics = new PhysicMaterial();
-            m_MaxFrictionPhysics.name = "maxFrictionPhysics";
-            m_MaxFrictionPhysics.staticFriction = 1f;
-            m_MaxFrictionPhysics.dynamicFriction = 1f;
-            m_MaxFrictionPhysics.frictionCombine = PhysicMaterialCombine.Maximum;
 
-            // air physics 
-            m_SlippyPhysics = new PhysicMaterial();
-            m_SlippyPhysics.name = "slippyPhysics";
-            m_SlippyPhysics.staticFriction = 0f;
-            m_SlippyPhysics.dynamicFriction = 0f;
-            m_SlippyPhysics.frictionCombine = PhysicMaterialCombine.Minimum;
+            if (m_GroundedMovingFrictionMaterial == null){
+                // prevents the collider from slipping on ramps
+                m_GroundedIdleFrictionMaterial = new PhysicMaterial();
+                m_GroundedIdleFrictionMaterial.name = "GroundedIdlePhysics";
+                m_GroundedIdleFrictionMaterial.staticFriction = 1f;
+                m_GroundedIdleFrictionMaterial.dynamicFriction = 1f;
+                m_GroundedIdleFrictionMaterial.frictionCombine = PhysicMaterialCombine.Maximum;
+            }
+
+
+            if (m_GroundedMovingFrictionMaterial == null){
+                // air physics 
+                m_AirFrictionMaterial = new PhysicMaterial();
+                m_AirFrictionMaterial.name = "AirFrictionPhysics";
+                m_AirFrictionMaterial.staticFriction = 0f;
+                m_AirFrictionMaterial.dynamicFriction = 0f;
+                m_AirFrictionMaterial.frictionCombine = PhysicMaterialCombine.Minimum;
+            }
+
 
             if (m_Input) m_Camera = CameraController.Instance.Camera;
         }
@@ -260,13 +277,8 @@
 		{
             if (m_DeltaTime == 0) return;
 
-            //if(m_Input){
-            //    UpdateSpeed();
-            //    //DebugActiveActions();
-            //}
 
             m_Grounded = CheckGround();
-
 
 
             if (m_Actions != null)
@@ -363,6 +375,9 @@
 
 
 
+
+
+
         private bool CheckGround()
         {
 
@@ -370,21 +385,21 @@
 
             // change the physics material to very slip when not grounded or maxFriction when is
             if (m_Grounded && m_InputVector == Vector3.zero)
-                m_CapsuleCollider.material = m_MaxFrictionPhysics;
+                m_CapsuleCollider.material = m_GroundedIdleFrictionMaterial;
             else if (m_Grounded && m_InputVector != Vector3.zero)
-                m_CapsuleCollider.material = m_FrictionPhysics;
+                m_CapsuleCollider.material = m_GroundedMovingFrictionMaterial;
             else
-                m_CapsuleCollider.material = m_SlippyPhysics;
+                m_CapsuleCollider.material = m_AirFrictionMaterial;
             
 
             if(m_Grounded)
             {
                 m_MoveDirection = m_Moving ? Vector3.Cross(m_Transform.right, m_GroundHit.normal) : Vector3.zero;
-                m_SlopeAngle = Vector3.Angle(m_Transform.forward, m_GroundHit.normal);
+                m_SlopeAngle = Vector3.Angle(m_Transform.forward, m_GroundHit.normal) - 90;
             }
             else{
                 m_MoveDirection = Vector3.zero;
-                m_SlopeAngle = 90;
+                m_SlopeAngle = 0;
             }
 
             Ray groundCheck = new Ray(m_Transform.position + Vector3.up * m_AlignToGroundDepthOffset, Vector3.down);
@@ -392,19 +407,19 @@
 
             if (Physics.Raycast(groundCheck, out m_GroundHit, m_AlignToGroundDepthOffset + m_SkinWidth, m_Layers.SolidLayer))
             {
-                var rayStart = (m_Transform.position + Vector3.up * m_StepOffsetMax) + m_Transform.forward * (m_CapsuleCollider.radius + m_SkinWidth);
-                var rayEnd = Vector3.down * (m_StepOffsetMax - m_StepOffset);
-                Ray rayStep = new Ray(rayStart, rayEnd);
+                var rayStart = (m_Transform.position + Vector3.up * m_MaxStepHeight) + m_Transform.forward * (m_CapsuleCollider.radius + m_SkinWidth);
+                var rayEnd = Vector3.down * (m_MaxStepHeight - m_StepOffset);
+
                 if (m_DrawDebugLine) Debug.DrawRay(rayStart, rayEnd, Color.yellow);
 
                 if(m_InputVector.sqrMagnitude > 0.1f && m_Grounded)
                 {
-                    if (Physics.Raycast(rayStep, out m_StepHit, m_StepOffsetMax - m_StepOffset, m_Layers.SolidLayer))
+                    if (Physics.Raycast(rayStart, rayEnd, out m_StepHit, m_MaxStepHeight - m_StepOffset, m_Layers.SolidLayer))
                     {
                         if (m_StepHit.point.y >= (m_Transform.position.y) && m_StepHit.point.y <= (m_Transform.position.y + m_StepOffset + m_SkinWidth))
                         {
-                            m_MoveDirection = (m_StepHit.point - m_Transform.position).normalized * m_StepSmooth * (m_Speed > 1 ? m_Speed : 1);
-                            m_Rigidbody.velocity = m_MoveDirection; // * m_StepSmooth * (m_Speed > 1 ? m_Speed : 1);// + (Vector3.up * m_StepOffset);
+                            m_MoveDirection = (m_StepHit.point - m_Transform.position).normalized * m_StepSpeed * (m_Speed > 1 ? m_Speed : 1);
+                            m_Rigidbody.velocity = m_MoveDirection; // * m_StepSpeed * (m_Speed > 1 ? m_Speed : 1);// + (Vector3.up * m_Step);
 
                             _stepColor = Color.magenta;
                         }
@@ -417,7 +432,7 @@
                 }
 
                 if (m_DrawDebugLine)
-                    Debug.DrawRay( m_Transform.position, m_MoveDirection * m_StepSmooth * (m_Speed > 1 ? m_Speed : 1), _stepColor);
+                    Debug.DrawRay( m_Transform.position, m_MoveDirection * m_StepSpeed * (m_Speed > 1 ? m_Speed : 1), _stepColor);
 
                 return true;
             }
@@ -488,32 +503,11 @@
                     m_Rigidbody.AddForce(m_MoveDirection * (m_Speed) * m_DeltaTime, ForceMode.VelocityChange);
                 }
 
-
-
-                //m_CurrentVelocity = m_Rigidbody.velocity;
-                //m_MoveAmount = Mathf.Clamp01(Mathf.Abs(m_InputVector.x) + Mathf.Abs(m_InputVector.y));
-                //if (m_MoveAmount > 0)
-                //{
-                //    m_TargetVelocity = m_Transform.forward * m_InputVector.z * m_GroundSpeed.z;
-                //    m_TargetVelocity += m_Transform.right * m_InputVector.x * m_GroundSpeed.x;
-                //    m_TargetVelocity = m_TargetVelocity.normalized * 2;
-                //    m_TargetVelocity.y = 0;
-                //}
-                //else
-                //{
-                //    m_TargetVelocity = Vector3.zero;
-                //}
-                //m_Velocity = Vector3.Lerp(m_CurrentVelocity, m_TargetVelocity, m_DeltaTime * 3);
-                //m_Rigidbody.velocity = m_Velocity;
-
-                //m_Velocity = m_Transform.forward * m_InputVector.z * m_GroundSpeed.z;
-                //m_Velocity += m_Transform.right * m_InputVector.x * m_GroundSpeed.x;
-                //m_Velocity.Normalize();
-                //m_Rigidbody.velocity = m_Velocity;
             }
 
             m_Moving = m_InputVector.sqrMagnitude > 0.1f;
         }
+
 
 
         private void UpdateAnimator()
@@ -521,6 +515,7 @@
             m_AnimationMonitor.SetForwardInputValue(m_InputVector.z * m_Speed);
             m_AnimationMonitor.SetHorizontalInputValue(m_InputVector.x * m_Speed);
             m_Animator.SetFloat(HashID.Speed, m_Speed);
+            m_Animator.SetBool(HashID.Moving, m_Moving);
         }
 
 
@@ -530,12 +525,17 @@
 
 		public void MoveCharacter(float horizontalMovement, float forwardMovement, Quaternion lookRotation)
         {
+            m_InputVector.x = horizontalMovement;
+            m_InputVector.y = m_Rigidbody.velocity.y;
+            m_InputVector.z = forwardMovement;
+            m_LookRotation = lookRotation;
+
             //if (Mathf.Abs(horizontalMovement) < 1 && Mathf.Abs(forwardMovement) < 1) return;
 
             m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Transform.rotation, lookRotation.normalized, m_RotationSpeed * m_DeltaTime));
             if (m_UseRootMotion)
             {
-                //m_MoveAmount = Mathf.Clamp01(Mathf.Abs(horizontalMovement) + Mathf.Abs(forwardMovement));
+
                 m_Velocity = m_Transform.forward * forwardMovement;
                 m_Velocity += m_Transform.right * horizontalMovement;
                 m_Velocity.Normalize();
@@ -654,83 +654,6 @@
 
 
 
-        private void UpdateActions_Orignial()
-        {
-            if (m_Actions != null)
-            {
-                for (int i = 0; i < m_Actions.Length; i++)
-                {
-                    //  Cache current action.
-                    if (m_Actions[i] == null) continue;
-                    //  Cache the current action.
-                    m_CurrentAction = m_Actions[i];
-
-
-                    //  Update the current action.
-                    m_CurrentAction.UpdateAction();
-
-                    //  If active action is active, try to stop it.
-                    if (m_ActiveAction)
-                    {
-                        //Debug.LogFormat("Active action is {0}", m_ActiveAction.GetType().Name);
-                        //  Check if we can stop the current action.
-                        if (m_ActiveAction.CanStopAction())
-                        {
-                            //  Start the Action and update the animator.
-                            m_ActiveAction.UpdateAnimator();
-                            m_ActiveAction.StopAction();
-
-                            //  Reset the active action.
-                            m_ActiveAction = null;
-                            m_ActiveActions[i] = null;
-                        }
-                        //  If there is an active action and the current action is concurrent.
-                        else if (m_CurrentAction.IsConcurrentAction())
-                        {
-                            //  Check if we can start the action.
-                            if (m_CurrentAction.CanStartAction())
-                            {
-                                //  Start the Action and update the animator.
-                                m_CurrentAction.UpdateAnimator();
-                                m_CurrentAction.StartAction();
-                            }
-                        }
-                    }
-                    //  If there is no active action, try to start current action.
-                    else
-                    {
-                        //  Check if we can start the action.
-                        if (m_CurrentAction.CanStartAction())
-                        {
-                            //  Start the Action and update the animator.
-                            m_CurrentAction.UpdateAnimator();
-                            m_CurrentAction.StartAction();
-                            //  Cache the active action.
-                            //  TODO:  Currently can't get out of toggle Actions if it isn't cached as Active action.
-                            //if( !m_CurrentAction.IsConcurrentAction())          
-                            //m_ActiveAction = m_CurrentAction;
-                            m_ActiveAction = m_CurrentAction;
-                            m_ActiveActions[i] = m_Actions[i];
-                            Debug.Log("Setting ActiveActions " + m_ActiveActions[i]);
-                        }
-                    }
-
-
-                    //  Reset the current action for this loop.
-                    m_CurrentAction = null;
-                }
-            }
-            if (m_UpdateRotation == false)
-            {
-                m_LookRotation = Quaternion.Euler(0, 0, 0);
-            }
-            //if(m_UpdateRotation) UpdateRotation();
-            MoveCharacter(RelativeInputVector.x, RelativeInputVector.z, m_LookRotation);
-        }
-
-
-
-
 
 
 
@@ -738,49 +661,6 @@
 		#region Debug 
 
 
-
-        //private void DebugActiveActions()
-        //{
-        //    if (Input.GetKeyDown(KeyCode.Q))
-        //    {
-        //        var actions = "Active Actions:\n";
-        //        foreach (var item in m_ActiveActions)
-        //        {
-        //            actions += string.Format("{0}\n", item == null ? "null" : item.GetType().Name);
-        //        }
-        //        Debug.Log(actions);
-        //    }
-        //    if (Input.GetKeyDown(KeyCode.Alpha1))
-        //    {
-        //        int index = 0;
-        //        Debug.LogFormat("{0} | Is active: {1}", m_Actions[index].GetType().Name, m_ActiveActions[index] == null ? "null" : m_ActiveActions[index].GetType().Name);
-        //    }
-        //    if (Input.GetKeyDown(KeyCode.Alpha2))
-        //    {
-        //        int index = 1;
-        //        Debug.LogFormat("{0} | Is active: {1}", m_Actions[index].GetType().Name, m_ActiveActions[index] == null ? "null" : m_ActiveActions[index].GetType().Name);
-        //    }
-        //    if (Input.GetKeyDown(KeyCode.Alpha3))
-        //    {
-        //        int index = 2;
-        //        Debug.LogFormat("{0} | Is active: {1}", m_Actions[index].GetType().Name, m_ActiveActions[index] == null ? "null" : m_ActiveActions[index].GetType().Name);
-        //    }
-        //    if (Input.GetKeyDown(KeyCode.Alpha4))
-        //    {
-        //        int index = 3;
-        //        Debug.LogFormat("{0} | Is active: {1}", m_Actions[index].GetType().Name, m_ActiveActions[index] == null ? "null" : m_ActiveActions[index].GetType().Name);
-        //    }
-        //    if (Input.GetKeyDown(KeyCode.Alpha5))
-        //    {
-        //        int index = 4;
-        //        Debug.LogFormat("{0} | Is active: {1}", m_Actions[index].GetType().Name, m_ActiveActions[index] == null ? "null" : m_ActiveActions[index].GetType().Name);
-        //    }
-        //    if (Input.GetKeyDown(KeyCode.Alpha6))
-        //    {
-        //        int index = 5;
-        //        Debug.LogFormat("{0} | Is active: {1}", m_Actions[index].GetType().Name, m_ActiveActions[index] == null ? "null" : m_ActiveActions[index].GetType().Name);
-        //    }
-        //}
 
 
 
@@ -814,53 +694,6 @@
 
 
 
-
-
-        //public void Move(float horizontalMovement, float forwardMovement, Quaternion lookRotation)
-        //{
-        //    //m_Animator.SetBool("Crouching", m_IsCrouching);
-        //    m_InputVector.Set(horizontalMovement, 0, forwardMovement);
-
-        //    if(horizontalMovement == 0 && forwardMovement == 0)
-        //    {
-        //        //transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, m_DeltaTime * m_RotationSpeed);
-        //        if (lookRotation != Quaternion.identity)
-        //            m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Rigidbody.rotation, lookRotation, m_DeltaTime * m_RotationSpeed));
-        //        m_Velocity = Vector3.zero;
-        //        m_Rigidbody.velocity = Vector3.zero;
-
-        //        //  Play Animation
-        //        m_AnimationMonitor.SetHorizontalInputValue(0);
-        //        m_AnimationMonitor.SetForwardInputValue(0);
-
-        //        //m_Animator.SetFloat("HorizontalInput", 0);
-        //        //m_Animator.SetFloat("ForwardInput", 0);
-        //        //m_Animator.SetBool("Moving", false);
-
-        //    }
-        //    else
-        //    {
-        //        m_Velocity.Set(m_GroundSpeed.x * m_InputVector.x, m_Rigidbody.velocity.y, m_GroundSpeed.z * m_InputVector.z);
-
-        //        if(lookRotation != Quaternion.identity)
-        //            m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Rigidbody.rotation, lookRotation, m_DeltaTime * m_RotationSpeed));
-        //        m_Rigidbody.MovePosition( transform.position + (m_Velocity.normalized * 2 * m_DeltaTime));
-
-
-        //        m_FwdDotProduct = Vector3.Dot(transform.forward, m_Velocity);
-        //        m_RightDotProduct = Vector3.Dot(transform.right, m_Velocity);
-
-        //        //  Play Animation
-        //        m_AnimationMonitor.SetHorizontalInputValue(m_RightDotProduct);
-        //        m_AnimationMonitor.SetForwardInputValue(m_FwdDotProduct);
-
-        //        //m_Animator.SetBool("Moving", true);
-        //        //m_Animator.SetFloat("HorizontalInput", m_RightDotProduct);
-        //        //m_Animator.SetFloat("ForwardInput", m_FwdDotProduct);
-        //    }
-
-        //    m_AngleVector3 = Vector3.Angle(transform.forward, transform.rotation * transform.forward);
-        //}
     }
 
 }

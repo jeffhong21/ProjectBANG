@@ -141,6 +141,7 @@ GameObject:
   - component: {fileID: 114608634134138704}
   - component: {fileID: 114134402579393908}
   - component: {fileID: 114786276463712790}
+  - component: {fileID: 114271638190619894}
   - component: {fileID: 114102256960092262}
   m_Layer: 10
   m_Name: Player_v02
@@ -277,6 +278,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4226517194447132}
+  - component: {fileID: 135039626562579204}
+  - component: {fileID: 114096396209103906}
   m_Layer: 10
   m_Name: Ankle_R
   m_TagString: Untagged
@@ -292,6 +295,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4157195832335922}
+  - component: {fileID: 135708225745471512}
+  - component: {fileID: 114700089850486596}
   m_Layer: 10
   m_Name: Ankle_L
   m_TagString: Untagged
@@ -1512,8 +1517,8 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1141768220188808}
-  m_LocalRotation: {x: -0, y: 0.9282894, z: -0, w: 0.3718586}
-  m_LocalPosition: {x: -3.53, y: 0, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.5, y: 0, z: 1.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4370930341478922}
@@ -1704,6 +1709,17 @@ MonoBehaviour:
   - {fileID: 4215629344895060}
   - {fileID: 4869774699660034}
   - {fileID: 4406298832063842}
+--- !u!114 &114096396209103906
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1290103908100940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b35342f7be0e4c26a043469a2f91bb3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114102256960092262
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1765,7 +1781,7 @@ MonoBehaviour:
     leftHip: {fileID: 0}
     rightHip: {fileID: 0}
   anim: {fileID: 95278574169747482}
-  meshRenderer: {fileID: 0}
+  meshRenderer: {fileID: 137591622708054598}
 --- !u!114 &114220855003856576
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1788,6 +1804,24 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   m_TimeInvincibleAfterSpawn: 0
+--- !u!114 &114271638190619894
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa7477202022244aca8f8b4dfa3d0348, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minVelocity: 0
+  footOffset: 0
+  interval: 0
+  debugTextureName: 1
+  m_leftFootTrigger: {fileID: 0}
+  m_reftFootTrigger: {fileID: 0}
+  m_currentStep: {fileID: 0}
 --- !u!114 &114311917172092944
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1820,11 +1854,8 @@ MonoBehaviour:
   heightFromGroundRaycast: 1.14
   raycastDownDistance: 1.5
   m_HipOffset: 0
-  m_HipsMovingPositionAdjustmentSpeed: 0.28
+  m_HipsMovingPositionAdjustmentSpeed: 0.84
   m_FootPositionAdjustmentSpeed: 0.5
-  leftFootAnimVariableName: LeftFootCurve
-  rightFootAnimVariableName: RightFootCurve
-  useProIkFeature: 0
   showSolverDebug: 0
 --- !u!114 &114429236655991950
 MonoBehaviour:
@@ -1977,6 +2008,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_ID: 1
   m_CustomEquipPoints: []
+--- !u!114 &114700089850486596
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1295697214705682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b35342f7be0e4c26a043469a2f91bb3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114752500204725904
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2077,8 +2119,9 @@ MonoBehaviour:
   m_GroundSpeed: {x: 1, y: 0, z: 1}
   m_SkinWidth: 0.08
   m_SlopeLimit: 120
+  m_MaxStepHeight: 0.65
   m_StepOffset: 0.15
-  m_StepSmooth: 4
+  m_StepSpeed: 1
   m_Acceleration: 20
   m_Actions:
   - {fileID: 114102256960092262}
@@ -2089,9 +2132,34 @@ MonoBehaviour:
   - {fileID: 114608634134138704}
   m_ActiveAction: {fileID: 0}
   m_ActiveActions: []
+  m_InputVector: {x: 0, y: 0, z: 0}
   m_DrawDebugLine: 0
   m_ShowComponents: 0
   m_SelectedAction: {fileID: 0}
+--- !u!135 &135039626562579204
+SphereCollider:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1290103908100940}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.1
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!135 &135708225745471512
+SphereCollider:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1295697214705682}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!136 &136461347018360410
 CapsuleCollider:
   m_ObjectHideFlags: 1
@@ -2101,7 +2169,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.25
+  m_Radius: 0.3
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
@@ -2120,7 +2188,7 @@ SkinnedMeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: 1dba2237e864148f99a2f7fab5de9cde, type: 2}
+  - {fileID: 2100000, guid: f343dcd6a3e4344d6ae1aef064e6d16e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2144,7 +2212,7 @@ SkinnedMeshRenderer:
   m_Quality: 0
   m_UpdateWhenOffscreen: 0
   m_SkinnedMotionVectors: 1
-  m_Mesh: {fileID: 4300010, guid: ad9b136e9ac104c66b5fb99ea52cfb13, type: 3}
+  m_Mesh: {fileID: 4300006, guid: ad9b136e9ac104c66b5fb99ea52cfb13, type: 3}
   m_Bones:
   - {fileID: 4060261611074538}
   - {fileID: 4062153608772630}

@@ -4,7 +4,7 @@
     using System;
     using System.Collections.Generic;
 
-    [RequireComponent(typeof(CharacterLocomotion))]
+
     public class CharacterIK : MonoBehaviour
     {
         private readonly float m_LookAtRayLength = 30;
@@ -83,10 +83,7 @@
         [Range(0, 1)] [SerializeField] private float m_HipsMovingPositionAdjustmentSpeed = 0.28f;
         [Range(0, 1)] [SerializeField] private float m_FootPositionAdjustmentSpeed = 0.5f;
 
-        public string leftFootAnimVariableName = "LeftFootCurve";
-        public string rightFootAnimVariableName = "RightFootCurve";
 
-        public bool useProIkFeature = false;
         public bool showSolverDebug = true;
 
 
@@ -214,10 +211,6 @@
             FeetPositionSolver(rightFootPosition, ref rightFootIkPosition, ref rightFootIkRotation); // handle the solver for right foot
             FeetPositionSolver(leftFootPosition, ref leftFootIkPosition, ref leftFootIkRotation); //handle the solver for the left foot
 
-            //rightHandPosition = m_RightHand.position;
-            //rightHandRotation = m_RightHand.rotation;
-            //rightHandTargetPosition = m_RightHandTarget.position;
-            //rightHandTargetRotation = m_RightHandTarget.rotation;
         }
 
 
@@ -272,19 +265,11 @@
 
             //right foot ik position and rotation -- utilise the pro features in here
             m_Animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1);
-            if (useProIkFeature)
-            {
-                m_Animator.SetIKRotationWeight(AvatarIKGoal.RightFoot, m_Animator.GetFloat(rightFootAnimVariableName));
-            }
             MoveFeetToIkPoint(AvatarIKGoal.RightFoot, rightFootIkPosition, rightFootIkRotation, ref lastRightFootPositionY);
 
 
             //left foot ik position and rotation -- utilise the pro features in here
             m_Animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1);
-            if (useProIkFeature)
-            {
-                m_Animator.SetIKRotationWeight(AvatarIKGoal.LeftFoot, m_Animator.GetFloat(leftFootAnimVariableName));
-            }
             MoveFeetToIkPoint(AvatarIKGoal.LeftFoot, leftFootIkPosition, leftFootIkRotation, ref lastLeftFootPositionY);
         }
 

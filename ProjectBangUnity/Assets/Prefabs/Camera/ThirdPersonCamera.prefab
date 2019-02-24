@@ -69,6 +69,7 @@ GameObject:
   - component: {fileID: 4903180862728622}
   - component: {fileID: 20746103284679522}
   - component: {fileID: 81808721213615164}
+  - component: {fileID: 114395464280231394}
   m_Layer: 0
   m_Name: Camera
   m_TagString: MainCamera
@@ -220,7 +221,7 @@ MonoBehaviour:
   m_Target: {fileID: 0}
   m_Pivot: {fileID: 4572819961280480}
   m_MouseSensitivity: 2
-  m_CameraState: {fileID: 11400000, guid: 7e6f7bf8d3f914d2c8b9d8f007b3c2a2, type: 2}
+  m_CameraState: {fileID: 11400000, guid: e82b040537bcb4a78b56a639a9fbdcac, type: 2}
   m_IsAiming: 0
   m_IsCrouching: 0
   m_LockCamera: 0
@@ -228,6 +229,18 @@ MonoBehaviour:
   m_Yaw: 0
   m_Pitch: 0
   m_CameraStateToggle: 1
+--- !u!114 &114395464280231394
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1662552086436872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff26db721962cdf4a8edcdfa9a767d2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  profile: {fileID: 11400000, guid: f6b5c3b03be4f4b48bddb761a81e2017, type: 2}
 --- !u!114 &114789476485691392
 MonoBehaviour:
   m_ObjectHideFlags: 1

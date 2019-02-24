@@ -27,7 +27,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseColorRGBOutlineWidthA:
-        m_Texture: {fileID: 2800000, guid: b7f7913d478835e4f8d8010a13c8546a, type: 3}
+        m_Texture: {fileID: 2800000, guid: a70ee0408280c0540834992618cd9948, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -55,7 +55,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Highlight:
-        m_Texture: {fileID: 2800000, guid: 21b5ffb8e2af142d48f6d9ddc154c13d, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
@@ -100,8 +100,8 @@ Material:
     - _AOuv: 0
     - _ASEOutlineWidth: 0.01
     - _AmbientPower: 0
-    - _BaseCellOffset: -0.62
-    - _BaseCellSharpness: 0.093
+    - _BaseCellOffset: -0.16
+    - _BaseCellSharpness: 0.339
     - _Brightness: 0
     - _BumpScale: 1
     - _ColorCorrectionEnable: 0
@@ -131,7 +131,7 @@ Material:
     - _HFogEnable: 0
     - _HighlightCellOffset: -0.95
     - _HighlightCellSharpness: 0.01
-    - _IndirectDiffuseContribution: 0.62
+    - _IndirectDiffuseContribution: 0.354
     - _IndirectSpecularContribution: 1
     - _LMPower: 0
     - _LightSmoothness: 0.557
@@ -162,7 +162,7 @@ Material:
     - _RealtimeShadow: 0
     - _RimEnable: 0
     - _RimIntensity: 0.028
-    - _RimOffset: 0.183
+    - _RimOffset: 0.266
     - _RimPower: 1
     - _RimSize: 1.09
     - _RimSmoothness: 0.387
@@ -203,9 +203,9 @@ Material:
     - _SrcBlend: 1
     - _StaticHighLights: 0
     - _TessMax: 25
-    - _TessMin: 10
+    - _TessMin: 100
     - _TessPhongStrength: 0.5
-    - _TessValue: 6.6
+    - _TessValue: 7
     - _UVSec: 0
     - _UnityFogEnable: 0
     - _ZWrite: 1

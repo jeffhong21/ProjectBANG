@@ -67,17 +67,22 @@ namespace CharacterController
             m_Inventory = GetComponent<Inventory>();
             m_ItemAction = GetComponent<ItemActionManager>();
 
-            if (m_CameraController)
-            {
-                m_CameraController = Instantiate(m_CameraController) as CameraController;
-                m_CameraController.m_Target = gameObject;
-            }
+
 
             m_LayerMask = ~(1 << gameObject.layer);
         }
 
 
-        public virtual float GetAxis(string name){
+		private void Start()
+		{
+            if(CameraController.Instance == null && m_CameraController){
+                m_CameraController = Instantiate(m_CameraController) as CameraController;
+                m_CameraController.SetMainTarget(transform);
+            }
+		}
+
+
+		public virtual float GetAxis(string name){
             return Input.GetAxis(name);
         }
 
@@ -246,8 +251,8 @@ namespace CharacterController
             {
                 if(CameraController.Instance != null){
                     CameraController.LockRotation = !CameraController.LockRotation;
-                    if (CameraController.LockRotation)
-                        Debug.LogFormat(" -- Locking Camera Rotation -- ");
+                    //if (CameraController.LockRotation)
+                        //Debug.LogFormat(" -- Locking Camera Rotation -- ");
                 }
             }
         }

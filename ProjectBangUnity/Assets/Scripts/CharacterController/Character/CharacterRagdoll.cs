@@ -7,6 +7,7 @@
 
     public class CharacterRagdoll : MonoBehaviour
     {
+        protected CharacterLocomotion m_Controller;
         protected Rigidbody m_Rigidbody;
         protected Collider m_Collider;
         protected Animator m_Aniimator;
@@ -22,6 +23,7 @@
 
         private void Awake()
         {
+            m_Controller = GetComponent<CharacterLocomotion>();
             m_Rigidbody = GetComponent<Rigidbody>();
             m_Collider = GetComponent<Collider>();
             m_Aniimator = GetComponent<Animator>();
@@ -83,6 +85,7 @@
             EnableRagdoll_Actual(position, direction);
 
             yield return new WaitForEndOfFrame();
+            m_Controller.enabled = false;
             m_Aniimator.enabled = false; //  this will stop ragdolls from exploding.
             m_Collider.enabled = false;
             m_Rigidbody.isKinematic = true;

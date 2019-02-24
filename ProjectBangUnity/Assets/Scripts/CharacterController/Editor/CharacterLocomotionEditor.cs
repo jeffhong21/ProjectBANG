@@ -38,8 +38,9 @@ namespace CharacterController
         private SerializedProperty m_SkinWidth;
         private SerializedProperty m_SlopeLimit;
 
+        private SerializedProperty m_MaxStepHeight;
         private SerializedProperty m_StepOffset;
-        private SerializedProperty m_StepSmooth;
+        private SerializedProperty m_StepSpeed;
         private SerializedProperty m_Acceleration;
 
 
@@ -68,8 +69,9 @@ namespace CharacterController
             m_SkinWidth = serializedObject.FindProperty("m_SkinWidth");
             m_SlopeLimit = serializedObject.FindProperty("m_SlopeLimit");
 
+            m_MaxStepHeight = serializedObject.FindProperty("m_MaxStepHeight");
             m_StepOffset = serializedObject.FindProperty("m_StepOffset");
-            m_StepSmooth = serializedObject.FindProperty("m_StepSmooth");
+            m_StepSpeed = serializedObject.FindProperty("m_StepSpeed");
             m_Acceleration = serializedObject.FindProperty("m_Acceleration");
 
             m_ActionsList = new ReorderableList(serializedObject, serializedObject.FindProperty("m_Actions"), true, true, true, true);
@@ -98,10 +100,14 @@ namespace CharacterController
                 EditorGUILayout.PropertyField(m_SkinWidth);
                 EditorGUILayout.PropertyField(m_SlopeLimit);
 
+                EditorGUILayout.PropertyField(m_MaxStepHeight);
                 EditorGUILayout.PropertyField(m_StepOffset);
-                EditorGUILayout.PropertyField(m_StepSmooth);
+                EditorGUILayout.PropertyField(m_StepSpeed);
                 EditorGUILayout.PropertyField(m_Acceleration);
             }
+
+            EditorGUILayout.Space();
+
 
             m_Actions.isExpanded = EditorGUILayout.Foldout(m_Actions.isExpanded, m_Actions.displayName);
             if (m_Actions.isExpanded) DrawReorderableList<CharacterAction>(m_ActionsList);
@@ -110,7 +116,9 @@ namespace CharacterController
 
             DrawPropertiesExcluding(serializedObject, m_DontIncude);
             m_ShowComponents = EditorGUILayout.ToggleLeft(new GUIContent("Show Action Components"), serializedObject.FindProperty("m_ShowComponents").boolValue);  // serializedObject.FindProperty("m_ShowComponents").boolValue
-            for (int i = 0; i < m_Controller.CharActions.Length; i++)
+            if(m_Controller.CharActions != null)
+            {
+                for (int i = 0; i < m_Controller.CharActions.Length; i++)
             {
                 if( m_ShowComponents == false && m_Controller.CharActions[i].hideFlags == HideFlags.None){
                     m_Controller.CharActions[i].hideFlags = HideFlags.HideInInspector;
@@ -126,6 +134,8 @@ namespace CharacterController
             //    m_Controller.CharActions[i].hideFlags = HideFlags.HideInInspector;
             //}
 
+
+            }
 
 
 

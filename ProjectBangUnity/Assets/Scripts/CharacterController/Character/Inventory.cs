@@ -120,10 +120,18 @@
 		{
             //  Setup item hands slots.
             ItemEquipSlot[] itemSlots = GetComponentsInChildren<ItemEquipSlot>();
-            for (int i = 0; i < itemSlots.Length; i++){
-                if (itemSlots[i].ID == 0) m_EquipPoints.RightHandSlot = itemSlots[i];
-                if (itemSlots[i].ID == 1) m_EquipPoints.LeftHandSlot = itemSlots[i];
+            if (itemSlots.Length == 0){
+                var rightHand = m_Animator.GetBoneTransform(HumanBodyBones.RightHand);
             }
+
+            if(itemSlots.Length > 0){
+                for (int i = 0; i < itemSlots.Length; i++)
+                {
+                    if (itemSlots[i].ID == 0) m_EquipPoints.RightHandSlot = itemSlots[i];
+                    if (itemSlots[i].ID == 1) m_EquipPoints.LeftHandSlot = itemSlots[i];
+                }
+            }
+
 		}
 
 

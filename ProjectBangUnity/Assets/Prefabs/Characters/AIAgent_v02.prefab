@@ -1846,6 +1846,9 @@ MonoBehaviour:
   m_GroundSpeed: {x: 1, y: 0, z: 1}
   m_SkinWidth: 0.08
   m_SlopeLimit: 120
+  m_StepOffset: 0.15
+  m_StepSmooth: 4
+  m_Acceleration: 20
   m_Actions:
   - {fileID: 114616004797550368}
   - {fileID: 114470667466529952}
@@ -1853,7 +1856,6 @@ MonoBehaviour:
   m_ActiveActions: []
   m_DrawDebugLine: 0
   m_ShowComponents: 1
-  m_DebugActiveActions: 0
   m_SelectedAction: {fileID: 0}
 --- !u!114 &114999616151661266
 MonoBehaviour:
@@ -1919,7 +1921,7 @@ SkinnedMeshRenderer:
   m_Quality: 0
   m_UpdateWhenOffscreen: 0
   m_SkinnedMotionVectors: 1
-  m_Mesh: {fileID: 4300002, guid: ad9b136e9ac104c66b5fb99ea52cfb13, type: 3}
+  m_Mesh: {fileID: 4300014, guid: ad9b136e9ac104c66b5fb99ea52cfb13, type: 3}
   m_Bones:
   - {fileID: 4060261611074538}
   - {fileID: 4062153608772630}

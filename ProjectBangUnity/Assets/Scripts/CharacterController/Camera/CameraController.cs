@@ -10,6 +10,8 @@
 
     public class CameraController : MonoBehaviour
     {
+        public enum ViewTypes { ThirdPerson, Topdown };
+
         private static CameraController m_Instance;
         private static bool m_LockRotation;
 
@@ -27,7 +29,7 @@
         private Image m_Crosshair;
         [SerializeField]
         private bool m_LockCursor;
-        public GameObject m_Target;
+        public Transform m_Target;
         [SerializeField]
         private Transform m_Pivot;
         [SerializeField]
@@ -87,25 +89,28 @@
         }
 
 
-		public void Start()
-		{
-            if(m_Target != null){
-                m_Controller = m_Target.GetComponent<CharacterLocomotion>();
-            }
-
-            Cursor.lockState = m_LockCursor ? CursorLockMode.Locked : CursorLockMode.Confined;
-		}
-
-
 		private void OnEnable()
 		{
             //EventHandler.RegisterEvent<float, Vector3, Vector3, GameObject>(m_GameObject, "OnTakeDamage", OnTakeDamage);
+            Cursor.lockState = m_LockCursor ? CursorLockMode.Locked : CursorLockMode.Confined;
 		}
 
 		private void OnDisable()
 		{
 			
 		}
+
+
+        public void SetMainTarget(Transform target)
+        {
+            m_Target = target;
+            m_Controller = m_Target.gameObject.GetComponent<CharacterLocomotion>();
+        }
+
+        public void SetTarget(Transform target)
+        {
+            m_Target = target;
+        }
 
 
 		public void LateUpdate()
@@ -119,11 +124,11 @@
 
             float speed = m_IsAiming ? m_CameraState.AimSpeed : m_CameraState.MoveSpeed;
 
-            m_TargetPosition = Vector3.Lerp(m_Transform.position, m_Target.transform.position, speed * Time.deltaTime);
+            m_TargetPosition = Vector3.Lerp(m_Transform.position, m_Target.position, speed * Time.deltaTime);
             m_Transform.position = m_TargetPosition;
 
 
-            if(m_Crosshair){
+            if(m_Crosshair && m_Controller != null){
                 m_Crosshair.enabled = m_Controller.Aiming;
             }
         }
@@ -157,6 +162,7 @@
             m_CameraPosition.z = targetZ;
 
             float time = Time.deltaTime * m_CameraState.AdaptSpeed;
+
             m_Pivot.localPosition = Vector3.Lerp(m_Pivot.localPosition, m_PivotPosition, time);
             m_Camera.transform.localPosition = Vector3.Lerp(m_Camera.transform.localPosition, m_CameraPosition, time);
         }
@@ -180,7 +186,7 @@
                 m_SmoothPitch = m_Pitch;
             }
 
-            //eulerYAngle = Mathf.SmoothDampAngle(m_Transform.eulerAngles.y, m_Target.transform.eulerAngles.y, ref rotationVel, m_CameraState.TurnSmooth);
+            //eulerYAngle = Mathf.SmoothDampAngle(m_Transform.eulerAngles.y, m_Target.eulerAngles.y, ref rotationVel, m_CameraState.TurnSmooth);
             //m_Transform.rotation = Quaternion.Slerp(m_Transform.rotation, Quaternion.Euler(0, eulerYAngle, 0), m_CameraState.YawRotateSpeed * Time.deltaTime);
 
 
@@ -215,6 +221,7 @@
             m_Transform.rotation = m_TargetRotation;
             //  Update the camera pivot.
             m_Pivot.localRotation = Quaternion.Euler(m_SmoothPitch - m_CameraState.PivotRotationOffset, 0, 0);
+            //m_Pivot.localRotation *= Quaternion.Euler(m_SmoothPitch - m_CameraState.PivotRotationOffset, 0, 0);
 
         }
 

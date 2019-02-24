@@ -126,7 +126,7 @@
 
         protected void OnEnable()
 		{
-            //this.hideFlags = HideFlags.HideInInspector;
+            this.hideFlags = HideFlags.HideInInspector;
 		}
 
         protected void OnDisable()
