@@ -21,14 +21,19 @@ namespace CharacterController
 
         public override bool CanStartAction()
         {
-            if(CheckGround() == false){
-                if(m_MinFallHeight < 1){
-                    return true;
-                }
-                if (Physics.Raycast(m_Transform.position, Vector3.down, m_MinFallHeight, m_Layers.SolidLayer)){
-                    return true;
-                }
+            if(Mathf.Abs(m_Rigidbody.velocity.y) > m_MinFallHeight ){
+                return true;
             }
+
+
+            //if(CheckGround() == false){
+            //    if(m_MinFallHeight < 1){
+            //        return true;
+            //    }
+            //    if (Physics.Raycast(m_Transform.position, Vector3.down, m_MinFallHeight, m_Layers.SolidLayer)){
+            //        return true;
+            //    }
+            //}
             return false;
         }
 
@@ -36,10 +41,21 @@ namespace CharacterController
 		public override bool CanStopAction()
 		{
             
-            if (Physics.Raycast(m_Transform.position, Vector3.down, 1, m_Layers.SolidLayer) )
+            //if (Physics.Raycast(m_Transform.position, Vector3.down, 10, m_Layers.SolidLayer) )
+            //{
+            //    return true;
+            //}
+
+            //if (CheckGround())
+            //{
+            //    return true;
+            //}
+
+            if (m_Rigidbody.velocity.y == 0)
             {
                 return true;
             }
+
             return false;
 		}
 
@@ -62,8 +78,10 @@ namespace CharacterController
 
         protected override void ActionStopped()
         {
-            endFallPosition = m_Transform.position;
-            m_Heightfall = Vector3.Distance(startFallPosition, endFallPosition);
+            //endFallPosition = m_Transform.position;
+            //m_Heightfall = Vector3.Distance(startFallPosition, endFallPosition);
+
+            m_Heightfall = Mathf.Abs(m_Rigidbody.velocity.y);
             m_AnimatorMonitor.SetActionID(0);
         }
     }

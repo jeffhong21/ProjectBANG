@@ -62,11 +62,13 @@ namespace ActorSkins
             if(randomSkin){
                 meshRenderer.sharedMesh = skin.GetRandomSkin().sharedMesh;
                 //meshRenderer.sharedMaterial.SetTexture("_MainTex", characterSkinTexture[textureType]);
+                //meshRenderer.sharedMaterial.mainTexture = characterSkinTexture[textureType];
             }
             //  Use Mesh Provided from ActorSkin.
             else{
                 meshRenderer.sharedMesh = skin.mesh.sharedMesh;
                 //meshRenderer.sharedMaterial.SetTexture("_MainTex", characterSkinTexture[textureType]);
+                //meshRenderer.sharedMaterial.mainTexture = characterSkinTexture[textureType];
             }
 
         }

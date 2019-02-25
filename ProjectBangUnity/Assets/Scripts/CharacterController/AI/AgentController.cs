@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -19,6 +20,7 @@ namespace CharacterController.AI
         protected AgentContext m_Context;
         protected NavMeshAgentBridge m_NavMeshAgent;
         private CharacterLocomotion m_Controller;
+        private Animator m_Animator;
         private GameObject m_GameObject;
         private Transform m_Transform;
 
@@ -43,6 +45,7 @@ namespace CharacterController.AI
         private void Awake()
         {
             m_NavMeshAgent = GetComponent<NavMeshAgentBridge>();
+            m_Animator = GetComponent<Animator>();
             m_Context = new AgentContext(this, m_NavMeshAgent);
             m_Controller = GetComponent<CharacterLocomotion>();
             m_GameObject = gameObject;
@@ -55,7 +58,16 @@ namespace CharacterController.AI
 
 		private void Start()
 		{
-
+            var movementSetID = 0;
+            var percentage = UnityEngine.Random.Range(0, 101);
+            if (UnityEngine.Random.Range(0, 101) > 50){
+                if (UnityEngine.Random.Range(0, 101) > 50){
+                    movementSetID = -1;
+                } else {
+                    movementSetID = -2;
+                }
+            } 
+            m_Animator.SetInteger(HashID.MovementSetID, movementSetID);
 		}
 
 		private void OnEnable()
@@ -83,7 +95,7 @@ namespace CharacterController.AI
                         m_NavMeshAgent.StopMoving();
                         m_Context.hasDestination = false;
                         UpdateStateIndicator(idleState);
-                        m_nextUpdate = m_Time + m_CheckRate + Random.Range(0f, 2f);
+                        m_nextUpdate = m_Time + m_CheckRate + UnityEngine.Random.Range(0f, 2f);
                     }
 
                 }
@@ -94,7 +106,7 @@ namespace CharacterController.AI
                         m_Context.hasDestination = true;
 
 
-                        m_Controller.Running = DetermineAgentMoveType(50);
+                        m_Controller.Running = DetermineAgentMoveType(75);
                     }
                 }
 
@@ -111,7 +123,7 @@ namespace CharacterController.AI
         private bool RandomWanderTarget(float range, out Vector3 result)
         {
             NavMeshHit navHit;
-            Vector3 randomPoint = m_Transform.position + (Random.onUnitSphere.normalized * range);
+            Vector3 randomPoint = m_Transform.position + (UnityEngine.Random.onUnitSphere.normalized * range);
             randomPoint.y = 0;
 
             if (NavMesh.SamplePosition(randomPoint, out navHit, 5f, NavMesh.AllAreas))
@@ -134,7 +146,7 @@ namespace CharacterController.AI
 
 
         private bool DetermineAgentMoveType(int threshhold){
-            var randomValue = Random.Range(0, 100);
+            var randomValue = UnityEngine.Random.Range(0, 100);
             if (randomValue > threshhold){
                 UpdateStateIndicator(runningState);
                 return true;

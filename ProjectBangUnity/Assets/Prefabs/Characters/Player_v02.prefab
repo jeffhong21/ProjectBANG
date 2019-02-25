@@ -143,6 +143,7 @@ GameObject:
   - component: {fileID: 114786276463712790}
   - component: {fileID: 114271638190619894}
   - component: {fileID: 114102256960092262}
+  - component: {fileID: 114515745106380408}
   m_Layer: 10
   m_Name: Player_v02
   m_TagString: Player
@@ -278,8 +279,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4226517194447132}
-  - component: {fileID: 135039626562579204}
-  - component: {fileID: 114096396209103906}
   m_Layer: 10
   m_Name: Ankle_R
   m_TagString: Untagged
@@ -295,8 +294,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4157195832335922}
-  - component: {fileID: 135708225745471512}
-  - component: {fileID: 114700089850486596}
   m_Layer: 10
   m_Name: Ankle_L
   m_TagString: Untagged
@@ -357,6 +354,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4520061233418272}
+  - component: {fileID: 135924659862574544}
+  - component: {fileID: 114281062523916406}
   m_Layer: 10
   m_Name: Ball_R
   m_TagString: Untagged
@@ -508,6 +507,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4995351592264486}
+  - component: {fileID: 135165146506796760}
+  - component: {fileID: 114978308396178828}
   m_Layer: 10
   m_Name: Ball_L
   m_TagString: Untagged
@@ -1709,17 +1710,6 @@ MonoBehaviour:
   - {fileID: 4215629344895060}
   - {fileID: 4869774699660034}
   - {fileID: 4406298832063842}
---- !u!114 &114096396209103906
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1290103908100940}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b35342f7be0e4c26a043469a2f91bb3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114102256960092262
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1771,8 +1761,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 961839ed55f144df395c44935ee66d70, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skin: {fileID: 11400000, guid: 623108bd7d2124a7ea8dd6cb5d36eed9, type: 2}
-  randomSkin: 1
+  skin: {fileID: 11400000, guid: e064ef4507cd9447dbaabfc1b8e90f60, type: 2}
+  randomSkin: 0
   slots:
     head: {fileID: 0}
     neck: {fileID: 0}
@@ -1815,13 +1805,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa7477202022244aca8f8b4dfa3d0348, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minVelocity: 0
-  footOffset: 0
-  interval: 0
+  minVelocity: 0.8
+  footOffset: 0.1
+  interval: 0.3
+  m_RightDecal: {fileID: 1455016260013104, guid: ec21979b8c63b48b7805fc653eeeff9f,
+    type: 2}
+  m_LeftDecal: {fileID: 1991509024244254, guid: 008144400badb4c9e8447d4d56138c2f,
+    type: 2}
   debugTextureName: 1
-  m_leftFootTrigger: {fileID: 0}
-  m_reftFootTrigger: {fileID: 0}
+  m_leftFootTrigger: {fileID: 114978308396178828}
+  m_rightFootTrigger: {fileID: 114281062523916406}
   m_currentStep: {fileID: 0}
+--- !u!114 &114281062523916406
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1485629515918786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b35342f7be0e4c26a043469a2f91bb3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  footStepObject:
+    ID: 0
+    name: FootPrint_R
+    sender: {fileID: 0}
+    ground: {fileID: 0}
+    terrain: {fileID: 0}
+    renderer: {fileID: 0}
 --- !u!114 &114311917172092944
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1922,6 +1934,22 @@ MonoBehaviour:
   m_ActionID: 1
   m_StateHash: 0
   m_IsActive: 0
+--- !u!114 &114515745106380408
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09fdbb03b976849eca937d6491ebbf4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  normalizeTime: 0
+  shortNameHash: 0
+  state: 
+  PistolAimHash: 0
+  RifleEquipHash: 0
 --- !u!114 &114518044546574396
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2008,17 +2036,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_ID: 1
   m_CustomEquipPoints: []
---- !u!114 &114700089850486596
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1295697214705682}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b35342f7be0e4c26a043469a2f91bb3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114752500204725904
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2133,29 +2150,49 @@ MonoBehaviour:
   m_ActiveAction: {fileID: 0}
   m_ActiveActions: []
   m_InputVector: {x: 0, y: 0, z: 0}
+  _rigidbodyVelocity: {x: 0, y: 0, z: 0}
+  _rigidbodyAngularVelocity: {x: 0, y: 0, z: 0}
   m_DrawDebugLine: 0
   m_ShowComponents: 0
   m_SelectedAction: {fileID: 0}
---- !u!135 &135039626562579204
+--- !u!114 &114978308396178828
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1683485818438374}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b35342f7be0e4c26a043469a2f91bb3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  footStepObject:
+    ID: 1
+    name: FootPrint_L
+    sender: {fileID: 0}
+    ground: {fileID: 0}
+    terrain: {fileID: 0}
+    renderer: {fileID: 0}
+--- !u!135 &135165146506796760
 SphereCollider:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1290103908100940}
+  m_GameObject: {fileID: 1683485818438374}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!135 &135708225745471512
+--- !u!135 &135924659862574544
 SphereCollider:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1295697214705682}
+  m_GameObject: {fileID: 1485629515918786}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.1
@@ -2212,7 +2249,7 @@ SkinnedMeshRenderer:
   m_Quality: 0
   m_UpdateWhenOffscreen: 0
   m_SkinnedMotionVectors: 1
-  m_Mesh: {fileID: 4300006, guid: ad9b136e9ac104c66b5fb99ea52cfb13, type: 3}
+  m_Mesh: {fileID: 4300010, guid: ad9b136e9ac104c66b5fb99ea52cfb13, type: 3}
   m_Bones:
   - {fileID: 4060261611074538}
   - {fileID: 4062153608772630}

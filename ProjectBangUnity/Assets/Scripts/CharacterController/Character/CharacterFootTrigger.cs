@@ -9,6 +9,7 @@ namespace CharacterController
     {
         protected Collider trigger;
         protected CharacterFootsteps m_Footsteps;
+        [SerializeField]
         protected FootStepObject footStepObject;
 
 
@@ -25,7 +26,7 @@ namespace CharacterController
         {
             if(trigger == null) trigger = GetComponent<SphereCollider>();
             trigger.isTrigger = true;
-            footStepObject = new FootStepObject(transform);
+            //footStepObject = new FootStepObject(transform);
         }
 
 

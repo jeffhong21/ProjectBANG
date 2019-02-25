@@ -687,7 +687,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1761652248440620
 GameObject:
   m_ObjectHideFlags: 0
@@ -1668,7 +1668,7 @@ MeshRenderer:
   m_GameObject: {fileID: 1760482892714718}
   m_Enabled: 1
   m_CastShadows: 1
-  m_ReceiveShadows: 1
+  m_ReceiveShadows: 0
   m_DynamicOccludee: 1
   m_MotionVectors: 1
   m_LightProbeUsage: 1
@@ -2086,7 +2086,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   m_positionInterpolationSpeed: 30
-  m_AutoBraking: 1
+  m_AutoBraking: 0
   m_DrawDebugLines: 0
   m_InputVector: {x: 0, y: 0, z: 0}
   arriveRamp: 0
@@ -2296,6 +2296,8 @@ MonoBehaviour:
   m_ActiveAction: {fileID: 0}
   m_ActiveActions: []
   m_InputVector: {x: 0, y: 0, z: 0}
+  _rigidbodyVelocity: {x: 0, y: 0, z: 0}
+  _rigidbodyAngularVelocity: {x: 0, y: 0, z: 0}
   m_DrawDebugLine: 0
   m_ShowComponents: 0
   m_SelectedAction: {fileID: 0}
@@ -2443,7 +2445,7 @@ SkinnedMeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: 1dba2237e864148f99a2f7fab5de9cde, type: 2}
+  - {fileID: 2100000, guid: f343dcd6a3e4344d6ae1aef064e6d16e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2467,7 +2469,7 @@ SkinnedMeshRenderer:
   m_Quality: 0
   m_UpdateWhenOffscreen: 0
   m_SkinnedMotionVectors: 1
-  m_Mesh: {fileID: 4300012, guid: ad9b136e9ac104c66b5fb99ea52cfb13, type: 3}
+  m_Mesh: {fileID: 4300006, guid: ad9b136e9ac104c66b5fb99ea52cfb13, type: 3}
   m_Bones:
   - {fileID: 4756614858799874}
   - {fileID: 4741954931594854}

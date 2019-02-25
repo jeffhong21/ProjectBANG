@@ -210,7 +210,7 @@
                 //rigb.AddForce(transform.forward * m_HitscanImpactForce, ForceMode.Impulse);
                 var hitDirection = rigb.transform.position - m_FirePoint.position;
                 rigb.AddForceAtPosition(hitDirection.normalized * m_HitscanImpactForce, hit.point, ForceMode.Impulse);
-                //rigb.AddExplosionForce(500f, hitDirection, 50f);
+                //rigb.AddExplosionForce(m_HitscanImpactForce, hitDirection, 50f);
             }
         }
 

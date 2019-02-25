@@ -54,7 +54,7 @@
         protected PhysicMaterial m_GroundedMovingFrictionMaterial;
         protected PhysicMaterial m_StepFrictionMaterial;
         protected PhysicMaterial m_SlopeFrictionMaterial;
-        protected PhysicMaterial m_AirFrictionMaterial; 
+        protected PhysicMaterial m_AirFrictionMaterial;
 
 
 
@@ -67,6 +67,11 @@
         [SerializeField]
         Vector3 m_InputVector;
         Quaternion m_LookRotation;
+
+        [Header("-- Rigidbody Debug --")]
+
+        [SerializeField] private Vector3 _rigidbodyVelocity;
+        [SerializeField] private Vector3 _rigidbodyAngularVelocity;
 
 
         PlayerInput m_Input;
@@ -233,6 +238,16 @@
 		}
 
 
+        public void PlayInteractAnimation()
+        {
+            var actionIntId = UnityEngine.Random.Range(0, 3);
+            m_Animator.SetInteger(HashID.ActionIntData, actionIntId);
+            //m_Animator.CrossFade("Pickup_Item.Pickup_Item_Ground", 0.2f, 0);
+            m_Animator.CrossFade("Pickup_Item.OnEntry", 0.2f, 0);
+            Debug.Log("Playing Animation " + Animator.StringToHash("Pickup_Item.Pickup_Item_Ground") + " | ID: " + actionIntId );
+        }
+
+
 		protected void Start()
         {
             m_ActiveActions = new CharacterAction[m_Actions.Length];
@@ -367,6 +382,8 @@
 
         private void FixedUpdate()
         {
+            _rigidbodyVelocity = m_Rigidbody.velocity;
+            _rigidbodyAngularVelocity = m_Rigidbody.angularVelocity;
             if (m_UpdateRotation) UpdateRotation();
             if (m_UpdateMovement) UpdateMovement();
             if (m_UpdateAnimator) UpdateAnimator();

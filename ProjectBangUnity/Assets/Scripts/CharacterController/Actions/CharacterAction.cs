@@ -328,7 +328,7 @@
         public virtual bool CheckGround()
         {
             RaycastHit hit;
-            if (Physics.Raycast(m_Transform.position + Vector3.up * 0.5f, Vector3.down, out hit, 1, m_Layers.SolidLayer)){
+            if (Physics.Raycast(m_Transform.position + Vector3.up * 0.5f, Vector3.down, out hit, 2, m_Layers.SolidLayer)){
                 return true;
             }
             return false;

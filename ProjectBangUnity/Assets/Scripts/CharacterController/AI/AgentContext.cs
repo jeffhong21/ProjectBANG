@@ -8,9 +8,9 @@ namespace CharacterController.AI
     [Serializable]
     public class AgentContext 
     {
-
+        [HideInInspector]
         public AgentController agent;
-
+        [HideInInspector]
         public NavMeshAgentBridge navMeshAgent;
 
         public Transform target;
@@ -27,7 +27,8 @@ namespace CharacterController.AI
 
 
 
-        public AgentContext(){
+        public AgentContext()
+        {
             
         }
 

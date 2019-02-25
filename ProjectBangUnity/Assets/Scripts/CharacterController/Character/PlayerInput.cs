@@ -115,6 +115,7 @@ namespace CharacterController
 
             SwitchItem(KeyCode.E, false);
 
+            Interact(KeyCode.F);
             //else if (Input.GetKeyDown(KeyCode.F))
             //{
                 
@@ -231,10 +232,13 @@ namespace CharacterController
 
         }
 
-        //public void ToggleItem()
-        //{
-
-        //}
+        public void Interact(KeyCode keycode)
+        {
+            if (Input.GetKeyDown(keycode))
+            {
+                m_Controller.PlayInteractAnimation();
+            }
+        }
 
 
         //public void DropItem(int itemID)
