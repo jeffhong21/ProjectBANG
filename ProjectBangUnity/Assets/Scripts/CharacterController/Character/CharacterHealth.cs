@@ -9,9 +9,31 @@
 
 
 
-        protected override void Die(Vector3 hitLocation, Vector3 hitDirection, GameObject attacker)
+        public override void TakeDamage(float amount, Vector3 position, Vector3 force, GameObject attacker, GameObject hitGameObject)
         {
-            base.Die(hitLocation, hitDirection, attacker);
+            if (m_Invincible) return;
+
+            if (m_CurrentHealth > 0)
+            {
+                EventHandler.ExecuteEvent(gameObject, "OnTakeDamage", amount, position, force, attacker);
+                //  Change health amount.
+                m_CurrentHealth -= amount;
+                SpawnParticles(m_DamageEffect, position);
+
+                //var rigb = hitGameObject.GetComponent<Rigidbody>();
+                //rigb.AddForceAtPosition(force * 100, position, ForceMode.Impulse);
+                //Debug.LogFormat("{0} hit {1}", attacker.name, hitGameObject.name);
+                if (m_CurrentHealth <= 0){
+                    Die(position, force, attacker);
+                }
+            }
+        }
+
+
+
+        protected override void Die(Vector3 position, Vector3 force, GameObject attacker)
+        {
+            base.Die(position, force, attacker);
 
             //Debug.LogFormat("{0} killed by {1}", m_GameObject.name, attacker.name);
 

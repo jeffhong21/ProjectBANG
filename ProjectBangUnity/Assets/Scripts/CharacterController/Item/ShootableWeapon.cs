@@ -21,16 +21,14 @@
         protected int m_MaxAmmo = 30;
         [SerializeField]
         protected bool m_AutoReload;
-        [SerializeField]
+        [SerializeField, Range(0, 1)]
         protected float m_RecoilAmount = 0.1f;
         [SerializeField, Range(0,1)]
         protected float m_Spread = 0.01f;
         [SerializeField]
-        protected string m_ShootStateName = "Shoot";
-        [SerializeField]
-        protected string m_ReloadStateName = "Reload";
-        [SerializeField]
         protected GameObject m_Smoke;
+        [SerializeField]
+        protected GameObject m_MuzzleFlash;
         [SerializeField]
         protected Transform m_SmokeLocation;
         [Header("-- Hitscan Settings --")]
@@ -48,14 +46,15 @@
         [SerializeField]
         protected GameObject m_Projectile;
 
-        [Header("Debug"), SerializeField]
-        private bool m_DrawAimLine;
-
+        [Header("-- Decals --")]
         [SerializeField]
         protected GameObject m_DefaultDecal;
         [SerializeField]
         protected GameObject m_DefaultDust;
 
+
+        [Header("Debug"), SerializeField]
+        private bool m_DrawAimLine;
 
         private float m_ReloadTime = 3f;
         private float m_NextUseTime = 0;
@@ -73,6 +72,18 @@
             if (m_CurrentAmmo > m_MaxAmmo)
                 m_CurrentAmmo = m_MaxAmmo;
 
+
+
+            if (m_Smoke != null){
+                m_Smoke.transform.localPosition = m_FirePoint.localPosition;
+                m_Smoke.transform.localRotation = m_FirePoint.localRotation;
+                m_Smoke.SetActive(false);
+            }
+            if (m_MuzzleFlash != null){
+                m_MuzzleFlash.transform.localPosition = m_FirePoint.localPosition;
+                m_MuzzleFlash.transform.localRotation = m_FirePoint.localRotation;
+                m_MuzzleFlash.SetActive(false);
+            }
         }
 
         public override void Initialize(Inventory inventory)
@@ -87,24 +98,20 @@
 
         public virtual bool TryUse()
         {
-            if (InUse())
-                return false;
-            
+            if (InUse()) return false;
+
             if (m_CurrentAmmo > 0)
             {
-                //  Shoot weapon.
                 Fire();
                 //  Set cooldown variables.
                 m_NextUseTime = Time.timeSinceLevelLoad + m_FireRate;
-                //Debug.LogFormat("Shooting | {0}", Time.timeSinceLevelLoad);
                 return true;
             }
             return false;
         }
 
 
-        public virtual bool InUse()
-        {
+        public virtual bool InUse(){
             return Time.timeSinceLevelLoad < m_NextUseTime;
         }
 
@@ -114,9 +121,8 @@
 
         public virtual bool TryStartReload()
         {
-            if(IsReloading())
-                return false;
-            
+            if (IsReloading()) return false;
+
             m_NextUseTime = Time.timeSinceLevelLoad + m_ReloadTime;
 
             //Debug.LogFormat("Reloading | {0}", Time.timeSinceLevelLoad);
@@ -133,10 +139,16 @@
 
 
 
-
         protected override void ItemActivated()
         {
+            if (m_Smoke) m_Smoke.SetActive(true);
+            if (m_MuzzleFlash) m_MuzzleFlash.SetActive(true);
+        }
 
+        protected override void ItemDeactivated()
+        {
+            if (m_Smoke) m_Smoke.SetActive(false);
+            if (m_MuzzleFlash) m_MuzzleFlash.SetActive(false);
         }
 
 
@@ -150,13 +162,15 @@
             } else {
                 HitscanFire();
             }
+
             //  Play Particle Shoot Effects.
             if(m_Smoke){
-                var go = Instantiate(m_Smoke, m_SmokeLocation == null ? m_FirePoint.position : m_SmokeLocation.position, Quaternion.identity);
-                var ps = go.GetComponentInChildren<ParticleSystem>();
-                ps.Play();
-                Destroy(ps.gameObject, ps.main.duration + 1);
+                m_Smoke.GetComponentInChildren<ParticleSystem>().Play();
             }
+            if(m_MuzzleFlash){
+                m_MuzzleFlash.GetComponentInChildren<ParticleSystem>().Play();
+            }
+
 
 
             //  Update current ammo.
@@ -185,33 +199,48 @@
         {
             RaycastHit hit;
 
-            if(Physics.Raycast(m_FirePoint.position, m_FirePoint.forward, out hit, m_HitscanFireRange, m_HitscanImpactLayers)){
+            Debug.DrawRay(m_FirePoint.position, m_FirePoint.forward * m_HitscanFireRange, Color.green, 1);
+            if(Physics.Raycast(m_FirePoint.position, m_FirePoint.forward, out hit, m_HitscanFireRange, m_HitscanImpactLayers))
+            {
+                var damagableObject = hit.transform.GetComponent<Health>();
+                //var damagableObject = hit.transform.GetComponent<DamageReciever>();
+                Vector3 hitDirection = hit.transform.position - m_FirePoint.position;
+                Vector3 force = hitDirection.normalized * m_HitscanImpactForce;
+                var rigb = hit.transform.GetComponent<Rigidbody>();
 
-                //var damagableObject = hit.transform.GetComponent<Health>();
-                var damagableObject = hit.transform.GetComponent<DamageReciever>();
 
-                if(damagableObject)
+                if(damagableObject is CharacterHealth)
+                {
+                    RaycastHit hitGameObject;
+                    if (Physics.Raycast(m_FirePoint.position, m_FirePoint.forward, out hitGameObject, m_HitscanFireRange, LayerMask.NameToLayer("Ragdoll"))){
+                        damagableObject.TakeDamage(m_HitscanDamageAmount, hitGameObject.point, hitGameObject.normal, m_Character, hitGameObject.collider.gameObject);
+                    }
+                    else{
+                        damagableObject.TakeDamage(m_HitscanDamageAmount, hit.point, hit.normal, m_Character, hit.collider.gameObject);
+                    }
+                    //Debug.Log(hitGameObject.collider);
+                }
+                else if(damagableObject is Health)
                 {
                     damagableObject.TakeDamage(m_HitscanDamageAmount, hit.point, hit.normal, m_Character);
-
-                    //SpawnParticles(damagableObject.GetType() == typeof(CharacterHealth) ? m_DefaultDecal : m_DefaultDust, hit.point, hit.normal);
-                    SpawnParticles(m_DefaultDecal, hit.point, hit.normal);
                 }
                 else{
                     SpawnParticles(m_DefaultDust, hit.point, hit.normal);
                     //SpawnHitEffects(hit.point, -hit.normal);
                 }
 
-            }
 
 
-            var rigb = hit.transform.GetComponent<Rigidbody>();
-            if (rigb && !hit.transform.gameObject.isStatic){
-                //rigb.AddForce(transform.forward * m_HitscanImpactForce, ForceMode.Impulse);
-                var hitDirection = rigb.transform.position - m_FirePoint.position;
-                rigb.AddForceAtPosition(hitDirection.normalized * m_HitscanImpactForce, hit.point, ForceMode.Impulse);
-                //rigb.AddExplosionForce(m_HitscanImpactForce, hitDirection, 50f);
+                if (rigb && !hit.transform.gameObject.isStatic)
+                {
+                    //rigb.AddForce(hitDirection.normalized * m_HitscanImpactForce, ForceMode.Impulse);
+                    rigb.AddForceAtPosition(hitDirection.normalized * m_HitscanImpactForce, hit.point, ForceMode.Impulse);
+                    //rigb.AddExplosionForce(m_HitscanImpactForce, hitDirection, 50f);
+                }
+
+                //Debug.Log(hit.collider.gameObject.name);
             }
+
         }
 
 
@@ -269,6 +298,18 @@
                 Gizmos.DrawRay(m_FirePoint.position, (m_FirePoint.forward * 12));  //  + (Vector3.up * m_FirePoint.position.y) 
             }
         }
+
+
+
+
+
+
+
+
+
+
+
+
 
     }
 

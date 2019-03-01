@@ -1,6 +1,5 @@
 ﻿namespace CharacterController
 {
-    using JH_Utils;
     using UnityEngine;
 
     /// <summary>

@@ -1,6 +1,5 @@
 ﻿namespace CharacterController
 {
-    using JH_Utils;
     using UnityEngine;
 
 
@@ -33,20 +32,18 @@
         protected Vector3 m_RotationOffset;
 
 
-        [SerializeField]
-        protected GameObject m_CrosshairsSprite;
 
 
         //protected Collider[] m_Collider;
-        protected GameObject m_GameObject;
-        protected Transform m_Transform;
+
         protected Animator m_Animator;
         [SerializeField, DisplayOnly]
         protected GameObject m_Character;
         [SerializeField, DisplayOnly]
         protected CharacterLocomotion m_Controller;
         protected Inventory m_Inventory;
-
+        protected GameObject m_GameObject;
+        protected Transform m_Transform;
 
 
 
@@ -88,10 +85,6 @@
         }
 
 
-        public GameObject CrosshairsSprite
-        {
-            get { return m_CrosshairsSprite; }
-        }
 
 
 

@@ -3,7 +3,7 @@
     using UnityEngine;
     using System;
     using System.Collections;
-    using JH_Utils;
+
 
     [RequireComponent(typeof(CapsuleCollider), typeof(Rigidbody), typeof(LayerManager))]
     public class CharacterLocomotion : MonoBehaviour
@@ -262,7 +262,7 @@
             }
 
 
-            if (m_GroundedMovingFrictionMaterial == null){
+            if (m_GroundedIdleFrictionMaterial == null){
                 // prevents the collider from slipping on ramps
                 m_GroundedIdleFrictionMaterial = new PhysicMaterial();
                 m_GroundedIdleFrictionMaterial.name = "GroundedIdlePhysics";
@@ -272,7 +272,7 @@
             }
 
 
-            if (m_GroundedMovingFrictionMaterial == null){
+            if (m_AirFrictionMaterial == null){
                 // air physics 
                 m_AirFrictionMaterial = new PhysicMaterial();
                 m_AirFrictionMaterial.name = "AirFrictionPhysics";
@@ -397,7 +397,6 @@
 
         private bool CheckGround()
         {
-
             Color _stepColor = Color.blue;
 
             // change the physics material to very slip when not grounded or maxFriction when is
@@ -575,17 +574,6 @@
         }
 
 
-
-
-        public void SetPosition(Vector3 position)
-        {
-            m_Rigidbody.MovePosition(position);
-        }
-
-        public void SetRotation(Quaternion rotation)
-        {
-            m_Rigidbody.MoveRotation(rotation);
-        }
 
 
         public void StopMovement()

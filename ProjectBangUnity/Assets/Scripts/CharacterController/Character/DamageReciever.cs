@@ -32,12 +32,12 @@ namespace CharacterController
 
 
 
-		public virtual void TakeDamage(float amount, Vector3 hitLocation, Vector3 hitDirection, GameObject attacker)
+		public virtual void TakeDamage(float amount, Vector3 position, Vector3 force, GameObject attacker)
         {
             //Debug.LogFormat("{0} got hit in the {1}.", m_Character.name, m_GameObject.name);
 
             amount *= m_DamageMultiplier;
-            EventHandler.ExecuteEvent(m_Character, EventIDs.OnTakeDamage, amount, hitLocation, hitDirection, attacker);
+            EventHandler.ExecuteEvent(m_Character, EventIDs.OnTakeDamage, amount, position, force, attacker);
 
 
             //m_Rigidbody.AddForceAtPosition(hitDirection.normalized * 10, hitLocation, ForceMode.Impulse);

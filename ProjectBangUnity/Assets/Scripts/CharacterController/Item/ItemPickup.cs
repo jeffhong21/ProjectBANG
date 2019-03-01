@@ -9,6 +9,8 @@
         [SerializeField]
         protected Item[] m_Items;
         [SerializeField]
+        protected Transform m_TooltipUI;
+        [SerializeField]
         protected Transform m_ObjectHolder;
         [SerializeField]
         protected ParticleSystem m_DefaultVFX;
@@ -28,7 +30,7 @@
         [SerializeField]
         protected bool m_RotateCounterClockwise;
         [SerializeField, Range(-360, 360)]
-        protected float m_DegreesPerSseconod = 30f;
+        protected float m_DegreesPerSecond = 30f;
         [SerializeField]
         protected bool m_IsBouncing = true;
         [SerializeField, Range(0, 1), Tooltip("How high the itemHolder bobbles up and down.  Value should be the same or greater than the itemHolder Y position.")]
@@ -54,7 +56,8 @@
         Vector3 m_TargetRotation;
         Vector3 m_TargetPosition;
 
-
+        //Transform target;
+        //Vector3 targetPosition;
 
         public Item[] Items{
             get { return m_Items; }
@@ -98,6 +101,7 @@
             m_DefaultPosition = m_ObjectHolder.localPosition;
             m_DefaultPosition.y += m_Amplitude;
 
+
             Initialize(false);
         }
 
@@ -113,6 +117,8 @@
             m_PositionOffset = m_ObjectHolder.transform.position;
             //m_Transform.localScale = Vector3.one;
 
+            m_TooltipUI.gameObject.SetActive(false);
+            //target = CameraController.Instance.transform;
         }
 
 
@@ -153,16 +159,17 @@
         {
             if(m_PlayDefaultAnimation)
             {
-                if (m_IsRotating)
-                {
-                    UpdateRotation(m_DegreesPerSseconod, m_RotateCounterClockwise);
+                if (m_IsRotating){
+                    UpdateRotation(m_DegreesPerSecond, m_RotateCounterClockwise);
                 }
 
-                if (m_IsBouncing)
-                {
+                if (m_IsBouncing){
                     UpdateYPosition(m_Frequency, m_Amplitude);
                 }
             }
+
+            //targetPosition = target.position;
+            //transform.LookAt(targetPosition);
         }
 
 
@@ -222,7 +229,11 @@
 
         protected void OnTriggerEnter(Collider other)
         {
-            
+            if(other.CompareTag("Player"))
+            {
+                m_TooltipUI.gameObject.SetActive(true);
+            }
+
             if(ObjectPickup(other))
             {
                 if(m_PickupVFX){
@@ -245,7 +256,10 @@
 
         protected void OnTriggerExit(Collider other)
 		{
-			
+            if (other.CompareTag("Player"))
+            {
+                m_TooltipUI.gameObject.SetActive(false);
+            }
 		}
 
 
@@ -266,4 +280,29 @@
         }
 	}
 
+
+
+
+
+
+
+ //   public class LookAtCamera : MonoBehaviour
+ //   {
+
+ //       public Transform target;
+ //       Vector3 targetPosition;
+
+	//	private void Start()
+	//	{
+ //           target = GameObject.FindGameObjectWithTag("MainCamera").transform;
+	//	}
+
+
+	//	private void Update()
+	//	{
+ //           targetPosition = target.position;
+ //           transform.LookAt(targetPosition);
+	//	}
+
+	//}
 }

@@ -1739,7 +1739,7 @@ Rigidbody:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1761652248440620}
   serializedVersion: 2
-  m_Mass: 100
+  m_Mass: 50
   m_Drag: 0
   m_AngularDrag: 0.05
   m_UseGravity: 1
@@ -2177,11 +2177,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Invincible: 0
   m_CurrentHealth: 0
-  m_MaxHealth: 20
+  m_MaxHealth: 50
+  m_DamageEffect: {fileID: 1359636532566120, guid: e7fd3bc00cb0e4705ad206d71d216190,
+    type: 2}
+  m_DeathEffect: {fileID: 0}
   m_DeactivateOnDeath: 0
   m_DeactivateOnDeathDelay: 5
   m_SpawnedObjectsOnDeath: []
-  m_DestroyedObjectsOnDeath: []
   m_DeathLayer:
     serializedVersion: 2
     m_Bits: 0
@@ -2286,7 +2288,7 @@ MonoBehaviour:
   m_SkinWidth: 0.08
   m_SlopeLimit: 120
   m_MaxStepHeight: 0.65
-  m_StepOffset: NaN
+  m_StepOffset: 0.15
   m_StepSpeed: 4
   m_Acceleration: 20
   m_Actions:
@@ -2323,9 +2325,9 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.25
-  m_Height: 1.66
+  m_Height: 1.8
   m_Direction: 1
-  m_Center: {x: 0, y: 0.83, z: 0}
+  m_Center: {x: 0, y: 0.92, z: 0}
 --- !u!136 &136021705258655244
 CapsuleCollider:
   m_ObjectHideFlags: 1
@@ -2469,7 +2471,7 @@ SkinnedMeshRenderer:
   m_Quality: 0
   m_UpdateWhenOffscreen: 0
   m_SkinnedMotionVectors: 1
-  m_Mesh: {fileID: 4300006, guid: ad9b136e9ac104c66b5fb99ea52cfb13, type: 3}
+  m_Mesh: {fileID: 4300012, guid: ad9b136e9ac104c66b5fb99ea52cfb13, type: 3}
   m_Bones:
   - {fileID: 4756614858799874}
   - {fileID: 4741954931594854}

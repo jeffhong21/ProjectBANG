@@ -4,7 +4,7 @@
     using System;
     using System.Collections.Generic;
 
-    using JH_Utils;
+
 
     public class Inventory : MonoBehaviour
     {
@@ -42,7 +42,7 @@
         protected Transform m_ItemHolder;
 
 
-    
+
         //
         // Properties
         //
@@ -111,6 +111,12 @@
             m_ItemHolder.parent = transform;
             m_ItemHolder.localPosition = Vector3.up;
 
+
+		}
+
+
+		private void Start()
+		{
             //  Load default items.
             LoadDefaultLoadout();
 		}

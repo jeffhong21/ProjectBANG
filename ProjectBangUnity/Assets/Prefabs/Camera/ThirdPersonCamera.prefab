@@ -221,7 +221,7 @@ MonoBehaviour:
   m_Target: {fileID: 0}
   m_Pivot: {fileID: 4572819961280480}
   m_MouseSensitivity: 2
-  m_CameraState: {fileID: 11400000, guid: e82b040537bcb4a78b56a639a9fbdcac, type: 2}
+  m_CameraState: {fileID: 11400000, guid: 7e6f7bf8d3f914d2c8b9d8f007b3c2a2, type: 2}
   m_IsAiming: 0
   m_IsCrouching: 0
   m_LockCamera: 0

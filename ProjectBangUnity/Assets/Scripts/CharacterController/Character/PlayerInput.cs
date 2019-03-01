@@ -1,7 +1,6 @@
 namespace CharacterController
 {
     using UnityEngine;
-    using JH_Utils;
 
 
     [RequireComponent(typeof(CharacterLocomotion))]
@@ -70,15 +69,19 @@ namespace CharacterController
 
 
             m_LayerMask = ~(1 << gameObject.layer);
+
+
+            if (CameraController.Instance == null && m_CameraController)
+            {
+                m_CameraController = Instantiate(m_CameraController) as CameraController;
+                m_CameraController.SetMainTarget(transform);
+            }
         }
 
 
 		private void Start()
 		{
-            if(CameraController.Instance == null && m_CameraController){
-                m_CameraController = Instantiate(m_CameraController) as CameraController;
-                m_CameraController.SetMainTarget(transform);
-            }
+
 		}
 
 

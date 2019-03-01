@@ -1,89 +1,89 @@
-﻿namespace CharacterController
-{
-    using UnityEngine;
-    using System;
-    using System.Collections.Generic;
-    using JH_Utils;
+﻿//namespace CharacterController
+//{
+//    using UnityEngine;
+//    using System;
+//    using System.Collections.Generic;
 
-    public class Inventory_1 : MonoBehaviour
-    {
+
+//    public class Inventory_1 : MonoBehaviour
+//    {
         
-        [SerializeField, DisplayOnly]
-        protected Item m_EquippedItemType;
-        [SerializeField]
-        protected PrimaryItem[] m_Loadout;
-        [SerializeField]
-        protected Dictionary<Item, ItemObject> m_Inventory;
+//        [SerializeField, DisplayOnly]
+//        protected Item m_EquippedItemType;
+//        [SerializeField]
+//        protected PrimaryItem[] m_Loadout;
+//        [SerializeField]
+//        protected Dictionary<Item, ItemObject> m_Inventory;
 
 
-        private int m_CurrentItemIndex = -1;
-        private bool m_Switching;
+//        private int m_CurrentItemIndex = -1;
+//        private bool m_Switching;
 
-        private Animator m_Animator;
-
-
-
-        public bool IsSwitchingItem{
-            get { return m_Switching; }
-        }
-
-        public Item EquippedItemType{
-            get { return m_EquippedItemType; }
-        }
+//        private Animator m_Animator;
 
 
 
-        //
-        // Methods
-        //
-        private void Awake()
-        {
-            m_Animator = GetComponent<Animator>();
-            m_Inventory = new Dictionary<Item, ItemObject>();
+//        public bool IsSwitchingItem{
+//            get { return m_Switching; }
+//        }
+
+//        public Item EquippedItemType{
+//            get { return m_EquippedItemType; }
+//        }
 
 
-            //LoadDefaultLoadout();
-        }
+
+//        //
+//        // Methods
+//        //
+//        private void Awake()
+//        {
+//            m_Animator = GetComponent<Animator>();
+//            m_Inventory = new Dictionary<Item, ItemObject>();
 
 
-        public void PickupItem(Item itemType, int amount, bool equip, bool immediateActivation)
-        {
-            //if (!m_Inventory.ContainsKey(itemType))
-            //{
-            //    if (itemType.GetType() == typeof(PrimaryItem))
-            //    {
-            //        PrimaryItem primaryItem = (PrimaryItem)itemType;
-            //        m_Inventory[itemType] = primaryItem.CreateItem(m_RightHandSlot.transform);
-            //        m_Inventory[itemType].SetActive(false);
-            //    }
-            //    else if (itemType.Stackable || itemType is ConsumableItem)
-            //    {
+//            //LoadDefaultLoadout();
+//        }
 
-            //    }
-            //}
-            //else
-            //{
-            //    if (itemType.GetType() == typeof(PrimaryItem))
-            //    {
-            //        PrimaryItem primaryItem = (PrimaryItem)itemType;
-            //        m_Inventory[itemType] = primaryItem.CreateItem(m_RightHandSlot.transform);
-            //        m_Inventory[itemType].SetActive(false);
-            //    }
-            //    else if (itemType.Stackable || itemType is ConsumableItem)
-            //    {
 
-            //    }
-            //}
+//        public void PickupItem(Item itemType, int amount, bool equip, bool immediateActivation)
+//        {
+//            //if (!m_Inventory.ContainsKey(itemType))
+//            //{
+//            //    if (itemType.GetType() == typeof(PrimaryItem))
+//            //    {
+//            //        PrimaryItem primaryItem = (PrimaryItem)itemType;
+//            //        m_Inventory[itemType] = primaryItem.CreateItem(m_RightHandSlot.transform);
+//            //        m_Inventory[itemType].SetActive(false);
+//            //    }
+//            //    else if (itemType.Stackable || itemType is ConsumableItem)
+//            //    {
 
-            //if (equip)
-            //{
-            //    EquipItem(itemType);
-            //}
+//            //    }
+//            //}
+//            //else
+//            //{
+//            //    if (itemType.GetType() == typeof(PrimaryItem))
+//            //    {
+//            //        PrimaryItem primaryItem = (PrimaryItem)itemType;
+//            //        m_Inventory[itemType] = primaryItem.CreateItem(m_RightHandSlot.transform);
+//            //        m_Inventory[itemType].SetActive(false);
+//            //    }
+//            //    else if (itemType.Stackable || itemType is ConsumableItem)
+//            //    {
 
-        }
-    }
+//            //    }
+//            //}
 
-}
+//            //if (equip)
+//            //{
+//            //    EquipItem(itemType);
+//            //}
+
+//        }
+//    }
+
+//}
 
 
 

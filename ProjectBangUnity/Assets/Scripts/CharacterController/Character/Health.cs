@@ -3,13 +3,13 @@
     using UnityEngine;
     using System;
     using System.Collections;
-    using JH_Utils;
+
 
     public class Health : MonoBehaviour
     {
         public delegate void OnTakeDamage(float amount, Vector3 position, Vector3 force, GameObject attacker, Collider hitCollider);
         public delegate void OnHeal(float amount);
-        public delegate void OnDeath(Vector3 hitLocation, Vector3 hitDirection, GameObject attacker);
+        public delegate void OnDeath(Vector3 position, Vector3 force, GameObject attacker);
 
         //
         // Fields
@@ -21,17 +21,25 @@
         [SerializeField]
         protected float m_MaxHealth = 100f;
         [SerializeField]
+        protected GameObject m_DamageEffect;
+        //[SerializeField]
+        //protected AudioClip m_DamageSfx;
+        [SerializeField]
+        protected GameObject m_DeathEffect;
+        //[SerializeField]
+        //protected AudioClip m_DeathSfx;
+        [SerializeField]
         protected bool m_DeactivateOnDeath;
         [SerializeField]
         protected float m_DeactivateOnDeathDelay = 5f;
         [SerializeField]
         protected GameObject[] m_SpawnedObjectsOnDeath;
-        [SerializeField]
-        protected GameObject[] m_DestroyedObjectsOnDeath;
+
         [SerializeField]
         protected LayerMask m_DeathLayer;
         [SerializeField]
         protected float m_TimeInvincibleAfterSpawn;
+
 
         protected GameObject m_GameObject;
         protected Transform m_Transform;
@@ -70,14 +78,14 @@
 
 		private void OnEnable()
 		{
-            EventHandler.RegisterEvent<float, Vector3, Vector3, GameObject>(m_GameObject, EventIDs.OnTakeDamage, TakeDamage);
+            //EventHandler.RegisterEvent<float, Vector3, Vector3, GameObject>(m_GameObject, EventIDs.OnTakeDamage, TakeDamage);
             //EventHandler.RegisterEvent<Vector3, Vector3, GameObject>(m_GameObject, "Death", Death);
 		}
 
 
 		private void OnDisable()
 		{
-            EventHandler.UnregisterEvent<float, Vector3, Vector3, GameObject>(m_GameObject, EventIDs.OnTakeDamage, TakeDamage);
+            //EventHandler.UnregisterEvent<float, Vector3, Vector3, GameObject>(m_GameObject, EventIDs.OnTakeDamage, TakeDamage);
             //EventHandler.UnregisterEvent<Vector3, Vector3, GameObject>(m_GameObject, "Death", Death);
 		}
 
@@ -89,24 +97,45 @@
         }
 
 
-        public virtual void TakeDamage(float amount, Vector3 hitLocation, Vector3 hitDirection, GameObject attacker)
+
+
+
+        public virtual void TakeDamage(float amount, Vector3 position, Vector3 force, GameObject attacker)
         {
             if (m_Invincible) return;
 
-            if(m_CurrentHealth > 0){
-                
-                //EventHandler.ExecuteEvent(gameObject, "OnTakeDamage", amount, hitLocation, hitDirection, attacker);
+            if(m_CurrentHealth > 0)
+            {
+                //EventHandler.ExecuteEvent(gameObject, "OnTakeDamage", amount, position, force, attacker);
                 //  Change health amount.
                 m_CurrentHealth -= amount;
-
-                //Debug.LogFormat("-- {0} recieved {1} of damage.", m_GameObject.name, amount);
-
-                //  If current health is zero, call death.
-                if(m_CurrentHealth <= 0){
-                    Die(hitLocation, hitDirection, attacker);
+                SpawnParticles(m_DamageEffect, position, force);
+                if (m_CurrentHealth <= 0)
+                {
+                    Die(position, force, attacker);
                 }
             }
         }
+
+
+        public virtual void TakeDamage(float amount, Vector3 position, Vector3 force, GameObject attacker, GameObject hitGameObject)
+        {
+            if (m_Invincible) return;
+
+
+            if (m_CurrentHealth > 0)
+            {
+                EventHandler.ExecuteEvent(gameObject, "OnTakeDamage", amount, position, force, attacker);
+                //  Change health amount.
+                m_CurrentHealth -= amount;
+                SpawnParticles(m_DamageEffect, position);
+                if (m_CurrentHealth <= 0)
+                {
+                    Die(position, force, attacker);
+                }
+            }
+        }
+
 
 
         public bool IsAlive(){
@@ -130,18 +159,34 @@
         }
 
 
-        protected virtual void Die(Vector3 hitLocation, Vector3 hitDirection, GameObject attacker)
+        protected virtual void Die(Vector3 position, Vector3 force, GameObject attacker)
         {
             //Debug.LogFormat("{0} killed by {1}", m_GameObject.name, attacker.name);
             //  Deactivate gameobject on death.
 
-            EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnDeath, hitLocation, hitDirection, attacker);
-            EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnRagdoll, hitLocation, hitDirection, 0f);
+            EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnDeath, position, force, attacker);
+            EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnRagdoll, position, force, 0f);
         }
 
 
 
+        protected void SpawnParticles(GameObject particleObject, Vector3 position)
+        {
+            //var go = Instantiate(particleObject, position, Quaternion.FromToRotation(m_Transform.forward + position, direction));
+            var go = Instantiate(particleObject, position, Quaternion.FromToRotation(m_Transform.forward, position));
+            var ps = go.GetComponentInChildren<ParticleSystem>();
+            ps.Play();
+            Destroy(ps.gameObject, ps.main.duration + 1);
+        }
 
+        protected void SpawnParticles(GameObject particleObject, Vector3 position, Vector3 direction)
+        {
+            //var go = Instantiate(particleObject, position, Quaternion.FromToRotation(m_Transform.forward + position, direction));
+            var go = Instantiate(particleObject, position, Quaternion.FromToRotation(m_Transform.forward, direction));
+            var ps = go.GetComponentInChildren<ParticleSystem>();
+            ps.Play();
+            Destroy(ps.gameObject, ps.main.duration + 1);
+        }
     }
 
 }

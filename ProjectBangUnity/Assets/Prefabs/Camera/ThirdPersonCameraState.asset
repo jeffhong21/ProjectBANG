@@ -22,10 +22,10 @@ MonoBehaviour:
   MinPitch: -25
   MaxPitch: 45
   PivotRotationOffset: 0
-  DefaultPositionX: 10.76
+  DefaultPositionX: 0
   DefaultPositionZ: 3
   AimPositionX: 0.5
-  AimPositionZ: 1
+  AimPositionZ: 2
   DefaultPositionY: 1.5
   CrouchPositionY: 1
   LookDirection: {x: 0, y: 0, z: 1}
