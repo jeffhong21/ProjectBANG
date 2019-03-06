@@ -1990,12 +1990,6 @@ MonoBehaviour:
   - m_Item: {fileID: 11400000, guid: 6c5d9ac65e6844feb81b0131f2050c07, type: 2}
     m_Amount: 1
     m_Equip: 0
-  - m_Item: {fileID: 11400000, guid: eff795c8b6e0c4b26b47624a847107c9, type: 2}
-    m_Amount: 1
-    m_Equip: 0
-  - m_Item: {fileID: 11400000, guid: 29d47eb19b2d3474080e5b333f73e67f, type: 2}
-    m_Amount: 1
-    m_Equip: 0
   m_Loadout: []
   m_EquipPoints:
     m_LeftHandSlot: {fileID: 114684986398083596}

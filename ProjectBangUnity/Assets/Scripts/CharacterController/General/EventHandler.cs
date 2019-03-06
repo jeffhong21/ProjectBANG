@@ -6,10 +6,6 @@
 
     public static class EventHandler
     {
-        //public static string OnTakeDamage = "OnTakeDamage";
-        //public static string OnHeal = "OnHeal";
-        //public static string OnDeath = "OnDeath";
-
 
 
         private static Dictionary<object, Dictionary<string, List<object>>> m_RegisterdEvents =

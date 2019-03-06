@@ -648,7 +648,7 @@ MonoBehaviour:
   m_HitscanImpactForce: 100
   m_Projectile: {fileID: 0}
   m_DefaultDecal: {fileID: 166404, guid: 1b9f66cb9bb3047649bf932337e6b03a, type: 2}
-  m_DefaultDust: {fileID: 1082194431870132, guid: 69e5544af4a7b4cd6ae33513e78a694e,
+  m_DefaultDust: {fileID: 1225023134673244, guid: b240e9cd471cf4e89b8f10b1b17812b3,
     type: 2}
   m_DrawAimLine: 0
 --- !u!198 &198526742418125214

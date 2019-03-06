@@ -17,9 +17,9 @@ namespace uUtilityAI.AIEditor
         // Fields
         //
         [HideInInspector, SerializeField]
-        private string _storagePath = "Assets/Scripts/UtilityAI/Resources/AIStorage";
+        private string _storagePath = "Assets/UtilityAI/Resources/AIStorage";
         [HideInInspector, SerializeField]
-        private string _nameMapPath = "Assets/Scripts/UtilityAI";
+        private string _nameMapPath = "Assets/UtilityAI";
         private bool _isDirty;
 
         //

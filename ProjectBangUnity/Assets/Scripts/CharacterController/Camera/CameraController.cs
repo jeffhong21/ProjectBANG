@@ -91,7 +91,6 @@
 
 		private void OnEnable()
 		{
-            //EventHandler.RegisterEvent<float, Vector3, Vector3, GameObject>(m_GameObject, "OnTakeDamage", OnTakeDamage);
             Cursor.lockState = m_LockCursor ? CursorLockMode.Locked : CursorLockMode.Confined;
 		}
 

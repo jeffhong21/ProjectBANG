@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ObjectPoolManager : MonoBehaviour
+public class ObjectPoolManager : MonoBehaviour 
 {
     public static ObjectPoolManager Instance { get; private set; }
 
     [SerializeField]
-    private List<ObjectPool> m_Pools = new List<ObjectPool>();
+    private List<Pool> m_Pools = new List<Pool>();
 
-    private Dictionary<string, Pool> m_ObjectPool;
+    private Dictionary<GameObject, Queue<GameObject>> m_ObjectPool;
 
     private Transform m_Host;
 
@@ -18,53 +18,95 @@ public class ObjectPoolManager : MonoBehaviour
 
     protected void Awake()
     {
-        if (Instance != null)
-        {
-            Debug.LogWarning(this + " another instance has already been registered for this scene, destroying this one");
+        if (Instance != null){
             Destroy(this);
             return;
         }
         Instance = this;
 
-        m_ObjectPool = new Dictionary<string, Pool>();
+        m_ObjectPool = new Dictionary<GameObject, Queue<GameObject>>();
         m_Host = transform;
-    }
 
 
-    protected void Start()
-    {
-        for (int index = 0; index < m_Pools.Count; index++)
-        {
-            ObjectPool pool = m_Pools[index];
-            Pool objectPool = new Pool(pool.Prefab, m_Host, pool.Count);
-            m_ObjectPool.Add(pool.ID, objectPool);
-        }
-
-    }
-
-
-    public GameObject Get(string id, Vector3 position, Quaternion rotation, Transform parent = null)
-    {
-        if (m_ObjectPool.ContainsKey(id))
-        {
-            Pool pool = m_ObjectPool[id];
-            GameObject obj = pool.Get(position, rotation, parent);
-            return obj;
-        }
-        return null;
-    }
-
-
-    public void Return(string id, GameObject obj)
-    {
-        if (m_ObjectPool.ContainsKey(id))
-        {
-            Pool pool = m_ObjectPool[id];
-            pool.Return(obj);
+        for (int index = 0; index < m_Pools.Count; index++){
+            m_ObjectPool.Add(m_Pools[index].Prefab, new Queue<GameObject>());
+            for (int i = 0; i < m_Pools[index].Count; i++){
+                Instantiate(m_Pools[index].Prefab, Vector3.zero, Quaternion.identity, m_Host);
+            }
         }
     }
 
 
+
+
+
+
+    public GameObject Instantiate(GameObject original, Vector3 position, Quaternion rotation, Transform parent = null)
+    {
+        //if (!m_ObjectPool.ContainsKey(original))
+            //m_ObjectPool.Add(original, new Queue<GameObject>());
+        
+        GameObject instantiatedObject = Instantiate(original);
+        m_ObjectPool[original].Enqueue(instantiatedObject);
+
+
+        instantiatedObject.transform.position = position;
+        instantiatedObject.transform.rotation = rotation;
+        instantiatedObject.transform.SetParent(parent);
+        instantiatedObject.SetActive(false);
+
+        return instantiatedObject;
+    }
+
+
+    public GameObject Spawn(GameObject original, Vector3 position, Quaternion rotation, Transform parent = null)
+    {
+        GameObject instantiatedObject = null;
+        if (m_ObjectPool.ContainsKey(original))
+        {
+            if(m_ObjectPool[original].Count > 0){
+                instantiatedObject = m_ObjectPool[original].Dequeue();
+            }
+            else{
+                instantiatedObject = Instantiate(original, Vector3.zero, Quaternion.identity, parent);
+            }
+
+
+            instantiatedObject.transform.position = position;
+            instantiatedObject.transform.rotation = rotation;
+            instantiatedObject.transform.SetParent(parent);
+            instantiatedObject.SetActive(true);
+        } 
+        //else{
+        //    m_ObjectPool.Add(original, new Queue<GameObject>());
+        //    instantiatedObject = Instantiate(original, Vector3.zero, Quaternion.identity, parent);
+        //}
+
+
+
+        return instantiatedObject;
+    }
+
+
+
+    public void Destroy(GameObject instantiatedObject)
+	{
+        if (m_ObjectPool.ContainsKey(instantiatedObject))
+        {
+            Debug.LogFormat("Returning {0} to pool", instantiatedObject);
+            instantiatedObject.transform.SetParent(m_Host.transform);
+
+            instantiatedObject.transform.localPosition = Vector3.zero;
+            instantiatedObject.transform.localEulerAngles = Vector3.zero;
+            instantiatedObject.transform.localScale = Vector3.one;
+            instantiatedObject.gameObject.SetActive(false);
+
+            m_ObjectPool[instantiatedObject].Enqueue(instantiatedObject.gameObject);
+        }
+        else{
+            Debug.LogFormat("Object pool does not contain {0}", instantiatedObject);
+        }
+	}
 
 
 
@@ -73,70 +115,9 @@ public class ObjectPoolManager : MonoBehaviour
     [Serializable]
     public class Pool
     {
-
-        private Queue<GameObject> m_Pool;
-        private GameObject m_Prefab;        //  The object to instantiate.
-        private Transform m_Host;           //  The parent object of all the objects.
-
-
-        public int Count { get { return m_Pool.Count; } }
-
-
-
-        public Pool(GameObject prefab, Transform host, int initialInstanceCount)
-        {
-            m_Pool = new Queue<GameObject>(initialInstanceCount);
-            m_Prefab = prefab;
-            m_Host = host;
-
-            //Instantiate and queue up the initial number of entities
-            for (int i = 0; i < initialInstanceCount; i++)
-            {
-                m_Pool.Enqueue(CreateInstance(m_Host));
-            }
-        }
-
-
-        protected GameObject CreateInstance(Transform host)
-        {
-            GameObject obj = GameObject.Instantiate(m_Prefab);
-            obj.transform.SetParent(host);
-            obj.SetActive(false);
-            return obj;
-        }
-
-
-
-        public GameObject Get(Vector3 position, Quaternion rotation, Transform parent = null)
-        {
-            GameObject obj;
-            if (m_Pool.Count > 0)
-            {
-                obj = m_Pool.Dequeue();
-            }
-            else
-            {
-                obj = CreateInstance(parent);
-            }
-            obj.gameObject.SetActive(true);
-            obj.transform.position = position;
-            obj.transform.rotation = rotation;
-
-            return null;
-        }
-
-
-        public void Return(GameObject obj)
-        {
-            obj.transform.SetParent(m_Host.transform);
-
-            obj.transform.localPosition = Vector3.zero;
-            obj.transform.localEulerAngles = Vector3.zero;
-            obj.transform.localScale = Vector3.one;
-            obj.gameObject.SetActive(false);
-
-            m_Pool.Enqueue(obj.gameObject);
-        }
-
+        //public string ID;
+        public GameObject Prefab;
+        [Range(0, 20)]
+        public int Count;
     }
 }

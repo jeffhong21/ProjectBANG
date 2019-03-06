@@ -9,9 +9,8 @@
     public class CharacterLocomotion : MonoBehaviour
     {
         public event Action<bool> OnAim = delegate {};
-
-
         public enum MovementType {Adventure, TopDown };
+
 
         [SerializeField, HideInInspector]
         protected bool m_UseRootMotion = true;
@@ -252,34 +251,34 @@
         {
             m_ActiveActions = new CharacterAction[m_Actions.Length];
 
-            if(m_GroundedMovingFrictionMaterial == null){
-                // slides the character through walls and edges
-                m_GroundedMovingFrictionMaterial = new PhysicMaterial();
-                m_GroundedMovingFrictionMaterial.name = "GroundedMovingPhysics";
-                m_GroundedMovingFrictionMaterial.staticFriction = .25f;
-                m_GroundedMovingFrictionMaterial.dynamicFriction = .25f;
-                m_GroundedMovingFrictionMaterial.frictionCombine = PhysicMaterialCombine.Multiply;
-            }
+            //if(m_GroundedMovingFrictionMaterial == null){
+            //    // slides the character through walls and edges
+            //    m_GroundedMovingFrictionMaterial = new PhysicMaterial();
+            //    m_GroundedMovingFrictionMaterial.name = "GroundedMovingPhysics";
+            //    m_GroundedMovingFrictionMaterial.staticFriction = .25f;
+            //    m_GroundedMovingFrictionMaterial.dynamicFriction = .25f;
+            //    m_GroundedMovingFrictionMaterial.frictionCombine = PhysicMaterialCombine.Multiply;
+            //}
 
 
-            if (m_GroundedIdleFrictionMaterial == null){
-                // prevents the collider from slipping on ramps
-                m_GroundedIdleFrictionMaterial = new PhysicMaterial();
-                m_GroundedIdleFrictionMaterial.name = "GroundedIdlePhysics";
-                m_GroundedIdleFrictionMaterial.staticFriction = 1f;
-                m_GroundedIdleFrictionMaterial.dynamicFriction = 1f;
-                m_GroundedIdleFrictionMaterial.frictionCombine = PhysicMaterialCombine.Maximum;
-            }
+            //if (m_GroundedIdleFrictionMaterial == null){
+            //    // prevents the collider from slipping on ramps
+            //    m_GroundedIdleFrictionMaterial = new PhysicMaterial();
+            //    m_GroundedIdleFrictionMaterial.name = "GroundedIdlePhysics";
+            //    m_GroundedIdleFrictionMaterial.staticFriction = 1f;
+            //    m_GroundedIdleFrictionMaterial.dynamicFriction = 1f;
+            //    m_GroundedIdleFrictionMaterial.frictionCombine = PhysicMaterialCombine.Maximum;
+            //}
 
 
-            if (m_AirFrictionMaterial == null){
-                // air physics 
-                m_AirFrictionMaterial = new PhysicMaterial();
-                m_AirFrictionMaterial.name = "AirFrictionPhysics";
-                m_AirFrictionMaterial.staticFriction = 0f;
-                m_AirFrictionMaterial.dynamicFriction = 0f;
-                m_AirFrictionMaterial.frictionCombine = PhysicMaterialCombine.Minimum;
-            }
+            //if (m_AirFrictionMaterial == null){
+            //    // air physics 
+            //    m_AirFrictionMaterial = new PhysicMaterial();
+            //    m_AirFrictionMaterial.name = "AirFrictionPhysics";
+            //    m_AirFrictionMaterial.staticFriction = 0f;
+            //    m_AirFrictionMaterial.dynamicFriction = 0f;
+            //    m_AirFrictionMaterial.frictionCombine = PhysicMaterialCombine.Minimum;
+            //}
 
 
             if (m_Input) m_Camera = CameraController.Instance.Camera;
@@ -400,12 +399,12 @@
             Color _stepColor = Color.blue;
 
             // change the physics material to very slip when not grounded or maxFriction when is
-            if (m_Grounded && m_InputVector == Vector3.zero)
-                m_CapsuleCollider.material = m_GroundedIdleFrictionMaterial;
-            else if (m_Grounded && m_InputVector != Vector3.zero)
-                m_CapsuleCollider.material = m_GroundedMovingFrictionMaterial;
-            else
-                m_CapsuleCollider.material = m_AirFrictionMaterial;
+            //if (m_Grounded && m_InputVector == Vector3.zero)
+            //    m_CapsuleCollider.material = m_GroundedIdleFrictionMaterial;
+            //else if (m_Grounded && m_InputVector != Vector3.zero)
+            //    m_CapsuleCollider.material = m_GroundedMovingFrictionMaterial;
+            //else
+                //m_CapsuleCollider.material = m_AirFrictionMaterial;
             
 
             if(m_Grounded)

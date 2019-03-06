@@ -10,6 +10,7 @@ public class DecalDestroyer : MonoBehaviour
     private IEnumerator Start()
     {
         yield return new WaitForSeconds(lifeTime);
+        //ObjectPoolManager.Instance.Destroy(gameObject);
         Destroy(gameObject);
     }
 }

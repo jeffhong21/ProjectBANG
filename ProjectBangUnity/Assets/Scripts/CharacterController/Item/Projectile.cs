@@ -13,8 +13,6 @@ namespace CharacterController
         [SerializeField]
         protected float m_ImpactForce = 5f;
         [SerializeField]
-        protected string m_DamageEvent = "OnTakeDamage";
-        [SerializeField]
         protected GameObject m_Explosion;
         [SerializeField]
         protected GameObject m_DefaultDecal;
@@ -160,7 +158,7 @@ namespace CharacterController
                 }
                 else if (damagableObject.GetType() == typeof(CharacterHealth))
                 {
-                    //EventHandler.ExecuteEvent(damagableObject.gameObject, "OnTakeDamage", m_DamageAmount, collisionPoint, collisionPointNormal, originator);
+                    //EventHandler.ExecuteEvent(damagableObject.gameObject, EventIDs.OnTakeDamage, m_DamageAmount, collisionPoint, collisionPointNormal, originator);
                     damagableObject.TakeDamage(m_DamageAmount, collisionPoint, collisionPointNormal, originator);
                     //  Play DefaultDecal particle system.
                     if (m_DefaultDecal){

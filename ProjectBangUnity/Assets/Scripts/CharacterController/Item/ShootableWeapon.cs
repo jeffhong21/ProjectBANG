@@ -213,19 +213,20 @@
                 {
                     RaycastHit hitGameObject;
                     if (Physics.Raycast(m_FirePoint.position, m_FirePoint.forward, out hitGameObject, m_HitscanFireRange, LayerMask.NameToLayer("Ragdoll"))){
-                        damagableObject.TakeDamage(m_HitscanDamageAmount, hitGameObject.point, hitGameObject.normal, m_Character, hitGameObject.collider.gameObject);
+                        damagableObject.TakeDamage(m_HitscanDamageAmount, hitGameObject.point, force, m_Character, hitGameObject.collider.gameObject);
                     }
                     else{
-                        damagableObject.TakeDamage(m_HitscanDamageAmount, hit.point, hit.normal, m_Character, hit.collider.gameObject);
+                        damagableObject.TakeDamage(m_HitscanDamageAmount, hit.point, force, m_Character, hit.collider.gameObject);
                     }
                     //Debug.Log(hitGameObject.collider);
                 }
                 else if(damagableObject is Health)
                 {
-                    damagableObject.TakeDamage(m_HitscanDamageAmount, hit.point, hit.normal, m_Character);
+                    damagableObject.TakeDamage(m_HitscanDamageAmount, hit.point, force, m_Character);
                 }
                 else{
-                    SpawnParticles(m_DefaultDust, hit.point, hit.normal);
+                    ObjectPoolManager.Instance.Spawn(m_DefaultDust, hit.point, Quaternion.FromToRotation(m_DefaultDust.transform.forward, hit.normal));
+                    //SpawnParticles(m_DefaultDust, hit.point, hit.normal);
                     //SpawnHitEffects(hit.point, -hit.normal);
                 }
 

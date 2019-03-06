@@ -7,7 +7,7 @@
     using System.IO;
 
 
-
+    //  To add a AIStorage asset, create a UtilityAIAssetConfig script in the resources folder.
 
     [Serializable]
     public class AIStorage : ScriptableObject

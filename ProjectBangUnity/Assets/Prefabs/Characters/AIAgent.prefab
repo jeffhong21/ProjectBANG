@@ -699,7 +699,10 @@ GameObject:
   - component: {fileID: 95603462698715644}
   - component: {fileID: 136021364020045450}
   - component: {fileID: 54245609895480114}
+  - component: {fileID: 195902453104059552}
   - component: {fileID: 114558140941445660}
+  - component: {fileID: 114067928307790024}
+  - component: {fileID: 114914555897092106}
   - component: {fileID: 114943009071803092}
   - component: {fileID: 114371115631749686}
   - component: {fileID: 114072454928899778}
@@ -710,12 +713,10 @@ GameObject:
   - component: {fileID: 114202808708353530}
   - component: {fileID: 114073733139308380}
   - component: {fileID: 114241857771727578}
-  - component: {fileID: 114914555897092106}
-  - component: {fileID: 195902453104059552}
   - component: {fileID: 114192664051248166}
   m_Layer: 10
   m_Name: AIAgent
-  m_TagString: Actor
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1936,6 +1937,32 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &114067928307790024
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1761652248440620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bbdcf5f06c1f4a8ca5e59b30682820e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializedGuid: 
+  aiConfigs:
+  - aiId: GenericAI
+    intervalMin: 1
+    intervalMax: 1
+    startDelayMin: 0
+    startDelayMax: 0
+    isActive: 1
+    isPredefined: 1
+    type: CharacterController.AI.GenericAI
+    debug: 0
+  debugNextIntervalTime: 0
+  showDefaultInspector: 0
+  showDeleteAssetOption: 0
+  selectAiAssetOnCreate: 0
 --- !u!114 &114072454928899778
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2177,7 +2204,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Invincible: 0
   m_CurrentHealth: 0
-  m_MaxHealth: 50
+  m_MaxHealth: 30
   m_DamageEffect: {fileID: 1359636532566120, guid: e7fd3bc00cb0e4705ad206d71d216190,
     type: 2}
   m_DeathEffect: {fileID: 0}
@@ -2253,8 +2280,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: beb0abb21668e4255a205b52c1853acc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_CheckRate: 1
-  m_WanderRange: 20
   m_Context:
     agent: {fileID: 0}
     navMeshAgent: {fileID: 0}
@@ -2262,11 +2287,10 @@ MonoBehaviour:
     destination: {x: 0, y: 0, z: 0}
     hasDestination: 0
     sampledPositions: []
-    entitites: []
-  m_stateIndicator: {fileID: 23024995623082534}
-  walkState: {r: 0.7058824, g: 1, b: 0, a: 1}
-  runningState: {r: 0, g: 0.5549643, b: 1, a: 1}
-  idleState: {r: 0.5188679, g: 0.5188679, b: 0.5188679, a: 1}
+    hostiles: []
+    hostilesLayer:
+      serializedVersion: 2
+      m_Bits: 0
 --- !u!114 &114943009071803092
 MonoBehaviour:
   m_ObjectHideFlags: 1

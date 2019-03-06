@@ -21,10 +21,10 @@
     {
         //  For Debuging.
         private string debugColor;
-        public bool debugClient{ get; set; }
+        public bool debugClient { get; set; }
 
         //  ContextProvider from BANG.
-        private AIContextProvider contextProvider;
+        private IContextProvider contextProvider;
 
 
         private ISchedulerHandle _handle;
@@ -86,7 +86,7 @@
         public UtilityAIClient(Guid aiId, IContextProvider contextProvider, float intervalMin, float intervalMax, float startDelayMin, float startDelayMax)
         {
             ai = AIManager.GetAI(aiId);
-            this.contextProvider = contextProvider as AIContextProvider;
+            this.contextProvider = contextProvider;
 
             this.intervalMin = intervalMin;
             this.intervalMax = intervalMax;
@@ -118,7 +118,7 @@
         public UtilityAIClient(IUtilityAI ai, IContextProvider contextProvider, float intervalMin, float intervalMax, float startDelayMin, float startDelayMax)
         {
             this.ai = ai;
-            this.contextProvider = contextProvider as AIContextProvider;
+            this.contextProvider = contextProvider;
 
             this.intervalMin = intervalMin;
             this.intervalMax = intervalMax;
@@ -149,29 +149,26 @@
         {
             //Debug.LogFormat("<color={0}>AI {1}</color> is Executing Update. | LastUpdate: {2} | NextUpdate: {3}", debugColor, ai.name, deltaTime, nextInterval);
             activeAction = ai.Select(contextProvider.GetContext());
-            activeAction.Execute(contextProvider.GetContext());
 
-
-
-
-            if(debugClient)
+            if(activeAction != null)
             {
-                //Debug.LogFormat("BaseType: {0}   |   {1}", activeAction.GetType().BaseType, activeAction.GetType().BaseType == typeof(ActionWithOptions<Vector3>));
-                if(activeAction.GetType().BaseType == typeof(ActionWithOptions<Vector3>)){
-                    Debug.LogFormat("BaseType: {0} | Type: {1}", activeAction.GetType().BaseType, activeAction.GetType());
+                activeAction.Execute(contextProvider.GetContext());
+
+                visualizer = null;
+                if (Visualization.VisualizerManager.TryGetVisualizerFor(activeAction.GetType(), out visualizer)){
+                    //Debug.LogFormat("There is a visualizer for Action {0} |", activeAction.GetType());
+                    visualizer.EntityUpdate(activeAction, contextProvider.GetContext(), ai.id);
                 }
 
-                //if (activeAction.GetType() == typeof(ActionWithOptions<>)){
-                //    Debug.Log(activeAction.GetType().Name);
-                //}
+                if (debugClient)
+                {
+                    //Debug.LogFormat("Active action is {0}", activeAction.GetType().Name);
+                }
             }
+                
 
-            visualizer = null;
-            if (Visualization.VisualizerManager.TryGetVisualizerFor(activeAction.GetType(), out visualizer))
-            {
-                //Debug.LogFormat("There is a visualizer for Action {0} |", activeAction.GetType());
-                visualizer.EntityUpdate(activeAction, contextProvider.GetContext(), ai.id);
-            }
+
+
 
             //if (activeAction is CompositeAction){
             //    for (int i = 0; i < ((CompositeAction)activeAction).actions.Count; i++){

@@ -15,7 +15,7 @@
 
             if (m_CurrentHealth > 0)
             {
-                EventHandler.ExecuteEvent(gameObject, "OnTakeDamage", amount, position, force, attacker);
+                EventHandler.ExecuteEvent(gameObject, EventIDs.OnTakeDamage, amount, position, force, attacker);
                 //  Change health amount.
                 m_CurrentHealth -= amount;
                 SpawnParticles(m_DamageEffect, position);

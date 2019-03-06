@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-
+using uUtilityAI;
 
 namespace CharacterController.AI
 {
     [Serializable]
-    public class AgentContext 
+    public class AgentContext : IAIContext
     {
         [HideInInspector]
         public AgentController agent;
@@ -21,9 +21,9 @@ namespace CharacterController.AI
 
         public List<Vector3> sampledPositions = new List<Vector3>();
        
-        public List<GameObject> entitites = new List<GameObject>();
-
-
+        public List<GameObject> hostiles = new List<GameObject>();
+        [HideInInspector]
+        public LayerMask hostilesLayer;
 
 
 
@@ -36,14 +36,9 @@ namespace CharacterController.AI
         {
             agent = a;
             navMeshAgent = bridge;
-
+            hostilesLayer = agent.GetComponent<LayerManager>().EnemyLayer;
         }
 
-        public void Initialize(AgentController a, NavMeshAgentBridge bridge)
-        {
-            agent = a;
-            navMeshAgent = bridge;
-        }
 
 
 

@@ -15,7 +15,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 
 
     private SpawnPoints[] m_SpawnPoints = new SpawnPoints[0];
-
+    private float m_SpawnInterval = 1;
 
 
 
@@ -36,15 +36,9 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
             Spawn(m_Player, m_SpawnPoints[0].Position, m_SpawnPoints[0].Rotation);
         }
 
-        if(m_SpawnPoints.Length > 0){
-            for (int i = 0; i < m_AgentCount; i++){
-                if (i + 1 == m_SpawnPoints.Length)
-                    break;
-                var go = Spawn(m_Agent, m_SpawnPoints[i + 1].Position, m_SpawnPoints[i + 1].Rotation);
-                go.GetComponent<ActorSkins.ActorSkinComponent>().LoadActorSkin();
-            }
-        }
 
+
+        StartCoroutine(SpawnAgents(m_SpawnInterval));
     }
 
 
@@ -66,5 +60,25 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         return go;
     }
 
+
+    private IEnumerator SpawnAgents(float intervalTime)
+    {
+        var spawnInterval = new WaitForSeconds(intervalTime);
+
+        if (m_SpawnPoints.Length > 0)
+        {
+            for (int i = 0; i < m_AgentCount; i++)
+            {
+                if (i + 1 == m_SpawnPoints.Length)
+                    break;
+                var go = Spawn(m_Agent, m_SpawnPoints[i + 1].Position, m_SpawnPoints[i + 1].Rotation);
+                go.GetComponent<ActorSkins.ActorSkinComponent>().LoadActorSkin();
+
+                yield return spawnInterval;
+            }
+        }
+
+        yield return null;
+    }
 
 }

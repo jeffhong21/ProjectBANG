@@ -23,7 +23,7 @@ namespace CharacterController
         float m_LineHeight;
         float m_LineHeightSpace;
 
-        bool m_ShowMovementFoldout;
+        bool m_ShowMovementFoldout = true;
         bool m_ShowComponents;
 
 

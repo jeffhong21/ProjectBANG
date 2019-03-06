@@ -14,6 +14,7 @@ public class SpawnPoints : MonoBehaviour
         public Color defaultColor = Color.cyan;
         public Color spawnColor = Color.green;
         public Color respawnColor = Color.magenta;
+
     }
 
 
@@ -48,13 +49,16 @@ public class SpawnPoints : MonoBehaviour
 
 
 
-
-
-
-	private void OnDrawGizmosSelected()
-	{
+    private void OnDrawGizmos()
+    {
         DrawGizmos();
-	}
+    }
+
+
+	//private void OnDrawGizmosSelected()
+	//{
+ //       DrawGizmos();
+	//}
 
 
 	public void DrawGizmos()

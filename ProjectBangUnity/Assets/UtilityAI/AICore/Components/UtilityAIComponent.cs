@@ -14,8 +14,8 @@
 
         [SerializeField]
         private string serializedGuid;
-        public UtilityAIConfig[] aiConfigs;
-        private IUtilityAIClient[] _clients;
+        public UtilityAIConfig[] aiConfigs = new UtilityAIConfig[0];
+        private IUtilityAIClient[] _clients = new IUtilityAIClient[0];
 
 
 

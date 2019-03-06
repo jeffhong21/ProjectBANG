@@ -14,7 +14,7 @@
         //
         // Static Fields
         //
-        public static string TempStorageFolder = "Assets/Scripts/UtilityAI/Resources/AIStorage";
+        public static string TempStorageFolder = "Assets/UtilityAI/Resources/AIStorage";
         public static string StorageFolder = "AIStorage";
 
         private static readonly bool initLock;

@@ -20,7 +20,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4846225323537990}
   - component: {fileID: 198444631259220202}
-  - component: {fileID: 114588977035162148}
   - component: {fileID: 199086262331057820}
   m_Layer: 0
   m_Name: bulletHit_blocks_fx
@@ -42,18 +41,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114588977035162148
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1082194431870132}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f521016a8953c4c6b97f8a5cb59dbfa0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _poolId: 0
 --- !u!198 &198444631259220202
 ParticleSystem:
   m_ObjectHideFlags: 1
