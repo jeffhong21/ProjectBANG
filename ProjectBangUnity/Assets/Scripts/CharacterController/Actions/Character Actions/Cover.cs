@@ -23,7 +23,7 @@ namespace CharacterController
         //protected Vector3 m_PopDistance = new Vector3(0.3f, 0, 3);
 
 
-        [SerializeField]
+       // [SerializeField]
         protected CoverIDs m_CurrentCoverID;
         protected Transform m_DetectorHolder;
         protected Transform m_ObjectDetector;
@@ -38,25 +38,25 @@ namespace CharacterController
 
         protected RaycastHit m_RaycastHit;
         protected Quaternion m_TargetRotation;
-        [SerializeField]
+        //[SerializeField]
         protected Vector3 m_TargetPosition;
         protected Vector3 m_CoverDirection;
        
 
         protected bool m_HighCover;
         protected float m_PopoutLength = 0.5f;
-        [SerializeField]
+        //[SerializeField]
         protected float m_HorizontalInput;
-        [SerializeField]
+       // [SerializeField]
         protected float m_ForwardInput;
 
-        [SerializeField]
+        //[SerializeField]
         protected Vector3 m_StartPosition;
-        [SerializeField]
+        //[SerializeField]
         protected Vector3 m_StopPosition;       //  Stop position when hitting side edge of cover
-        [SerializeField]
+        //[SerializeField]
         protected bool m_CanPopLeft;
-        [SerializeField]
+        //[SerializeField]
         protected bool m_CanPopRight;
         protected bool m_HasHighCoverLeft;
         protected bool m_HasHighCoverRight;

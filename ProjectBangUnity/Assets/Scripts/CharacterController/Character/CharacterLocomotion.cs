@@ -371,7 +371,7 @@
 
             if (Physics.Raycast(groundCheck, out m_GroundHit, m_AlignToGroundDepthOffset + m_SkinWidth, m_Layers.SolidLayer))
             {
-                var rayStart = (m_Transform.position + Vector3.up * m_MaxStepHeight) + m_Transform.forward * (m_CapsuleCollider.radius + m_SkinWidth);
+                var rayStart = (m_Transform.position + Vector3.up * m_MaxStepHeight) + m_Transform.forward * (m_CapsuleCollider.radius * 2);  //+ m_SkinWidth);
                 var rayEnd = Vector3.down * (m_MaxStepHeight - m_StepOffset);
 
                 if (m_DrawDebugLine) Debug.DrawRay(rayStart, rayEnd, Color.yellow);
@@ -383,8 +383,8 @@
                         if (m_StepHit.point.y >= (m_Transform.position.y) && m_StepHit.point.y <= (m_Transform.position.y + m_StepOffset + m_SkinWidth))
                         {
                             m_MoveDirection = (m_StepHit.point - m_Transform.position).normalized * m_StepSpeed * (m_Speed > 1 ? m_Speed : 1);
-                            m_Rigidbody.velocity = m_MoveDirection; // * m_StepSpeed * (m_Speed > 1 ? m_Speed : 1);// + (Vector3.up * m_Step);
-
+                            m_Rigidbody.velocity = m_MoveDirection + Vector3.up * 1; // * m_StepSpeed * (m_Speed > 1 ? m_Speed : 1);// + (Vector3.up * m_Step);
+                            //m_Transform.position += m_MoveDirection;
                             _stepColor = Color.magenta;
                         }
                         else
@@ -409,7 +409,6 @@
         //  Update the rotation forces.
         private void UpdateRotation()
         {
-
             if (m_Aiming){
                 m_LookDirection = m_FocusPoint.position - m_Transform.position;
                 m_LookDirection.y = m_Transform.position.y;
@@ -583,9 +582,10 @@
             //  Call On Aim Delegate.
             OnAim(aim);
 
-
-            //Debug.LogFormat("Aiming is {0}", aim);
+            CameraController.Instance.FreeRotation = aim;
+            Debug.LogFormat("Camera Free Rotation is {0}", CameraController.Instance.FreeRotation);
         }
+
 
 
         private void OnActionActive(CharacterAction action, bool activated)

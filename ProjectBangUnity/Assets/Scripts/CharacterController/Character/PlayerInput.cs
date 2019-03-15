@@ -131,6 +131,8 @@ namespace CharacterController
 
 		private void Update()
         {
+            CameraInput();
+
             if(m_Controller)
             {
                 //  Set input vectors.
@@ -174,7 +176,7 @@ namespace CharacterController
 
 		private void LateUpdate()
 		{
-            CameraInput();
+            
             SetCameraPosition();
             LockCameraRotation();
 		}
@@ -342,7 +344,7 @@ namespace CharacterController
 
             m_CameraController.RotateCamera(Input.GetAxis(m_RotateCameraXInput), Input.GetAxis(m_RotateCameraYInput));
 
-            //m_CameraController.ZoomCamera(Input.GetAxisRaw("Mouse ScrollWheel"));
+            m_CameraController.ZoomCamera(Input.GetAxisRaw("Mouse ScrollWheel"));
         }
 
 

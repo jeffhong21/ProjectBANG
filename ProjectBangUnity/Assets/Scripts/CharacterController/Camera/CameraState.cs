@@ -20,6 +20,7 @@ namespace CharacterController
 
 
         [Header("--  Rotation Settings  --")]
+        [Range(0.05f, 1)]
         public float TurnSmooth = 0.12f;
         [Tooltip("Left and right rotation speed.")]
         public float YawRotateSpeed = 4; 

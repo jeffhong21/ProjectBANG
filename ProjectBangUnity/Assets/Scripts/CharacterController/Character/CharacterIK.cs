@@ -236,7 +236,6 @@
             //rightHandPosition = m_RightHand.position;
             //rightHandTargetRotation = m_RightHandTarget.rotation;
             //rightHandTargetPosition = m_RightHandTarget.position;
-
         }
 
 
@@ -260,25 +259,10 @@
         }
 
 
-        protected virtual void PositionLowerBody()
-        {
-            //MovePelvisHeight();
-
-            //right foot ik position and rotation -- utilise the pro features in here
-            m_Animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1);
-            MoveFeetToIkPoint(AvatarIKGoal.RightFoot, rightFootIkPosition, rightFootIkRotation, ref lastRightFootPositionY);
-
-
-            //left foot ik position and rotation -- utilise the pro features in here
-            m_Animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1);
-            MoveFeetToIkPoint(AvatarIKGoal.LeftFoot, leftFootIkPosition, leftFootIkRotation, ref lastLeftFootPositionY);
-        }
 
 
         protected virtual void RotateDominantHand()
         {
-
-
             m_Animator.SetIKRotationWeight(AvatarIKGoal.RightHand, m_TargetHandWeight);
             m_Animator.SetIKRotation(AvatarIKGoal.RightHand, m_RightHandTarget.rotation * rightHandTargetRotation);
             //m_Animator.SetIKRotation(AvatarIKGoal.RightHand, m_RightHandTarget.rotation);
@@ -312,9 +296,6 @@
             m_Animator.SetIKPosition(AvatarIKGoal.RightHand, m_RightHandTarget.position);
 
 
-
-
-
             //rightHandTargetPosition = rightHandTargetPosition + rightHandTargetRotation * m_HandIKOffset;
             //rightHandTargetPosition += rightHandPosition + rightHandRotation * m_HandIKOffset - m_RightHand.position;
             //rightHandTargetPosition += rightHandPosition;
@@ -325,6 +306,19 @@
 
 
 
+        protected virtual void PositionLowerBody()
+        {
+            MovePelvisHeight();
+
+            //right foot ik position and rotation -- utilise the pro features in here
+            m_Animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1);
+            MoveFeetToIkPoint(AvatarIKGoal.RightFoot, rightFootIkPosition, rightFootIkRotation, ref lastRightFootPositionY);
+
+
+            //left foot ik position and rotation -- utilise the pro features in here
+            m_Animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1);
+            MoveFeetToIkPoint(AvatarIKGoal.LeftFoot, leftFootIkPosition, leftFootIkRotation, ref lastLeftFootPositionY);
+        }
 
 
         void MoveFeetToIkPoint(AvatarIKGoal foot, Vector3 positionIkHolder, Quaternion rotationIkHolder, ref float lastFootPositionY)

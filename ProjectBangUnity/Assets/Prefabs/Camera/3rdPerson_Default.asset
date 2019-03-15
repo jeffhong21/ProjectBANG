@@ -14,15 +14,15 @@ MonoBehaviour:
   StateName: Default
   MoveSpeed: 8
   AimSpeed: 24
-  AdaptSpeed: 8
+  AdaptSpeed: 16
   DefaultPositionX: 0
   DefaultPositionZ: 4.5
   DefaultPositionY: 2
   TurnSmooth: 0.12
   YawRotateSpeed: 1
   PitchRotateSpeed: 2
-  MinYaw: -65
-  MaxYaw: 65
+  MinYaw: -80
+  MaxYaw: 80
   MinPitch: -25
   MaxPitch: 45
   PivotRotationOffset: 0
