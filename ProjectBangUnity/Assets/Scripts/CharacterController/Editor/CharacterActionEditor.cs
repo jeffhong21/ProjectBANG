@@ -6,7 +6,7 @@
 
 
 
-    [CustomEditor(typeof(CharacterAction))]
+    [CustomEditor(typeof(CharacterAction), true)]
     public class CharacterActionEditor : Editor
     {
         private static readonly string[] m_DontIncude = new string[] { "m_Script" };
@@ -20,7 +20,6 @@
         {
             if (target == null) return;
             m_Action = (CharacterAction)target;
-
             m_Action.hideFlags = HideFlags.HideInInspector;
         }
 

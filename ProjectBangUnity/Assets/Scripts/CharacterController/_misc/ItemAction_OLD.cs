@@ -10,9 +10,9 @@
     {
         public enum AnimationLayers { BaseLayer = 0, UpperbodyLayer = 1, AdditiveLayer = 2, FullbodyLayer = 3 };
         [SerializeField]
-        protected Item m_Item;
+        protected ItemType m_Item;
         protected int m_LayerIndex;
-        [Header("-- Item Action Input --")]
+        [Header("-- ItemType Action Input --")]
         [SerializeField]
         protected KeyCode m_ShootInput = KeyCode.Mouse0;
         [SerializeField]
@@ -151,7 +151,7 @@
         public void SwitchItem()
         {
             //Debug.Log(GetItemEnterStateName(m_Inventory.EquippedItemType));
-            //  Get the current Item HASH first.  Than switch
+            //  Get the current ItemType HASH first.  Than switch
             m_Switching = true;
             m_Inventory.SwitchItem(true);
             m_AnimatorMonitor.SetItemID(GetItemID(), 0);
@@ -167,7 +167,7 @@
             m_Inventory.SwitchItem(true);
             Unequip();
 
-            //Debug.LogFormat("Switched Item: <color=red> {0} </color> | Current Hash: <color=red> {1} </color> | Hash:<color=red> {2} </color>",
+            //Debug.LogFormat("Switched ItemType: <color=red> {0} </color> | Current Hash: <color=red> {1} </color> | Hash:<color=red> {2} </color>",
             //GetUnequipStateName(), m_Animator.GetCurrentAnimatorStateInfo(m_LayerIndex).fullPathHash, Animator.StringToHash(GetUnequipStateName()));
         }
 
@@ -266,13 +266,13 @@
             //GUILayout.BeginArea(new Rect(5, 5, Screen.width * 0.5f, Screen.height * 0.6f), GUI.skin.box);
 
 
-            //var playerInputContent = new GUIContent(string.Format(" Switched Item: <color=red> {0} </color> |\n Current Hash: <color=red> {1} </color> |\n Hash:<color=red> {2} </color>",
+            //var playerInputContent = new GUIContent(string.Format(" Switched ItemType: <color=red> {0} </color> |\n Current Hash: <color=red> {1} </color> |\n Hash:<color=red> {2} </color>",
             //                                                      GetUnequipStateName(),
             //                                                      m_Animator.GetCurrentAnimatorStateInfo(m_LayerIndex).fullPathHash,
             //                                                      Animator.StringToHash(GetUnequipStateName() ) ) );
             //GUILayout.Label(playerInputContent);
 
-            //var Equipped = new GUIContent(string.Format(" Switched Item: <color=red> {0} </color> |\n Current Hash: <color=red> {1} </color> |\n Hash:<color=red> {2} </color>",
+            //var Equipped = new GUIContent(string.Format(" Switched ItemType: <color=red> {0} </color> |\n Current Hash: <color=red> {1} </color> |\n Hash:<color=red> {2} </color>",
             //                                            GetEquipStateName(),
             //                                            m_Animator.GetCurrentAnimatorStateInfo(m_LayerIndex).fullPathHash,
             //                                            Animator.StringToHash(GetEquipStateName())));
@@ -421,7 +421,7 @@
             return string.Format("{0}.{1}.{2}", m_AnimatorMonitor.UpperBodyLayerName, GetItemName(), "Unequip");
         }
 
-        protected string GetItemEnterStateName(Item item)
+        protected string GetItemEnterStateName(ItemType item)
         {
             var enterStateName = "Equip";
             if (item == null) enterStateName = "Idle";

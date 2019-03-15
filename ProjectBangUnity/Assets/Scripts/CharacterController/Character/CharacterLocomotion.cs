@@ -17,6 +17,8 @@
         [SerializeField, HideInInspector]
         protected float m_RootMotionSpeedMultiplier = 1;
         [SerializeField, HideInInspector]
+        protected float m_SpeedChangeMultiplier = 1;
+        [SerializeField, HideInInspector]
         protected float m_RotationSpeed = 4f;
         [SerializeField, HideInInspector]
         protected float m_AimRotationSpeed = 8f;
@@ -29,7 +31,7 @@
         [SerializeField, HideInInspector]
         protected float m_SkinWidth = 0.08f;
         [SerializeField, HideInInspector]
-        protected float m_SlopeLimit = 30f;
+        protected float m_SlopeLimit = 45f;
 
         [SerializeField, HideInInspector]
         protected float m_MaxStepHeight = 0.65f;
@@ -40,37 +42,35 @@
         [SerializeField, HideInInspector]
         protected float m_Acceleration = 20f;
 
-        [SerializeField]
+
+
+        [SerializeField, HideInInspector]
         protected CharacterAction[] m_Actions;
-        [SerializeField]
+        [SerializeField, HideInInspector]
         private CharacterAction m_ActiveAction;
         [SerializeField, HideInInspector]
         private CharacterAction[] m_ActiveActions;
         private CharacterAction m_CurrentAction;
 
 
-        protected PhysicMaterial m_GroundedIdleFrictionMaterial; 
-        protected PhysicMaterial m_GroundedMovingFrictionMaterial;
-        protected PhysicMaterial m_StepFrictionMaterial;
-        protected PhysicMaterial m_SlopeFrictionMaterial;
-        protected PhysicMaterial m_AirFrictionMaterial;
-
-
 
         [Header("-- Debug --")]
         private bool m_Grounded = true;
         private bool m_Moving, m_Aiming, m_Running;
+        //[SerializeField, DisplayOnly]
         private float m_Speed;
-        Vector3 m_Velocity, m_CurrentVelocity, m_TargetVelocity;
-        Vector3 m_MoveDirection;
-        [SerializeField]
-        Vector3 m_InputVector;
-        Quaternion m_LookRotation;
+        //[SerializeField, DisplayOnly]
+        private Vector3 m_Velocity, m_MoveDirection, m_LookDirection;
+        //[SerializeField, DisplayOnly]
+        private Vector3 m_InputVector;
+        //[SerializeField, DisplayOnly]
+        private float rotationDifference , eulerY;
+        private Quaternion m_LookRotation;
+
 
         [Header("-- Rigidbody Debug --")]
-
-        [SerializeField] private Vector3 _rigidbodyVelocity;
-        [SerializeField] private Vector3 _rigidbodyAngularVelocity;
+        [SerializeField, DisplayOnly] private Vector3 _rigidbodyVelocity;
+        [SerializeField, DisplayOnly] private Vector3 _rigidbodyAngularVelocity;
 
 
         PlayerInput m_Input;
@@ -79,11 +79,11 @@
         Animator m_Animator;
         CapsuleCollider m_CapsuleCollider;
         Rigidbody m_Rigidbody;
-        Camera m_Camera;
         GameObject m_GameObject;
         Transform m_Transform;
-        Transform m_LookAtPoint;
+        Transform m_FocusPoint;
         float m_DeltaTime;
+
 
         bool m_UpdateRotation = true, m_UpdateMovement = true, m_UpdateAnimator = true;
 
@@ -91,18 +91,10 @@
 
         RaycastHit m_GroundHit;
         RaycastHit m_StepHit;
-
-
         float m_SlopeAngle;
 
 
-
-
-
-
         [SerializeField] bool m_DrawDebugLine;
-        [SerializeField] bool m_ShowComponents;
-        bool m_DebugActiveActions;
         [SerializeField, HideInInspector] CharacterAction m_SelectedAction;
 
 
@@ -110,8 +102,7 @@
 
         #region Properties
 
-        public bool Moving
-        {
+        public bool Moving{
             get{
                 m_Moving = Mathf.Abs(InputVector.x) < 1 && Mathf.Abs(InputVector.z) < 1;
                 return m_Moving;
@@ -124,37 +115,37 @@
             set { m_Running = value; }
         }
 
-        public float RotationSpeed
-        {
+
+        public float SpeedChangeMultiplier{
+            get { return m_SpeedChangeMultiplier; }
+            set { m_SpeedChangeMultiplier = value; }
+        }
+
+
+        public float RotationSpeed{
             get { return m_RotationSpeed; }
             set { m_RotationSpeed = value; }
         }
 
-        public float AimRotationSpeed
-        {
+        public float AimRotationSpeed{
             get { return m_AimRotationSpeed; }
             set { m_AimRotationSpeed = value; }
         }
 
-        public bool AimState
-        {
+        public bool AimState{
             get { return m_Aiming; }
             set { m_Aiming = value; }
         }
 
         public bool Aiming{
-            get {
-                if(m_Aiming){
-                    if(Grounded){
-                        return true;
-                    }
-                }
+            get{
+                if(m_Aiming && Grounded)
+                    return true;
                 return false;
             }
         }
 
-        public Vector3 InputVector
-        {
+        public Vector3 InputVector{
             get { return m_InputVector; }
             set { m_InputVector = value; }
         }
@@ -164,32 +155,28 @@
             get { return m_InputVector.normalized; }
         }
 
-        public Quaternion LookRotation
-        {
+        public Quaternion LookRotation{
             get { return m_LookRotation; }
             set { m_LookRotation = value; }
         }
 
-        public bool Grounded
-        {
+        public bool Grounded{
             get { return m_Grounded; }
             set { m_Grounded = value; }
         }
 
-        public Vector3 Velocity
-        {
+        public Vector3 Velocity{
             get { return m_Velocity; }
             set { m_Velocity = value; }
         }
 
 
         public Vector3 LookPosition{
-            get { return m_LookAtPoint.position; }
-            set { m_LookAtPoint.position = value; }
+            get { return m_FocusPoint.position; }
+            set { m_FocusPoint.position = value; }
         }
 
-        public CharacterAction[] CharActions
-        {
+        public CharacterAction[] CharActions{
             get { return m_Actions; }
             set { m_Actions = value; }
         }
@@ -216,10 +203,9 @@
             if(m_Layers == null) m_Layers = m_GameObject.AddComponent<LayerManager>();
 
 
-            m_LookAtPoint = new GameObject("LookAtPoint").transform; //.parent = gameObject.transform;
-            m_LookAtPoint.transform.parent = m_GameObject.transform;
-            m_LookAtPoint.position = (m_Transform.forward * 10) + (Vector3.up * 1.35f);
-
+            m_FocusPoint = new GameObject("LookAtPoint").transform; //.parent = gameObject.transform;
+            m_FocusPoint.transform.parent = m_GameObject.transform;
+            m_FocusPoint.position = (m_Transform.forward * 10) + (Vector3.up * 1.35f);
 
         }
 
@@ -241,47 +227,17 @@
         {
             var actionIntId = UnityEngine.Random.Range(0, 3);
             m_Animator.SetInteger(HashID.ActionIntData, actionIntId);
-            //m_Animator.CrossFade("Pickup_Item.Pickup_Item_Ground", 0.2f, 0);
-            m_Animator.CrossFade("Pickup_Item.OnEntry", 0.2f, 0);
-            Debug.Log("Playing Animation " + Animator.StringToHash("Pickup_Item.Pickup_Item_Ground") + " | ID: " + actionIntId );
+            if(actionIntId == 0) m_Animator.CrossFade("Pickup_Item.Pickup_Item_Ground", 0.2f, 0);
+            else if (actionIntId == 1) m_Animator.CrossFade("Pickup_Item.Pickup_Item_Waist", 0.2f, 0);
+            else if (actionIntId == 2) m_Animator.CrossFade("Pickup_Item.Pickup_Objects_Ground", 0.2f, 0);
+                    
+            //Debug.Log("Playing Animation " + Animator.StringToHash("Pickup_Item.Pickup_Item_Ground") + " | ID: " + actionIntId );
         }
 
 
 		protected void Start()
         {
             m_ActiveActions = new CharacterAction[m_Actions.Length];
-
-            //if(m_GroundedMovingFrictionMaterial == null){
-            //    // slides the character through walls and edges
-            //    m_GroundedMovingFrictionMaterial = new PhysicMaterial();
-            //    m_GroundedMovingFrictionMaterial.name = "GroundedMovingPhysics";
-            //    m_GroundedMovingFrictionMaterial.staticFriction = .25f;
-            //    m_GroundedMovingFrictionMaterial.dynamicFriction = .25f;
-            //    m_GroundedMovingFrictionMaterial.frictionCombine = PhysicMaterialCombine.Multiply;
-            //}
-
-
-            //if (m_GroundedIdleFrictionMaterial == null){
-            //    // prevents the collider from slipping on ramps
-            //    m_GroundedIdleFrictionMaterial = new PhysicMaterial();
-            //    m_GroundedIdleFrictionMaterial.name = "GroundedIdlePhysics";
-            //    m_GroundedIdleFrictionMaterial.staticFriction = 1f;
-            //    m_GroundedIdleFrictionMaterial.dynamicFriction = 1f;
-            //    m_GroundedIdleFrictionMaterial.frictionCombine = PhysicMaterialCombine.Maximum;
-            //}
-
-
-            //if (m_AirFrictionMaterial == null){
-            //    // air physics 
-            //    m_AirFrictionMaterial = new PhysicMaterial();
-            //    m_AirFrictionMaterial.name = "AirFrictionPhysics";
-            //    m_AirFrictionMaterial.staticFriction = 0f;
-            //    m_AirFrictionMaterial.dynamicFriction = 0f;
-            //    m_AirFrictionMaterial.frictionCombine = PhysicMaterialCombine.Minimum;
-            //}
-
-
-            if (m_Input) m_Camera = CameraController.Instance.Camera;
         }
 
 
@@ -290,9 +246,6 @@
         private void Update()
 		{
             if (m_DeltaTime == 0) return;
-
-
-            m_Grounded = CheckGround();
 
 
             if (m_Actions != null)
@@ -311,7 +264,7 @@
                         //  Can start if there is no active action.
                         if (m_ActiveAction == null)
                         {
-                            if (m_Actions[i].CanStartAction())
+                            if (m_Actions[i].CanStartAction() && m_Actions[i].StartType != ActionStartType.Manual)
                             {
                                 //  Start the Action and update the animator.
                                 m_Actions[i].StartAction();
@@ -325,7 +278,7 @@
                             }
                         }
                         //  Can start if action is concurrent
-                        else if (m_Actions[i].IsConcurrentAction())
+                        else if (m_Actions[i].IsConcurrentAction() && m_Actions[i].StartType != ActionStartType.Manual)
                         {
                             if (m_Actions[i].CanStartAction())
                             {
@@ -346,7 +299,7 @@
                     }
                     //  STOPPING
                     //  If the active actions slot is equal to the current action, than that action can be stopped.
-                    else if (m_ActiveActions[i] == m_Actions[i])
+                    else if (m_ActiveActions[i] == m_Actions[i] && m_ActiveActions[i].StopType != ActionStopType.Manual)
                     {
                         if (m_Actions[i].CanStopAction())
                         {
@@ -383,6 +336,10 @@
         {
             _rigidbodyVelocity = m_Rigidbody.velocity;
             _rigidbodyAngularVelocity = m_Rigidbody.angularVelocity;
+
+
+            m_Grounded = CheckGround();
+
             if (m_UpdateRotation) UpdateRotation();
             if (m_UpdateMovement) UpdateMovement();
             if (m_UpdateAnimator) UpdateAnimator();
@@ -398,14 +355,6 @@
         {
             Color _stepColor = Color.blue;
 
-            // change the physics material to very slip when not grounded or maxFriction when is
-            //if (m_Grounded && m_InputVector == Vector3.zero)
-            //    m_CapsuleCollider.material = m_GroundedIdleFrictionMaterial;
-            //else if (m_Grounded && m_InputVector != Vector3.zero)
-            //    m_CapsuleCollider.material = m_GroundedMovingFrictionMaterial;
-            //else
-                //m_CapsuleCollider.material = m_AirFrictionMaterial;
-            
 
             if(m_Grounded)
             {
@@ -457,19 +406,48 @@
         }
 
 
-
         //  Update the rotation forces.
         private void UpdateRotation()
         {
-            //var angle = Mathf.Atan2(InputVector.x, Mathf.Abs(InputVector.z));
-            //angle = Mathf.Rad2Deg * m_RotationSpeed;
-            //angle += m_Transform.eulerAngles.y;
-            //LookRotation = Quaternion.Euler(0, angle, 0);
 
-            //m_LookRotation *= Quaternion.AngleAxis(m_RotationSpeed * m_InputVector.x * m_DeltaTime, Vector3.up);
-            //m_Rigidbody.MoveRotation(m_LookRotation.normalized);
+            if (m_Aiming){
+                m_LookDirection = m_FocusPoint.position - m_Transform.position;
+                m_LookDirection.y = m_Transform.position.y;
 
-            m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Transform.rotation, m_LookRotation.normalized, m_RotationSpeed * m_DeltaTime));
+                if (m_LookDirection != Vector3.zero)
+                    m_LookRotation = Quaternion.LookRotation(m_LookDirection, m_Transform.up);
+                else
+                    m_LookRotation = m_Transform.rotation;
+                
+                rotationDifference = m_LookRotation.eulerAngles.y - m_Transform.eulerAngles.y;
+                m_LookRotation = Quaternion.Slerp(m_Transform.rotation, m_LookRotation.normalized, m_RotationSpeed * m_DeltaTime);
+                m_Rigidbody.MoveRotation(m_LookRotation);
+
+                if (m_DrawDebugLine) Debug.DrawRay(m_Transform.position, m_LookDirection, Color.red);
+            }
+            else if(m_InputVector != Vector3.zero && m_MoveDirection.sqrMagnitude > 0.2f)
+            {
+                eulerY = Mathf.Atan2(m_InputVector.x, Mathf.Abs(m_InputVector.z));
+                eulerY = Mathf.Rad2Deg * m_RotationSpeed * m_DeltaTime;
+                eulerY *= m_InputVector.x;
+                eulerY += m_Transform.eulerAngles.y;
+
+                rotationDifference = eulerY - m_Transform.eulerAngles.y;
+
+                if (rotationDifference == 0) eulerY = m_Transform.eulerAngles.y;
+
+                m_LookRotation = Quaternion.Euler(m_Transform.eulerAngles.x, eulerY, m_Transform.eulerAngles.z);
+                m_LookRotation = Quaternion.Slerp(m_Transform.rotation, m_LookRotation.normalized, m_RotationSpeed * m_DeltaTime);
+                m_Rigidbody.MoveRotation(m_LookRotation);
+
+                //m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Transform.rotation, m_LookRotation.normalized, m_RotationSpeed * m_DeltaTime));
+            }
+            else{
+                rotationDifference = 0;
+            }
+
+
+            //m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Transform.rotation, m_LookRotation.normalized, m_RotationSpeed * m_DeltaTime));
         }
 
 
@@ -478,22 +456,18 @@
         {
             //if (m_SlopeAngle >= m_SlopeLimit) return;
 
-
             if(m_Aiming)
             {
                 m_Speed = Mathf.Clamp01(Mathf.Abs(m_InputVector.x) + Mathf.Abs(m_InputVector.z));
                 m_Speed = Mathf.Clamp(m_Speed, 0, 1);
-                if (m_Running)
-                    m_Speed += 1f;
-                //m_Speed = Mathf.Clamp(m_InputVector.z, -1, 1);
-                //if (m_Running)
-                    //m_Speed += 1f;
+                if (m_Running) m_Speed += 1f;
+
             }
             else{
-                m_Speed = Mathf.Clamp01(Mathf.Abs(m_InputVector.x) + Mathf.Abs(m_InputVector.z));
-                m_Speed = Mathf.Clamp(m_Speed, 0, 1);
-                if (m_Running)
-                    m_Speed += 1f;
+                m_Speed = Mathf.Clamp01(Mathf.Abs(m_InputVector.x) + Mathf.Abs(m_InputVector.z)) * m_SpeedChangeMultiplier;
+                //m_Speed = Mathf.Clamp(m_Speed, 0, 1);
+                //if (m_Running)
+                    //m_Speed += 0.5f;
             }
 
 
@@ -503,16 +477,13 @@
                 m_Velocity.y = m_Rigidbody.velocity.y;
                 m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, m_Acceleration * m_DeltaTime);
             }
-            else
-            {
-                if(m_Aiming)
-                {
+            else{
+                if(m_Aiming){
                     m_Velocity = (m_Transform.TransformDirection(m_InputVector) * m_Speed);
                     m_Velocity.y = m_Rigidbody.velocity.y;
                     m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, m_Acceleration * m_DeltaTime);
                 }
-                else
-                {
+                else{
                     m_Velocity = m_MoveDirection + m_Transform.forward * m_Speed;
                     m_Rigidbody.velocity = m_Velocity;
                     m_Rigidbody.AddForce(m_MoveDirection * (m_Speed) * m_DeltaTime, ForceMode.VelocityChange);
@@ -540,35 +511,41 @@
 
 		public void MoveCharacter(float horizontalMovement, float forwardMovement, Quaternion lookRotation)
         {
+            //throw new NotImplementedException(string.Format("<color=yellow>{0}</color> MoveCharacter not Implemented.", GetType()));
+
             m_InputVector.x = horizontalMovement;
             m_InputVector.y = m_Rigidbody.velocity.y;
             m_InputVector.z = forwardMovement;
             m_LookRotation = lookRotation;
 
-            //if (Mathf.Abs(horizontalMovement) < 1 && Mathf.Abs(forwardMovement) < 1) return;
 
-            m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Transform.rotation, lookRotation.normalized, m_RotationSpeed * m_DeltaTime));
-            if (m_UseRootMotion)
-            {
+            m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Transform.rotation, m_LookRotation.normalized, m_RotationSpeed * m_DeltaTime));
 
-                m_Velocity = m_Transform.forward * forwardMovement;
-                m_Velocity += m_Transform.right * horizontalMovement;
-                m_Velocity.Normalize();
-            }
-            else
-            {
-                m_Velocity = m_Transform.forward * forwardMovement * m_GroundSpeed.z;
-                m_Velocity += m_Transform.right * horizontalMovement * m_GroundSpeed.x;
-                m_Velocity.Normalize();
-                m_Rigidbody.velocity = m_Velocity * m_RootMotionSpeedMultiplier;
-            }
+            m_Velocity = m_MoveDirection + m_Transform.forward * m_Speed;
+            m_Rigidbody.velocity = m_Velocity;
+            m_Rigidbody.AddForce(m_MoveDirection * (m_Speed) * m_DeltaTime, ForceMode.VelocityChange);
 
 
 
-            //  Play Animation
-            UpdateAnimator();
-            //if(Aiming){
-            //    m_AnimationMonitor.SetHorizontalInputValue(horizontalMovement);
+            m_Moving = m_InputVector.sqrMagnitude > 0.1f;
+
+
+            ////if (Mathf.Abs(horizontalMovement) < 1 && Mathf.Abs(forwardMovement) < 1) return;
+
+            //m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Transform.rotation, lookRotation.normalized, m_RotationSpeed * m_DeltaTime));
+            //if (m_UseRootMotion)
+            //{
+
+            //    m_Velocity = m_Transform.forward * forwardMovement;
+            //    m_Velocity += m_Transform.right * horizontalMovement;
+            //    m_Velocity.Normalize();
+            //}
+            //else
+            //{
+            //    m_Velocity = m_Transform.forward * forwardMovement * m_GroundSpeed.z;
+            //    m_Velocity += m_Transform.right * horizontalMovement * m_GroundSpeed.x;
+            //    m_Velocity.Normalize();
+            //    m_Rigidbody.velocity = m_Velocity * m_RootMotionSpeedMultiplier;
             //}
         }
 
@@ -589,7 +566,6 @@
             //    m_Rigidbody.velocity = m_Velocity;
             //    //Debug.Log(m_Animator.deltaPosition);
             //}
-
         }
 
 
@@ -598,23 +574,30 @@
         private void OnAimActionStart(bool aim)
         {
             m_Aiming = aim;
+
+            //if(aim)CameraController.Instance.ChangeCameraState("Aim");
+            //else CameraController.Instance.SetDefaultCameraState();
+            
+
+
+            //  Call On Aim Delegate.
             OnAim(aim);
+
+
             //Debug.LogFormat("Aiming is {0}", aim);
         }
 
 
         private void OnActionActive(CharacterAction action, bool activated)
         {
-            if(m_DebugActiveActions){
-                if (action is Aim) return;
-                Debug.Log(action + " activated: " + activated);
-            }
+            //int index = Array.IndexOf(m_Actions, action);
+            //if(activated){
+            //    m_ActiveActions[index] = m_Actions[index];
+            //}
+            //else{
+            //    m_ActiveActions[index] = null;
+            //}
         }
-
-
-
-
-
 
 
         public T GetAction<T>() where T : CharacterAction
@@ -623,13 +606,45 @@
         }
 
 
-        public bool TryStartAction(CharacterAction ability)
+        public bool TryStartAction(CharacterAction action)
         {
-            if (ability.CanStartAction())
-            {
-                ability.StartAction();
-                return true;
+            if (action == null) return false;
+
+            int index = Array.IndexOf(m_Actions, action);
+            //  If there is an active action and current action is non concurrent.
+            if(m_ActiveAction != null && action.IsConcurrentAction() == false){
+                int activeActionIndex = Array.IndexOf(m_Actions, m_ActiveAction);
+                Debug.LogFormat("Action index {0} | Active Action index {1}", index, activeActionIndex);
+                if(index < activeActionIndex){
+                    if (action.CanStartAction()){
+                        m_ActiveAction = m_Actions[index];
+                        m_ActiveActions[index] = m_Actions[index];
+                        action.StartAction();
+                        return true;
+                    }
+                } 
             }
+            //  If there is an active action and current action is concurrent.
+            else if (m_ActiveAction != null && action.IsConcurrentAction())
+            {
+                if (action.CanStartAction()){
+                    m_ActiveActions[index] = m_Actions[index];
+                    action.StartAction();
+                    return true;
+                }
+            }
+            //  If there is no active action.
+            else if (m_ActiveAction == null){
+                if (action.CanStartAction())
+                {
+                    m_ActiveAction = m_Actions[index];
+                    m_ActiveActions[index] = m_Actions[index];
+                    action.StartAction();
+                    return true;
+                }
+            }
+
+
             return false;
         }
 
@@ -640,10 +655,41 @@
 
         }
 
-        public void TryStopAction()
+        public void TryStopAction(CharacterAction action)
         {
+            if (action == null) return; 
 
+
+            if (action.CanStopAction())
+            {
+                int index = Array.IndexOf(m_Actions, action);
+                if (m_ActiveAction == action)
+                    m_ActiveAction = null;
+                m_ActiveActions[index] = null;
+
+                action.StopAction();
+                ActionStopped();
+            }
         }
+
+
+        public void TryStopAction(CharacterAction action, bool force)
+        {
+            if (action == null) return; 
+            if(force){
+                int index = Array.IndexOf(m_Actions, action);
+                if (m_ActiveAction == action)
+                    m_ActiveAction = null;
+                m_ActiveActions[index] = null;
+
+                action.StopAction();
+                ActionStopped();
+                return;
+            }
+
+            TryStopAction(action);
+        }
+
 
         public void ActionStopped()
         {
@@ -684,7 +730,11 @@
             //    Gizmos.DrawRay(transform.position + m_DebugHeightOffset, transform.right );
             //    //Gizmos.DrawRay(transform.position + Vector3.up * heightOffset, transform.right + Vector3.up * heightOffset);
             //}
-
+            //if(Application.isPlaying){
+            //    Gizmos.color = Color.green;
+            //    Gizmos.DrawSphere(LookPosition, 0.1f);
+            //    Gizmos.DrawLine(transform.position + (transform.up * 1.35f), LookPosition);
+            //}
             //if(Aiming && m_DrawDebugLine){
             //    Gizmos.color = Color.red;
             //    Gizmos.DrawSphere(LookPosition, 0.1f);

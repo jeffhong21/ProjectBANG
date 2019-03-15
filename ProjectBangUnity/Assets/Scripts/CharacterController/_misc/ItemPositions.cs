@@ -2,7 +2,7 @@
 {
     using UnityEngine;
 
-    [CreateAssetMenu(fileName = "ItemObject Position", menuName = "Character Controller/Items/Item Position")]
+    [CreateAssetMenu(fileName = "Item Position", menuName = "Character Controller/Items/ItemType Position")]
     public class ItemPositions : ScriptableObject
     {
         public Vector3 position;

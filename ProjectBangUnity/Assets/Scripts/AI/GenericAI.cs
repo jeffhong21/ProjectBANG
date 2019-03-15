@@ -65,11 +65,16 @@ namespace CharacterController.AI
 
 
 
+
+
+
+
+
             #region Default-Scan
             //
             //  Default Qualifier
             //
-            //rs.defaultQualifier.action = new EmptyAction();
+            rs.defaultQualifier.action = new ScanForEntities();
             #endregion
         }
 

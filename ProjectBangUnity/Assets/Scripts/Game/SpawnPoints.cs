@@ -11,16 +11,19 @@ public class SpawnPoints : MonoBehaviour
     {
         [Range(0, 1)]
         public float gizmoSize = 0.25f;
-        public Color defaultColor = Color.cyan;
-        public Color spawnColor = Color.green;
-        public Color respawnColor = Color.magenta;
-
+        public Color defaultColor = new Color(0, 1, 1, 0.5f);
+        public Color spawnColor = new Color(1, 0, 1, 0.5f);
+        public Color respawnColor = new Color(0, 1, 0, 0.5f);
+        public Color textColor = new Color(1, 1, 1, 1);
     }
 
 
-
     public SpawnType m_SpawnType = SpawnType.Default;
+    public float m_Radius = 1;
+    public float m_DelayBetweenSpawns = 3;
 
+
+    [Space]
     public SpawPointDebugSettings m_DebugSettings = new SpawPointDebugSettings();
 
 
@@ -29,6 +32,10 @@ public class SpawnPoints : MonoBehaviour
 
 
 
+
+    //
+    //  Properties
+    // 
     public Vector3 Position{
         get { return transform.position; }
     }
@@ -38,31 +45,43 @@ public class SpawnPoints : MonoBehaviour
     }
 
 
-	private void Awake()
+	//
+    //  Methods
+    //
+    private void Awake()
 	{
         m_GameObject = gameObject;
         m_Transform = transform;
 	}
 
 
-
-
-
-
-    private void OnDrawGizmos()
+    public Vector3 GetSpawnPosition()
     {
-        DrawGizmos();
+        Vector3 spawnPoint = m_Transform.position;
+        spawnPoint = m_Transform.position + (UnityEngine.Random.insideUnitSphere * m_Radius);
+        spawnPoint.y = 0;
+        return spawnPoint;
     }
 
 
-	//private void OnDrawGizmosSelected()
-	//{
- //       DrawGizmos();
-	//}
+
+
+    //private void OnDrawGizmos()
+    //{
+    //    DrawGizmos();
+    //}
+
+
+	private void OnDrawGizmosSelected()
+	{
+        DrawGizmos();
+	}
 
 
 	public void DrawGizmos()
 	{
+        #if UNITY_EDITOR
+
         if (m_DebugSettings == null) return;
 
         switch (m_SpawnType)
@@ -78,7 +97,91 @@ public class SpawnPoints : MonoBehaviour
                 break;
         }
 
+        Gizmos.DrawSphere(transform.position, m_Radius);
 
-        Gizmos.DrawSphere(transform.position, m_DebugSettings.gizmoSize);
+
+        GizmosUtils.DrawString(gameObject.name, transform.position + Vector3.up, m_DebugSettings.textColor);
+
+        #endif
 	}
 }
+
+
+
+
+    //public class SpawnPoint : MonoBehaviour
+    //{
+    //    public int grouping;
+    //    public SpawnShape shape;
+
+    //    public float radius = 1f;
+    //    public float xLength = 1f;
+    //    public float zLength = 1f;
+    //    public Color gizmoColor = new Color(1f, 0f, 0f, 0.2f);
+
+    //    private Vector3 boxSize = Vector3.one;
+
+
+    //    private void Awake()
+    //    {
+    //        gameObject.tag = "RespawnPoint";
+    //    }
+
+
+    //    private void OnEnable()
+    //    {
+    //        boxSize = new Vector3(xLength, 1, zLength);
+    //    }
+
+
+    //    public Vector3 GetSpawnPoint()
+    //    {
+    //        Vector3 spawnPoint = transform.position;
+    //        switch (shape)
+    //        {
+    //            case SpawnShape.Point:
+    //                spawnPoint = transform.position;
+    //                break;
+    //            case SpawnShape.Sphere:
+    //                spawnPoint = transform.position + (Random.insideUnitSphere * radius);
+    //                spawnPoint.y = 0;
+    //                break;
+    //            case SpawnShape.Box:
+    //                float randomX = Random.Range(transform.position.x - xLength, transform.position.x + xLength);
+    //                float randomZ = Random.Range(transform.position.z - zLength, transform.position.z + zLength);
+    //                Vector3 randomRange = new Vector3(randomX, 0, randomZ);
+
+    //                spawnPoint = transform.position + randomRange;
+    //                break;
+    //        }
+
+    //        return spawnPoint;
+    //    }
+
+
+    //    private void OnDrawGizmosSelected()
+    //    {
+    //        Gizmos.color = gizmoColor;
+    //        switch (shape)
+    //        {
+    //            case SpawnShape.Point:
+    //                Gizmos.DrawSphere(transform.position, 0.25f);
+    //                break;
+    //            case SpawnShape.Sphere:
+    //                Gizmos.DrawSphere(transform.position, radius);
+    //                break;
+    //            case SpawnShape.Box:
+    //                boxSize.Set(xLength, 1, zLength);
+    //                Gizmos.DrawCube(transform.position + Vector3.up * (boxSize.y * 0.5f), boxSize);
+    //                break;
+    //        }    
+    //    }
+
+    //}
+
+    //public enum SpawnShape
+    //{
+    //    Point,
+    //    Sphere,
+    //    Box
+    //}

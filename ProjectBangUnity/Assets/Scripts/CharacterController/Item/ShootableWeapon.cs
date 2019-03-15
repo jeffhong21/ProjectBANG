@@ -3,7 +3,7 @@
     using UnityEngine;
 
 
-    public class ShootableWeapon : ItemObject, IUseableItem, IReloadableItem
+    public class ShootableWeapon : Item, IUseableItem, IReloadableItem
     {
         //
         // Fields
@@ -31,20 +31,17 @@
         protected GameObject m_MuzzleFlash;
         [SerializeField]
         protected Transform m_SmokeLocation;
-        [Header("-- Hitscan Settings --")]
         [SerializeField]
-        protected float m_HitscanFireRange = float.MaxValue;
+        protected float m_DamageAmount = 10;
         [SerializeField]
-        protected LayerMask m_HitscanImpactLayers = -1;
+        protected float m_ImpactForce = 5;
         [SerializeField]
-        protected string m_HitscanDamageEvent;
+        protected float m_FireRange = float.MaxValue;
         [SerializeField]
-        protected float m_HitscanDamageAmount = 10;
-        [SerializeField]
-        protected float m_HitscanImpactForce = 5;
-        [Header("-- Projectile Settings --")]
+        protected LayerMask m_ImpactLayers = -1;
         [SerializeField]
         protected GameObject m_Projectile;
+
 
         [Header("-- Decals --")]
         [SerializeField]
@@ -58,7 +55,7 @@
 
         private float m_ReloadTime = 3f;
         private float m_NextUseTime = 0;
-        private float m_ImpactForceMultiplier = 10;
+
 
         private Quaternion m_Rotation;
 
@@ -75,11 +72,13 @@
 
 
             if (m_Smoke != null){
-                m_Smoke.transform.localPosition = m_FirePoint.localPosition;
-                m_Smoke.transform.localRotation = m_FirePoint.localRotation;
+                m_Smoke = Instantiate(m_Smoke, m_Transform);
+                m_Smoke.transform.localPosition = m_SmokeLocation.localPosition;
+                m_Smoke.transform.localRotation = m_SmokeLocation.localRotation;
                 m_Smoke.SetActive(false);
             }
             if (m_MuzzleFlash != null){
+                m_MuzzleFlash = Instantiate(m_MuzzleFlash, m_Transform);
                 m_MuzzleFlash.transform.localPosition = m_FirePoint.localPosition;
                 m_MuzzleFlash.transform.localRotation = m_FirePoint.localRotation;
                 m_MuzzleFlash.SetActive(false);
@@ -159,7 +158,7 @@
 
             if (m_Projectile){
                 ProjectileFire();
-            } else {
+            }  else {
                 HitscanFire();
             }
 
@@ -187,59 +186,80 @@
         {
             //  Spawn Projectile from the PooManager.
             var go = Instantiate(m_Projectile, m_FirePoint.position, m_FirePoint.rotation);
-            //Debug.Break();
             //  Get Projectile Component.
             var projectile = go.GetComponent<Projectile>();
             //  Initialize projectile.
-            projectile.Initialize(m_FirePoint.forward, m_GameObject);
+            projectile.Initialize(m_DamageAmount, m_FirePoint.forward, m_Character);
+
         }
+
+
 
 
         protected virtual void HitscanFire()
         {
             RaycastHit hit;
+            Debug.DrawRay(m_FirePoint.position, m_FirePoint.forward * m_FireRange, Color.green, 1);
 
-            Debug.DrawRay(m_FirePoint.position, m_FirePoint.forward * m_HitscanFireRange, Color.green, 1);
-            if(Physics.Raycast(m_FirePoint.position, m_FirePoint.forward, out hit, m_HitscanFireRange, m_HitscanImpactLayers))
+            if(Physics.Raycast(m_FirePoint.position, m_FirePoint.forward, out hit, m_FireRange, m_ImpactLayers))
             {
-                var damagableObject = hit.transform.GetComponent<Health>();
-                //var damagableObject = hit.transform.GetComponent<DamageReciever>();
+                var damagableObject = hit.transform.GetComponentInParent<Health>();
                 Vector3 hitDirection = hit.transform.position - m_FirePoint.position;
-                Vector3 force = hitDirection.normalized * m_HitscanImpactForce;
+                Vector3 force = hitDirection.normalized * m_ImpactForce;
                 var rigb = hit.transform.GetComponent<Rigidbody>();
 
 
-                if(damagableObject is CharacterHealth)
-                {
-                    RaycastHit hitGameObject;
-                    if (Physics.Raycast(m_FirePoint.position, m_FirePoint.forward, out hitGameObject, m_HitscanFireRange, LayerMask.NameToLayer("Ragdoll"))){
-                        damagableObject.TakeDamage(m_HitscanDamageAmount, hitGameObject.point, force, m_Character, hitGameObject.collider.gameObject);
-                    }
-                    else{
-                        damagableObject.TakeDamage(m_HitscanDamageAmount, hit.point, force, m_Character, hit.collider.gameObject);
-                    }
-                    //Debug.Log(hitGameObject.collider);
-                }
-                else if(damagableObject is Health)
-                {
-                    damagableObject.TakeDamage(m_HitscanDamageAmount, hit.point, force, m_Character);
-                }
-                else{
-                    ObjectPoolManager.Instance.Spawn(m_DefaultDust, hit.point, Quaternion.FromToRotation(m_DefaultDust.transform.forward, hit.normal));
-                    //SpawnParticles(m_DefaultDust, hit.point, hit.normal);
-                    //SpawnHitEffects(hit.point, -hit.normal);
-                }
 
+                //if(damagableObject is CharacterHealth)
+                //{
+                //    RaycastHit hitGameObject;
+                //    if (Physics.Raycast(m_FirePoint.position, m_FirePoint.forward, out hitGameObject, m_FireRange, LayerMask.NameToLayer("Ragdoll"))){
+                //        damagableObject.TakeDamage(m_DamageAmount, hitGameObject.point, force, m_Character, hitGameObject.collider.gameObject);
+                //    }
+                //    else{
+                //        damagableObject.TakeDamage(m_DamageAmount, hit.point, force, m_Character, hit.collider.gameObject);
+                //    }
+                //    //Debug.Log(hitGameObject.collider);
+                //}
+                //else if(damagableObject is Health)
+                //{
+                //    damagableObject.TakeDamage(m_DamageAmount, hit.point, force, m_Character);
+                //}
+                //else{
+                //    ObjectPoolManager.Instance.Spawn(m_DefaultDust, hit.point, Quaternion.LookRotation(hit.normal));
+                //    //SpawnParticles(m_DefaultDust, hit.point, hit.normal);
+                //    //SpawnHitEffects(hit.point, -hit.normal);
+                //}
+
+
+                //if (rigb && !hit.transform.gameObject.isStatic){
+                //    //rigb.AddForce(hitDirection.normalized * m_ImpactForce, ForceMode.Impulse);
+                //    rigb.AddForceAtPosition(hitDirection.normalized * m_ImpactForce, hit.point, ForceMode.Impulse);
+                //}
+
+
+                if (damagableObject is CharacterHealth)
+                {
+                    damagableObject.TakeDamage(m_DamageAmount, hit.point, force, m_Character, hit.collider.gameObject);
+                }
+                else if (damagableObject is Health)
+                {
+                    damagableObject.TakeDamage(m_DamageAmount, hit.point, force, m_Character);
+                }
+                else
+                {
+                    //ObjectPoolManager.Instance.Spawn(m_DefaultDust, collisionPoint, Quaternion.FromToRotation(m_Transform.forward, collisionPointNormal));
+                    ObjectPoolManager.Instance.Spawn(m_DefaultDust, hit.point, Quaternion.LookRotation(hit.normal));
+                }
 
 
                 if (rigb && !hit.transform.gameObject.isStatic)
                 {
-                    //rigb.AddForce(hitDirection.normalized * m_HitscanImpactForce, ForceMode.Impulse);
-                    rigb.AddForceAtPosition(hitDirection.normalized * m_HitscanImpactForce, hit.point, ForceMode.Impulse);
-                    //rigb.AddExplosionForce(m_HitscanImpactForce, hitDirection, 50f);
+                    rigb.AddForceAtPosition(hitDirection.normalized * m_ImpactForce, hit.point, ForceMode.Impulse);
                 }
 
-                //Debug.Log(hit.collider.gameObject.name);
+
+
             }
 
         }
@@ -274,9 +294,9 @@
 
         private void SpawnHitEffects(Vector3 collisionPoint, Vector3 collisionPointNormal)
         {
-            var decal = Instantiate(m_DefaultDecal, collisionPoint, Quaternion.FromToRotation(m_Transform.forward, collisionPointNormal));
+            var decal = Instantiate(m_DefaultDecal, collisionPoint, Quaternion.LookRotation(collisionPointNormal));
             Destroy(decal, 5);
-            var dust = Instantiate(m_DefaultDust, collisionPoint, Quaternion.FromToRotation(m_Transform.forward, collisionPointNormal));
+            var dust = Instantiate(m_DefaultDust, collisionPoint, Quaternion.LookRotation(collisionPointNormal));
             var ps = dust.GetComponentInChildren<ParticleSystem>();
             ps.Play();
             Destroy(ps.gameObject, ps.main.duration + 1);
@@ -285,7 +305,7 @@
 
         private void SpawnParticles(GameObject particleObject, Vector3 collisionPoint, Vector3 collisionPointNormal)
         {
-            var go = Instantiate(particleObject, collisionPoint, Quaternion.FromToRotation(m_Transform.forward, collisionPointNormal));
+            var go = Instantiate(particleObject, collisionPoint, Quaternion.LookRotation(collisionPointNormal));
             var ps = go.GetComponentInChildren<ParticleSystem>();
             ps.Play();
             Destroy(ps.gameObject, ps.main.duration + 1);
@@ -296,7 +316,7 @@
         {
             if(m_DrawAimLine && m_FirePoint != null){
                 Gizmos.color = Color.yellow;
-                Gizmos.DrawRay(m_FirePoint.position, (m_FirePoint.forward * 12));  //  + (Vector3.up * m_FirePoint.position.y) 
+                Gizmos.DrawRay(m_FirePoint.position, (m_FirePoint.forward * 50));  //  + (Vector3.up * m_FirePoint.position.y) 
             }
         }
 

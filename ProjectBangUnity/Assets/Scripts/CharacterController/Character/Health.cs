@@ -22,12 +22,12 @@
         protected float m_MaxHealth = 100f;
         [SerializeField]
         protected GameObject m_DamageEffect;
-        //[SerializeField]
-        //protected AudioClip m_DamageSfx;
+        [SerializeField]
+        protected AudioClip m_DamageSfx;
         [SerializeField]
         protected GameObject m_DeathEffect;
-        //[SerializeField]
-        //protected AudioClip m_DeathSfx;
+        [SerializeField]
+        protected AudioClip m_DeathSfx;
         [SerializeField]
         protected bool m_DeactivateOnDeath;
         [SerializeField]
@@ -40,7 +40,8 @@
         [SerializeField]
         protected float m_TimeInvincibleAfterSpawn;
 
-
+        protected Rigidbody m_Rigidbody;
+        protected Collider m_Collider;
         protected GameObject m_GameObject;
         protected Transform m_Transform;
 
@@ -68,6 +69,8 @@
         // 
         protected virtual void Awake()
         {
+            m_Rigidbody = GetComponent<Rigidbody>();
+            m_Collider = GetComponent<Collider>();
             m_CurrentHealth = m_MaxHealth;
             m_GameObject = gameObject;
             m_Transform = transform;
@@ -112,6 +115,8 @@
                 {
                     Die(position, force, attacker);
                 }
+
+                Debug.LogFormat("{0} hit {1}", attacker.name, gameObject.name);
             }
         }
 
@@ -162,8 +167,7 @@
             //Debug.LogFormat("{0} killed by {1}", m_GameObject.name, attacker.name);
             //  Deactivate gameobject on death.
 
-            EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnDeath, position, force, attacker);
-            EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnRagdoll, position, force, 0f);
+
         }
 
 

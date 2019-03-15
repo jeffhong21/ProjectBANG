@@ -222,13 +222,12 @@ MonoBehaviour:
   m_Pivot: {fileID: 4572819961280480}
   m_MouseSensitivity: 2
   m_CameraState: {fileID: 11400000, guid: 7e6f7bf8d3f914d2c8b9d8f007b3c2a2, type: 2}
-  m_IsAiming: 0
-  m_IsCrouching: 0
-  m_LockCamera: 0
   m_ScreenToViewport: {x: 0, y: 0, z: 0}
   m_Yaw: 0
   m_Pitch: 0
+  m_ZoomAmount: 0
   m_CameraStateToggle: 1
+  rotationDifference: 0
 --- !u!114 &114395464280231394
 MonoBehaviour:
   m_ObjectHideFlags: 1

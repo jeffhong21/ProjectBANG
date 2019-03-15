@@ -8,26 +8,12 @@
     {
 
 
-        protected Rigidbody m_RigidBody;
-
 
 
         //
         // Methods
         //
-        protected virtual void Reset()
-        {
-            m_ActionID = 1;
-            m_InputName = "Jump";
-            m_StartType = ActionStartType.ButtonDown;
-            m_StopType = ActionStopType.Automatic;
-        }
 
-
-        //public override bool CanStopAction()
-        //{
-        //    return CheckGround();
-        //}
 
         protected override void ActionStarted()
         {
@@ -47,6 +33,12 @@
         {
             //Debug.LogFormat("{0} Action has stopped", GetType().Name);
         }
+
+
+        //public override bool CanStopAction()
+        //{
+        //    return CheckGround();
+        //}
     }
 
 }

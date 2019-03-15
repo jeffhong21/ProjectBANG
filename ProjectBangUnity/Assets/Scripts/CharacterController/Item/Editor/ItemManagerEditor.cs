@@ -9,7 +9,7 @@
     public class ItemManagerEditor : Editor
     {
         private static readonly string[] m_DontIncude = new string[] { "m_Script" };
-        private static readonly string m_SearchFilter = "t:Item";
+        private static readonly string m_SearchFilter = "t:ItemType";
 
         private ItemManager m_ItemManager;
 
@@ -36,7 +36,7 @@
 
 
 
-            if(GUILayout.Button(new GUIContent("Initialize Item Manager"))){
+            if(GUILayout.Button(new GUIContent("Initialize ItemType Manager"))){
                 //InitializeItemManager();
                 m_ItemManager.Initialize();
             }
@@ -52,7 +52,7 @@
             for (int i = 0; i < guids.Length; i++)
             {
                 string path = AssetDatabase.GUIDToAssetPath(guids[i]);
-                Item asset = AssetDatabase.LoadAssetAtPath<Item>(path);
+                ItemType asset = AssetDatabase.LoadAssetAtPath<ItemType>(path);
                 Debug.LogFormat("Asset: {1}\nPath: {0}", path, asset);
 
                 //m_Items.InsertArrayElementAtIndex(i);

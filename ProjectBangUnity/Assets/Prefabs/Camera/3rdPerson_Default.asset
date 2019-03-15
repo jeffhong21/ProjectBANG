@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4366c462a5014715a9f4a388c59a825, type: 3}
+  m_Name: 3rdPerson_Default
+  m_EditorClassIdentifier: 
+  StateName: Default
+  MoveSpeed: 8
+  AimSpeed: 24
+  AdaptSpeed: 8
+  DefaultPositionX: 0
+  DefaultPositionZ: 4.5
+  DefaultPositionY: 2
+  TurnSmooth: 0.12
+  YawRotateSpeed: 1
+  PitchRotateSpeed: 2
+  MinYaw: -65
+  MaxYaw: 65
+  MinPitch: -25
+  MaxPitch: 45
+  PivotRotationOffset: 0
+  AllowZoom: 0
+  ZoomSmooth: 100
+  ZoomStep: 2
+  MaxZoom: -10
+  MinZooom: -30
+  AimPositionX: 0.5
+  AimPositionZ: 2
+  CrouchPositionY: 1.5
+  LookDirection: {x: 0, y: 0, z: 1}

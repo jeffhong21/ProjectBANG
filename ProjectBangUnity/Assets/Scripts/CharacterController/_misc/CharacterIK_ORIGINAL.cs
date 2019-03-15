@@ -1,4 +1,4 @@
-//namespace CharacterController
+﻿//namespace CharacterController
 //{
 //    using UnityEngine;
 //    using System;
@@ -55,7 +55,7 @@
 //        private Transform m_RightHand, m_LeftHand, m_UpperChest, m_RightShoulder;
 //        private Transform m_AimPivot;
 //        [SerializeField] private Transform m_RightHandTarget;
-//        [SerializeField] private ItemObject m_CurrentItem;
+//        [SerializeField] private Item m_CurrentItem;
 
 
 //        private Vector3 m_TargetDirection;
@@ -137,14 +137,14 @@
 
 //        private void OnEnable()
 //        {
-//            EventHandler.RegisterEvent<ItemObject>(m_GameObject, "OnInventoryEquip", HandleItem);
+//            EventHandler.RegisterEvent<Item>(m_GameObject, "OnInventoryEquip", HandleItem);
 //            EventHandler.RegisterEvent<bool>(m_GameObject, "OnAimActionStart", OnAim);
 //        }
 
 
 //        private void OnDisable()
 //        {
-//            EventHandler.UnregisterEvent<ItemObject>(m_GameObject, "OnInventoryEquip", HandleItem);
+//            EventHandler.UnregisterEvent<Item>(m_GameObject, "OnInventoryEquip", HandleItem);
 //            EventHandler.UnregisterEvent<bool>(m_GameObject, "OnAimActionStart", OnAim);
 //        }
 
@@ -222,7 +222,7 @@
 
 
 
-//        private void HandleItem(ItemObject item)
+//        private void HandleItem(Item item)
 //        {
 //            //Debug.LogFormat("{0} currently equipped item is {1}.", gameObject.name, item == null ? "<null>" : item.ItemAnimName);
 //            if (item == null)

@@ -45,6 +45,12 @@ namespace ActorSkins
             return manager.skins[index].mesh;
         }
 
+        public Texture2D GetRandmTexture()
+        {
+            int index = Random.Range(0, manager.textures.Length);
+            return manager.textures[index];
+        }
+
     }
 }
 

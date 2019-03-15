@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using CharacterController;
+
 public class GameManager : SingletonMonoBehaviour<GameManager> 
 {
-
+    [SerializeField]
+    private CameraController m_CameraController;
     public GameObject m_Player;
 
     public GameObject m_Agent;
@@ -15,7 +18,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 
 
     private SpawnPoints[] m_SpawnPoints = new SpawnPoints[0];
-    private float m_SpawnInterval = 1;
+    private float m_SpawnInterval = 2;
 
 
 
@@ -24,21 +27,35 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 	{
         base.Awake();
 
+        if (CameraController.Instance == null && m_CameraController)
+            m_CameraController = Instantiate(m_CameraController) as CameraController;
+        
+        else if (m_CameraController == null && CameraController.Instance != null)
+            m_CameraController = CameraController.Instance;
+        
+        else
+            Debug.LogError("GameManager has no Camera");
+
+
         GetAllSpawnPoints();
 	}
 
 
 	private void Start()
 	{
+        GameObject player = null;
         if (m_SpawnPoints.Length <= 0){
-            Spawn(m_Player, Vector3.zero, Quaternion.identity);
+            player = Spawn(m_Player, Vector3.zero, Quaternion.identity);
         } else {
-            Spawn(m_Player, m_SpawnPoints[0].Position, m_SpawnPoints[0].Rotation);
+            player = Spawn(m_Player, m_SpawnPoints[0].Position, m_SpawnPoints[0].Rotation);
         }
 
+        SetCameraTarget(player);
 
 
         StartCoroutine(SpawnAgents(m_SpawnInterval));
+
+        if(player != null) UnityEditor.Selection.activeGameObject = player;
     }
 
 
@@ -48,9 +65,11 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     }
 
 
-    private void SetCameraTarget()
+    private void SetCameraTarget(GameObject target)
     {
-        
+
+
+        m_CameraController.SetMainTarget(target.transform);
     }
 
 
@@ -67,13 +86,16 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 
         if (m_SpawnPoints.Length > 0)
         {
+            int spawnIndex = 1;
             for (int i = 0; i < m_AgentCount; i++)
             {
-                if (i + 1 == m_SpawnPoints.Length)
-                    break;
-                var go = Spawn(m_Agent, m_SpawnPoints[i + 1].Position, m_SpawnPoints[i + 1].Rotation);
+                if (spawnIndex == m_SpawnPoints.Length)
+                    spawnIndex = 1;
+                var go = Spawn(m_Agent, m_SpawnPoints[spawnIndex].GetSpawnPosition(), m_SpawnPoints[spawnIndex].Rotation);
+                go.name = string.Format("{0}({1})", "AI Agent", i);
                 go.GetComponent<ActorSkins.ActorSkinComponent>().LoadActorSkin();
 
+                spawnIndex++;
                 yield return spawnInterval;
             }
         }

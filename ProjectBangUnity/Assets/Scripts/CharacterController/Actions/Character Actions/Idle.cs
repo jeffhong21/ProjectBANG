@@ -13,14 +13,23 @@ namespace CharacterController
 
 
 
+
+        public override bool CanStartAction()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override bool CanStopAction()
+        {
+            throw new System.NotImplementedException();
+        }
+
+
+
         //
         // Methods
         //
-        protected virtual void Reset()
-        {
-            m_StartType = ActionStartType.Automatic;
-            m_StopType = ActionStopType.Automatic;
-        }
+
 
 
         //public override bool CanStartAction()

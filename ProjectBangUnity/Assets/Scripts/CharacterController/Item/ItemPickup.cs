@@ -5,9 +5,9 @@
 
     public class ItemPickup : MonoBehaviour
     {
-        [Header("--  Item Pickup Settings --")]
+        [Header("--  ItemType Pickup Settings --")]
         [SerializeField]
-        protected Item[] m_Items;
+        protected ItemType[] m_Items;
         [SerializeField]
         protected Transform m_TooltipUI;
         [SerializeField]
@@ -40,6 +40,8 @@
 
         //[SerializeField]
         //private AnimationCurve plot = new AnimationCurve();
+        //protected Transform m_Camera;
+
 
 
         protected BoxCollider m_Trigger;
@@ -59,7 +61,7 @@
         //Transform target;
         //Vector3 targetPosition;
 
-        public Item[] Items{
+        public ItemType[] Items{
             get { return m_Items; }
             set { m_Items = value; }
         }
@@ -109,7 +111,6 @@
         public void Initialize(bool isDropped)
         {
             //  Set starting random default values.
-            SetMaterials(isDropped ? m_DropMaterial : m_DefaultMaterial);
             m_Transform.eulerAngles = new Vector3(0, Random.Range(-360, 360), 0);
             m_ObjectHolder.localPosition = m_DefaultPosition;
 
@@ -128,10 +129,8 @@
 
             bool itemAdded = false;
             int amount = 1;
-            if (inventory != null)
-            {
-                for (int i = 0; i < m_Items.Length; i++)
-                {
+            if (inventory != null){
+                for (int i = 0; i < m_Items.Length; i++){
                     if (m_Items[i] is ConsumableItem)
                         amount = ((ConsumableItem)m_Items[i]).Amount;
 
@@ -147,6 +146,7 @@
         protected virtual void OnEnable()
 		{
             m_Transform.localScale = Vector3.one;
+            //m_Camera = CameraController.Instance.transform;
 		}
 
         protected virtual void OnDisable()
@@ -157,20 +157,88 @@
 
         protected void Update()
         {
-            if(m_PlayDefaultAnimation)
-            {
-                if (m_IsRotating){
-                    UpdateRotation(m_DegreesPerSecond, m_RotateCounterClockwise);
-                }
-
-                if (m_IsBouncing){
-                    UpdateYPosition(m_Frequency, m_Amplitude);
-                }
+            if(m_PlayDefaultAnimation){
+                if (m_IsRotating) UpdateRotation(m_DegreesPerSecond, m_RotateCounterClockwise);
+                if (m_IsBouncing)UpdateYPosition(m_Frequency, m_Amplitude);
             }
 
-            //targetPosition = target.position;
-            //transform.LookAt(targetPosition);
+
+            //if(m_Camera != null && m_TooltipUI.gameObject.activeSelf) m_TooltipUI.LookAt(m_Camera);
         }
+
+
+
+
+
+
+        protected void DisableParticleSystems(ParticleSystem[] ps)
+        {
+            for (int i = 0; i < ps.Length; i++){
+                ps[i].gameObject.SetActive(false);
+            }
+        }
+
+
+
+
+
+
+
+
+        protected void OnTriggerEnter(Collider other)
+        {
+            if(other.CompareTag("Player")){
+                m_TooltipUI.gameObject.SetActive(true);
+            }
+
+            if(ObjectPickup(other))
+            {
+                if(m_PickupVFX){
+
+                    var pickupVfx = Instantiate(m_PickupVFX, m_Transform.position + m_Transform.up * 0.5f, Quaternion.identity);
+                    var ps = pickupVfx.GetComponentInChildren<ParticleSystem>();
+                    ps.Play();
+                    Destroy(ps.gameObject, ps.main.duration);
+                }
+
+
+                StartCoroutine(ExitAnimation(new Vector3(0.15f, 0.15f, 0.15f), 0.5f, 2f));
+            }
+            else{
+                //  Nothing has been added to the inventory.
+            }
+        }
+
+
+
+        protected void OnTriggerExit(Collider other)
+		{
+            if (other.CompareTag("Player")){
+                m_TooltipUI.gameObject.SetActive(false);
+            }
+		}
+
+
+
+        private IEnumerator ExitAnimation(Vector3 targetScale, float time, float speed)
+        {
+            float i = 0.0f;
+            float rate = (1.0f / time) * speed;
+            Vector3 startScale = transform.localScale;
+            while (i < 1.0f)
+            {
+                i += Time.deltaTime * rate;
+                transform.localScale = Vector3.Lerp(startScale, targetScale, i);
+                yield return null;
+            }
+
+            gameObject.SetActive(false);
+        }
+
+
+
+
+
 
 
         protected void UpdateRotation(float degrees, bool rotateCounterClockwise, Space space = Space.World)
@@ -201,83 +269,6 @@
             //plot.AddKey(Time.realtimeSinceStartup, height);
         }
 
-
-
-        protected void DisableParticleSystems(ParticleSystem[] ps)
-        {
-            for (int i = 0; i < ps.Length; i++)
-            {
-                ps[i].gameObject.SetActive(false);
-            }
-        }
-
-
-        protected void SetMaterials(Material material)
-        {
-            if (material == null) return;
-
-            MeshRenderer[] meshRenderers = m_ObjectHolder.GetComponentsInChildren<MeshRenderer>();
-            for (int i = 0; i < meshRenderers.Length; i++)
-            {
-                meshRenderers[i].material = material;
-            }
-        }
-
-
-
-
-
-        protected void OnTriggerEnter(Collider other)
-        {
-            if(other.CompareTag("Player"))
-            {
-                m_TooltipUI.gameObject.SetActive(true);
-            }
-
-            if(ObjectPickup(other))
-            {
-                if(m_PickupVFX){
-
-                    var pickupVfx = Instantiate(m_PickupVFX, m_Transform.position + m_Transform.up * 0.5f, Quaternion.identity);
-                    var ps = pickupVfx.GetComponentInChildren<ParticleSystem>();
-                    ps.Play();
-                    Destroy(ps.gameObject, ps.main.duration);
-                }
-
-
-                StartCoroutine(ExitAnimation(new Vector3(0.15f, 0.15f, 0.15f), 0.5f, 2f));
-            }
-            else{
-                //  Nothing has been added to the inventory.
-            }
-        }
-
-
-
-        protected void OnTriggerExit(Collider other)
-		{
-            if (other.CompareTag("Player"))
-            {
-                m_TooltipUI.gameObject.SetActive(false);
-            }
-		}
-
-
-
-        private IEnumerator ExitAnimation(Vector3 targetScale, float time, float speed)
-        {
-            float i = 0.0f;
-            float rate = (1.0f / time) * speed;
-            Vector3 startScale = transform.localScale;
-            while (i < 1.0f)
-            {
-                i += Time.deltaTime * rate;
-                transform.localScale = Vector3.Lerp(startScale, targetScale, i);
-                yield return null;
-            }
-
-            gameObject.SetActive(false);
-        }
 	}
 
 
@@ -286,23 +277,4 @@
 
 
 
- //   public class LookAtCamera : MonoBehaviour
- //   {
-
- //       public Transform target;
- //       Vector3 targetPosition;
-
-	//	private void Start()
-	//	{
- //           target = GameObject.FindGameObjectWithTag("MainCamera").transform;
-	//	}
-
-
-	//	private void Update()
-	//	{
- //           targetPosition = target.position;
- //           transform.LookAt(targetPosition);
-	//	}
-
-	//}
 }

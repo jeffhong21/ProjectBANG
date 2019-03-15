@@ -20,24 +20,20 @@ namespace CharacterController.AI
         private bool m_HideNavMeshAgent;
         [SerializeField]
         private Vector3 m_InputVector;
+        [SerializeField]
         private float m_fwd, m_horizontal;
 
-        [SerializeField]
-        private float arriveRamp;
-        [SerializeField]
-        private float m_distance;
-        private Vector3[] m_corners;
-        private NavMeshHit m_navMeshHit;
+
+
 
         [Header("--  NavMeshAgent Properties --")]
         private bool updatePosition = false;
-        private bool updateRotation = false;
+        private bool updateRotation = true;
 
 
-        private Vector3 m_destination;
+
         private Vector3 m_lookDirection;
-        private Quaternion m_lookRotation;
-        private float m_rotationAngle;
+        private Quaternion m_LookRotation;
 
         private Vector3 m_targetPosition;
         private Vector3 m_interpolatedPosition;
@@ -45,8 +41,12 @@ namespace CharacterController.AI
 
 
 
-
-
+        [SerializeField]
+        Vector3 desiredVelocity, steeringTarget;
+        [SerializeField]
+        float velocitySpeed;
+        [SerializeField]
+        float rotationDifference;
 
 
         private AgentController m_Agent;
@@ -74,6 +74,8 @@ namespace CharacterController.AI
             m_NavMeshAgent = GetComponent<NavMeshAgent>();
             if (m_NavMeshAgent == null) m_NavMeshAgent = gameObject.AddComponent<NavMeshAgent>();
             m_Controller = GetComponent<CharacterLocomotion>();
+            //  Get reference to the context.
+            m_Context = m_Agent.Context;
             m_GameObject = gameObject;
             m_Transform = transform;
 
@@ -107,61 +109,68 @@ namespace CharacterController.AI
             m_NavMeshAgent.enabled = false;
         }
 
-        //[SerializeField]
-        Vector3 desiredVelocity;
-        //[SerializeField]
-        float velocitySpeed;
-        //[SerializeField]
-        float direction;
+
+
+        [SerializeField]
+        private float arriveRamp;
+        [SerializeField]
+        private float m_distance;
+        private Vector3[] m_corners;
+
+
 		private void FixedUpdate()
 		{
             if (m_NavMeshAgent.hasPath)
             {
-                //desiredVelocity = m_NavMeshAgent.desiredVelocity;
-                //velocitySpeed = m_NavMeshAgent.desiredVelocity.sqrMagnitude;
-                //direction = (float)Math.Round(Mathf.Clamp(Vector3.Dot(-m_Transform.right, m_NavMeshAgent.desiredVelocity), -1, 1), 4);
+                desiredVelocity = m_NavMeshAgent.desiredVelocity;
+                velocitySpeed = m_NavMeshAgent.desiredVelocity.sqrMagnitude;
+                steeringTarget = m_NavMeshAgent.steeringTarget;
+
 
 
                 m_lookDirection = m_NavMeshAgent.steeringTarget - m_Transform.position;
-                //m_rotationAngle = Vector3.Angle(m_Transform.forward, m_lookDirection);
-                //m_NavMeshAgent.acceleration = m_rotationAngle * m_NavMeshAgent.speed;
+                m_lookDirection.y = 0;
+
                 if (m_lookDirection != Vector3.zero){
-                    m_lookRotation = Quaternion.LookRotation(m_lookDirection);
-                }
-                else{
-                    m_lookRotation = m_Transform.rotation;
+                    m_LookRotation = Quaternion.LookRotation(m_lookDirection, m_Transform.up);
+                } else {
+                    m_LookRotation = m_Transform.rotation;
                 }
 
+                //Debug.DrawRay(m_Transform.position + (Vector3.up * 0.1f), m_lookDirection, Color.magenta);
 
-                //m_fwd = Vector3.Dot(m_Transform.forward, m_lookDirection.normalized);
-                desiredVelocity = m_NavMeshAgent.desiredVelocity;
+
                 m_fwd = m_NavMeshAgent.desiredVelocity.sqrMagnitude;
                 m_fwd = (float)Math.Round(Mathf.Clamp(m_fwd, -1, 1), 4);
                 if (Mathf.Abs(m_fwd) < 0.1f) m_fwd = 0;
                 if (Mathf.Abs(m_fwd) > 0.9f) m_fwd = 1;
 
-                m_horizontal = Vector3.Dot(-m_Transform.right, m_lookDirection);
-                m_horizontal = (float)Math.Round(Mathf.Clamp(m_horizontal, -1, 1), 4);
-                if (Mathf.Abs(m_horizontal) < 0.1f) m_horizontal = 0;
-                if (Mathf.Abs(m_horizontal) > 0.9f) m_horizontal = 1;
-                
+                rotationDifference = m_LookRotation.eulerAngles.y - m_Transform.eulerAngles.y;
+                if(rotationDifference < 5 || rotationDifference > -5 || m_NavMeshAgent.desiredVelocity == Vector3.zero){
+                    m_horizontal = 0;
+                } else {
+                    m_horizontal = (float)Math.Round(Mathf.Clamp(rotationDifference, -1, 1), 4);
+                }
+
             }
             else{
                 m_fwd = 0f;
                 m_horizontal = 0;
             }
 
-            m_interpolatedPosition = Vector3.Lerp(m_Transform.position, m_targetPosition, m_deltaTime * m_positionInterpolationSpeed);
+
             if(!m_NavMeshAgent.updatePosition){
+                m_interpolatedPosition = Vector3.Lerp(m_Transform.position, m_targetPosition, m_deltaTime * m_positionInterpolationSpeed);
                 m_NavMeshAgent.Move(m_interpolatedPosition - m_Transform.position);
                 m_NavMeshAgent.nextPosition = m_interpolatedPosition;
             }
 
 
             ////  Check for edges.
-            //if (m_NavMeshAgent.FindClosestEdge(out m_navMeshHit)){
-            //    if(m_navMeshHit.distance < m_NavMeshAgent.stoppingDistance && m_NavMeshAgent.remainingDistance > m_NavMeshAgent.stoppingDistance){
-            //        Debug.Log("Closest edge distance." + m_navMeshHit.distance);
+            //NavMeshHit navMeshEdgeHit;
+            //if (m_NavMeshAgent.FindClosestEdge(out navMeshEdgeHit)){
+            //    if(navMeshEdgeHit.distance < m_NavMeshAgent.stoppingDistance && m_NavMeshAgent.remainingDistance > m_NavMeshAgent.stoppingDistance){
+            //        Debug.Log("Closest edge distance." + navMeshEdgeHit.distance);
             //        //m_NavMeshAgent.CalculatePath(m_destination, new NavMeshPath());
             //    }
             //}
@@ -169,10 +178,12 @@ namespace CharacterController.AI
 
 
             m_InputVector.Set(m_horizontal, m_NavMeshAgent.desiredVelocity.y, m_fwd);
-            m_Controller.LookRotation = m_lookRotation;
             m_Controller.InputVector = m_InputVector;
 
+
             m_targetPosition = m_Transform.position;
+            //  Update waypoits.
+            m_Context.WayPoints = m_NavMeshAgent.path.corners;
 		}
 
 
@@ -180,14 +191,17 @@ namespace CharacterController.AI
 
         public void SetDestination(Vector3 destination, float maxDist = 2f, int areaMask = NavMesh.AllAreas) // maxDist is Sample within this distance from sourcePosition.
         {
-            if (NavMesh.SamplePosition(destination, out m_navMeshHit, maxDist, areaMask))
+            NavMeshHit navMeshHit;
+            if (NavMesh.SamplePosition(destination, out navMeshHit, maxDist, areaMask))
             {
-                m_destination = m_navMeshHit.position;
                 m_NavMeshAgent.isStopped = false;
-                m_NavMeshAgent.SetDestination(m_destination);
-                //m_destination = m_NavMeshAgent.destination;
+                m_NavMeshAgent.SetDestination(navMeshHit.position);
+
+                m_Context.WayPoints = m_NavMeshAgent.path.corners;
             }
         }
+
+
 
         public void StopMoving()
         {
@@ -197,13 +211,11 @@ namespace CharacterController.AI
         }
 
 
-
         public float GetDistanceRemaining()
         {
             m_distance = 0.0f;
             m_corners = m_NavMeshAgent.path.corners;
-            for (int c = 0; c < m_corners.Length - 1; c++)
-            {
+            for (int c = 0; c < m_corners.Length - 1; c++){
                 m_distance += Mathf.Abs((m_corners[c] - m_corners[c + 1]).magnitude);
             }
             return m_distance;
@@ -218,55 +230,55 @@ namespace CharacterController.AI
 
 
 
-        private void OnDrawGizmosSelected()
+
+
+        private void OnDrawGizmos()
         {
-            if (m_DrawDebugLines && Application.isPlaying)
-            {
-                if (m_NavMeshAgent != null)
-                {
-                    if (m_NavMeshAgent.path != null)
-                    {
-                        Vector3[] corners = m_NavMeshAgent.path.corners;
-                        for (int c = 0; c < corners.Length - 1; c++)
-                        {
+            //if (Application.isPlaying && m_NavMeshAgent != null)
+            //{
+            //    Gizmos.color = Color.red;
+            //    Gizmos.DrawSphere(m_NavMeshAgent.steeringTarget, .5f);
 
-                            var corner1 = corners[c];
-                            corner1.y += 0.05f;
-                            var corner2 = corners[c + 1];
-                            corner2.y += 0.05f;
-                            Gizmos.color = Color.green;
-                            Gizmos.DrawLine(corner1, corner2);
-                            if (c + 1 <= corners.Length)
-                            {
-                                Gizmos.DrawSphere(corners[c + 1], 0.5f);
-                            }
-                        }
+            //}
 
-                        //DrawGizmoString(string.Format("Distance: {0}", m_distance), corners[corners.Length-1], Color.green);
-                    }
-                    //else
-                    //{
-                    //    Gizmos.color = Color.gray;
-                    //    Gizmos.DrawSphere(m_Context.destination, 0.5f);
-                    //}
+            //if (m_DrawDebugLines && Application.isPlaying)
+            //{
+                //if (m_NavMeshAgent != null)
+                //{
+                //    if (m_NavMeshAgent.path != null)
+                //    {
+                //        Vector3[] corners = m_NavMeshAgent.path.corners;
+                //        for (int c = 0; c < corners.Length - 1; c++)
+                //        {
+
+                //            var corner1 = corners[c];
+                //            corner1.y += 0.05f;
+                //            var corner2 = corners[c + 1];
+                //            corner2.y += 0.05f;
+                //            Gizmos.color = Color.green;
+                //            Gizmos.DrawLine(corner1, corner2);
+                //            if (c + 1 <= corners.Length)
+                //            {
+                //                Gizmos.DrawSphere(corners[c + 1], 0.5f);
+                //            }
+                //        }
+
+                //        //DrawGizmoString(string.Format("Distance: {0}", m_distance), corners[corners.Length-1], Color.green);
+                //    }
+                //    //else
+                //    //{
+                //    //    Gizmos.color = Color.gray;
+                //    //    Gizmos.DrawSphere(m_Context.destination, 0.5f);
+                //    //}
 
 
-                }
-            }
+                //}
+            //}
         }
 
 
 
-        private void DrawGizmoString(string text, Vector3 worldPos, Color? colour = null)
-        {
-            UnityEditor.Handles.BeginGUI();
-            if (colour.HasValue) GUI.color = colour.Value;
-            var view = UnityEditor.SceneView.currentDrawingSceneView;
-            Vector3 screenPos = view.camera.WorldToScreenPoint(worldPos);
-            Vector2 size = GUI.skin.label.CalcSize(new GUIContent(text));
-            GUI.Label(new Rect(screenPos.x - (size.x / 2), -screenPos.y + view.position.height + 4, size.x, size.y), text);
-            UnityEditor.Handles.EndGUI();
-        }
+
 
 	}
 }

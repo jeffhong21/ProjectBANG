@@ -58,7 +58,7 @@
         private Transform m_RightHand, m_LeftHand, m_UpperChest, m_RightShoulder;
         private Transform m_AimPivot;
         [SerializeField] private Transform m_RightHandTarget;
-        private ItemObject m_CurrentItem;
+        private Item m_CurrentItem;
 
 
         private Vector3 m_TargetDirection;
@@ -84,7 +84,7 @@
         [Range(0, 1)] [SerializeField] private float m_FootPositionAdjustmentSpeed = 0.5f;
 
 
-        public bool showSolverDebug = true;
+
 
 
 
@@ -129,7 +129,7 @@
 
         private void OnEnable()
         {
-            EventHandler.RegisterEvent<ItemObject>(m_GameObject, "OnInventoryEquip", HandleItem);
+            EventHandler.RegisterEvent<Item>(m_GameObject, "OnInventoryEquip", HandleItem);
             EventHandler.RegisterEvent<bool>(m_GameObject, "OnAimActionStart", OnAim);
 
             //rightHandPosition = m_RightHand.position;
@@ -141,28 +141,29 @@
 
         private void OnDisable()
         {
-            EventHandler.UnregisterEvent<ItemObject>(m_GameObject, "OnInventoryEquip", HandleItem);
+            EventHandler.UnregisterEvent<Item>(m_GameObject, "OnInventoryEquip", HandleItem);
             EventHandler.UnregisterEvent<bool>(m_GameObject, "OnAimActionStart", OnAim);
         }
 
 
 
 
-        private void HandleItem(ItemObject item)
+        private void HandleItem(Item item)
         {
             //Debug.LogFormat("{0} currently equipped item is {1}.", gameObject.name, item == null ? "<null>" : item.ItemAnimName);
             if (item == null)
             {
                 m_CurrentItem = null;
                 m_RightHandTarget.localPosition = m_RightHand.localPosition;
-                m_RightHandTarget.localEulerAngles = m_RightHand.localEulerAngles;
+                m_RightHandTarget.localEulerAngles = Vector3.zero;
             }
             else
             {
                 m_CurrentItem = item;
                 m_RightHandTarget.localPosition = item.PositionOffset;
-                m_RightHandTarget.localEulerAngles = item.RotationOffset;
+                //m_RightHandTarget.localEulerAngles = item.RotationOffset;
 
+                rightHandTargetRotation = Quaternion.Euler(item.RotationOffset);
             }
         }
 
@@ -199,7 +200,7 @@
 
             m_TargetRotation = Quaternion.LookRotation(m_TargetDirection);
             m_AimPivot.rotation = Quaternion.Slerp(m_AimPivot.rotation, m_TargetRotation, Time.deltaTime * 15);
-
+            //m_RightHandTarget.rotation = Quaternion.Slerp(m_RightHandTarget.rotation, m_TargetRotation, Time.deltaTime * 15);
 
 
 
@@ -276,14 +277,11 @@
 
         protected virtual void RotateDominantHand()
         {
-            //Vector3 direction = m_LookAtPoint.position - m_RightHandTarget.position;
-            //Quaternion rotation = Quaternion.FromToRotation(m_RightHandTarget.forward, direction);
-            //rotation *= Quaternion.Euler(0, 0, -90);
-            //m_RightHandTarget.rotation = Quaternion.Slerp(m_Transform.rotation, rotation, Time.deltaTime * m_HandIKAdjustmentSpeed);
 
 
             m_Animator.SetIKRotationWeight(AvatarIKGoal.RightHand, m_TargetHandWeight);
-            m_Animator.SetIKRotation(AvatarIKGoal.RightHand, m_RightHandTarget.rotation);
+            m_Animator.SetIKRotation(AvatarIKGoal.RightHand, m_RightHandTarget.rotation * rightHandTargetRotation);
+            //m_Animator.SetIKRotation(AvatarIKGoal.RightHand, m_RightHandTarget.rotation);
         }
 
 
@@ -379,8 +377,7 @@
             //raycast handling section 
             RaycastHit feetOutHit;
 
-            if (showSolverDebug)
-                Debug.DrawLine(footPosition, footPosition + Vector3.down * (raycastDownDistance + heightFromGroundRaycast), Color.yellow);
+
 
             if (Physics.Raycast(footPosition, Vector3.down, out feetOutHit, raycastDownDistance + heightFromGroundRaycast, m_LayerManager.SolidLayer))
             {
@@ -432,6 +429,11 @@
                         Gizmos.DrawSphere(m_Controller.LookPosition, 0.1f);
                     }
                 }
+                if(Application.isPlaying){
+                    Gizmos.color = Color.magenta;
+                    Gizmos.DrawRay(m_AimPivot.position, (m_AimPivot.forward * 50));
+                }
+
             }
 		}
 

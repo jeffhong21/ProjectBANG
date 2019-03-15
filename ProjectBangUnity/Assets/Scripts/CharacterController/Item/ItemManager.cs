@@ -26,8 +26,8 @@
 
 
         [SerializeField]
-        private Item[] m_Items;
-        private Dictionary<string, Item> m_ItemLookup;
+        private ItemType[] m_Items;
+        private Dictionary<string, ItemType> m_ItemLookup;
 
 
 
@@ -43,9 +43,9 @@
 
 		public void Initialize()
         {
-            if (m_ItemLookup == null) m_ItemLookup = new Dictionary<string, Item>();
+            if (m_ItemLookup == null) m_ItemLookup = new Dictionary<string, ItemType>();
 
-            m_Items = Resources.LoadAll<Item>("");
+            m_Items = Resources.LoadAll<ItemType>("");
 
             for (int i = 0; i < m_Items.Length; i++)
             {
@@ -57,11 +57,11 @@
                 m_ItemLookup[m_Items[i].name].ID = i;
             }
 
-            Debug.LogFormat("** Initializing Item Manager");
+            Debug.LogFormat("** Initializing ItemType Manager");
         }
 
 
-        public Item GetItem(string itemName)
+        public ItemType GetItem(string itemName)
         {
             if (m_ItemLookup.ContainsKey(itemName))
             {
@@ -74,7 +74,7 @@
 
 
 
-        public static T CreateItemType<T>(string itemName) where T : Item
+        public static T CreateItemType<T>(string itemName) where T : ItemType
         {
             if (Directory.Exists(StorageFolder)){
                 T item = ScriptableObject.CreateInstance<T>();
@@ -95,26 +95,26 @@
 
 
 
-        [MenuItem("Assets/Create/Character Controller/Items/Item Manager", false, 140)]
+        [MenuItem("Assets/Create/Character Controller/Items/ItemType Manager", false, 140)]
         public static void CreateItemManager()
         {
             if (Directory.Exists(StorageFolder)){
                 if(ItemManager.Instance == null){
                     ItemManager itemManager = ScriptableObject.CreateInstance<ItemManager>();
-                    string directory = AssetDatabase.GenerateUniqueAssetPath(StorageFolder + "Item Manager" + ".asset");
+                    string directory = AssetDatabase.GenerateUniqueAssetPath(StorageFolder + "ItemType Manager" + ".asset");
                     AssetDatabase.CreateAsset(itemManager, directory);
                     AssetDatabase.SaveAssets();
                     ItemManager.Instance = itemManager;
                 } else{
-                    Debug.LogFormat("**  Item Manager exists already", StorageFolder);
+                    Debug.LogFormat("**  ItemType Manager exists already", StorageFolder);
                 }
             } else {
-                Debug.LogFormat("**  Cannot Create Item Manager.  Storage Folder \"{0}\" does not exist", StorageFolder);
+                Debug.LogFormat("**  Cannot Create ItemType Manager.  Storage Folder \"{0}\" does not exist", StorageFolder);
             }
         }
 
 
-        [MenuItem("Assets/Create/Character Controller/Items/Primary Item", false, 0)]
+        [MenuItem("Assets/Create/Character Controller/Items/Primary ItemType", false, 0)]
         public static void CreatePrimaryItem()
         {
             PrimaryItem item = CreateItemType<PrimaryItem>("PrimaryItem");
@@ -122,7 +122,7 @@
         }
 
 
-        [MenuItem("Assets/Create/Character Controller/Items/Consumable Item", false, 0)]
+        [MenuItem("Assets/Create/Character Controller/Items/Consumable ItemType", false, 0)]
         public static void CreateConsumableItem()
         {
             ConsumableItem item = CreateItemType<ConsumableItem>("ConsumableItem");

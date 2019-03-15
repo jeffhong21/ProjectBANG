@@ -9,11 +9,11 @@
 //    {
         
 //        [SerializeField, DisplayOnly]
-//        protected Item m_EquippedItemType;
+//        protected ItemType m_EquippedItemType;
 //        [SerializeField]
 //        protected PrimaryItem[] m_Loadout;
 //        [SerializeField]
-//        protected Dictionary<Item, ItemObject> m_Inventory;
+//        protected Dictionary<ItemType, Item> m_Inventory;
 
 
 //        private int m_CurrentItemIndex = -1;
@@ -27,7 +27,7 @@
 //            get { return m_Switching; }
 //        }
 
-//        public Item EquippedItemType{
+//        public ItemType EquippedItemType{
 //            get { return m_EquippedItemType; }
 //        }
 
@@ -39,14 +39,14 @@
 //        private void Awake()
 //        {
 //            m_Animator = GetComponent<Animator>();
-//            m_Inventory = new Dictionary<Item, ItemObject>();
+//            m_Inventory = new Dictionary<ItemType, Item>();
 
 
 //            //LoadDefaultLoadout();
 //        }
 
 
-//        public void PickupItem(Item itemType, int amount, bool equip, bool immediateActivation)
+//        public void PickupItem(ItemType itemType, int amount, bool equip, bool immediateActivation)
 //        {
 //            //if (!m_Inventory.ContainsKey(itemType))
 //            //{

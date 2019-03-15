@@ -12,9 +12,9 @@
 //        public class ItemAmount
 //        {
 //            [SerializeField]
-//            protected Item m_ItemType;
+//            protected ItemType m_ItemType;
 //            [SerializeField, HideInInspector]
-//            protected ItemObject m_Item;
+//            protected Item m_Item;
 //            [SerializeField]
 //            protected int m_Amount = 1;
 //            [SerializeField, HideInInspector]
@@ -23,12 +23,12 @@
 //            protected bool m_Equip = true;
 
 
-//            public Item Item
+//            public ItemType ItemType
 //            {
 //                get { return m_ItemType; }
 //            }
 
-//            public ItemObject ItemObject
+//            public Item Item
 //            {
 //                get { return m_Item; }
 //                set { m_Item = value; }
@@ -72,7 +72,7 @@
 //            {
 //            }
 
-//            public ItemAmount(Item itemType, int amount)
+//            public ItemAmount(ItemType itemType, int amount)
 //            {
 //                m_ItemType = itemType;
 //                m_Amount = amount;
@@ -83,7 +83,7 @@
 //            }
 
 
-//            public ItemAmount(Item itemType, ItemObject item, int amount)
+//            public ItemAmount(ItemType itemType, Item item, int amount)
 //            {
 //                m_ItemType = itemType;
 //                m_Item = item;
@@ -104,14 +104,14 @@
 //        protected ItemAmount[] m_DefaultLoadout;
 
 //        [SerializeField]
-//        protected Item[] m_Loadout;
+//        protected ItemType[] m_Loadout;
 //        [SerializeField]
 //        protected ItemAmount[] m_CurrentInventory;
 
-//        protected Dictionary<Item, ItemAmount> m_Inventory;
+//        protected Dictionary<ItemType, ItemAmount> m_Inventory;
 
 //        [SerializeField, DisplayOnly]
-//        protected Item m_EquippedItemType;
+//        protected ItemType m_EquippedItemType;
 
 
 //        private int m_CurrentItemIndex = -1;
@@ -139,7 +139,7 @@
 //            get { return m_Switching; }
 //        }
 
-//        public Item EquippedItemType
+//        public ItemType EquippedItemType
 //        {
 //            get { return m_EquippedItemType; }
 //        }
@@ -153,7 +153,7 @@
 //            m_Animator = GetComponent<Animator>();
 //            m_ItemSlots = GetComponentsInChildren<ItemEquipSlot>();
 
-//            m_Inventory = new Dictionary<Item, ItemAmount>();
+//            m_Inventory = new Dictionary<ItemType, ItemAmount>();
 
 //            m_ItemHolder = new GameObject("Items").transform;
 //            m_ItemHolder.parent = transform;
@@ -189,14 +189,14 @@
 //            for (int i = 0; i < m_DefaultLoadout.Length; i++)
 //            {
 //                var loadoutItem = m_DefaultLoadout[i];
-//                PickupItem(loadoutItem.Item, loadoutItem.Amount, loadoutItem.Equip, false);
+//                PickupItem(loadoutItem.ItemType, loadoutItem.Amount, loadoutItem.Equip, false);
 //            }
 //        }
 
 
 
 
-//        public void PickupItem(Item itemType, int amount, bool equip, bool immediateActivation)
+//        public void PickupItem(ItemType itemType, int amount, bool equip, bool immediateActivation)
 //        {
 //            if (!m_Inventory.ContainsKey(itemType))
 //            {
@@ -206,8 +206,8 @@
 //                if (itemType.GetType() == typeof(PrimaryItem))
 //                {
 //                    PrimaryItem primaryItem = (PrimaryItem)itemType;
-//                    itemAmount.ItemObject = primaryItem.CreateItem(m_RightHandSlot.transform);
-//                    itemAmount.ItemObject.SetActive(false);
+//                    itemAmount.Item = primaryItem.CreateItem(m_RightHandSlot.transform);
+//                    itemAmount.Item.SetActive(false);
 //                }
 
 
@@ -237,30 +237,30 @@
 
 
 
-//        public ItemObject GetCurrentItem(Item itemType)
+//        public Item GetCurrentItem(ItemType itemType)
 //        {
 //            if (m_EquippedItemType == null)
 //                return null;
 
 //            if (m_EquippedItemType == itemType)
 //            {
-//                return m_Inventory[itemType].ItemObject;
+//                return m_Inventory[itemType].Item;
 //            }
 //            return null;
 //        }
 
 
-//        public ItemObject GetItem(Item itemType)
+//        public Item GetItem(ItemType itemType)
 //        {
 //            if (itemType.GetType() == typeof(PrimaryItem))
 //            {
-//                return m_Inventory[itemType].ItemObject;
+//                return m_Inventory[itemType].Item;
 //            }
 //            return null;
 //        }
 
 
-//        public void UseItem(Item itemType, int amount)
+//        public void UseItem(ItemType itemType, int amount)
 //        {
 //            if (m_EquippedItemType == null)
 //                return;
@@ -280,7 +280,7 @@
 //        }
 
 
-//        public void ReloadItem(Item itemType, int amount)
+//        public void ReloadItem(ItemType itemType, int amount)
 //        {
 //            if (m_EquippedItemType == null)
 //                return;
@@ -306,15 +306,15 @@
 //        }
 
 
-//        public void EquipItem(Item itemType)
+//        public void EquipItem(ItemType itemType)
 //        {
 //            if (m_Inventory.ContainsKey(itemType))
 //            {
 //                if (itemType.GetType() == typeof(PrimaryItem))
 //                {
 //                    m_EquippedItemType = itemType as PrimaryItem;
-//                    //Debug.Log(m_Inventory[m_EquippedItemType].ItemObject);
-//                    //m_Inventory[m_EquippedItemType].ItemObject.SetActive(true);
+//                    //Debug.Log(m_Inventory[m_EquippedItemType].Item);
+//                    //m_Inventory[m_EquippedItemType].Item.SetActive(true);
 //                }
 //            }
 //            //int itemIndex = Array.IndexOf(m_CurrentInventory, typeof(PrimaryItem));
@@ -326,12 +326,12 @@
 //        {
 //            if (itemIndex >= m_CurrentInventory.Length)
 //            {
-//                Debug.LogFormat("ItemObject index is incorrect");
+//                Debug.LogFormat("Item index is incorrect");
 //                return;
 //            }
 //            if (m_CurrentInventory[itemIndex].GetType() == typeof(PrimaryItem))
 //            {
-//                m_EquippedItemType = m_CurrentInventory[itemIndex].Item as PrimaryItem;
+//                m_EquippedItemType = m_CurrentInventory[itemIndex].ItemType as PrimaryItem;
 //            }
 //        }
 
@@ -341,7 +341,7 @@
 //            GetCurrentItem(m_EquippedItemType).SetActive(false);
 //            m_EquippedItemType = null;
 
-//            EventHandler.ExecuteEvent(gameObject, "OnInventoryEquip", (ItemObject)null);
+//            EventHandler.ExecuteEvent(gameObject, "OnInventoryEquip", (Item)null);
 //        }
 
 
@@ -350,9 +350,9 @@
 //            //  Equip item.
 //            if (m_EquippedItemType == null)
 //            {
-//                m_EquippedItemType = m_CurrentInventory[0].Item;
-//                m_Inventory[m_EquippedItemType].ItemObject.SetActive(true);
-//                EventHandler.ExecuteEvent(gameObject, "OnInventoryEquip", m_CurrentInventory[0].ItemObject);
+//                m_EquippedItemType = m_CurrentInventory[0].ItemType;
+//                m_Inventory[m_EquippedItemType].Item.SetActive(true);
+//                EventHandler.ExecuteEvent(gameObject, "OnInventoryEquip", m_CurrentInventory[0].Item);
 //            }
 //            //  Unequipp
 //            else
@@ -375,27 +375,27 @@
 
 
 
-//        private void OnInventoryAddItem(ItemObject item)
+//        private void OnInventoryAddItem(Item item)
 //        {
 
 //        }
 
-//        private void OnInventoryPickupItem(ItemObject item, float count, bool immediatePickup, bool forceEquip)
+//        private void OnInventoryPickupItem(Item item, float count, bool immediatePickup, bool forceEquip)
 //        {
 
 //        }
 
-//        private void OnInventoryEquipItem(ItemObject item, int slotID)
+//        private void OnInventoryEquipItem(Item item, int slotID)
 //        {
 
 //        }
 
-//        private void OnInventoryUnequipItem(ItemObject item, int slotID)
+//        private void OnInventoryUnequipItem(Item item, int slotID)
 //        {
 
 //        }
 
-//        private void OnInventoryRemoveItem(ItemObject item, int slotID)
+//        private void OnInventoryRemoveItem(Item item, int slotID)
 //        {
 
 //        }

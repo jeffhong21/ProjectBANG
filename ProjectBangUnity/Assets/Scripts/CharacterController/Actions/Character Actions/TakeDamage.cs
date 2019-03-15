@@ -19,13 +19,6 @@ namespace CharacterController
 
 
 
-        protected virtual void Reset()
-        {
-            m_ActionID = 10;
-            m_InputName = "";
-            m_StartType = ActionStartType.Automatic;
-            m_StopType = ActionStopType.Automatic;
-        }
 
 
         public override bool CanStartAction()
@@ -117,7 +110,11 @@ namespace CharacterController
         }
 
 
-
+        protected virtual void Reset()
+        {
+            m_StartType = ActionStartType.Automatic;
+            m_StopType = ActionStopType.Automatic;
+        }
     }
 
 }

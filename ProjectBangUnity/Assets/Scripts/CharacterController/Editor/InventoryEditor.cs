@@ -79,7 +79,7 @@
 
             list.drawHeaderCallback = (Rect rect) => 
             {
-                //m_DefaultLoadout.isExpanded = EditorGUI.ToggleLeft(rect, "Item", m_DefaultLoadout.isExpanded);
+                //m_DefaultLoadout.isExpanded = EditorGUI.ToggleLeft(rect, "ItemType", m_DefaultLoadout.isExpanded);
                 rect.x += 12;
                 EditorGUI.LabelField(rect, "Items");
                 rect.x = rect.width - 36;
@@ -96,7 +96,7 @@
             list.onAddDropdownCallback = (Rect buttonRect, ReorderableList l) => 
             {
                 var menu = new GenericMenu();
-                var itemGuids = AssetDatabase.FindAssets("t:Item t:PrimaryItem t:ConsumableItem");
+                var itemGuids = AssetDatabase.FindAssets("t:ItemType t:PrimaryItem t:ConsumableItem");
                 for (int i = 0; i < itemGuids.Length; i++){
                     var itemPath = AssetDatabase.GUIDToAssetPath(itemGuids[i]);
                     menu.AddItem(new GUIContent(Path.GetFileNameWithoutExtension(itemPath)), false, () => AddItemToDefaultLoadout(itemPath));
@@ -115,7 +115,7 @@
 
         private void AddItemToDefaultLoadout(string itemPath)
         {
-            Item item = (Item)AssetDatabase.LoadAssetAtPath(itemPath, typeof(Item));
+            ItemType item = (ItemType)AssetDatabase.LoadAssetAtPath(itemPath, typeof(ItemType));
 
             int index = m_DefaultLoadoutList.count;
 
@@ -146,15 +146,15 @@
         {
             Rect rect = elementRect;
             int intFieldWidth = 36;
-            //SerializedObject elementObj = new SerializedObject(m_Inventory.DefaultLoadout[index].Item);
+            //SerializedObject elementObj = new SerializedObject(m_Inventory.DefaultLoadout[index].ItemType);
             SerializedProperty m_Item = element.FindPropertyRelative("m_Item");
             SerializedProperty m_Amount = element.FindPropertyRelative("m_Amount");
             SerializedProperty m_Equip = element.FindPropertyRelative("m_Equip");
-            Item itemType = (Item)m_Item.objectReferenceValue;
+            ItemType itemType = (ItemType)m_Item.objectReferenceValue;
 
-            //EditorGUI.LabelField(rect, m_Inventory.DefaultLoadout[index].Item.ItemAnimName);
+            //EditorGUI.LabelField(rect, m_Inventory.DefaultLoadout[index].ItemType.ItemAnimName);
 
-            //  Item Scriptableobject
+            //  ItemType Scriptableobject
             rect.width = elementRect.width * 0.95f - intFieldWidth - 4;
             EditorGUI.ObjectField(rect, m_Item, GUIContent.none);
             ////  Toggle Enable

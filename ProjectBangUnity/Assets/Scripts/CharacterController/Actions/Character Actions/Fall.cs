@@ -25,34 +25,13 @@ namespace CharacterController
                 return true;
             }
 
-
-            //if(CheckGround() == false){
-            //    if(m_MinFallHeight < 1){
-            //        return true;
-            //    }
-            //    if (Physics.Raycast(m_Transform.position, Vector3.down, m_MinFallHeight, m_Layers.SolidLayer)){
-            //        return true;
-            //    }
-            //}
             return false;
         }
 
 
 		public override bool CanStopAction()
 		{
-            
-            //if (Physics.Raycast(m_Transform.position, Vector3.down, 10, m_Layers.SolidLayer) )
-            //{
-            //    return true;
-            //}
-
-            //if (CheckGround())
-            //{
-            //    return true;
-            //}
-
-            if (m_Rigidbody.velocity.y == 0)
-            {
+            if (m_Rigidbody.velocity.y == 0){
                 return true;
             }
 
@@ -71,7 +50,10 @@ namespace CharacterController
         //  Returns the state the given layer should be on.
         public override string GetDestinationState(int layer)
         {
-            return "Fall";
+            if(layer == 0){
+                return "Fall";
+            }
+            return "";
         }
 
 
@@ -84,7 +66,16 @@ namespace CharacterController
             m_Heightfall = Mathf.Abs(m_Rigidbody.velocity.y);
             m_AnimatorMonitor.SetActionID(0);
         }
-    }
+
+
+
+
+        protected virtual void Reset()
+		{
+            m_StartType = ActionStartType.Automatic;
+            m_StopType = ActionStopType.Automatic;
+		}
+	}
 
 }
 

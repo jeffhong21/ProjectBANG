@@ -19,13 +19,6 @@ namespace CharacterController
         //
         // Methods
         //
-        private void Reset()
-        {
-            m_ActionID = 4;
-            m_InputName = "";
-            m_StartType = ActionStartType.Automatic;
-            m_StopType = ActionStopType.Automatic;
-        }
 
 
         public override bool CanStartAction()
@@ -93,7 +86,6 @@ namespace CharacterController
 
             return index;
         }
-
 
 
 

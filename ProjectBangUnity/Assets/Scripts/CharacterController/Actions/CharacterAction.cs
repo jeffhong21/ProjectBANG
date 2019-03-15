@@ -3,45 +3,57 @@
     using UnityEngine;
     using System;
 
-
-
     public enum ActionStartType { Automatic, Manual, ButtonDown, DoublePress };
     public enum ActionStopType { Automatic, Manual, ButtonUp, ButtonToggle };
 
     [Serializable]
     public abstract class CharacterAction : MonoBehaviour
     {
-        //
-        // Fields
-        //
-        [SerializeField]
-        protected string m_InputName;
-        [SerializeField]
-        protected ActionStartType m_StartType;
-        [SerializeField]
-        protected ActionStopType m_StopType = ActionStopType.Manual;
+        [SerializeField, HideInInspector]
+        protected string m_StateName;
+        [SerializeField, HideInInspector]
+        protected int m_ActionID;
         //[SerializeField]
         protected float m_TransitionDuration = 0.2f;
         //[SerializeField]
         protected float m_SpeedMultiplier = 1;
-        [SerializeField, Header("-- State Info --")]
-        protected string m_StateName;
-        [SerializeField]
-        protected int m_ActionID;
         [SerializeField, DisplayOnly]
         protected int m_StateHash;
-        [Space(12)]
+        //[SerializeField]
         protected bool m_EquipItem;
+        [SerializeField]
+        protected KeyCode m_Keycode;
+        [SerializeField]
+        protected ActionStartType m_StartType;
+        [SerializeField]
+        protected ActionStopType m_StopType = ActionStopType.Manual;
 
-        protected GameObject m_GameObject;
-        protected Transform m_Transform;
+
+        public ActionStartType StartType
+        {
+            get { return m_StartType; }
+            //set { m_StartType = value; }
+        }
+
+        public ActionStopType StopType
+        {
+            get { return m_StopType; }
+            //set { m_StopType = value; }
+        }
+
+        [Space(12)]
+
+
+
         protected Animator m_Animator;
         protected AnimatorMonitor m_AnimatorMonitor;
         protected LayerManager m_Layers;
         protected CharacterLocomotion m_Controller;
+        protected LayerManager m_LayerManager;
         protected Inventory m_Inventory;
         protected Rigidbody m_Rigidbody;
-        protected LayerManager m_LayerManager;
+        protected GameObject m_GameObject;
+        protected Transform m_Transform;
 
         protected AnimatorTransitionInfo m_TransitionInfo;
 
@@ -57,7 +69,8 @@
         // Properties
         //
         public bool IsActive { 
-            get { return enabled;}
+            get { return m_IsActive;}
+            set { m_IsActive = value; }
         }
 
         public int ActionID{
@@ -65,23 +78,6 @@
             set { m_ActionID = value; }
         }
 
-        public string InputName
-        {
-            get { return m_InputName; }
-            set { m_InputName = value; }
-        }
-
-        public ActionStartType StartType
-        {
-            get { return m_StartType; }
-            set { m_StartType = value; }
-        }
-
-        public ActionStopType StopType
-        {
-            get { return m_StopType; }
-            set { m_StopType = value; }
-        }
 
         public float SpeedMultiplier
         {
@@ -104,7 +100,6 @@
         //
         protected virtual void Awake()
         {
-
             m_GameObject = gameObject;
             m_Transform = transform;
             m_Animator = GetComponent<Animator>();
@@ -126,13 +121,19 @@
 
         protected void OnEnable()
 		{
-            this.hideFlags = HideFlags.HideInInspector;
+            //this.hideFlags = HideFlags.HideInInspector;
 		}
 
         protected void OnDisable()
         {
 
         }
+
+
+		private void OnValidate()
+		{
+            if (string.IsNullOrEmpty(m_StateName)) m_StateName = GetType().Name;
+		}
 
 
 		protected void MoveToTarget(Vector3 targetPosition, Quaternion targetRotation, float minMoveSpeed, Action onComplete)
@@ -152,50 +153,99 @@
         //  Checks if action can be started.
         public virtual bool CanStartAction()
         {
-            bool canStartAction = false;
             switch (m_StartType)
             {
                 case ActionStartType.Automatic:
-                    canStartAction = true;
+                    if (m_IsActive == false)
+                        return true;
                     break;
                 case ActionStartType.Manual:
-                    if(!m_CanManualStart){
-                        m_CanManualStart = true;
-                        canStartAction = true;
-                    }
+                    if (m_IsActive == false)
+                        return true;
                     break;
                 case ActionStartType.ButtonDown:
-                    if (Input.GetButtonDown(m_InputName))
+                    if (Input.GetKeyDown(m_Keycode))
                     {
-                        canStartAction = true;
+                        if (m_IsActive == false)
+                            return true;
                         if (m_StopType == ActionStopType.ButtonToggle)
                             m_ActionStopToggle = true;
                     }
-
-                    break;
-                case ActionStartType.DoublePress:
-                    canStartAction = true;
                     break;
             }
-            return canStartAction;
+            return false;
+        }
+
+        public virtual bool CanStopAction()
+        {
+            if (m_IsActive == false) return false;
+
+            switch (m_StopType)
+            {
+                case ActionStopType.Automatic:
+                    for (int index = 0; index < m_Animator.layerCount; index++){
+                        if (m_Animator.GetCurrentAnimatorStateInfo(index).IsName(m_StateName)){
+                            Debug.LogFormat("Stopping Action State {0}", m_StateName);
+                            return false;
+                        }
+                    }
+                    Debug.LogFormat("Trying to stopping Action State {0}", m_StateName);
+                    m_IsActive = false;
+                    return true;
+                case ActionStopType.Manual:
+                    m_IsActive = false;
+                    return true;
+
+
+                case ActionStopType.ButtonUp:
+                    if (Input.GetKeyUp(m_Keycode)){
+                        m_IsActive = false;
+                        return true;
+                    }
+                    break;
+                case ActionStopType.ButtonToggle:
+                    if (m_ActionStopToggle){
+                        if (Input.GetKeyDown(m_Keycode)){
+                            m_ActionStopToggle = false;
+                            m_IsActive = false;
+                            return true;
+                        }
+                    }
+                    break;
+            }
+            return false;
         }
 
 
-        public virtual void StartAction()
+
+        public void StartAction()
         {
-            m_AnimatorMonitor.SetActionID(m_ActionID);
-            m_AnimatorMonitor.SetActionTrigger(HashID.ActionChange);
+            m_IsActive = true;
+            EventHandler.ExecuteEvent(m_GameObject, "OnCharacterActionActive", this, m_IsActive);
 
             ActionStarted();
-            EventHandler.ExecuteEvent(m_GameObject, "OnCharacterActionActive", this, true);
 
-            for (int index = 0; index < m_Animator.layerCount; index++)
-            {
-                if (string.IsNullOrEmpty(GetDestinationState(index)) == false)
-                {
+            m_AnimatorMonitor.SetActionID(m_ActionID);
+            //m_AnimatorMonitor.SetActionTrigger(HashID.ActionChange);
+
+            for (int index = 0; index < m_Animator.layerCount; index++){
+                if (string.IsNullOrEmpty(GetDestinationState(index)) == false){
                     m_Animator.CrossFade(GetDestinationState(index), m_TransitionDuration, index);
                 }
             }
+
+        }
+
+
+        public void StopAction()
+        {
+            m_AnimatorMonitor.SetActionID(0);
+            //m_Animator.ResetTrigger(HashID.ActionChange);
+
+            ActionStopped();
+
+            m_IsActive = false;
+            EventHandler.ExecuteEvent(m_GameObject, "OnCharacterActionActive", this, m_IsActive);
         }
 
 
@@ -203,68 +253,6 @@
         protected virtual void ActionStarted()
         {
 
-        }
-
-
-        public virtual bool CanStopAction()
-        {
-            bool canStopAction = false;
-            switch (m_StopType)
-            {
-                case ActionStopType.Automatic:
-                    if (m_Animator.GetCurrentAnimatorStateInfo(m_AnimatorMonitor.BaseLayerIndex).shortNameHash == m_StateHash)
-                    {
-                        if (GetNormalizedTime() >= 1 - m_TransitionDuration)
-                        {
-                            canStopAction = true;
-                        }
-                        else
-                        {
-                            canStopAction = false;
-                        }
-                    }
-                    else
-                    {
-                        canStopAction = false;
-                    }
-
-                    break;
-                case ActionStopType.Manual:
-                    canStopAction = true;
-                    break;
-                case ActionStopType.ButtonUp:
-                    if (Input.GetButtonUp(m_InputName))
-                    {
-                        canStopAction = true;
-                    }
-
-                    break;
-                case ActionStopType.ButtonToggle:
-                    if (m_ActionStopToggle)
-                    {
-                        if (Input.GetButtonDown(m_InputName))
-                        {
-                            canStopAction = true;
-                            m_ActionStopToggle = false;
-                        }
-                    }
-
-                    break;
-            }
-
-            m_CanManualStart = false;
-            return canStopAction;
-        }
-
-
-        public virtual void StopAction()
-        {
-            m_AnimatorMonitor.SetActionID(0);
-            m_Animator.ResetTrigger(HashID.ActionChange);
-
-            EventHandler.ExecuteEvent(m_GameObject, "OnCharacterActionActive", this, false);
-
-            ActionStopped();
         }
 
 
@@ -344,7 +332,7 @@
         //  Returns the state the given layer should be on.
         public virtual string GetDestinationState(int layer)
         {
-            return GetType().Name;
+            return m_StateName;
         }
 
 

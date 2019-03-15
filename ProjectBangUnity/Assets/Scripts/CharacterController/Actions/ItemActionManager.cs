@@ -24,6 +24,10 @@
         protected CharacterLocomotion m_Controller;
         protected LayerManager m_LayerManager;
 
+        [SerializeField]
+        protected bool m_IsReloading;
+
+        protected AnimatorStateInfo m_StateInfo;
 
 
         private void Awake()
@@ -38,9 +42,24 @@
 		private void Start()
 		{
             m_LayerIndex = m_AnimatorMonitor.UpperBodyLayerIndex;
+
 		}
 
 
+
+		private void Update()
+		{
+            m_StateInfo = m_Animator.GetCurrentAnimatorStateInfo(m_LayerIndex);
+
+            if(m_StateInfo.IsName(GetFullStateName(ReloadState)) )
+            {
+                if(m_IsReloading && m_StateInfo.normalizedTime > 1 - m_TransitionDuration){
+                    m_IsReloading = false;
+                    Debug.LogFormat("Done reloading. | {0}", Time.timeSinceLevelLoad);
+                }
+            }
+
+		}
 
 
 
@@ -56,11 +75,12 @@
 
 
             //if(m_Controller.Aiming)
-                
-            m_Animator.CrossFade(Animator.StringToHash(GetFullStateName(ReloadState)), m_TransitionDuration, m_LayerIndex);
             m_AnimatorMonitor.SetItemStateIndex(0);
+            m_Animator.CrossFade(Animator.StringToHash(GetFullStateName(ReloadState)), m_TransitionDuration, m_LayerIndex);
             m_Animator.SetBool(HashID.Aiming, false);
             m_Inventory.ReloadItem(m_Inventory.EquippedItemType, 1);
+            m_IsReloading = true;
+            Debug.LogFormat("Starting to reload. | {0}", Time.timeSinceLevelLoad);
         }
 
 
@@ -99,6 +119,9 @@
                 return null;
             
             var itemName = itemObject.ItemAnimName;
+            if (string.IsNullOrEmpty(itemName))
+                Debug.LogFormat("** {0} does not have an anim state name", itemObject.name);
+            
             var layerName = m_AnimatorMonitor.UpperBodyLayerName;
 
             string stateName = string.Format("{0}.{1}.{2}", layerName, itemName, state);

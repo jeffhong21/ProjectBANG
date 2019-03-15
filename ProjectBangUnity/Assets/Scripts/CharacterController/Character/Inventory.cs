@@ -8,38 +8,38 @@
 
     public class Inventory : MonoBehaviour
     {
-        public delegate void OnInventoryAddItem(ItemObject item);
-        public delegate void OnInventoryPickupItem(ItemObject item, float count, bool immediatePickup, bool forceEquip);
-        public delegate void OnInventoryEquipItem(ItemObject item);
-        public delegate void OnInventoryUnequipItem(ItemObject item);
-        public delegate void OnInventoryRemoveItem(ItemObject item, int slotID);
+        public delegate void OnInventoryAddItem(Item item);
+        public delegate void OnInventoryPickupItem(Item item, float count, bool immediatePickup, bool forceEquip);
+        public delegate void OnInventoryEquipItem(Item item);
+        public delegate void OnInventoryUnequipItem(Item item);
+        public delegate void OnInventoryRemoveItem(Item item, int slotID);
 
 
         //[Header("-- Default Loadout --")]
         [SerializeField]
         protected ItemAmount[] m_DefaultLoadout;
         [SerializeField]
-        protected Item[] m_Loadout;
+        protected ItemType[] m_Loadout;
         //[SerializeField]
         protected int m_NextInventorySlot;
         [SerializeField]
         protected CharacterEquipPoints m_EquipPoints;
 
-        [Header("-- Equipped Item --")]
+        [Header("-- Equipped ItemType --")]
         [SerializeField, DisplayOnly]
-        protected Item m_EquippedItem;
+        protected ItemType m_EquippedItem;
         //[SerializeField, DisplayOnly]
         protected int m_EquippedItemIndex = -1;
         //[SerializeField, DisplayOnly]
-        protected Item m_LastEquippedItem;
+        protected ItemType m_LastEquippedItem;
         [SerializeField]
         protected bool m_Switching;
 
 
-        protected Dictionary<Item, ItemObject> m_Inventory;
+        protected Dictionary<ItemType, Item> m_Inventory;
         protected AnimatorMonitor m_AnimatorMonitor;
         protected Animator m_Animator;
-        protected Transform m_ItemHolder;
+
 
 
 
@@ -51,7 +51,7 @@
             set { m_DefaultLoadout = value; }
         }
 
-        public Item[] Loadout{
+        public ItemType[] Loadout{
             get { return m_Loadout; }
         }
 
@@ -81,7 +81,7 @@
             }
         }
 
-        public Item EquippedItemType{
+        public ItemType EquippedItemType{
             get { return m_EquippedItem; }
         }
 
@@ -100,16 +100,11 @@
 		{
             m_AnimatorMonitor = GetComponent<AnimatorMonitor>();
             m_Animator = GetComponent<Animator>();
-            m_Inventory = new Dictionary<Item, ItemObject>();
-            m_Loadout = new Item[6];
+            m_Inventory = new Dictionary<ItemType, Item>();
+            m_Loadout = new ItemType[6];
 
             //  Setup item hands slots.
             CacheItemEquipSlots();
-
-            //  Set up item holder.
-            m_ItemHolder = new GameObject("Item Holder").transform;
-            m_ItemHolder.parent = transform;
-            m_ItemHolder.localPosition = Vector3.up;
 
 
 		}
@@ -166,21 +161,21 @@
         {
             for (int i = 0; i < m_DefaultLoadout.Length; i++){
                 var loadoutItem = m_DefaultLoadout[i];
-                PickupItem(loadoutItem.Item, loadoutItem.Amount,loadoutItem.Equip);
+                PickupItem(loadoutItem.ItemType, loadoutItem.Amount,loadoutItem.Equip);
             }
         }
 
 
 
 
-        public bool PickupItem(Item item, int amount, bool equip)
+        public bool PickupItem(ItemType item, int amount, bool equip)
         {
             bool itemAddedToInventory = false;
-            //  If Item is already in the inventory.
+            //  If ItemType is already in the inventory.
             if (m_Inventory.ContainsKey(item))
             {
                 if (item is PrimaryItem){
-                    //ItemObject itemObject = InstantiateItem(item, m_ItemHolder);
+                    //Item itemObject = InstantiateItem(item, m_ItemHolder);
                     //PrimaryItem primaryItem = (PrimaryItem)item;
                     //m_Inventory.Add(primaryItem, itemObject);
                     ////  TODO:  Get loadout item index and update loadout item.
@@ -207,7 +202,7 @@
                             parent = m_EquipPoints.RightHandSlot.GetEquipPoint(customEquipPoint);
                     }
 
-                    ItemObject itemObject = InstantiateItem(item, parent);
+                    Item itemObject = InstantiateItem(item, parent);
                     PrimaryItem primaryItem = (PrimaryItem)item;
                     m_Inventory.Add(primaryItem, itemObject);
                     //  Add item to the Loadout.
@@ -250,11 +245,11 @@
         }
 
 
-        private ItemObject InstantiateItem(Item item, Transform parent)
+        private Item InstantiateItem(ItemType item, Transform parent)
         {
             if(item is PrimaryItem)
             {
-                ItemObject itemObject = Instantiate( ((PrimaryItem)item).OriginalObject).GetComponent<ItemObject>();
+                Item itemObject = Instantiate( ((PrimaryItem)item).OriginalObject).GetComponent<Item>();
                 itemObject.transform.parent = parent;
                 itemObject.transform.localPosition = Vector3.zero;
                 itemObject.transform.localEulerAngles = Vector3.zero;
@@ -271,13 +266,13 @@
 
 
 
-        public ItemObject GetCurrentItem()
+        public Item GetCurrentItem()
         {
             return GetCurrentItem(m_EquippedItem);
         }
 
 
-        public ItemObject GetCurrentItem(Item item)
+        public Item GetCurrentItem(ItemType item)
         {
             if(item == null) return null;
 
@@ -288,7 +283,7 @@
         }
 
 
-        public ItemObject GetItem(Item item)
+        public Item GetItem(ItemType item)
         {
             if(m_Inventory.ContainsKey(item)){
                 if(item is PrimaryItem){
@@ -299,7 +294,7 @@
         }
 
 
-        public Item GetNextItem(bool next)
+        public ItemType GetNextItem(bool next)
         {
             int n = next ? 1 : -1;
             for (int i = EquippedItemIndex + n; i < m_Loadout.Length || i < 0; i += n){
@@ -313,7 +308,7 @@
 
         #region Inventory Actions
 
-        public void UseItem(Item item, int amount)
+        public void UseItem(ItemType item, int amount)
         {
             if (m_EquippedItem == null)
                 return;
@@ -331,7 +326,7 @@
         }
 
 
-        public void ReloadItem(Item item, int amount)
+        public void ReloadItem(ItemType item, int amount)
         {
             if (m_EquippedItem == null)
                 return;
@@ -377,7 +372,7 @@
         }
 
 
-        public void EquipItem(Item item)
+        public void EquipItem(ItemType item)
         {
             if (m_Inventory.ContainsKey(item)){
                 if (item.GetType() == typeof(PrimaryItem)){
@@ -391,7 +386,7 @@
         public void EquipItem(int itemIndex)
         {
             if (itemIndex >= m_Loadout.Length || itemIndex < 0){
-                Debug.LogFormat("- {0}:  Equip Item index is incorrect.  ItemIndex: {1}", GetType(), itemIndex);
+                Debug.LogFormat("- {0}:  Equip ItemType index is incorrect.  ItemIndex: {1}", GetType(), itemIndex);
                 return;
             }
 
@@ -402,7 +397,7 @@
             {
                 
                 ////  Turn item object off.
-                //ItemObject itemObject = GetCurrentItem(m_LastEquippedItem);
+                //Item itemObject = GetCurrentItem(m_LastEquippedItem);
                 //if (itemObject != null)
                     //itemObject.SetActive(false);
                 
@@ -411,7 +406,7 @@
                 m_EquippedItem = m_Loadout[itemIndex] as PrimaryItem;
 
 
-                ////Debug.Log(m_Inventory[m_EquippedItem].ItemObject);
+                ////Debug.Log(m_Inventory[m_EquippedItem].Item);
                 //m_Inventory[m_EquippedItem].SetActive(true);
                 ////GetItem(m_EquippedItem).transform.parent = m_RightHandSlot.transform;
 
@@ -425,7 +420,7 @@
         {
             m_LastEquippedItem = m_EquippedItem;
 
-            //ItemObject itemObject = GetCurrentItem();
+            //Item itemObject = GetCurrentItem();
             //if (itemObject != null)
                 //itemObject.SetActive(false);
             
@@ -434,7 +429,7 @@
             m_EquippedItemIndex = -1;
 
 
-            EventHandler.ExecuteEvent(gameObject, "OnInventoryEquip", (ItemObject)null);
+            EventHandler.ExecuteEvent(gameObject, "OnInventoryEquip", (Item)null);
         }
 
 
@@ -530,12 +525,12 @@
         [Serializable]
         public class ItemAmount
         {
-            [SerializeField] protected Item m_Item;
+            [SerializeField] protected ItemType m_Item;
             [SerializeField] protected int m_Amount = 1;
             [SerializeField] protected bool m_Equip = true;
 
 
-            public Item Item{
+            public ItemType ItemType{
                 get { return m_Item; }
                 private set { m_Item = value; }
             }
@@ -556,12 +551,12 @@
             }
 
 
-            public ItemAmount(Item itemType, int amount){
+            public ItemAmount(ItemType itemType, int amount){
                 Initialize(itemType, amount);
             }
 
-            public void Initialize(Item itemType, int amount){
-                Item = itemType;
+            public void Initialize(ItemType itemType, int amount){
+                ItemType = itemType;
                 Amount = amount;
             }
         }

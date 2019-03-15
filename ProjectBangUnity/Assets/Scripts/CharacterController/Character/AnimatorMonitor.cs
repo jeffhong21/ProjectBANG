@@ -50,7 +50,8 @@
             { 9, "DamageVisualization"},
             //{ 10, "Interact"},
             //{ 11, "PickupItem"},
-            { 12, "Cover"}
+            { 12, "Cover"},
+            { 15, "Roll"}
         };
 
 
@@ -246,7 +247,7 @@
         public void SetItemStateIndex(int stateIndex)
         {
             m_Animator.SetInteger(HashID.ItemStateIndex, stateIndex);
-            m_Animator.SetTrigger(HashID.ItemStateIndexChange);
+            //m_Animator.SetTrigger(HashID.ItemStateIndexChange);
         }
 
         public void SetItemTrigger()

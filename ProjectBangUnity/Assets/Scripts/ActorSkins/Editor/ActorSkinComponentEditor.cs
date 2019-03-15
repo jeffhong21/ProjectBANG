@@ -19,11 +19,11 @@ namespace ActorSkins
         {
             base.OnInspectorGUI();
 
-            GUILayout.Space(12);
-            if (GUILayout.Button("Load Accessories"))
-            {
-                _target.LoadAccessories();
-            }
+            //GUILayout.Space(12);
+            //if (GUILayout.Button("Load Accessories"))
+            //{
+            //    _target.LoadAccessories();
+            //}
 
         }
     }

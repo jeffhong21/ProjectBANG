@@ -7,7 +7,7 @@
     /// <summary>
     /// Any items that can be consumed by the PrimaryItem. These items cannot be equipped or used independently.
     /// </summary>
-    public class ConsumableItem : Item
+    public class ConsumableItem : ItemType
     {
         [SerializeField]
         protected int m_Amount = 1;

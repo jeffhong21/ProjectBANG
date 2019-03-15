@@ -3,7 +3,7 @@
     using UnityEngine;
 
 
-    public class ItemObject : MonoBehaviour
+    public class Item : MonoBehaviour
     {
         //
         // Fields
@@ -17,7 +17,7 @@
         protected int m_MovementSetID;
         [SerializeField]
         protected ItemAnimStates m_AnimStates = new ItemAnimStates();
-        [Header("--  Item Settings --")]
+        [Header("--  ItemType Settings --")]
         [SerializeField]
         protected bool m_CanAim = true;
         [SerializeField]
@@ -84,7 +84,10 @@
             get { return m_NonDominantHandPosition; }
         }
 
-
+        public GameObject User
+        {
+            get { return m_Character; }
+        }
 
 
 

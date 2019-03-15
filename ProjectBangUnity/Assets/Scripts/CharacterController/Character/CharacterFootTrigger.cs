@@ -44,8 +44,8 @@ namespace CharacterController
         {
             if(m_Footsteps != null)
             {
-                if(other.GetComponent<MeshRenderer>())
-                    footStepObject.ground = other;
+                //if(other.GetComponent<MeshRenderer>())
+                    //footStepObject.ground = other;
 
                 m_Footsteps.StepOnMesh(footStepObject);
                 m_Footsteps.PlayFootFallSound(footStepObject);

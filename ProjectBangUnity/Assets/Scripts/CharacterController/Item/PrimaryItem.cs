@@ -4,7 +4,7 @@
     using System;
 
 
-    public class PrimaryItem : Item
+    public class PrimaryItem : ItemType
     {
         [SerializeField]
         protected GameObject m_OriginalObject;
@@ -68,7 +68,7 @@
             protected int m_Capacity;
 
 
-            public ConsumableItem Item
+            public ConsumableItem ItemType
             {
                 get { return m_ItemType; }
                 set { m_ItemType = value; }
