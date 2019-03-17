@@ -8,17 +8,27 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 {
     [SerializeField]
     private CameraController m_CameraController;
-    public GameObject m_Player;
+    [Header("-- Player Settings--")]
+    [SerializeField]
+    private GameObject m_PlayerPrefab;
+    private GameObject m_PlayerInstance;
+    [SerializeField]
+    private GameObject m_CrosshairsHUD;
 
-    public GameObject m_Agent;
-    [Range(0, 20)]
-    public int m_AgentCount;
-
-
-
-
+    [Header("-- Agent Settings--")]
+    [SerializeField]
+    private GameObject m_AgentPrefab;
+    [SerializeField, Range(0, 20)]
+    private int m_AgentCount;
     private SpawnPoints[] m_SpawnPoints = new SpawnPoints[0];
     private float m_SpawnInterval = 2;
+
+
+
+
+    public GameObject PlayerInstance{
+        get { return m_PlayerInstance; }
+    }
 
 
 
@@ -43,20 +53,15 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 
 	private void Start()
 	{
-        GameObject player = null;
-        if (m_SpawnPoints.Length <= 0){
-            player = Spawn(m_Player, Vector3.zero, Quaternion.identity);
-        } else {
-            player = Spawn(m_Player, m_SpawnPoints[0].Position, m_SpawnPoints[0].Rotation);
-        }
+        //  Initialize Player.
+        InitializePlayer();
 
-        SetCameraTarget(player);
-
-
+        //  Spawn Agents.
         StartCoroutine(SpawnAgents(m_SpawnInterval));
 
-        if(player != null) UnityEditor.Selection.activeGameObject = player;
+        if(m_PlayerInstance != null) UnityEditor.Selection.activeGameObject = m_PlayerInstance;
     }
+
 
 
     private void GetAllSpawnPoints()
@@ -65,12 +70,27 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     }
 
 
+    private void InitializePlayer()
+    {
+        if (m_SpawnPoints.Length <= 0){
+            m_PlayerInstance = Spawn(m_PlayerPrefab, Vector3.zero, Quaternion.identity);
+        }
+        else{
+            m_PlayerInstance = Spawn(m_PlayerPrefab, m_SpawnPoints[0].Position, m_SpawnPoints[0].Rotation);
+        }
+
+        if(m_CrosshairsHUD != null) m_CrosshairsHUD = Instantiate(m_CrosshairsHUD);
+
+
+        SetCameraTarget(m_PlayerInstance);
+    }
+
+
     private void SetCameraTarget(GameObject target)
     {
-
-
-        m_CameraController.SetMainTarget(target.transform);
+        m_CameraController.SetMainTarget(target);
     }
+
 
 
     public GameObject Spawn(GameObject obj, Vector3 position, Quaternion rotation)
@@ -91,7 +111,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
             {
                 if (spawnIndex == m_SpawnPoints.Length)
                     spawnIndex = 1;
-                var go = Spawn(m_Agent, m_SpawnPoints[spawnIndex].GetSpawnPosition(), m_SpawnPoints[spawnIndex].Rotation);
+                var go = Spawn(m_AgentPrefab, m_SpawnPoints[spawnIndex].GetSpawnPosition(), m_SpawnPoints[spawnIndex].Rotation);
                 go.name = string.Format("{0}({1})", "AI Agent", i);
                 go.GetComponent<ActorSkins.ActorSkinComponent>().LoadActorSkin();
 
@@ -102,5 +122,8 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 
         yield return null;
     }
+
+
+
 
 }

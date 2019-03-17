@@ -32,6 +32,10 @@
         [SerializeField]
         protected Transform m_SmokeLocation;
         [SerializeField]
+        protected AudioClip[] m_FireSound;
+        [SerializeField]
+        protected float m_FireSoundDelay = 0.1f;
+        [SerializeField]
         protected float m_DamageAmount = 10;
         [SerializeField]
         protected float m_ImpactForce = 5;
@@ -54,7 +58,7 @@
         private bool m_DrawAimLine;
 
         private float m_ReloadTime = 3f;
-        private float m_NextUseTime = 0;
+        private float m_NextUseTime;
 
 
         private Quaternion m_Rotation;
@@ -170,6 +174,8 @@
                 m_MuzzleFlash.GetComponentInChildren<ParticleSystem>().Play();
             }
 
+            var audioSource = GetComponent<AudioSource>();
+            audioSource.Play();
 
 
             //  Update current ammo.
@@ -184,12 +190,18 @@
 
         protected virtual void ProjectileFire()
         {
-            //  Spawn Projectile from the PooManager.
-            var go = Instantiate(m_Projectile, m_FirePoint.position, m_FirePoint.rotation);
-            //  Get Projectile Component.
-            var projectile = go.GetComponent<Projectile>();
-            //  Initialize projectile.
-            projectile.Initialize(m_DamageAmount, m_FirePoint.forward, m_Character);
+            RaycastHit hit;
+            if (Physics.Raycast(m_FirePoint.position, m_FirePoint.forward, out hit, m_FireRange))
+            {
+                //  Spawn Projectile from the PooManager.
+                var go = Instantiate(m_Projectile, m_FirePoint.position, m_FirePoint.rotation);
+                //  Get Projectile Component.
+                var projectile = go.GetComponent<Projectile>();
+                //  Initialize projectile.
+                projectile.Initialize(m_DamageAmount, m_FirePoint.forward, hit.point,m_Character);
+            }
+
+
 
         }
 

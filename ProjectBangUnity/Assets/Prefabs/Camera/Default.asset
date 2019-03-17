@@ -9,29 +9,28 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a4366c462a5014715a9f4a388c59a825, type: 3}
-  m_Name: 3rdPerson_Default
+  m_Name: Default
   m_EditorClassIdentifier: 
   StateName: Default
-  MoveSpeed: 8
-  AimSpeed: 24
-  AdaptSpeed: 16
-  DefaultPositionX: 0
-  DefaultPositionZ: 4.5
-  DefaultPositionY: 2
-  TurnSmooth: 0.12
-  YawRotateSpeed: 1
-  PitchRotateSpeed: 2
-  MinYaw: -80
-  MaxYaw: 80
-  MinPitch: -25
+  ViewDistance: 3
+  VerticalOffset: 0
+  ApplyYawLimit: 1
+  MinYaw: -135
+  MaxYaw: 135
+  ApplyPitchLimit: 1
+  MinPitch: -10
   MaxPitch: 45
-  PivotRotationOffset: 0
-  AllowZoom: 0
-  ZoomSmooth: 100
-  ZoomStep: 2
-  MaxZoom: -10
-  MinZooom: -30
-  AimPositionX: 0.5
-  AimPositionZ: 2
-  CrouchPositionY: 1.5
+  ApplyCameraOffset: 1
+  CameraOffset: {x: 0, y: 0, z: 0}
+  FieldOfView: 64
+  FieldOfViewSpeed: 5
+  ApplyTurn: 1
+  TurnSmooth: 0.12
+  TurnSpeed: 4
+  ApplyRotation: 0
+  RotationSpeed: 8
+  ApplyStepZoom: 0
+  StepZoomSensitivity: 1
+  MinStepZooom: -1
+  MaxStepZoom: 10
   LookDirection: {x: 0, y: 0, z: 1}

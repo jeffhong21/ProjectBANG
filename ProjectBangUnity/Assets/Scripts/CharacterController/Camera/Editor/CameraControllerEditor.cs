@@ -35,9 +35,9 @@ namespace CharacterController
             m_CameraStateToggle = EditorGUILayout.ToggleLeft(new GUIContent("Show Camera States Options"), m_CameraStateToggle);
             if(m_CameraStateToggle)
             {
-                if(m_Controller.CameraState != null){
+                if(m_Controller.ActiveState != null){
                     if(m_CameraState == null){
-                        m_CameraState = new SerializedObject(m_Controller.CameraState);
+                        m_CameraState = new SerializedObject(m_Controller.ActiveState);
                     }
                     SerializedProperty propertyIterator = m_CameraState.GetIterator();
                     while (propertyIterator.NextVisible(true))

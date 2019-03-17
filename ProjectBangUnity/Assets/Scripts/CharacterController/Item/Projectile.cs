@@ -24,7 +24,7 @@ namespace CharacterController
         [SerializeField]
         protected float m_Velocity = 25;
         [SerializeField]
-        protected float m_Lifespan = 2;
+        protected float m_Lifespan = 1;
         [SerializeField]
         protected bool m_DestroyOnCollision = true;
         [SerializeField]
@@ -36,7 +36,7 @@ namespace CharacterController
         private bool m_HasCollided;
         private float m_CurrentLifespan;
         private float m_ProjectileSize = 0.18f;                    //  If size is too small, sometimes physics doesn't register it.
-
+        private Vector3 m_Target;
 
 
         [Header("--  Debug Settings --")]
@@ -85,6 +85,13 @@ namespace CharacterController
         }
 
 
+        public void Initialize(float damage, Vector3 direction, Vector3 target, GameObject originator)
+        {
+            m_Target = target;
+            Initialize(damage, direction, originator);
+        }
+
+
         public void Initialize(float damage, Vector3 direction, GameObject originator)
         {
             m_DamageAmount = damage;
@@ -108,11 +115,10 @@ namespace CharacterController
         {
             if(!m_Initialized) return;
 
-
             m_Transform.position += m_Transform.forward * (m_Velocity * m_DeltaTime);
 
             m_CurrentLifespan += Time.deltaTime;
-            if (m_CurrentLifespan > m_Lifespan){
+            if (m_CurrentLifespan > m_Lifespan || m_Transform.position == m_Target){
                 DestroyProjectile();
             }
 

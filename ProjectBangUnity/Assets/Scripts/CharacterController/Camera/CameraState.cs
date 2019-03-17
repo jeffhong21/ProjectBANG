@@ -5,55 +5,71 @@ namespace CharacterController
     [CreateAssetMenu(menuName = "Character Controller/Camera State")]
     public class CameraState : ScriptableObject
     {
-        public string StateName = "CameraState";
-        [Header("--  Move Settings  --")]
-        public float MoveSpeed = 9;
-        public float AimSpeed = 24;
-        [Tooltip("The lerp speed when handling camera position.")]
-        public float AdaptSpeed = 8;
+        public string StateName;
+        //[Header("--  Move Settings  --")]
+        //public float MoveSpeed = 9;
+        //[Tooltip("The lerp speed when handling camera position.")]
+        //public float AdaptSpeed = 8;
 
 
         [Header("--  Position Settings  --")]
-        public float DefaultPositionX = 0;
-        public float DefaultPositionZ = 3;
-        public float DefaultPositionY = 1.5f;
+        public float ViewDistance = 3;
+        public float VerticalOffset;
 
 
-        [Header("--  Rotation Settings  --")]
-        [Range(0.05f, 1)]
+        [Tooltip("Limit horizontal axis?")]
+        public bool ApplyYawLimit = true;
+        [Tooltip("Minimum and maximum left and right rotation. ")]
+        public float MinYaw = -180;
+        public float MaxYaw = 180;
+
+        [Tooltip("Limit vertical axis?")]
+        public bool ApplyPitchLimit = true;
+        [Tooltip("Minimum and maximum up and down rotation. ")]
+        public float MinPitch = -60;
+        public float MaxPitch = 70;
+
+        public bool ApplyCameraOffset;
+        [Tooltip("The offset between the anchor and the location of the camera")]
+        public Vector3 CameraOffset = new Vector3(0.5f, 0.9f, -2f);
+
+        [Tooltip("The camera field of view")]
+        [Range(0, 180)]
+        public float FieldOfView = 60f;
+        [Tooltip("The speed at which the FOV transitions field of views")]
+        public float FieldOfViewSpeed = 5;
+
+        public bool ApplyTurn;
+        [Tooltip("The amount of smoothing to apply to the pitch and yaw. ")]
         public float TurnSmooth = 0.12f;
-        [Tooltip("Left and right rotation speed.")]
-        public float YawRotateSpeed = 4; 
-        [Tooltip("Up and down rotation speed.")]
-        public float PitchRotateSpeed = 2;
-        [Tooltip("Minimum and maximum left and right rotation. ")]
-        public float MinYaw = -90;
-        [Tooltip("Minimum and maximum left and right rotation. ")]
-        public float MaxYaw = 90;
-        [Tooltip("Minimum and maximum up and down rotation. ")]
-        public float MinPitch = -35;
-        [Tooltip("Minimum and maximum up and down rotation. ")]
-        public float MaxPitch = 35;
-        public float PivotRotationOffset;
+        [Tooltip("The speed at which the camera turns.")]
+        public float TurnSpeed = 3f;
+
+        public bool ApplyRotation;
+        [Tooltip("The speed at which the camera rotates.")]
+        public float RotationSpeed = 24;
 
 
         [Header("--  Zoom Settings  --")]
-        public bool AllowZoom;
-        public float ZoomSmooth = 0.12f;
-        public float ZoomStep = 1;
-        public float MaxZoom = 10;
-        public float MinZooom = -1;
+        public bool ApplyStepZoom;
+        public float StepZoomSensitivity = 1;
+        public float MinStepZooom = -1;
+        public float MaxStepZoom = 10;
+
+        //LayerMask m_IgnoreLayerMask = LayerManager.Mask.IgnoreInvisibleLayersPlayerWater
 
 
-        [Space]
-        [Header("--  Misc Settings  --")]
-        public float AimPositionX = 0.5f;
-        public float AimPositionZ = 1;
 
-        public float CrouchPositionY = 1;
         [HideInInspector]
         public Vector3 LookDirection = Vector3.forward;
 
 
-    }
+
+
+
+		public void OnEnable()
+		{
+            StateName = this.name;
+		}
+	}
 }

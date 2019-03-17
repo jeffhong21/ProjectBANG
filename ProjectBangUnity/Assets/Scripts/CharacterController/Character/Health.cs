@@ -172,6 +172,27 @@
 
 
 
+        protected IEnumerator FlashDamageColor()
+        {
+            Material material = m_GameObject.GetComponentInChildren<Renderer>().material;
+            Color initialColor = material.color;
+            Color flashColor = Color.red;
+
+            float flashSpeed = 1;
+            float timer = 0;
+            float changeSpeed = 0.5f;
+            while(timer < changeSpeed){
+                material.color = Color.Lerp(initialColor, flashColor, Mathf.PingPong(timer * flashSpeed, 1));
+                timer += Time.deltaTime;
+                yield return null;
+            }
+
+        }
+
+
+
+
+
         protected void SpawnParticles(GameObject particleObject, Vector3 position)
         {
             //var go = Instantiate(particleObject, position, Quaternion.FromToRotation(m_Transform.forward + position, direction));

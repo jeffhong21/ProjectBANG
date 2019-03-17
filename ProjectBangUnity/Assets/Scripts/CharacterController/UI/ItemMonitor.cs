@@ -1,4 +1,4 @@
-namespace CharacterController
+namespace CharacterController.UI
 {
     using UnityEngine;
     using System.Collections;

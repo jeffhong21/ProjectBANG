@@ -9,7 +9,7 @@
     public class CharacterLocomotion : MonoBehaviour
     {
         public event Action<bool> OnAim = delegate {};
-        public enum MovementType {Adventure, TopDown };
+        public enum MovementType {Combat, Adventure, TopDown };
 
 
         [SerializeField, HideInInspector]
@@ -424,27 +424,35 @@
 
                 if (m_DrawDebugLine) Debug.DrawRay(m_Transform.position, m_LookDirection, Color.red);
             }
-            else if(m_InputVector != Vector3.zero && m_MoveDirection.sqrMagnitude > 0.2f)
+            else if(m_InputVector != Vector3.zero && m_LookDirection.sqrMagnitude > 0.2f)
             {
-                eulerY = Mathf.Atan2(m_InputVector.x, Mathf.Abs(m_InputVector.z));
-                eulerY = Mathf.Rad2Deg * m_RotationSpeed * m_DeltaTime;
-                eulerY *= m_InputVector.x;
-                eulerY += m_Transform.eulerAngles.y;
+                //eulerY = Mathf.Atan2(m_InputVector.x, Mathf.Abs(m_InputVector.z));
+                //eulerY = Mathf.Rad2Deg * m_RotationSpeed * m_DeltaTime;
+                //eulerY *= m_InputVector.x;
+                //eulerY += m_Transform.eulerAngles.y;
+                //rotationDifference = eulerY - m_Transform.eulerAngles.y;
+                //if (rotationDifference < 0 || rotationDifference > 0) eulerY = m_Transform.eulerAngles.y;
+                //m_LookRotation = Quaternion.Euler(m_Transform.eulerAngles.x, eulerY, m_Transform.eulerAngles.z);
+                //m_LookRotation = Quaternion.Lerp(m_Transform.rotation, m_LookRotation.normalized, m_RotationSpeed * m_DeltaTime);
+                //m_Rigidbody.MoveRotation(m_LookRotation);
 
-                rotationDifference = eulerY - m_Transform.eulerAngles.y;
+                var targetDirection = m_LookDirection.normalized;
+                m_LookRotation = Quaternion.LookRotation(targetDirection, m_Transform.up);
+                rotationDifference = m_LookRotation.eulerAngles.y - m_Transform.eulerAngles.y;
+                eulerY = m_Transform.eulerAngles.y;
 
-                if (rotationDifference == 0) eulerY = m_Transform.eulerAngles.y;
-
-                m_LookRotation = Quaternion.Euler(m_Transform.eulerAngles.x, eulerY, m_Transform.eulerAngles.z);
-                m_LookRotation = Quaternion.Slerp(m_Transform.rotation, m_LookRotation.normalized, m_RotationSpeed * m_DeltaTime);
-                m_Rigidbody.MoveRotation(m_LookRotation);
+                if(m_Grounded){
+                    if (rotationDifference < 0 || rotationDifference > 0)
+                        eulerY = m_LookRotation.eulerAngles.y;
+                    var euler = new Vector3(m_Transform.eulerAngles.x, eulerY, m_Transform.eulerAngles.z);
+                    m_Rigidbody.MoveRotation(Quaternion.Lerp(m_Transform.rotation, Quaternion.Euler(euler).normalized, m_RotationSpeed * m_DeltaTime));
+                }
 
                 //m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Transform.rotation, m_LookRotation.normalized, m_RotationSpeed * m_DeltaTime));
             }
             else{
                 rotationDifference = 0;
             }
-
 
             //m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Transform.rotation, m_LookRotation.normalized, m_RotationSpeed * m_DeltaTime));
         }
@@ -506,6 +514,30 @@
 
 
 
+
+        public void SetRotation(Quaternion rotation)
+        {
+            m_Rigidbody.MoveRotation(rotation.normalized);
+        }
+
+        public void UpdateLookDirection(Transform referenceTransform = null)
+        {
+            if (referenceTransform)
+            {
+                var forward = referenceTransform.TransformDirection(Vector3.forward);
+                forward.y = 0;
+                //get the right-facing direction of the referenceTransform
+                var right = referenceTransform.TransformDirection(Vector3.right);
+
+                // determine the direction the player will face based on input and the referenceTransform's right and forward directions
+                m_LookDirection = m_InputVector.x * right + m_InputVector.z * forward;
+            }
+            else{
+                m_LookDirection = m_InputVector.x * m_Transform.right + m_InputVector.z * m_Transform.forward;
+            }
+                
+            
+        }
 
 
 		public void MoveCharacter(float horizontalMovement, float forwardMovement, Quaternion lookRotation)
@@ -574,16 +606,19 @@
         {
             m_Aiming = aim;
 
-            //if(aim)CameraController.Instance.ChangeCameraState("Aim");
-            //else CameraController.Instance.SetDefaultCameraState();
-            
-
+            if(m_Aiming){
+                CameraState aimState = CameraController.Instance.GetCameraStateWithName("Aim");
+                CameraController.Instance.ChangeCameraState("Aim");
+            }
+            else{
+                CameraController.Instance.ChangeCameraState("Default");
+            }
 
             //  Call On Aim Delegate.
             OnAim(aim);
 
-            CameraController.Instance.FreeRotation = aim;
-            Debug.LogFormat("Camera Free Rotation is {0}", CameraController.Instance.FreeRotation);
+            //CameraController.Instance.FreeRotation = aim;
+            //Debug.LogFormat("Camera Free Rotation is {0}", CameraController.Instance.FreeRotation);
         }
 
 
