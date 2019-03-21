@@ -10,11 +10,12 @@ namespace CharacterController
 
         [Header("-- Cover Settings --")]
         [SerializeField]
-        protected float m_TakeCoverDistance = 0.75f;
+        protected float m_TakeCoverDistance = 2f;
         [SerializeField]
         protected LayerMask m_CoverLayer;
         [SerializeField]
         protected float m_TakeCoverRotationSpeed = 4;
+
         //[SerializeField]
         //protected float m_CoverOffset = 0.05f;
         //[SerializeField]
@@ -23,15 +24,13 @@ namespace CharacterController
         //protected Vector3 m_PopDistance = new Vector3(0.3f, 0, 3);
 
 
-       // [SerializeField]
+        [SerializeField]
         protected CoverIDs m_CurrentCoverID;
         protected Transform m_DetectorHolder;
         protected Transform m_ObjectDetector;
         protected Transform m_HighCoverDetector;
         protected Transform m_RightCoverPopup;
         protected Transform m_LeftCoverPopup;
-        protected Transform m_RightUpperCoverPopup;
-        protected Transform m_LeftUpperCoverPopup;
         protected float m_ObjectDetectorHeight = 0.5f;
         protected float m_HighCoverHeight = 1.35f;
         protected float m_SideCoverDistance = 0.5f;
@@ -40,14 +39,14 @@ namespace CharacterController
         protected Quaternion m_TargetRotation;
         //[SerializeField]
         protected Vector3 m_TargetPosition;
-        protected Vector3 m_CoverDirection;
+
        
 
         protected bool m_HighCover;
         protected float m_PopoutLength = 0.5f;
-        //[SerializeField]
+        [SerializeField]
         protected float m_HorizontalInput;
-       // [SerializeField]
+        [SerializeField]
         protected float m_ForwardInput;
 
         //[SerializeField]
@@ -64,6 +63,7 @@ namespace CharacterController
 
         [SerializeField]
         protected bool m_DrawCanEnterLines;
+
 
 
         public CoverIDs CurrentCoverID{
@@ -85,8 +85,6 @@ namespace CharacterController
             m_HighCoverDetector = CreateDetectors("High_Cover_Detector", Vector3.up * m_HighCoverHeight);
             m_RightCoverPopup = CreateDetectors("Right_Cover_Detector", Vector3.right * m_SideCoverDistance + (Vector3.up * m_ObjectDetectorHeight));
             m_LeftCoverPopup = CreateDetectors("Left_Cover_Detector", Vector3.left * m_SideCoverDistance + (Vector3.up * m_ObjectDetectorHeight));
-            m_RightUpperCoverPopup = CreateDetectors("Right_Upper_Cover_Detector", Vector3.right * (m_SideCoverDistance * 0.75f) + (Vector3.up * m_HighCoverHeight));
-            m_LeftUpperCoverPopup = CreateDetectors("Left_Upper_Cover_Detector", Vector3.left * (m_SideCoverDistance * 0.75f) + (Vector3.up * m_HighCoverHeight));
 
             //m_CoverLayer = 9;
 		}
@@ -102,93 +100,46 @@ namespace CharacterController
         }
 
 
-        private bool CanEnterCover(bool drawAllLines = false)
-        {
-            float coverViewAngle = 135;
-            int numOfRays = 6;
-
-            float halfAngle = coverViewAngle / 2.0f;
-            Quaternion leftRayRotation = Quaternion.AngleAxis(-halfAngle, Vector3.up);
-            Vector3 leftRayDirection = leftRayRotation * (m_ObjectDetector.forward * m_TakeCoverDistance);
-            Vector3 direction = leftRayDirection;
-
-            float amountEach = coverViewAngle / (numOfRays);
-            for (int i = 0; i < numOfRays; i++)
-            {
-                if (i == 0) continue;
-                Quaternion desiredRotation = Quaternion.AngleAxis(amountEach, Vector3.up);
-                direction = desiredRotation * direction;
-
-                bool hit = false;
-                if (Physics.Raycast(m_ObjectDetector.position, direction, out m_RaycastHit, m_TakeCoverDistance, m_CoverLayer))
-                {
-                    if (!drawAllLines) Debug.DrawRay(m_ObjectDetector.position, direction, hit ? Color.green : Color.magenta, 1);
-                    hit = true;
-                    m_CoverDirection = direction;
-                    return true;
-                }
-                if (drawAllLines) Debug.DrawRay(m_ObjectDetector.position, direction, hit ? Color.green : Color.magenta, 1);
-            }
-
-            return false;
-        }
 
 
         //  Start
 		public override bool CanStartAction()
         {
-            if (Input.GetKeyDown(KeyCode.B))
-            {
-                return CanEnterCover(m_DrawCanEnterLines);
+            RaycastHit hit;
+            if (Physics.Raycast(m_ObjectDetector.position, m_ObjectDetector.forward, out hit, m_TakeCoverDistance, m_CoverLayer)){
+                m_TargetPosition = hit.point + (hit.normal * (m_CapsuleCollider.radius * 0.33f));
+                m_TargetPosition.y = m_Controller.transform.position.y;
+                return true;
             }
             return false;
+            //return CanEnterCover(m_DrawCanEnterLines);
         }
 
 
         protected override void ActionStarted()
         {
-
             if (Physics.Raycast(m_HighCoverDetector.position, m_HighCoverDetector.forward, m_TakeCoverDistance, m_CoverLayer)){
                 m_HighCover = true;
-            }
-            else{
+            } else {
                 m_HighCover = false;
             }
-
             m_CurrentCoverID = m_HighCover ? CoverIDs.StandStill : CoverIDs.CrouchStill;
 
-
-            m_AnimatorMonitor.SetIntDataValue((int)m_CurrentCoverID);
-        }
-
-        //  Stop
-        public override bool CanStopAction()
-        {
-            //if(!Physics.Raycast(m_ObjectDetector.position, m_ObjectDetector.forward, m_PopoutLength, m_CoverLayer))
-            //{
-            //    //if (!Physics.Raycast(m_LeftCoverPopup.position, m_LeftCoverPopup.forward, m_PopoutLength, m_CoverLayer) && 
-            //    //    !Physics.Raycast(m_RightCoverPopup.position, m_RightCoverPopup.forward, m_PopoutLength, m_CoverLayer)) {
+            m_Animator.SetTrigger(HashID.ActionChange);
 
 
-            //    //    Debug.DrawRay(m_ObjectDetector.position, m_ObjectDetector.forward, Color.yellow);
-            //    //    Debug.DrawRay(m_LeftCoverPopup.position, m_LeftCoverPopup.forward, _hitLeft ? Color.green : Color.magenta);
-            //    //    Debug.DrawRay(m_RightCoverPopup.position, m_RightCoverPopup.forward, _hitRight ? Color.green : Color.blue);
-            //    //    //Debug.Break();
-            //    //    return true;
-            //    //}
-            //    return true;
-            //}
-            //else if(Input.GetKeyDown(KeyCode.V)){
-            //    return true;
-            //}
-
-            if (Input.GetKeyDown(KeyCode.V))
-            {
-                return true;
+            //m_Controller.SetPosition(m_TargetPosition);
+            var action = m_Controller.GetAction<MoveTowards>();
+            if(action != null){
+                if (!action.IsActive){
+                    action.ActionStartLocation = m_TargetPosition;
+                    m_Controller.TryStartAction(action);
+                }
             }
-            if (m_CurrentCoverID == CoverIDs.None) return true;
-            return false;
+
         }
+
+
 
 
         protected override void ActionStopped()
@@ -198,9 +149,9 @@ namespace CharacterController
             m_AnimatorMonitor.SetHeightValue(1);
 
             m_Controller.LookRotation = m_Transform.rotation;
-            //m_CurrentCoverID = CoverIDs.None;
+            m_CurrentCoverID = CoverIDs.None;
 
-            //Debug.Break();
+            m_Animator.ResetTrigger(HashID.ActionChange);
         }
 
 
@@ -226,115 +177,114 @@ namespace CharacterController
             m_HorizontalInput = m_Controller.InputVector.x;
 
             //  Check if character should be crouched or in high cover.
-            if (Physics.Raycast(m_RightUpperCoverPopup.position, m_RightUpperCoverPopup.forward, m_PopoutLength, m_CoverLayer))
-            {
+            if (Physics.Raycast(m_HighCoverDetector.position, m_HighCoverDetector.forward, m_PopoutLength, m_CoverLayer)){
                 m_HighCover = true;
-                m_HasHighCoverRight = true;
-            }
-            if (Physics.Raycast(m_LeftUpperCoverPopup.position, m_LeftUpperCoverPopup.forward, m_PopoutLength, m_CoverLayer)){
-                m_HighCover = true;
-                m_HasHighCoverLeft = true;
-            }
-            if ( !Physics.Raycast(m_RightUpperCoverPopup.position, m_RightUpperCoverPopup.forward, m_PopoutLength, m_CoverLayer))
-            {
+            } else {
                 m_HighCover = false;
-                m_HasHighCoverRight = false;
-            }
-            if (!Physics.Raycast(m_LeftUpperCoverPopup.position, m_LeftUpperCoverPopup.forward, m_PopoutLength, m_CoverLayer))
-            {
-                m_HighCover = false;
-                m_HasHighCoverLeft = false;
             }
 
             //  Check if character has reached the edge of the cover.
+            if(Mathf.Abs(m_HorizontalInput) > 0.2 )
+            {
+                //  If Left Cover Popup does not hit a cover object, than character cannot move left..  (MAGENTA)
+                if (!Physics.Raycast(m_LeftCoverPopup.position, m_LeftCoverPopup.forward, m_PopoutLength, m_CoverLayer))
+                {   //   - (0.25f * (m_RightCoverPopup.right))
 
+                    if (!m_CanPopLeft)
+                    {
+                        m_StartPosition = m_Transform.position;
+                        m_StopPosition = m_Transform.position - (m_Transform.right * 1.1f); //m_RightCoverPopup.position + (0.25f * (m_RightCoverPopup.right));
+                    }
+                    m_CanPopLeft = true;
 
-            //  If Left Cover Popup does not hit a cover object, than character cannot move left..  (MAGENTA)
-            if (!Physics.Raycast(m_LeftCoverPopup.position, m_LeftCoverPopup.forward, m_PopoutLength, m_CoverLayer)){   //   - (0.25f * (m_RightCoverPopup.right))
+                    m_HorizontalInput = Mathf.Clamp(m_HorizontalInput, 0, 1);
+                    m_ForwardInput = m_Controller.InputVector.z;
+                    m_Controller.InputVector.Set(m_HorizontalInput, m_Controller.InputVector.y, m_ForwardInput);
 
-                if (!m_CanPopLeft){
-                    m_StartPosition = m_Transform.position;
-                    m_StopPosition = m_Transform.position - (m_Transform.right * 1.1f); //m_RightCoverPopup.position + (0.25f * (m_RightCoverPopup.right));
-                }
-                m_CanPopLeft = true;
+                    if (m_ForwardInput == 1)
+                    {
+                        m_CurrentCoverID = m_HighCover ? CoverIDs.StandPopRight : CoverIDs.CrouchPopRight;
+                        m_LerpPercentage += m_ForwardInput * Time.deltaTime;
+                        m_LerpPercentage = Mathf.Clamp01(m_LerpPercentage);
+                        m_TargetPosition = Vector3.Lerp(m_StartPosition, m_StopPosition, m_LerpPercentage);
+                        m_Transform.position = m_TargetPosition;
 
-                m_HorizontalInput = Mathf.Clamp(m_HorizontalInput, 0, 1);
-                m_ForwardInput = m_Controller.InputVector.z;
-                m_Controller.InputVector.Set(m_HorizontalInput, m_Controller.InputVector.y, m_ForwardInput);
-
-                if (m_ForwardInput == 1)
-                {
-                    m_CurrentCoverID = m_HighCover ? CoverIDs.StandPopRight : CoverIDs.CrouchPopRight;
-                    m_LerpPercentage += m_ForwardInput * Time.deltaTime;
-                    m_LerpPercentage = Mathf.Clamp01(m_LerpPercentage);
-                    m_TargetPosition = Vector3.Lerp(m_StartPosition, m_StopPosition, m_LerpPercentage);
-                    m_Transform.position = m_TargetPosition;
-
-                    if (!Physics.Raycast(m_ObjectDetector.position, m_ObjectDetector.forward, m_PopoutLength, m_CoverLayer)){
-                        m_CurrentCoverID = CoverIDs.None;
+                        if (!Physics.Raycast(m_ObjectDetector.position, m_ObjectDetector.forward, m_PopoutLength, m_CoverLayer))
+                        {
+                            m_CurrentCoverID = CoverIDs.None;
+                        }
+                    }
+                    else
+                    {
+                        m_Controller.Velocity = m_Transform.right * m_HorizontalInput * Time.deltaTime;
+                        m_Transform.position += m_Controller.Velocity;
                     }
                 }
-                else{
-                    m_Controller.Velocity = m_Transform.right * m_HorizontalInput * Time.deltaTime;
-                    m_Transform.position += m_Controller.Velocity;
-                }
-            }
-            //  If Right Cover Popup does not hit a cover object, than character cannot move right. (Blue)
-            else if (!Physics.Raycast(m_RightCoverPopup.position , m_RightCoverPopup.forward, m_PopoutLength, m_CoverLayer)){  //  + (0.25f * (m_RightCoverPopup.right))
+                //  If Right Cover Popup does not hit a cover object, than character cannot move right. (Blue)
+                else if (!Physics.Raycast(m_RightCoverPopup.position, m_RightCoverPopup.forward, m_PopoutLength, m_CoverLayer))
+                {  //  + (0.25f * (m_RightCoverPopup.right))
 
-                if(!m_CanPopRight){
-                    m_StartPosition = m_Transform.position;
-                    m_StopPosition = m_Transform.position + (m_Transform.right * 1.1f); //m_RightCoverPopup.position + (0.25f * (m_RightCoverPopup.right));
-                }
-                m_CanPopRight = true;
+                    if (!m_CanPopRight)
+                    {
+                        m_StartPosition = m_Transform.position;
+                        m_StopPosition = m_Transform.position + (m_Transform.right * 1.1f); //m_RightCoverPopup.position + (0.25f * (m_RightCoverPopup.right));
+                    }
+                    m_CanPopRight = true;
 
-                //m_HorizontalInput = Mathf.Clamp(m_HorizontalInput, -1, 0);
-                m_HorizontalInput = Mathf.Clamp(m_HorizontalInput, -1, 0);
-                m_ForwardInput = m_Controller.InputVector.z;
-                m_Controller.InputVector.Set(m_HorizontalInput, m_Controller.InputVector.y, m_ForwardInput);
+                    //m_HorizontalInput = Mathf.Clamp(m_HorizontalInput, -1, 0);
+                    m_HorizontalInput = Mathf.Clamp(m_HorizontalInput, -1, 0);
+                    m_ForwardInput = m_Controller.InputVector.z;
+                    m_Controller.InputVector.Set(m_HorizontalInput, m_Controller.InputVector.y, m_ForwardInput);
 
-                if (m_ForwardInput == 1)
-                {
-                    m_CurrentCoverID = m_HighCover ? CoverIDs.StandPopLeft : CoverIDs.CrouchPopLeft;
-                    m_LerpPercentage += m_ForwardInput * Time.deltaTime;
-                    m_LerpPercentage = Mathf.Clamp01(m_LerpPercentage );
-                    m_TargetPosition = Vector3.Lerp(m_StartPosition, m_StopPosition, m_LerpPercentage);
-                    m_Transform.position = m_TargetPosition;
+                    if (m_ForwardInput == 1)
+                    {
+                        m_CurrentCoverID = m_HighCover ? CoverIDs.StandPopLeft : CoverIDs.CrouchPopLeft;
+                        m_LerpPercentage += m_ForwardInput * Time.deltaTime;
+                        m_LerpPercentage = Mathf.Clamp01(m_LerpPercentage);
+                        m_TargetPosition = Vector3.Lerp(m_StartPosition, m_StopPosition, m_LerpPercentage);
+                        m_Transform.position = m_TargetPosition;
 
-                    if (!Physics.Raycast(m_ObjectDetector.position, m_ObjectDetector.forward, m_PopoutLength, m_CoverLayer)){
-                        m_CurrentCoverID = CoverIDs.None;
+                        if (!Physics.Raycast(m_ObjectDetector.position, m_ObjectDetector.forward, m_PopoutLength, m_CoverLayer))
+                        {
+                            m_CurrentCoverID = CoverIDs.None;
+                        }
+                    }
+                    else
+                    {
+                        m_Controller.Velocity = m_Transform.right * m_HorizontalInput * Time.deltaTime;
+                        m_Transform.position += m_Controller.Velocity;
                     }
                 }
-                else{
+                //  Character can move left or right
+                else
+                {
+                    m_CurrentCoverID = m_HighCover ? CoverIDs.StandStill : CoverIDs.CrouchStill;
+                    m_CanPopRight = m_CanPopLeft = false;
+
+                    m_HorizontalInput = m_Controller.InputVector.x;
+                    m_ForwardInput = 0;
+                    m_LerpPercentage = 0;
+
+                    m_Controller.InputVector.Set(m_HorizontalInput, m_Controller.InputVector.y, m_ForwardInput);
                     m_Controller.Velocity = m_Transform.right * m_HorizontalInput * Time.deltaTime;
                     m_Transform.position += m_Controller.Velocity;
+
+
+                    //m_Rigidbody.AddForce(m_Transform.right * m_HorizontalInput * Time.deltaTime * 8, ForceMode.VelocityChange);
+                    //if (m_ForwardInput == 1){
+                    //    m_CurrentCoverID = CoverIDs.None;
+                    //}
                 }
             }
-            //  Character can move left or right
-            else{
-                m_CurrentCoverID = m_HighCover ? CoverIDs.StandStill : CoverIDs.CrouchStill;
-                m_CanPopRight = m_CanPopLeft = false;
 
-                m_HorizontalInput = m_Controller.InputVector.x;
-                m_ForwardInput = 0;
-                m_LerpPercentage = 0;
-
-                m_Controller.InputVector.Set(m_HorizontalInput, m_Controller.InputVector.y, m_ForwardInput);
-                m_Controller.Velocity = m_Transform.right * m_HorizontalInput * Time.deltaTime;
-                m_Transform.position += m_Controller.Velocity;
-
-                //if (m_ForwardInput == 1){
-                //    m_CurrentCoverID = CoverIDs.None;
-                //}
-            }
 
 
 
             Debug.DrawRay(m_ObjectDetector.position, m_ObjectDetector.forward, Color.yellow);
             Debug.DrawRay(m_LeftCoverPopup.position, m_LeftCoverPopup.forward, m_CanPopLeft ? Color.green : Color.magenta);
             Debug.DrawRay(m_RightCoverPopup.position, m_RightCoverPopup.forward, m_CanPopRight ? Color.green : Color.blue);
-            Debug.DrawRay(m_LeftUpperCoverPopup.position, m_LeftUpperCoverPopup.forward, m_HasHighCoverLeft ? Color.green : Color.magenta);
-            Debug.DrawRay(m_RightUpperCoverPopup.position, m_RightUpperCoverPopup.forward, m_HasHighCoverRight ? Color.green : Color.blue);
+            Debug.DrawRay(m_HighCoverDetector.position, m_HighCoverDetector.forward, m_HighCover ? Color.green : Color.yellow);
+
 
             return false;
         }
@@ -342,10 +292,11 @@ namespace CharacterController
 
         public override bool UpdateAnimator()
         {
-            m_AnimatorMonitor.SetIntDataValue((int)m_CurrentCoverID);
+            //m_AnimatorMonitor.SetIntDataValue((int)m_CurrentCoverID);
             m_AnimatorMonitor.SetHeightValue(m_HighCover ? 1 : 0.5f);
             m_AnimatorMonitor.SetHorizontalInputValue(m_HorizontalInput);
             m_AnimatorMonitor.SetForwardInputValue(0);
+            m_Animator.SetInteger(HashID.ActionID, m_ActionID);
             return false;
         }
 
@@ -437,6 +388,36 @@ namespace CharacterController
 
 
 
+        //private bool CanEnterCover(bool drawAllLines = false)
+        //{
+        //    float coverViewAngle = 135;
+        //    int numOfRays = 6;
+
+        //    float halfAngle = coverViewAngle / 2.0f;
+        //    Quaternion leftRayRotation = Quaternion.AngleAxis(-halfAngle, Vector3.up);
+        //    Vector3 leftRayDirection = leftRayRotation * (m_ObjectDetector.forward * m_TakeCoverDistance);
+        //    Vector3 direction = leftRayDirection;
+
+        //    float amountEach = coverViewAngle / (numOfRays);
+        //    for (int i = 0; i < numOfRays; i++)
+        //    {
+        //        if (i == 0) continue;
+        //        Quaternion desiredRotation = Quaternion.AngleAxis(amountEach, Vector3.up);
+        //        direction = desiredRotation * direction;
+
+        //        bool hit = false;
+        //        if (Physics.Raycast(m_ObjectDetector.position, direction, out m_RaycastHit, m_TakeCoverDistance, m_CoverLayer))
+        //        {
+        //            if (!drawAllLines) Debug.DrawRay(m_ObjectDetector.position, direction, hit ? Color.green : Color.magenta, 1);
+        //            hit = true;
+        //            m_TargetPosition = m_RaycastHit.point + (m_RaycastHit.normal * (m_CapsuleCollider.radius * 1.0f));
+        //            m_TargetPosition.y = m_Controller.transform.position.y;
+        //            return true;
+        //        }
+        //        if (drawAllLines) Debug.DrawRay(m_ObjectDetector.position, direction, hit ? Color.green : Color.magenta, 1);
+        //    }
+        //    return false;
+        //}
 
 
     }

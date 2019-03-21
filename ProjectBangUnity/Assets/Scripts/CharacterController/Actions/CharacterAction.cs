@@ -9,6 +9,8 @@
     [Serializable]
     public abstract class CharacterAction : MonoBehaviour
     {
+        [SerializeField]
+        protected bool m_IsActive;
         [SerializeField, HideInInspector]
         protected string m_StateName;
         [SerializeField, HideInInspector]
@@ -17,10 +19,6 @@
         protected float m_TransitionDuration = 0.2f;
         //[SerializeField]
         protected float m_SpeedMultiplier = 1;
-        [SerializeField, DisplayOnly]
-        protected int m_StateHash;
-        //[SerializeField]
-        protected bool m_EquipItem;
         [SerializeField]
         protected KeyCode m_Keycode;
         [SerializeField]
@@ -28,39 +26,22 @@
         [SerializeField]
         protected ActionStopType m_StopType = ActionStopType.Manual;
 
-
-        public ActionStartType StartType
-        {
-            get { return m_StartType; }
-            //set { m_StartType = value; }
-        }
-
-        public ActionStopType StopType
-        {
-            get { return m_StopType; }
-            //set { m_StopType = value; }
-        }
-
         [Space(12)]
 
 
-
+        protected CharacterLocomotion m_Controller;
+        protected Rigidbody m_Rigidbody;
+        protected CapsuleCollider m_CapsuleCollider;
         protected Animator m_Animator;
         protected AnimatorMonitor m_AnimatorMonitor;
         protected LayerManager m_Layers;
-        protected CharacterLocomotion m_Controller;
-        protected LayerManager m_LayerManager;
         protected Inventory m_Inventory;
-        protected Rigidbody m_Rigidbody;
         protected GameObject m_GameObject;
         protected Transform m_Transform;
 
         protected AnimatorTransitionInfo m_TransitionInfo;
 
-        protected bool m_Input;
-        [SerializeField]
-        protected bool m_IsActive;
-        protected bool m_CanManualStart;
+
         //[SerializeField]
         protected bool m_ActionStopToggle;        //  Used for double clicks.
 
@@ -79,18 +60,21 @@
         }
 
 
-        public float SpeedMultiplier
-        {
+        public float SpeedMultiplier{
             get { return m_SpeedMultiplier; }
             set { m_SpeedMultiplier = value; }
         }
 
-        public bool EquipItem { 
-            set { 
-                m_EquipItem = value;
-            }
+
+        public ActionStartType StartType{
+            get { return m_StartType; }
+            //set { m_StartType = value; }
         }
 
+        public ActionStopType StopType{
+            get { return m_StopType; }
+            //set { m_StopType = value; }
+        }
 
 
 
@@ -100,28 +84,27 @@
         //
         protected virtual void Awake()
         {
-            m_GameObject = gameObject;
-            m_Transform = transform;
+            m_Controller = GetComponent<CharacterLocomotion>();
+            m_CapsuleCollider = GetComponent<CapsuleCollider>();
+            m_Rigidbody = GetComponent<Rigidbody>();
             m_Animator = GetComponent<Animator>();
             m_AnimatorMonitor = GetComponent<AnimatorMonitor>();
-            m_Controller = GetComponent<CharacterLocomotion>();
             m_Layers = GetComponent<LayerManager>();
-            m_Rigidbody = GetComponent<Rigidbody>();
-            m_LayerManager = GetComponent<LayerManager>();
             m_Inventory = GetComponent<Inventory>();
+            m_GameObject = gameObject;
+            m_Transform = transform;
             //EventHandler.RegisterEvent<CharacterAction, bool>(m_GameObject, "OnCharacterActionActive", OnActionActive);
 
-            if (string.IsNullOrWhiteSpace(m_StateName))
-            {
+            if (string.IsNullOrWhiteSpace(m_StateName)){
                 m_StateName = GetType().Name;
             }
-            m_StateHash = Animator.StringToHash(m_StateName);
+
         }
 
 
         protected void OnEnable()
 		{
-            //this.hideFlags = HideFlags.HideInInspector;
+
 		}
 
         protected void OnDisable()

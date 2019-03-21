@@ -160,6 +160,7 @@ GameObject:
   - component: {fileID: 114641910215582532}
   - component: {fileID: 114843526904343182}
   - component: {fileID: 114329433760099396}
+  - component: {fileID: 114015622257898310}
   m_Layer: 31
   m_Name: Player
   m_TagString: Player
@@ -1791,6 +1792,24 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &114015622257898310
+MonoBehaviour:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0951410c124624a93a72ab6ef081dda7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: MoveTowards
+  m_ActionID: 0
+  m_Keycode: 0
+  m_StartType: 1
+  m_StopType: 0
+  m_ActionStartLocation: {x: 0, y: 0, z: 0}
 --- !u!114 &114077551664450782
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1858,13 +1877,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 935f069628fb44cde89d56865b07253d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_IsActive: 0
   m_StateName: Jump
   m_ActionID: 0
-  m_StateHash: 0
   m_Keycode: 0
   m_StartType: 1
   m_StopType: 1
-  m_IsActive: 0
 --- !u!114 &114311917172092944
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1910,13 +1928,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb16de68a3c6f4c2c99766840b8420c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_IsActive: 0
   m_StateName: Roll
   m_ActionID: 15
-  m_StateHash: 0
   m_Keycode: 0
   m_StartType: 1
   m_StopType: 0
-  m_IsActive: 0
 --- !u!114 &114429236655991950
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1975,13 +1992,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 043998c3940ed496da75fc62118ed578, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_IsActive: 0
   m_StateName: Aim
   m_ActionID: 0
-  m_StateHash: 0
   m_Keycode: 0
   m_StartType: 1
   m_StopType: 1
-  m_IsActive: 0
   m_ItemID: 0
   m_ItemName: 
 --- !u!114 &114641910215582532
@@ -1995,13 +2011,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c6b69abf52d14e8186e8a930c05af45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_IsActive: 0
   m_StateName: Take_Damage
   m_ActionID: 0
-  m_StateHash: 0
   m_Keycode: 0
   m_StartType: 0
   m_StopType: 0
-  m_IsActive: 0
   m_MinDamageAmount: 0
 --- !u!114 &114684986398083596
 MonoBehaviour:
@@ -2048,13 +2063,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24f4915bd11574121a2a533c85cb7cc1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_IsActive: 0
   m_StateName: Fall
   m_ActionID: 0
-  m_StateHash: 0
   m_Keycode: 0
   m_StartType: 0
   m_StopType: 0
-  m_IsActive: 0
   m_MinFallHeight: 1
 --- !u!114 &114786276463712790
 MonoBehaviour:
@@ -2079,13 +2093,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6154c3fa2c49643758284fb02e121cd3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_IsActive: 0
   m_StateName: Crouch
   m_ActionID: 0
-  m_StateHash: 0
   m_Keycode: 0
   m_StartType: 1
   m_StopType: 1
-  m_IsActive: 0
 --- !u!114 &114901688824212290
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2117,20 +2130,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3005a58794a74e28bd4e9600cba665f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_IsActive: 0
   m_StateName: Cover
-  m_ActionID: 0
-  m_StateHash: 0
+  m_ActionID: 12
   m_Keycode: 0
   m_StartType: 1
   m_StopType: 1
-  m_IsActive: 0
-  m_TakeCoverDistance: 0.75
+  m_TakeCoverDistance: 2
   m_CoverLayer:
     serializedVersion: 2
     m_Bits: 768
   m_TakeCoverRotationSpeed: 4
-  m_DrawCanEnterLines: 0
-  m_Debug: 0
+  m_CurrentCoverID: 0
+  m_HorizontalInput: 0
+  m_ForwardInput: 0
+  m_DrawCanEnterLines: 1
+  m_Debug: 1
 --- !u!114 &114921923587186984
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2170,14 +2185,16 @@ MonoBehaviour:
   m_Acceleration: 20
   m_Actions:
   - {fileID: 114776445558567580}
-  - {fileID: 114329433760099396}
   - {fileID: 114908900733630684}
+  - {fileID: 114329433760099396}
   - {fileID: 114286754863660934}
   - {fileID: 114843526904343182}
   - {fileID: 114484464717320762}
   - {fileID: 114641910215582532}
+  - {fileID: 114015622257898310}
   m_ActiveAction: {fileID: 0}
   m_ActiveActions: []
+  m_InputVector: {x: 0, y: 0, z: 0}
   _rigidbodyVelocity: {x: 0, y: 0, z: 0}
   _rigidbodyAngularVelocity: {x: 0, y: 0, z: 0}
   m_DrawDebugLine: 0
@@ -2191,7 +2208,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.25
+  m_Radius: 0.3
   m_Height: 1.8
   m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0}

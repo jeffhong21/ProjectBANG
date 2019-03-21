@@ -230,16 +230,6 @@
 		}
 
 
-        private void LateUpdate()
-        {
-            //rightHandRotation = m_RightHand.rotation;
-            //rightHandPosition = m_RightHand.position;
-            //rightHandTargetRotation = m_RightHandTarget.rotation;
-            //rightHandTargetPosition = m_RightHandTarget.position;
-        }
-
-
-
         protected virtual void LookAtTarget()
         {
             //Vector3 directionTowardsTarget = m_LookAtPoint.position - m_Transform.position;

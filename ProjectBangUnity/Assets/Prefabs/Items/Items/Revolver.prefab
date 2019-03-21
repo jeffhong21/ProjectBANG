@@ -623,7 +623,7 @@ MonoBehaviour:
   m_AutoReload: 0
   m_RecoilAmount: 0.1
   m_Spread: 0.01
-  m_Smoke: {fileID: 157586, guid: 2574ca206a571a342a7fab69fdfb87aa, type: 2}
+  m_Smoke: {fileID: 0}
   m_MuzzleFlash: {fileID: 1743301284569550, guid: ad2ab49d0a2a17148bd51c93d977bdbc,
     type: 2}
   m_SmokeLocation: {fileID: 4433258886810430}
@@ -636,7 +636,7 @@ MonoBehaviour:
   m_ImpactLayers:
     serializedVersion: 2
     m_Bits: 536874753
-  m_Projectile: {fileID: 152594, guid: c10933bdaacbc474f971cd93345e6bdb, type: 2}
+  m_Projectile: {fileID: 0}
   m_DefaultDecal: {fileID: 1030604309152162, guid: ed017de91831b481e8c7d14e692443a6,
     type: 2}
   m_DefaultDust: {fileID: 1030604309152162, guid: ed017de91831b481e8c7d14e692443a6,

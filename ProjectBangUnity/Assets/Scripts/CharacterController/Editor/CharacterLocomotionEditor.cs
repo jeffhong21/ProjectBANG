@@ -11,9 +11,13 @@ namespace CharacterController
     [CustomEditor(typeof(CharacterLocomotion))]
     public class CharacterLocomotionEditor : Editor
     {
-        private static readonly string[] m_DontIncude = new string[] { "m_Script", "m_Actions" };
+        private readonly string[] m_DontIncude = new string[] { "m_Script", "m_Actions" };
         //private static readonly string[] m_DontIncude = new string[] { "m_Script" };
         //private static readonly string[] m_DontIncude = new string[] { "m_Actions" };
+
+        private const string MotorFoldoutHeader = "Character Motor";
+        private const string PhysicsFoldoutHeader = "Character Physics";
+
 
         CharacterLocomotion m_Controller;
 
@@ -21,11 +25,16 @@ namespace CharacterController
         CharacterAction m_SelectedAction;
         Editor m_ActionEditor;
 
-        float m_LineHeight;
-        float m_LineHeightSpace;
 
-        bool m_ShowMovementFoldout = true;
-        bool m_ShowComponents;
+        private bool m_ShowCharMotorFoldout = true;
+        private bool m_ShowCharPhysicsFoldout;
+
+        private GUIStyle m_DefaultActionTextStyle = new GUIStyle();
+        private GUIStyle m_ActiveActionTextStyle = new GUIStyle();
+
+
+
+        private float m_LineHeight;
 
         private SerializedProperty m_Script;
         private SerializedProperty m_Actions;
@@ -54,10 +63,10 @@ namespace CharacterController
             m_Controller = (CharacterLocomotion)target;
 
             m_LineHeight = EditorGUIUtility.singleLineHeight;
-            m_LineHeightSpace = m_LineHeight + 10;
+            m_DefaultActionTextStyle.fontStyle = FontStyle.Normal;
+            m_ActiveActionTextStyle.fontStyle = FontStyle.Bold;
 
 
-            //m_ShowComponents = serializedObject.FindProperty("m_ShowComponents").boolValue;
 
             m_Script = serializedObject.FindProperty("m_Script");
             m_Actions = serializedObject.FindProperty("m_Actions");
@@ -89,20 +98,27 @@ namespace CharacterController
             GUI.enabled = false;
             EditorGUILayout.PropertyField(m_Script);
             GUI.enabled = true;
-            //m_ShowMovementFoldout = Foldout("Character Locomtion", m_ShowMovementFoldout);
-            m_ShowMovementFoldout  = EditorGUILayout.Foldout(m_ShowMovementFoldout, "Character Locomtion");
-            if(m_ShowMovementFoldout){
+            //m_ShowCharPhysicsFoldout = Foldout("Character Locomtion", m_ShowCharPhysicsFoldout);
+            m_ShowCharMotorFoldout = EditorGUILayout.Foldout(m_ShowCharMotorFoldout, PhysicsFoldoutHeader);
+            if(m_ShowCharMotorFoldout)
+            {
                 EditorGUILayout.PropertyField(m_UseRootMotion);
                 EditorGUILayout.PropertyField(m_RootMotionSpeedMultiplier);
                 EditorGUILayout.PropertyField(m_SpeedChangeMultiplier);
                 EditorGUILayout.PropertyField(m_RotationSpeed);
                 EditorGUILayout.PropertyField(m_AimRotationSpeed);
+                EditorGUILayout.PropertyField(m_GroundSpeed);
+            }
+
+            EditorGUILayout.Space();
+
+            m_ShowCharPhysicsFoldout  = EditorGUILayout.Foldout(m_ShowCharPhysicsFoldout, PhysicsFoldoutHeader);
+            if(m_ShowCharPhysicsFoldout){
+
                 EditorGUILayout.PropertyField(m_AlignToGround);
                 EditorGUILayout.PropertyField(m_AlignToGroundDepthOffset);
-                EditorGUILayout.PropertyField(m_GroundSpeed);
                 EditorGUILayout.PropertyField(m_SkinWidth);
                 EditorGUILayout.PropertyField(m_SlopeLimit);
-
                 EditorGUILayout.PropertyField(m_MaxStepHeight);
                 EditorGUILayout.PropertyField(m_StepOffset);
                 EditorGUILayout.PropertyField(m_StepSpeed);
@@ -111,14 +127,13 @@ namespace CharacterController
             EditorGUILayout.Space();
 
 
-            //m_Actions.isExpanded = EditorGUILayout.Foldout(m_Actions.isExpanded, m_Actions.displayName);
-            //if (m_Actions.isExpanded) DrawReorderableList<CharacterAction>(m_ActionsList);
-
+            //  Draw Action List.
             DrawReorderableList(m_ActionsList);
+            //  Draw Action Inspector.
             DrawActionInspector(m_SelectedAction);
 
+            GUILayout.Space(12);
             DrawPropertiesExcluding(serializedObject, m_DontIncude);
-
             serializedObject.ApplyModifiedProperties();
         }
 
@@ -131,21 +146,18 @@ namespace CharacterController
             list.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
             {
                 SerializedProperty element = list.serializedProperty.GetArrayElementAtIndex(index);
-                Rect elementRect = new Rect(rect.x, rect.y, rect.width, m_LineHeight);
-                DrawListElement(elementRect, element, isActive);
+                DrawListElement(rect, element, isActive);
             };
 
             list.drawHeaderCallback = (Rect rect) => {
                 DrawListHeader(rect);
             };
 
-
             list.onSelectCallback = (ReorderableList l) => {
                 SerializedProperty element = l.serializedProperty.GetArrayElementAtIndex(l.index);
                 m_SelectedAction = (CharacterAction)element.objectReferenceValue;
                 EditorUtility.SetDirty(m_SelectedAction);
             };
-
 
             list.onAddDropdownCallback = (Rect buttonRect, ReorderableList l) => {
                 var menu = new GenericMenu();
@@ -190,23 +202,29 @@ namespace CharacterController
         }
 
 
-        private void DrawListElement(Rect elementRect, SerializedProperty element, bool isActive)
+        private void DrawListElement(Rect elementRect, SerializedProperty element, bool isSelected)
         {
-            
             if(element.objectReferenceValue != null)
             {
                 Rect rect = elementRect;
                 rect.y += 2;
+                rect.height = m_LineHeight;
+
                 SerializedObject elementObj = new SerializedObject(element.objectReferenceValue);
                 SerializedProperty stateName = elementObj.FindProperty("m_StateName");
+                SerializedProperty isActive = elementObj.FindProperty("m_IsActive");
                 SerializedProperty actionID = elementObj.FindProperty("m_ActionID");
 
 
+                CharacterAction action = (CharacterAction)element.objectReferenceValue;
                 //  Action name.
                 rect.width = elementRect.width * 0.40f;
-                CharacterAction action = (CharacterAction)element.objectReferenceValue;
-                //EditorGUI.LabelField(rect, action.GetType().Name);
-                EditorGUI.LabelField(rect, isActive ?  action.GetType().Name + string.Format(" ({0})", "IsActive") : action.GetType().Name);
+                if(action.IsActive){
+                    EditorGUI.LabelField(rect, string.Format("{0} ({1})", action.GetType().Name, "Active"), m_ActiveActionTextStyle);
+                }
+                else{
+                    EditorGUI.LabelField(rect, action.GetType().Name, m_DefaultActionTextStyle);
+                }
 
 
                 //  Action state name.
@@ -230,8 +248,8 @@ namespace CharacterController
 
                 Event evt = Event.current;
                 if(elementRect.Contains(evt.mousePosition)){
-                    if(evt.button == 1 && evt.isMouse && evt.type == EventType.MouseUp){
-                        
+                    if(evt.button == 1 && evt.isMouse && evt.type == EventType.MouseUp)
+                    {
                         var menu = new GenericMenu();
                         menu.AddItem(new GUIContent("Add"), false, () => TestContextMenu(action.GetType().Name));
                         menu.AddItem(new GUIContent("Remove"), false, () => TestContextMenu(action.GetType().Name));

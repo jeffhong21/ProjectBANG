@@ -221,10 +221,10 @@
             if (m_CameraStateLookup.ContainsKey(name)){
                 m_CameraState = m_CameraStateLookup[name];
                 InitializeState();
-                Debug.LogFormat("CameraState: {0}", m_CameraState.name);
+                //Debug.LogFormat("CameraState: {0}", m_CameraState.name);
                 return true;
             }                 
-            Debug.LogWarningFormat("** Camera State {0} does not exist", name);
+            //Debug.LogWarningFormat("** Camera State {0} does not exist", name);
             return false;
         }
 

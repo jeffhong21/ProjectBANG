@@ -566,10 +566,6 @@ Prefab:
       propertyPath: m_Pivot.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1212768633576144, guid: b2141d4d33e5f4aa19bbefa4152815bc, type: 2}
-      propertyPath: m_Name
-      value: ItemHUD
-      objectReference: {fileID: 0}
     - target: {fileID: 114740502486158012, guid: b2141d4d33e5f4aa19bbefa4152815bc,
         type: 2}
       propertyPath: m_havePropertiesChanged

@@ -21,7 +21,7 @@ namespace CharacterController
         private KeyCode m_ReloadInput = KeyCode.R;
         private KeyCode m_InteractInput = KeyCode.F;
         //private KeyCode m_ThrowInput = KeyCode.G;
-        //private KeyCode m_DropItem = KeyCode.Y;
+        private KeyCode m_CoverInput = KeyCode.V;
         private KeyCode m_UseItemInput = KeyCode.Mouse0;
         private KeyCode m_AimInput = KeyCode.Mouse1;
 
@@ -31,7 +31,7 @@ namespace CharacterController
         private float m_TimeOfFirstButtoonPressed;
         private float m_DoubleTapInputTime = 0.25f;
         //[SerializeField, DisplayOnly]
-        private bool m_IsCrouching, m_IsRunning, m_IsAiming;
+        private bool m_IsCrouching, m_IsRunning, m_IsAiming, m_InCover;
         [Header("-- Debug Settings --")]
         //[SerializeField, DisplayOnly]
         private float m_Horizontal;
@@ -141,6 +141,8 @@ namespace CharacterController
                 Aim(m_AimInput);
                 //  Crouch
                 Crouch(m_CrouchInput);
+                //  Cover
+                EnterCover(m_CoverInput);
                 //  Dodge
                 Dodge();
                 // Run.
@@ -247,7 +249,8 @@ namespace CharacterController
         {
             if (Input.GetKeyDown(keycode)){
                 var action = m_Controller.GetAction<Crouch>();
-                if(m_IsCrouching == false){
+                if (!action.IsActive)
+                {
                     m_IsCrouching = m_Controller.TryStartAction(action);
                 }
                 else{
@@ -274,6 +277,22 @@ namespace CharacterController
                 ////var direction = (-m_Transform.forward) - m_Transform.position;
                 //var rotation = Quaternion.AngleAxis(180, Vector3.up);
                 //m_Controller.LookRotation = Quaternion.Slerp(m_Transform.rotation, rotation, 0.12f);
+            }
+        }
+
+        private void EnterCover(KeyCode keycode)
+        {
+            if (Input.GetKeyDown(keycode))
+            {
+                var action = m_Controller.GetAction<Cover>();
+                if(!action.IsActive){
+                    bool actionSuccess = m_Controller.TryStartAction(action);
+                    //if(actionSuccess) Debug.LogFormat(" Entering Cover.");
+                } else {
+                    m_Controller.TryStopAction(action);
+                    //Debug.Log("Exiting cover.");
+                }
+
             }
         }
 
@@ -316,7 +335,16 @@ namespace CharacterController
         {
             if (Input.GetKeyDown(keycode))
             {
-                m_Controller.PlayInteractAnimation();
+               // m_Controller.PlayInteractAnimation();
+
+                //var action = m_Controller.GetAction<MoveTowards>();
+                //if(action != null){
+                //    if (!action.IsActive){
+                //        action.ActionStartLocation = m_Transform.forward;
+                //        m_Controller.TryStartAction(action);
+                //    }
+                //}
+
             }
         }
 

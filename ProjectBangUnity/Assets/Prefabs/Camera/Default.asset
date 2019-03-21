@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Name: Default
   m_EditorClassIdentifier: 
   StateName: Default
-  ViewDistance: 3
+  ViewDistance: 3.5
   VerticalOffset: 0
-  ApplyYawLimit: 1
-  MinYaw: -135
-  MaxYaw: 135
+  ApplyYawLimit: 0
+  MinYaw: -180
+  MaxYaw: 180
   ApplyPitchLimit: 1
   MinPitch: -10
-  MaxPitch: 45
+  MaxPitch: 65
   ApplyCameraOffset: 1
   CameraOffset: {x: 0, y: 0, z: 0}
   FieldOfView: 64

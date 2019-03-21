@@ -46,7 +46,7 @@
 
         [SerializeField, HideInInspector]
         protected CharacterAction[] m_Actions;
-        [SerializeField, HideInInspector]
+        [SerializeField]
         private CharacterAction m_ActiveAction;
         [SerializeField, HideInInspector]
         private CharacterAction[] m_ActiveActions;
@@ -61,7 +61,7 @@
         private float m_Speed;
         //[SerializeField, DisplayOnly]
         private Vector3 m_Velocity, m_MoveDirection, m_LookDirection;
-        //[SerializeField, DisplayOnly]
+        [SerializeField, DisplayOnly]
         private Vector3 m_InputVector;
         //[SerializeField, DisplayOnly]
         private float rotationDifference , eulerY;
@@ -73,16 +73,15 @@
         [SerializeField, DisplayOnly] private Vector3 _rigidbodyAngularVelocity;
 
 
-        PlayerInput m_Input;
-        AnimatorMonitor m_AnimationMonitor;
-        LayerManager m_Layers;
-        Animator m_Animator;
-        CapsuleCollider m_CapsuleCollider;
-        Rigidbody m_Rigidbody;
-        GameObject m_GameObject;
-        Transform m_Transform;
-        Transform m_FocusPoint;
-        float m_DeltaTime;
+        private CapsuleCollider m_CapsuleCollider;
+        private Rigidbody m_Rigidbody;
+        private Animator m_Animator;
+        private AnimatorMonitor m_AnimationMonitor;
+        private LayerManager m_Layers;
+        private GameObject m_GameObject;
+        private Transform m_Transform;
+        private Transform m_FocusPoint;
+        private float m_DeltaTime;
 
 
         bool m_UpdateRotation = true, m_UpdateMovement = true, m_UpdateAnimator = true;
@@ -188,7 +187,6 @@
 
         protected void Awake()
         {
-            m_Input = GetComponent<PlayerInput>();
             m_AnimationMonitor = GetComponent<AnimatorMonitor>();
             m_Layers = GetComponent<LayerManager>();
             m_Animator = GetComponent<Animator>();
@@ -242,8 +240,7 @@
 
 
 
-
-        private void Update()
+        private void _CharacterActionUpdate()
 		{
             if (m_DeltaTime == 0) return;
 
@@ -323,8 +320,6 @@
                         m_UpdateAnimator = m_ActiveAction.UpdateAnimator();
                     }
                 }
-
-
             }
 
 
@@ -332,18 +327,112 @@
 
 
 
-        private void FixedUpdate()
+        private void CharacterActionUpdate()
         {
-            _rigidbodyVelocity = m_Rigidbody.velocity;
-            _rigidbodyAngularVelocity = m_Rigidbody.angularVelocity;
+            m_UpdateRotation = true;
+            m_UpdateMovement = true;
+            m_UpdateAnimator = true;
+
+            for (int i = 0; i < m_Actions.Length; i++)
+            {
+                //  First, check if current Action can Start or Stop.
+                var currentAction = m_Actions[i];
+                //  Current Action is Active.
+                if (m_Actions[i].IsActive)
+                {
+                    //  Check if can stop Action is StopType is NOT Manual.
+                    if (m_Actions[i].StopType != ActionStopType.Manual)
+                    {
+                        if (m_Actions[i].CanStopAction())
+                        {
+                            //  Start the Action and update the animator.
+                            m_Actions[i].StopAction();
+                            //m_Actions[i].UpdateAnimator();
+                            //  Reset Active Action.
+                            if (m_ActiveAction = m_Actions[i])
+                                m_ActiveAction = null;
+                            //  Move on to the next Action.
+                            continue;
+                        }
+                    }
+                }
+                //  Current Action is NOT Active.
+                else
+                {
+                    //  Check if can start Action is StartType is NOT Manual.
+                    if (m_Actions[i].StartType != ActionStartType.Manual)
+                    {
+                        if (m_ActiveAction == null)
+                        {
+                            if (m_Actions[i].CanStartAction())
+                            {
+                                //  Start the Action and update the animator.
+                                m_Actions[i].StartAction();
+                                m_Actions[i].UpdateAnimator();
+                                //  Set active Action if not concurrent.
+                                if (m_Actions[i].IsConcurrentAction() == false)
+                                    m_ActiveAction = m_Actions[i];
+                                //  Move onto the next Action.
+                                continue;
+                            }
+                        }
+                        else if (m_Actions[i].IsConcurrentAction())
+                        {
+                            if (m_Actions[i].CanStartAction())
+                           {
+                                //  Start the Action and update the animator.
+                                m_Actions[i].StartAction();
+                                //m_Actions[i].UpdateAnimator();
+                                //  Move onto the next Action.
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+                }
+
+                //  Next, if current Action is active, update overrides.
+                if (m_Actions[i].IsActive)
+                {
+                    if (m_UpdateRotation){
+                        m_UpdateRotation = m_Actions[i].UpdateRotation();
+                    }
+                    if (m_UpdateMovement){
+                        m_UpdateMovement = m_Actions[i].UpdateMovement();
+                    }
+                    if (m_UpdateAnimator){
+                        m_UpdateAnimator = m_Actions[i].UpdateAnimator();
+                    }
+                    //  Call Action Update.
+                    m_Actions[i].UpdateAction();
+                }
+            }
+        }
 
 
+		private void Update()
+		{
+            if (m_DeltaTime == 0) return;
+
+            CharacterActionUpdate();
+            //_CharacterActionUpdate();
+		}
+
+
+		private void FixedUpdate()
+        {
             m_Grounded = CheckGround();
 
             if (m_UpdateRotation) UpdateRotation();
             if (m_UpdateMovement) UpdateMovement();
             if (m_UpdateAnimator) UpdateAnimator();
-            //MoveCharacter(RelativeInputVector.x, RelativeInputVector.z, m_LookRotation);
+
+
+            _rigidbodyVelocity = m_Rigidbody.velocity;
+            _rigidbodyAngularVelocity = m_Rigidbody.angularVelocity;
         }
 
 
@@ -495,30 +584,43 @@
                     m_Rigidbody.velocity = m_Velocity;
                     m_Rigidbody.AddForce(m_MoveDirection * (m_Speed) * m_DeltaTime, ForceMode.VelocityChange);
                 }
-
             }
 
-            m_Moving = m_InputVector.sqrMagnitude > 0.1f;
-        }
 
+            m_Moving = m_InputVector.sqrMagnitude > 0.1f;
+            if(!m_Moving){
+                StopMovement();
+            }
+        }
 
 
         private void UpdateAnimator()
         {
             m_AnimationMonitor.SetForwardInputValue(m_InputVector.z * m_Speed);
             m_AnimationMonitor.SetHorizontalInputValue(m_InputVector.x * m_Speed);
-            m_Animator.SetFloat(HashID.Speed, m_Speed);
             m_Animator.SetBool(HashID.Moving, m_Moving);
         }
 
 
 
+        public void SetPosition(Vector3 position){
+            m_Rigidbody.MovePosition(position);
+        }
 
 
-        public void SetRotation(Quaternion rotation)
-        {
+        public void SetRotation(Quaternion rotation){
             m_Rigidbody.MoveRotation(rotation.normalized);
         }
+
+
+        bool m_MovingTowardsPosition;
+        Vector3 m_TargetPosition;
+        public void MoveTowards(Vector3 position)
+        {
+            m_MovingTowardsPosition = true;
+            m_TargetPosition = position;
+        }
+
 
         public void UpdateLookDirection(Transform referenceTransform = null)
         {
@@ -581,8 +683,6 @@
         }
 
 
-
-
         public void StopMovement()
         {
             m_Rigidbody.velocity = Vector3.zero;
@@ -628,9 +728,11 @@
             //int index = Array.IndexOf(m_Actions, action);
             //if(activated){
             //    m_ActiveActions[index] = m_Actions[index];
+            //    Debug.LogFormat(" {0} is active.", action.GetType().Name);
             //}
             //else{
             //    m_ActiveActions[index] = null;
+            //    Debug.LogFormat(" {0} is now not active.", action.GetType().Name);
             //}
         }
 
@@ -649,12 +751,13 @@
             //  If there is an active action and current action is non concurrent.
             if(m_ActiveAction != null && action.IsConcurrentAction() == false){
                 int activeActionIndex = Array.IndexOf(m_Actions, m_ActiveAction);
-                Debug.LogFormat("Action index {0} | Active Action index {1}", index, activeActionIndex);
+                //Debug.LogFormat("Action index {0} | Active Action index {1}", index, activeActionIndex);
                 if(index < activeActionIndex){
                     if (action.CanStartAction()){
                         m_ActiveAction = m_Actions[index];
-                        m_ActiveActions[index] = m_Actions[index];
+                        //m_ActiveActions[index] = m_Actions[index];
                         action.StartAction();
+                        action.UpdateAnimator();
                         return true;
                     }
                 } 
@@ -663,8 +766,9 @@
             else if (m_ActiveAction != null && action.IsConcurrentAction())
             {
                 if (action.CanStartAction()){
-                    m_ActiveActions[index] = m_Actions[index];
+                    //m_ActiveActions[index] = m_Actions[index];
                     action.StartAction();
+                    action.UpdateAnimator();
                     return true;
                 }
             }
@@ -673,8 +777,9 @@
                 if (action.CanStartAction())
                 {
                     m_ActiveAction = m_Actions[index];
-                    m_ActiveActions[index] = m_Actions[index];
+                    //m_ActiveActions[index] = m_Actions[index];
                     action.StartAction();
+                    action.UpdateAnimator();
                     return true;
                 }
             }
