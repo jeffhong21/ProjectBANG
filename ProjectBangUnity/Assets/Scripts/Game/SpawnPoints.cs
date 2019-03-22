@@ -71,6 +71,7 @@ public class SpawnPoints : MonoBehaviour
     //    DrawGizmos();
     //}
 
+    #if UNITY_EDITOR
 
 	private void OnDrawGizmosSelected()
 	{
@@ -80,8 +81,6 @@ public class SpawnPoints : MonoBehaviour
 
 	public void DrawGizmos()
 	{
-        #if UNITY_EDITOR
-
         if (m_DebugSettings == null) return;
 
         switch (m_SpawnType)
@@ -98,12 +97,13 @@ public class SpawnPoints : MonoBehaviour
         }
 
         Gizmos.DrawSphere(transform.position, m_Radius);
-
+        Gizmos.DrawRay(transform.position + transform.up * 1.5f, transform.forward);
 
         GizmosUtils.DrawString(gameObject.name, transform.position + Vector3.up, m_DebugSettings.textColor);
 
-        #endif
 	}
+
+    #endif
 }
 
 

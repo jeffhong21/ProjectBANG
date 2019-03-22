@@ -1,23 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
-
+﻿
 namespace CharacterController
 {
+    using UnityEngine;
+
     public class CharacterFootsteps : MonoBehaviour
     {
-        public float minVelocity = 0.8f;
-        [Range(0, 0.2f)]
-        public float footOffset = 0.08f;
-        public float interval = 0.3f;
-
-        public GameObject m_RightDecal;
-        public GameObject m_LeftDecal;
-
-        public bool debugTextureName;
-        public CharacterFootTrigger m_leftFootTrigger;
-        public CharacterFootTrigger m_rightFootTrigger;
-        public Transform m_currentStep;
+        [SerializeField]
+        protected GameObject m_Decal;
+        [SerializeField]
+        protected AudioClip[] footstepClips = new AudioClip[0];
+        [SerializeField]
+        protected CharacterFootTrigger m_leftFootTrigger;
+        [SerializeField]
+        protected CharacterFootTrigger m_rightFootTrigger;
+        [SerializeField]
+        protected Transform m_currentStep;
 
 
 
@@ -28,18 +25,21 @@ namespace CharacterController
         protected Transform m_Transform;
 
 
-        private float nextInterval;
 
 
 		private void Awake()
 		{
             m_Controller = GetComponent<CharacterLocomotion>();
+            m_Layers = GetComponent<LayerManager>();
             m_Animator = GetComponent<Animator>();
             m_GameObject = gameObject;
             m_Transform = transform;
 
-            if (m_leftFootTrigger == null || m_rightFootTrigger == null)
-                AddCharacterFootTriggers();
+            //if (m_leftFootTrigger == null || m_rightFootTrigger == null)
+                //AddCharacterFootTriggers();
+
+            if (m_leftFootTrigger == null) AddCharacterFootTriggers(m_Animator.GetBoneTransform(HumanBodyBones.LeftFoot), out m_leftFootTrigger);
+            if (m_rightFootTrigger == null) AddCharacterFootTriggers(m_Animator.GetBoneTransform(HumanBodyBones.RightFoot), out m_rightFootTrigger);
 
             m_leftFootTrigger.Init(this);
             m_rightFootTrigger.Init(this);
@@ -47,61 +47,40 @@ namespace CharacterController
 
 
 
-		private void Update()
-		{
-            //if(Time.time > nextInterval){
-            //    nextInterval += interval;
-            //    if(m_Controller.Velocity.sqrMagnitude > minVelocity){
-                    
-            //    }
-            //}
-		}
-
-
-
-
-		public void StepOnMesh(FootStepObject footStepObject)
+        public void StepOnMesh(CharacterFootTrigger sender)
         {
-            //Debug.LogFormat("{0}", m_Controller.Velocity.sqrMagnitude);
-            if (m_Controller.Velocity.sqrMagnitude > minVelocity)
+            m_currentStep = sender.transform;
+            RaycastHit hit;
+            if (Physics.Raycast(m_currentStep.position, m_currentStep.TransformVector(-m_currentStep.up), out hit, 1f, m_Layers.SolidLayer))
             {
-
-                m_currentStep = footStepObject.sender;
-
-                //var decal = Instantiate(footStepObject.ID == 0 ? m_RightDecal : m_LeftDecal, Vector3.zero, Quaternion.identity, m_currentStep).transform;
-                //decal.parent = null;
-                //var position = decal.position;
-                //position.y = 0;
-                //decal.position = position;
-                //decal.rotation = Quaternion.identity;
-                //decal.localScale = Vector3.one;
-
-                //Destroy(decal.gameObject, 5);
-
-                if (debugTextureName)
-                {
-                    Debug.LogFormat("{0}", m_currentStep);
+                var footStep = Instantiate(m_Decal, null);
+                var rotation = Quaternion.LookRotation(m_Transform.forward, Vector3.up);
+                var position = hit.point + Vector3.up * 0.001f;
+                if (m_currentStep.localPosition.x > 0){
+                    rotation = rotation * Quaternion.Euler(0, 0, 180);
                 }
 
+                footStep.transform.position = position;
+                footStep.transform.rotation = rotation;
             }
- 
         }
 
-        public void PlayFootFallSound(FootStepObject footStepObject)
+        public void PlayFootFallSound(CharacterFootTrigger sender)
         {
-
+            var index = Random.Range(0, footstepClips.Length);
+            var clip = footstepClips[index];
+            sender.AudioSource.clip = clip;
+            sender.AudioSource.Play();
         }
 
 
-        public void AddCharacterFootTriggers()
-        {
-            var leftFoot = m_Animator.GetBoneTransform(HumanBodyBones.LeftFoot).gameObject;
-            m_leftFootTrigger = leftFoot.AddComponent<CharacterFootTrigger>();
-            m_leftFootTrigger.Init(this);
 
-            var rightFoot = m_Animator.GetBoneTransform(HumanBodyBones.RightFoot).gameObject;
-            m_rightFootTrigger = rightFoot.AddComponent<CharacterFootTrigger>();
-            m_rightFootTrigger.Init(this);
+        private void AddCharacterFootTriggers(Transform foot, out CharacterFootTrigger footTrigger)
+        {
+            footTrigger = foot.GetComponent<CharacterFootTrigger>();
+            if(footTrigger == null){
+                footTrigger = foot.gameObject.AddComponent<CharacterFootTrigger>();
+            }
         }
 
 	}
@@ -110,7 +89,7 @@ namespace CharacterController
 
 
 
-    [Serializable]
+    [System.Serializable]
     public class FootStepObject
     {
         public int ID;

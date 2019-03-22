@@ -611,6 +611,7 @@ MonoBehaviour:
   m_RequiredAim: 1
   m_TwoHandedItem: 0
   m_NonDominantHandPosition: {fileID: 4037553092448768}
+  m_HolsterTarget: {fileID: 0}
   m_PositionOffset: {x: 0.084, y: -0.086, z: 0.362}
   m_RotationOffset: {x: -3.68, y: -0.2, z: -84.842}
   m_Character: {fileID: 0}
@@ -637,8 +638,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 536874753
   m_Projectile: {fileID: 0}
-  m_DefaultDecal: {fileID: 1030604309152162, guid: ed017de91831b481e8c7d14e692443a6,
-    type: 2}
+  m_DefaultDecal: {fileID: 0}
   m_DefaultDust: {fileID: 1030604309152162, guid: ed017de91831b481e8c7d14e692443a6,
     type: 2}
   m_DrawAimLine: 0

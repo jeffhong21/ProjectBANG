@@ -573,24 +573,21 @@
                 m_Velocity.y = m_Rigidbody.velocity.y;
                 m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, m_Acceleration * m_DeltaTime);
             }
-            else{
-                if(m_Aiming){
-                    m_Velocity = (m_Transform.TransformDirection(m_InputVector) * m_Speed);
-                    m_Velocity.y = m_Rigidbody.velocity.y;
-                    m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, m_Acceleration * m_DeltaTime);
-                }
-                else{
-                    m_Velocity = m_MoveDirection + m_Transform.forward * m_Speed;
-                    m_Rigidbody.velocity = m_Velocity;
-                    m_Rigidbody.AddForce(m_MoveDirection * (m_Speed) * m_DeltaTime, ForceMode.VelocityChange);
-                }
-            }
+            //else{
+            //    if(m_Aiming){
+            //        m_Velocity = (m_Transform.TransformDirection(m_InputVector) * m_Speed);
+            //        m_Velocity.y = m_Rigidbody.velocity.y;
+            //        m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, m_Acceleration * m_DeltaTime);
+            //    }
+            //    else{
+            //        m_Velocity = m_MoveDirection + m_Transform.forward * m_Speed;
+            //        m_Rigidbody.velocity = m_Velocity;
+            //        m_Rigidbody.AddForce(m_MoveDirection * (m_Speed) * m_DeltaTime, ForceMode.VelocityChange);
+            //    }
+            //} 
 
 
             m_Moving = m_InputVector.sqrMagnitude > 0.1f;
-            if(!m_Moving){
-                StopMovement();
-            }
         }
 
 
@@ -610,15 +607,6 @@
 
         public void SetRotation(Quaternion rotation){
             m_Rigidbody.MoveRotation(rotation.normalized);
-        }
-
-
-        bool m_MovingTowardsPosition;
-        Vector3 m_TargetPosition;
-        public void MoveTowards(Vector3 position)
-        {
-            m_MovingTowardsPosition = true;
-            m_TargetPosition = position;
         }
 
 

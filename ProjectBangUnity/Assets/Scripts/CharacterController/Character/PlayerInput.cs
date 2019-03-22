@@ -44,7 +44,7 @@ namespace CharacterController
 
 
         private Ray m_Ray;
-        private Vector3 m_DodgeDirection;
+        private Vector3 m_RollDirection;
 
         [SerializeField]
         private CameraController m_CameraController;
@@ -143,8 +143,8 @@ namespace CharacterController
                 Crouch(m_CrouchInput);
                 //  Cover
                 EnterCover(m_CoverInput);
-                //  Dodge
-                Dodge();
+                //  Roll
+                Roll();
                 // Run.
                 Run(m_RunInput);
 
@@ -208,37 +208,33 @@ namespace CharacterController
         }
 
 
-        private void Dodge()
+        private void Roll()
         {
             bool executeAction = false;
             if (CheckDoubleTap(KeyCode.W))
             {
-                m_DodgeDirection = m_Transform.forward;
-                //Debug.LogFormat("Dodging Forward ({0}) ", m_DodgeDirection);
+                m_RollDirection = m_Transform.forward;
                 executeAction = true;
             }
             else if (CheckDoubleTap(KeyCode.A))
             {
-                m_DodgeDirection = Vector3.Cross(m_Transform.forward.normalized, Vector3.up.normalized);
-                //Debug.LogFormat("Dodging Left ({0}) ", m_DodgeDirection);
+                m_RollDirection = Vector3.Cross(m_Transform.forward.normalized, Vector3.up.normalized);
                 executeAction = true;
             }
             else if (CheckDoubleTap(KeyCode.D))
             {
-                m_DodgeDirection = Vector3.Cross(m_Transform.forward.normalized, Vector3.up.normalized);
-                m_DodgeDirection = -m_DodgeDirection;
-                //Debug.LogFormat("Dodging Right ({0}) ", m_DodgeDirection);
+                m_RollDirection = Vector3.Cross(m_Transform.forward.normalized, Vector3.up.normalized);
+                m_RollDirection = -m_RollDirection;
                 executeAction = true;
             }
             else{
-                m_DodgeDirection = Vector3.zero;
+                m_RollDirection = Vector3.zero;
                 executeAction = false;
             }
 
-
-
             if(executeAction){
                 var action = m_Controller.GetAction<Roll>();
+                action.RollDirection = m_RollDirection;
                 m_Controller.TryStartAction(action);
             }
         }
@@ -264,9 +260,9 @@ namespace CharacterController
         private void Run(KeyCode keycode)
         {
             if (Input.GetKey(keycode)){
-                m_Controller.SpeedChangeMultiplier = 2f;
-            } else {
                 m_Controller.SpeedChangeMultiplier = 1.5f;
+            } else {
+                m_Controller.SpeedChangeMultiplier = 1f;
             }
             //m_Controller.Running = Input.GetKey(keycode);
         }

@@ -176,6 +176,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lifeTime: 5
+  meshRenderer: {fileID: 0}
+  material: {fileID: 0}
 --- !u!198 &198214740619166632
 ParticleSystem:
   m_ObjectHideFlags: 1
@@ -362,7 +364,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 0.78039217, g: 0.78039217, b: 0.78039217, a: 1}
+      maxColor: {r: 0.6792453, g: 0.6760413, b: 0.6760413, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -9314,7 +9316,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 0.23584908, g: 0.21966335, b: 0.18578678, a: 1}
+      maxColor: {r: 0.16037738, g: 0.15129942, b: 0.130874, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -10256,7 +10258,7 @@ ParticleSystem:
         ctime5: 0
         ctime6: 0
         ctime7: 0
-        atime0: 0
+        atime0: 32768
         atime1: 65535
         atime2: 65535
         atime3: 0

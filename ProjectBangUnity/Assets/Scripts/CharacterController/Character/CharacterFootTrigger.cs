@@ -4,52 +4,62 @@ using UnityEngine;
 
 namespace CharacterController
 {
-    [RequireComponent(typeof(SphereCollider))]
+    [RequireComponent(typeof(SphereCollider), typeof(AudioSource))]
     public class CharacterFootTrigger : MonoBehaviour
     {
-        protected Collider trigger;
-        protected CharacterFootsteps m_Footsteps;
         [SerializeField]
-        protected FootStepObject footStepObject;
+        protected float radius = 0.1f;
+        protected SphereCollider trigger;
+        protected AudioSource audioSource;
+        protected CharacterFootsteps m_Footsteps;
 
+        private float timeDelay;
 
-        private float radius = 0.1f;
-
-
-        public Collider Trigger
-        {
+        public Collider Trigger{
             get { return trigger; }
+        }
+
+        public AudioSource AudioSource{
+            get { return audioSource; }
         }
 
 
         private void Awake()
         {
-            if(trigger == null) trigger = GetComponent<SphereCollider>();
+            trigger = GetComponent<SphereCollider>();
+            audioSource = GetComponent<AudioSource>();
+
             trigger.isTrigger = true;
-            //footStepObject = new FootStepObject(transform);
+            trigger.radius = radius;
+            audioSource.playOnAwake = false;
+
         }
 
+		private void OnEnable()
+		{
+            timeDelay = Time.timeSinceLevelLoad + 0.5f;
+		}
 
-        public void Init(CharacterFootsteps footsteps)
+
+		public void Init(CharacterFootsteps footsteps)
         {
             m_Footsteps = footsteps;
-            trigger = GetComponent<SphereCollider>();
-            trigger.isTrigger = true;
-            var sphereTrigger = (SphereCollider)trigger;
-            sphereTrigger.radius = radius;
         }
 
 
         private void OnTriggerEnter(Collider other)
         {
-            if(m_Footsteps != null)
-            {
-                //if(other.GetComponent<MeshRenderer>())
-                    //footStepObject.ground = other;
-
-                m_Footsteps.StepOnMesh(footStepObject);
-                m_Footsteps.PlayFootFallSound(footStepObject);
+            if(Time.timeSinceLevelLoad > timeDelay){
+                if (other.CompareTag("Ground")){
+                    if (m_Footsteps != null)
+                    {
+                        m_Footsteps.StepOnMesh(this);
+                        m_Footsteps.PlayFootFallSound(this);
+                    }
+                }
             }
+
+
 
 
         }

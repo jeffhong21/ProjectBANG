@@ -697,6 +697,7 @@ MonoBehaviour:
   m_RequiredAim: 1
   m_TwoHandedItem: 0
   m_NonDominantHandPosition: {fileID: 4726260802812588}
+  m_HolsterTarget: {fileID: 0}
   m_PositionOffset: {x: 0.121, y: -0.09, z: 0.239}
   m_RotationOffset: {x: -3.757, y: -0.897, z: -90.08401}
   m_Character: {fileID: 0}
@@ -709,9 +710,11 @@ MonoBehaviour:
   m_AutoReload: 0
   m_RecoilAmount: 0.1
   m_Spread: 0.01
-  m_Smoke: {fileID: 1631976433701224, guid: d6d96d6a6b90843a49d7d851de6efc9c, type: 2}
+  m_Smoke: {fileID: 0}
   m_MuzzleFlash: {fileID: 0}
   m_SmokeLocation: {fileID: 4354005002595738}
+  m_FireSound: []
+  m_FireSoundDelay: 0.1
   m_DamageAmount: 10
   m_ImpactForce: 5
   m_FireRange: 3.4028235e+38

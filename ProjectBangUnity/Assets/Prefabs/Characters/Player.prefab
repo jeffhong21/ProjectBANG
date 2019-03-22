@@ -161,6 +161,7 @@ GameObject:
   - component: {fileID: 114843526904343182}
   - component: {fileID: 114329433760099396}
   - component: {fileID: 114015622257898310}
+  - component: {fileID: 114078442416988612}
   m_Layer: 31
   m_Name: Player
   m_TagString: Player
@@ -223,6 +224,21 @@ GameObject:
   - component: {fileID: 4746176834656468}
   m_Layer: 0
   m_Name: Thumb_031
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &1245767501359882
+GameObject:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4026830664792614}
+  m_Layer: 0
+  m_Name: ItemSlotHolder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -363,6 +379,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1422738266647256
+GameObject:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4629041865536168}
+  m_Layer: 0
+  m_Name: ItemSlotHolder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1485629515918786
 GameObject:
   m_ObjectHideFlags: 1
@@ -484,6 +515,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1645881993973392
+GameObject:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4169405933279638}
+  m_Layer: 0
+  m_Name: InventorySlot-Back
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1657572854946254
 GameObject:
   m_ObjectHideFlags: 1
@@ -523,7 +569,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4179381793874014}
   m_Layer: 0
-  m_Name: WeaponHolder
+  m_Name: InventorySlot-RevolverHolster
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -922,6 +968,19 @@ Transform:
   m_Father: {fileID: 4564718343340112}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 180, y: 0, z: 0}
+--- !u!4 &4026830664792614
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1245767501359882}
+  m_LocalRotation: {x: 0.75145596, y: -0.03664377, z: -0.041884568, w: 0.65743196}
+  m_LocalPosition: {x: 0.032568395, y: 0.083958834, z: 0.022033317}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4179381793874014}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4060261611074538
 Transform:
   m_ObjectHideFlags: 1
@@ -949,6 +1008,7 @@ Transform:
   - {fileID: 4064478850671600}
   - {fileID: 4516569471534186}
   - {fileID: 4061004441557878}
+  - {fileID: 4169405933279638}
   m_Father: {fileID: 4704933199679120}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1048,13 +1108,13 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1068415816946724}
-  m_LocalRotation: {x: 0.7526225, y: -0, z: -0, w: 0.65845233}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0.751456, y: -0.036643755, z: -0.04188453, w: 0.6574319}
+  m_LocalPosition: {x: 0.0229, y: -0.0024, z: 0.0155}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4179381793874014}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 97.63599, y: -0.000015258789, z: -0.000015258789}
+  m_LocalEulerAnglesHint: {x: 99.938995, y: 40.082, z: 39.655}
 --- !u!4 &4168144278164334
 Transform:
   m_ObjectHideFlags: 1
@@ -1068,6 +1128,20 @@ Transform:
   - {fileID: 4975069177892666}
   m_Father: {fileID: 4062153608772630}
   m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4169405933279638
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1645881993973392}
+  m_LocalRotation: {x: 0.48063445, y: -0.518643, z: 0.48063445, w: 0.518643}
+  m_LocalPosition: {x: 0, y: 0.19100006, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 4629041865536168}
+  m_Father: {fileID: 4060808892174514}
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4171828678274914
 Transform:
@@ -1094,6 +1168,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4157766890476814}
+  - {fileID: 4026830664792614}
   m_Father: {fileID: 4624738696831992}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 48.050003, y: -3.173, z: 92.284004}
@@ -1445,6 +1520,19 @@ Transform:
   m_Father: {fileID: 4520061233418272}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4629041865536168
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1422738266647256}
+  m_LocalRotation: {x: 0.3591769, y: -0.59213465, z: 0.37512034, w: 0.61616004}
+  m_LocalPosition: {x: 0.117, y: 0.094, z: -0.003}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4169405933279638}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 62.482002, y: -84.942, z: 4.5820003}
 --- !u!4 &4681139084913046
 Transform:
   m_ObjectHideFlags: 1
@@ -1826,6 +1914,26 @@ MonoBehaviour:
   - {fileID: 4215629344895060}
   - {fileID: 4869774699660034}
   - {fileID: 4406298832063842}
+--- !u!114 &114078442416988612
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa7477202022244aca8f8b4dfa3d0348, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Decal: {fileID: 1203368655300024, guid: 4bafa4351c495485790bee98073b5b46, type: 2}
+  footstepClips:
+  - {fileID: 8300000, guid: fc8da02e95435406f89db024451a0bb8, type: 3}
+  - {fileID: 8300000, guid: fd944e20ee6444efa87cef28957898aa, type: 3}
+  - {fileID: 8300000, guid: baf4414d6c8024046bb96cce835fbe26, type: 3}
+  - {fileID: 8300000, guid: 027dcff294339478d98ba358c0aeb528, type: 3}
+  m_leftFootTrigger: {fileID: 0}
+  m_rightFootTrigger: {fileID: 0}
+  m_currentStep: {fileID: 0}
 --- !u!114 &114145946620604510
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2171,7 +2279,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_UseRootMotion: 1
   m_RootMotionSpeedMultiplier: 1.5
-  m_SpeedChangeMultiplier: 1.5
+  m_SpeedChangeMultiplier: 1
   m_RotationSpeed: 8
   m_AimRotationSpeed: 8
   m_AlignToGround: 1
