@@ -8,6 +8,7 @@
 
     public class ItemActionManager : MonoBehaviour
     {
+        protected const string UseState = "Shoot";
         protected const string ReloadState = "Reload";
         protected const string EquipState = "Equip";
         protected const string UnequipState = "Unequip";
@@ -66,7 +67,9 @@
 		public void UseItem()
         {
             m_Inventory.UseItem(m_Inventory.EquippedItemType, 1);
+            //m_Animator.CrossFade(Animator.StringToHash(GetFullStateName(ReloadState)), m_TransitionDuration, m_LayerIndex);
         }
+
 
         public void Reload()
         {

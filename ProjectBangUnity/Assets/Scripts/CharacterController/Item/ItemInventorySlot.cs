@@ -8,19 +8,19 @@
         public enum ItemParentBone {Hips, Spine, Chest, UpperChest, LeftUpperLeg, RightUpperLeg }
 
         [SerializeField]
-        protected ItemParentBone m_ParentBone = ItemParentBone.Hips;
+        protected int m_InventorySlotID;
         [SerializeField]
         protected Transform m_ItemSlotHolder;
         [SerializeField]
         protected Transform m_ItemSlotHolster;
-
+        [SerializeField]
+        protected ItemParentBone m_ParentBone = ItemParentBone.Hips;
 
         private Animator m_Animator;
 
 
-        public ItemParentBone ParentBone{
-            get { return m_ParentBone; }
-            set { m_ParentBone = value; }
+        public int InventorySlotID{
+            get { return m_InventorySlotID; }
         }
 
         public Transform ItemSlotHolder{
@@ -31,7 +31,10 @@
             get { return m_ItemSlotHolster; }
         }
 
-
+        public ItemParentBone ParentBone{
+            get { return m_ParentBone; }
+            set { m_ParentBone = value; }
+        }
 
 
 

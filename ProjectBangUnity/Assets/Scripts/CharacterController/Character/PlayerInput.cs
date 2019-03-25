@@ -26,6 +26,8 @@ namespace CharacterController
         private KeyCode m_AimInput = KeyCode.Mouse1;
 
         private float m_InputDelay = 0.1f;
+        private float m_ActionInputDelay = 0.5f;
+        private float m_ActionInputTimer;
 
         private KeyCode m_FirstButtonPressed;
         private float m_TimeOfFirstButtoonPressed;
@@ -39,13 +41,15 @@ namespace CharacterController
         private float m_Vertical;
         //[SerializeField, DisplayOnly]
         private Vector3 m_InputVector;
-        private float m_RayLookDistance = 10f;
+        private float m_RayLookDistance = 20f;
+        [SerializeField]
         private LayerMask m_LayerMask;
 
 
         private Ray m_Ray;
-        private Vector3 m_RollDirection;
 
+
+        private Vector3 m_ScreenCenter = new Vector3(0.5f, 0.5f, 0);
         [SerializeField]
         private CameraController m_CameraController;
         private CharacterLocomotion m_Controller;
@@ -78,6 +82,8 @@ namespace CharacterController
             m_Transform = transform;
             m_DeltaTime = Time.deltaTime;
             m_LayerMask = ~(1 << gameObject.layer);
+
+
         }
 
 
@@ -95,6 +101,8 @@ namespace CharacterController
             else{
                 Debug.LogError("Player has no Camera");
             }
+
+            m_Ray = new Ray(m_CameraController.Camera.transform.position, m_CameraController.Camera.transform.forward * 10);
 		}
 
 
@@ -127,7 +135,7 @@ namespace CharacterController
 		private void FixedUpdate()
 		{
             CameraInput();
-            SetCameraPosition();
+            //SetCameraPosition();
 		}
 
 
@@ -135,8 +143,11 @@ namespace CharacterController
         {
             if(m_Controller)
             {
+                m_ActionInputTimer += m_DeltaTime;
+
                 //  Set input vectors.
                 SetInputVector(m_UseAxisRaw);
+                SetTargetLookAt();
 
                 Aim(m_AimInput);
                 //  Crouch
@@ -148,7 +159,6 @@ namespace CharacterController
                 // Run.
                 Run(m_RunInput);
 
-                QuickTurn();
 
                 //  Use current item
                 UseItem(m_UseItemInput);
@@ -162,10 +172,6 @@ namespace CharacterController
                 Interact(m_InteractInput);
             }
 
-
-
-
-
             //  For Debugging.
             DebugButtonPress();
         }
@@ -173,7 +179,6 @@ namespace CharacterController
 		private void LateUpdate()
 		{
             CameraInput();
-
             LockCameraRotation();
 		}
 
@@ -191,6 +196,15 @@ namespace CharacterController
         }
 
 
+        private void SetTargetLookAt()
+        {
+            m_Ray.origin = m_CameraController.Camera.transform.position;
+            m_Ray.direction = m_CameraController.Camera.transform.forward;
+            m_Controller.LookAtPoint = m_Ray.GetPoint(m_RayLookDistance);
+            //m_Controller.LookDirection = m_CameraController.Camera.transform.forward * 10 - m_CameraController.Camera.transform.position;
+        }
+
+
 
         #region Input actions
 
@@ -198,51 +212,67 @@ namespace CharacterController
         {
             if (Input.GetKeyDown(keycode)){
                 var action = m_Controller.GetAction<Aim>();
-                if (m_IsAiming == false) {
-                    m_IsAiming = m_Controller.TryStartAction(action);
+                if (action.IsActive == false) {
+                    if(m_Controller.TryStartAction(action)){
+                        CameraState aimState = CameraController.Instance.GetCameraStateWithName("TPS_Aim");
+                        CameraController.Instance.ChangeCameraState("TPS_Aim");
+                    }
+
                 } else {
                     m_Controller.TryStopAction(action);
-                    m_IsAiming = false;
+                    CameraController.Instance.ChangeCameraState("TPS_Default");
                 }
             }
+
+
         }
 
 
         private void Roll()
         {
+            if (m_ActionInputTimer < m_ActionInputDelay) return;
+
             bool executeAction = false;
+            Vector3 rollDirection = m_Transform.forward;
+
             if (CheckDoubleTap(KeyCode.W))
             {
-                m_RollDirection = m_Transform.forward;
+                rollDirection = m_Transform.forward;
                 executeAction = true;
             }
             else if (CheckDoubleTap(KeyCode.A))
             {
-                m_RollDirection = Vector3.Cross(m_Transform.forward.normalized, Vector3.up.normalized);
+                rollDirection = Vector3.Cross(m_Transform.forward.normalized, Vector3.up.normalized);
+
                 executeAction = true;
             }
             else if (CheckDoubleTap(KeyCode.D))
             {
-                m_RollDirection = Vector3.Cross(m_Transform.forward.normalized, Vector3.up.normalized);
-                m_RollDirection = -m_RollDirection;
+                rollDirection = Vector3.Cross(m_Transform.forward.normalized, Vector3.up.normalized);
+                rollDirection = -rollDirection;
+
                 executeAction = true;
             }
             else{
-                m_RollDirection = Vector3.zero;
+                rollDirection = Vector3.zero;
                 executeAction = false;
             }
 
             if(executeAction){
                 var action = m_Controller.GetAction<Roll>();
-                action.RollDirection = m_RollDirection;
+                action.RollDirection = rollDirection;
+
                 m_Controller.TryStartAction(action);
+
+                m_ActionInputTimer = 0;
             }
         }
 
 
-
         private void Crouch(KeyCode keycode)
         {
+            
+
             if (Input.GetKeyDown(keycode)){
                 var action = m_Controller.GetAction<Crouch>();
                 if (!action.IsActive)
@@ -267,6 +297,7 @@ namespace CharacterController
             //m_Controller.Running = Input.GetKey(keycode);
         }
 
+
         private void QuickTurn(){
             if (CheckDoubleTap(KeyCode.S))
             {
@@ -278,6 +309,8 @@ namespace CharacterController
 
         private void EnterCover(KeyCode keycode)
         {
+            if (m_ActionInputTimer < m_ActionInputDelay) return;
+
             if (Input.GetKeyDown(keycode))
             {
                 var action = m_Controller.GetAction<Cover>();
@@ -289,6 +322,8 @@ namespace CharacterController
                     //Debug.Log("Exiting cover.");
                 }
 
+                m_ActionInputTimer = 0;
+
             }
         }
 
@@ -296,6 +331,10 @@ namespace CharacterController
         public void UseItem(KeyCode keycode)
         {
             if (Input.GetKeyDown(keycode)){
+                RaycastHit hit;
+                if(Physics.Raycast(m_Ray, out hit, m_RayLookDistance)){
+                    m_Controller.LookAtPoint = m_Ray.GetPoint(hit.distance);
+                }
                 m_ItemAction.UseItem();
             }
         }
@@ -352,6 +391,8 @@ namespace CharacterController
 
         #endregion
 
+
+
         # region Camera methods
 
         private void CameraInput()
@@ -362,7 +403,8 @@ namespace CharacterController
             m_CameraController.ZoomCamera(Input.GetAxisRaw(m_MouseScrollInput));
 
             m_Controller.UpdateLookDirection(m_CameraController != null ? m_CameraController.transform : null);
-            if (m_Controller.Aiming)RotateWithAnotherTransform(m_CameraController.transform);
+            if (m_Controller.Aiming) 
+                RotateWithAnotherTransform(m_CameraController.transform);
         }
 
 
@@ -376,37 +418,12 @@ namespace CharacterController
 
 
 
-        private void SetCameraPosition()
-        {
-            if (m_Controller.Aiming)
-            {
-                //m_Controller.LookPosition = m_CameraController.Camera.transform.forward * 10 - m_CameraController.Camera.transform.position;
-                m_Ray = new Ray(m_CameraController.Camera.transform.position, m_CameraController.Camera.transform.forward * 10);
-                m_Controller.LookPosition = m_Ray.GetPoint(m_RayLookDistance);
-
-                ////Debug.DrawRay(m_Ray.origin, m_Ray.direction * 20, Color.red);
-                //RaycastHit hitInfo;
-                //if (Physics.Raycast(m_Ray.origin, m_Ray.direction, out hitInfo, 50, m_LayerMask)){
-                //    m_Controller.LookPosition = hitInfo.point;
-                //}
-                //else{
-                //    m_Controller.LookPosition = m_Controller.LookPosition;
-                //}
-            }
-            else
-            {
-                m_Controller.LookPosition = m_Controller.transform.position + (m_Controller.transform.forward * 10) + (m_Controller.transform.up * 1.35f);
-            }
-        }
-
 
         private void LockCameraRotation()
         {
             if (Input.GetKeyDown(KeyCode.L)){
                 if (CameraController.Instance != null){
                     CameraController.LockRotation = !CameraController.LockRotation;
-                    //if (CameraController.LockRotation)
-                    //Debug.LogFormat(" -- Locking Camera Rotation -- ");
                 }
             }
         }
@@ -436,7 +453,32 @@ namespace CharacterController
 
 
 
+        protected void OnDrawGizmos()
+        {
+            //if (m_DrawDebugLine)
+            //{
+            //    Gizmos.color = Color.green;
+            //    Gizmos.DrawRay(transform.position + m_DebugHeightOffset, m_Velocity.normalized );
+            //    //Gizmos.DrawRay(transform.position + Vector3.up * heightOffset, m_GroundSpeed + Vector3.up * heightOffset);
 
+            //    Gizmos.color = Color.blue;
+            //    Gizmos.DrawRay(transform.position + m_DebugHeightOffset, transform.forward );
+            //    Gizmos.color = Color.yellow;
+            //    Gizmos.DrawRay(transform.position + m_DebugHeightOffset, transform.right );
+            //    //Gizmos.DrawRay(transform.position + Vector3.up * heightOffset, transform.right + Vector3.up * heightOffset);
+            //}
+            //if(Application.isPlaying){
+            //    Gizmos.color = Color.green;
+            //    Gizmos.DrawSphere(m_LookDirection, 0.1f);
+            //    Gizmos.DrawLine(transform.position + (transform.up * 1.35f), m_LookDirection);
+            //}
+            if (Application.isPlaying)
+            {
+                Gizmos.color = Color.green;
+                Gizmos.DrawSphere(m_Ray.GetPoint(m_RayLookDistance), 0.1f);
+                Gizmos.DrawRay(m_Ray.origin, m_Ray.direction * m_RayLookDistance);
+            }
+        }
 
 
 

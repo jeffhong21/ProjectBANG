@@ -5,7 +5,9 @@ namespace CharacterController
 
     public class TakeDamage : CharacterAction
     {
+        [SerializeField]
         private int m_DamageTypeIndex;
+        [SerializeField]
         private bool m_IsDamaged;
 
         [SerializeField]
@@ -40,9 +42,11 @@ namespace CharacterController
 
 		protected override void ActionStarted()
 		{
-            m_IsDamaged = true;
-            m_AnimatorMonitor.SetActionID(m_IsDamaged ? 10 : 0);
-            m_AnimatorMonitor.SetIntDataValue(0);
+            //m_IsDamaged = true;
+            m_Animator.SetInteger(HashID.ActionID, m_IsDamaged ? 10 : 0);
+            m_Animator.SetInteger(HashID.ActionIntData, m_DamageTypeIndex);
+
+
             //Debug.Log("Damage Type Index: " + m_DamageTypeIndex);
 		}
 
@@ -64,7 +68,7 @@ namespace CharacterController
         //  Turn IK off so the hands are not used when taking damage.
         public override bool CanUseIK(int layer)
         {
-            return true;
+            return false;
         }
 
 
@@ -72,19 +76,19 @@ namespace CharacterController
         public override string GetDestinationState(int layer)
         {
             if (layer == m_AnimatorMonitor.AdditiveLayerIndex)
-                return "Take Damage";
-            
+                return "Take_Damage";
             return string.Empty;
         }
 
 
         private void OnTakeDamage(float amount, Vector3 position, Vector3 force, GameObject attacker)
         {
-            //Debug.LogFormat("-- {0} recieved {1} of damage.", m_GameObject.name, amount);
-            m_DamageTypeIndex = GetDamageTypeIndex(amount, position, force, attacker);
-            m_IsDamaged = true;
-
             if(amount > m_MinDamageAmount){
+                //Debug.LogFormat("-- {0} recieved {1} of damage.", m_GameObject.name, amount);
+                m_DamageTypeIndex = GetDamageTypeIndex(amount, position, force, attacker);
+                m_IsDamaged = true;
+            } else {
+                m_IsDamaged = false;
             }
         }
 
@@ -93,28 +97,24 @@ namespace CharacterController
         {
             int index = 0;
 
-            var direction = m_Transform.forward;
-            direction.y = position.y;
-            float fwd = Vector3.Dot(direction, position);
+            var fwdDirection = m_Transform.forward;
+            fwdDirection.y = position.y;
+            var hitDirection = position - m_Transform.position + Vector3.up * position.y;
 
-            if (fwd >= 0.45 || fwd <= -0.45)
-            {
-                if (fwd >= 0.45)
-                    index = 0;
-                else
-                    index = 1;
+            float fwd = Vector3.Dot(fwdDirection.normalized, position.normalized);
+
+            if (fwd >= 0.45 ){
+                index = 0;
+            }
+            else if(fwd <= -0.45){
+                index = 1;
             }
 
-            //Debug.LogFormat("{0} has take damage from {1}. | fwd: {2}) |", gameObject.name, attacker.name, fwd);
+            Debug.LogFormat("{0} has take damage from {1}. | Hit direction: {2}) |  Index {3}", gameObject.name, attacker.name, fwd, index);
             return index;
         }
 
 
-        protected virtual void Reset()
-        {
-            m_StartType = ActionStartType.Automatic;
-            m_StopType = ActionStopType.Automatic;
-        }
     }
 
 }

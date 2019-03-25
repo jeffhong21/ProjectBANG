@@ -15,7 +15,9 @@ namespace CharacterController
         protected CharacterFootTrigger m_rightFootTrigger;
         [SerializeField]
         protected Transform m_currentStep;
-
+        [SerializeField]
+        protected float m_FootstepTimer = 0.25f;
+        private float m_FootstepThreshold;
 
 
         protected CharacterLocomotion m_Controller;
@@ -35,11 +37,10 @@ namespace CharacterController
             m_GameObject = gameObject;
             m_Transform = transform;
 
-            //if (m_leftFootTrigger == null || m_rightFootTrigger == null)
-                //AddCharacterFootTriggers();
 
-            if (m_leftFootTrigger == null) AddCharacterFootTriggers(m_Animator.GetBoneTransform(HumanBodyBones.LeftFoot), out m_leftFootTrigger);
-            if (m_rightFootTrigger == null) AddCharacterFootTriggers(m_Animator.GetBoneTransform(HumanBodyBones.RightFoot), out m_rightFootTrigger);
+
+            if (m_leftFootTrigger == null) AddCharacterFootTriggers(m_Animator.GetBoneTransform(HumanBodyBones.LeftToes), out m_leftFootTrigger);
+            if (m_rightFootTrigger == null) AddCharacterFootTriggers(m_Animator.GetBoneTransform(HumanBodyBones.RightToes), out m_rightFootTrigger);
 
             m_leftFootTrigger.Init(this);
             m_rightFootTrigger.Init(this);
@@ -49,20 +50,31 @@ namespace CharacterController
 
         public void StepOnMesh(CharacterFootTrigger sender)
         {
-            m_currentStep = sender.transform;
-            RaycastHit hit;
-            if (Physics.Raycast(m_currentStep.position, m_currentStep.TransformVector(-m_currentStep.up), out hit, 1f, m_Layers.SolidLayer))
+            if(Time.timeSinceLevelLoad > m_FootstepThreshold)
             {
-                var footStep = Instantiate(m_Decal, null);
-                var rotation = Quaternion.LookRotation(m_Transform.forward, Vector3.up);
-                var position = hit.point + Vector3.up * 0.001f;
-                if (m_currentStep.localPosition.x > 0){
-                    rotation = rotation * Quaternion.Euler(0, 0, 180);
+                m_currentStep = sender.transform;
+                RaycastHit hit;
+                if (Physics.Raycast(m_currentStep.position, m_currentStep.TransformVector(-m_currentStep.up), out hit, 1f, m_Layers.SolidLayer))
+                {
+                    var footStep = Instantiate(m_Decal, null);
+                    var position = hit.point + Vector3.up * 0.001f;
+
+                    var rotation = Quaternion.LookRotation(m_Transform.forward, Vector3.up);
+                    if (m_currentStep.localPosition.x > 0){
+                        rotation = rotation * Quaternion.Euler(0, 0, 180);
+                    }
+
+                    //var rotationDirection = Vector3.Cross(hit.point - m_currentStep.transform.position, -m_currentStep.forward);
+                    //var newRotation = Quaternion.FromToRotation(m_Transform.forward, rotationDirection);
+                    //rotation = rotation * newRotation;
+
+                    footStep.transform.position = position;
+                    footStep.transform.rotation = rotation;
                 }
 
-                footStep.transform.position = position;
-                footStep.transform.rotation = rotation;
+                m_FootstepThreshold = Time.timeSinceLevelLoad + m_FootstepTimer;
             }
+
         }
 
         public void PlayFootFallSound(CharacterFootTrigger sender)

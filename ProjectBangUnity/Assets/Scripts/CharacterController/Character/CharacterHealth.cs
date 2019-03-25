@@ -6,7 +6,7 @@
 
     public class CharacterHealth : Health
     {
-        
+
 
 
         public override void TakeDamage(float amount, Vector3 position, Vector3 force, GameObject attacker, GameObject hitGameObject)
@@ -39,7 +39,7 @@
 
             GetComponent<CharacterIK>().enabled = false;
 
-            AddExplosionForce(position, 500, force, 1);
+            AddExplosionForce(position, 500, force, 2);
              // Deactivate gameobject on death.
             if (m_DeactivateOnDeath){
                 StartCoroutine(DeactivateDelay());

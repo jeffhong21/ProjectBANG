@@ -31,23 +31,31 @@ namespace CharacterController
         {
             //Debug.LogFormat("{0} Action has started {1}", GetType().Name, Time.time);
             //m_TargetDirection = m_ActionStartLocation - m_Transform.position;
+            m_Animator.SetBool(HashID.Moving, true);
         }
 
 
         public override void UpdateAction()
         {
             m_Transform.position = Vector3.Lerp(m_Transform.position, m_ActionStartLocation, Time.deltaTime * 2);
+
         }
 
-        //public override bool UpdateMovement()
-        //{
-        //    m_Transform.position = Vector3.Lerp(m_Transform.position, m_ActionStartLocation, Time.deltaTime);
-        //    return true;
-        //}
+		//public override bool UpdateMovement()
+		//{
+		//    m_Transform.position = Vector3.Lerp(m_Transform.position, m_ActionStartLocation, Time.deltaTime);
+		//    return true;
+		//}
 
 
+		public override bool UpdateAnimator()
+		{
+            m_Animator.SetInteger(HashID.ForwardInput, 1);
+            return false;
+		}
 
-        public override bool CanStopAction()
+
+		public override bool CanStopAction()
         {
             if ((m_ActionStartLocation - m_Transform.position).sqrMagnitude < m_StoppingDistanceSqr)
                 return true;
@@ -56,7 +64,9 @@ namespace CharacterController
 
 
         protected override void ActionStopped(){
+            m_Animator.SetBool(HashID.Moving, false);
             m_ActionStartLocation = Vector3.zero;
+            m_Animator.SetInteger(HashID.ForwardInput, 0);
         }
 
 

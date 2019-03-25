@@ -25,7 +25,7 @@ namespace CharacterController.AI
                 c.hasDestination = true;
                 c.navMeshAgent.SetDestination(c.destination);
 
-                agent._SetAgentMoveType();
+                //agent._SetAgentMoveType();
             } 
             else{
                 c.destination = agent.Position;

@@ -55,8 +55,9 @@ MonoBehaviour:
     type: 2}
   m_PlayerPrefab: {fileID: 1141768220188808, guid: f80c1af589fb4412c8617fb38fe4c4f8,
     type: 2}
-  m_CrosshairsHUD: {fileID: 1255404105120956, guid: 181a14527d7d84f18a2727477982580e,
+  m_CharacterHUD: {fileID: 1114321061321590, guid: 267538b0eceae4401a6dddb01ab01c1c,
     type: 2}
+  m_ItemHUD: {fileID: 0}
   m_AgentPrefab: {fileID: 1761652248440620, guid: b1cb448fc4ca442f99ad678ba7966df9,
     type: 2}
   m_AgentCount: 0

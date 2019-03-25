@@ -16,13 +16,11 @@ MonoBehaviour:
   m_Description: Default Rifle
   m_Icon: {fileID: 21300000, guid: ed8dd30f7bc7f4b0eb7dee200a546c1a, type: 3}
   m_Capacity: 1
-  m_ItemID: 0
   m_OriginalObject: {fileID: 1653775208639774, guid: 50e1114510fb448ba9e8e6e2c574b1aa,
     type: 2}
   m_DropObject: {fileID: 1266522032549876, guid: bcf3ea46895934a2bb504471fa678449,
     type: 2}
-  m_CustomEquipPoint: rifleEquipPoint
+  m_CustomEquipPoint: RifleEquipPoint
   m_ConsumableItem:
     m_ItemType: {fileID: 11400000, guid: 2e5ced0da118d496a8fe7f5a455e840f, type: 2}
-    m_CurrentAmount: 8
     m_Capacity: 8

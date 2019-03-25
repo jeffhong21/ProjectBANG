@@ -13,7 +13,9 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     private GameObject m_PlayerPrefab;
     private GameObject m_PlayerInstance;
     [SerializeField]
-    private GameObject m_CrosshairsHUD;
+    private GameObject m_CharacterHUD;
+    [SerializeField]
+    private GameObject m_ItemHUD;
 
     [Header("-- Agent Settings--")]
     [SerializeField]
@@ -36,6 +38,8 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 	protected override void Awake()
 	{
         base.Awake();
+
+        RemoveAssetsWithTag("Player", true);
 
         if (CameraController.Instance == null && m_CameraController)
             m_CameraController = Instantiate(m_CameraController) as CameraController;
@@ -79,8 +83,8 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
             m_PlayerInstance = Spawn(m_PlayerPrefab, m_SpawnPoints[0].Position, m_SpawnPoints[0].Rotation);
         }
 
-        if(m_CrosshairsHUD != null) m_CrosshairsHUD = Instantiate(m_CrosshairsHUD);
-
+        if (m_CharacterHUD != null) m_CharacterHUD = Instantiate(m_CharacterHUD);
+        if (m_ItemHUD != null) m_ItemHUD = Instantiate(m_ItemHUD);
 
         SetCameraTarget(m_PlayerInstance);
     }
@@ -126,4 +130,27 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 
 
 
+
+
+
+    //  Removes any Gameobject with designated tag.
+    private void RemoveAssetsWithTag(string assetTag, bool debugLog = false)
+    {
+        string debug_msg = "Assets with tag (" + assetTag + ") that were removed:\n";
+        GameObject[] assets = GameObject.FindGameObjectsWithTag(assetTag);
+
+        if (assets.Length > 0){
+            for (int i = 0; i < assets.Length; i++){
+                debug_msg += assets[i].name + "\n";
+                Destroy(assets[i]);
+            }
+            if (debugLog)
+                Debug.Log(debug_msg);
+            
+        }
+        //else{
+        //    debug_msg = "No assets with tag (" + assetTag + ") removed.";
+        //}
+
+    }
 }

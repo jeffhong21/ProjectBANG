@@ -48,9 +48,7 @@
         protected CharacterAction[] m_Actions;
         [SerializeField]
         private CharacterAction m_ActiveAction;
-        [SerializeField, HideInInspector]
-        private CharacterAction[] m_ActiveActions;
-        private CharacterAction m_CurrentAction;
+
 
 
 
@@ -63,6 +61,7 @@
         private Vector3 m_Velocity, m_MoveDirection, m_LookDirection;
         [SerializeField, DisplayOnly]
         private Vector3 m_InputVector;
+        private Vector3 m_LookAtPoint;
         //[SerializeField, DisplayOnly]
         private float rotationDifference , eulerY;
         private Quaternion m_LookRotation;
@@ -80,21 +79,18 @@
         private LayerManager m_Layers;
         private GameObject m_GameObject;
         private Transform m_Transform;
-        private Transform m_FocusPoint;
         private float m_DeltaTime;
 
 
         bool m_UpdateRotation = true, m_UpdateMovement = true, m_UpdateAnimator = true;
 
-
-
-        RaycastHit m_GroundHit;
-        RaycastHit m_StepHit;
-        float m_SlopeAngle;
+        private RaycastHit m_GroundHit;
+        private RaycastHit m_StepHit;
+        private float m_SlopeAngle;
 
 
         [SerializeField] bool m_DrawDebugLine;
-        [SerializeField, HideInInspector] CharacterAction m_SelectedAction;
+
 
 
 
@@ -170,9 +166,15 @@
         }
 
 
-        public Vector3 LookPosition{
-            get { return m_FocusPoint.position; }
-            set { m_FocusPoint.position = value; }
+        public Vector3 LookDirection{
+            get { return m_LookDirection; }
+            set { m_LookDirection = value; }
+        }
+
+        public Vector3 LookAtPoint
+        {
+            get { return m_LookAtPoint; }
+            set { m_LookAtPoint = value; }
         }
 
         public CharacterAction[] CharActions{
@@ -201,9 +203,7 @@
             if(m_Layers == null) m_Layers = m_GameObject.AddComponent<LayerManager>();
 
 
-            m_FocusPoint = new GameObject("LookAtPoint").transform; //.parent = gameObject.transform;
-            m_FocusPoint.transform.parent = m_GameObject.transform;
-            m_FocusPoint.position = (m_Transform.forward * 10) + (Vector3.up * 1.35f);
+
 
         }
 
@@ -233,102 +233,15 @@
         }
 
 
-		protected void Start()
-        {
-            m_ActiveActions = new CharacterAction[m_Actions.Length];
-        }
 
 
 
-        private void _CharacterActionUpdate()
+
+
+		private void Update()
 		{
             if (m_DeltaTime == 0) return;
 
-
-            if (m_Actions != null)
-            {
-                m_UpdateRotation = true;
-                m_UpdateMovement = true;
-                m_UpdateAnimator = true;
-
-                for (int i = 0; i < m_Actions.Length; i++)
-                {
-                    //  STARTING
-                    //  If active actions list slot is null, that means that action can attempt to be started.
-                    //  If it contains an item, that means that action is currently active.
-                    if (m_ActiveActions[i] == null)
-                    {
-                        //  Can start if there is no active action.
-                        if (m_ActiveAction == null)
-                        {
-                            if (m_Actions[i].CanStartAction() && m_Actions[i].StartType != ActionStartType.Manual)
-                            {
-                                //  Start the Action and update the animator.
-                                m_Actions[i].StartAction();
-                                m_Actions[i].UpdateAnimator();
-
-                                //  Cache the active action.
-                                m_ActiveAction = m_Actions[i];
-                                m_ActiveActions[i] = m_Actions[i];
-                                //  Move on to the next Action.
-                                continue;
-                            }
-                        }
-                        //  Can start if action is concurrent
-                        else if (m_Actions[i].IsConcurrentAction() && m_Actions[i].StartType != ActionStartType.Manual)
-                        {
-                            if (m_Actions[i].CanStartAction())
-                            {
-                                //  Start the Action and update the animator.
-                                m_Actions[i].StartAction();
-                                m_Actions[i].UpdateAnimator();
-                                //  Cache the active action.
-                                m_ActiveActions[i] = m_Actions[i];
-                                //  Move on to the next Action.
-                                continue;
-                            }
-                        }
-                        //  What to do if there is an active action.
-                        else if (m_ActiveAction != null)
-                        {
-
-                        }
-                    }
-                    //  STOPPING
-                    //  If the active actions slot is equal to the current action, than that action can be stopped.
-                    else if (m_ActiveActions[i] == m_Actions[i] && m_ActiveActions[i].StopType != ActionStopType.Manual)
-                    {
-                        if (m_Actions[i].CanStopAction())
-                        {
-                            //  Start the Action and update the animator.
-                            m_Actions[i].StopAction();
-                            m_Actions[i].UpdateAnimator();
-                            //  Cache the active action.
-                            if (m_Actions[i] == m_ActiveAction) m_ActiveAction = null;
-                            m_ActiveActions[i] = null;
-                            //  Move on to the next Action.
-                            continue;
-                        }
-                    }
-                    //  UPDATING
-                    //  Can't stop or start action, so will update.
-                    m_Actions[i].UpdateAction();
-                    if (m_ActiveAction == m_Actions[i])
-                    {
-                        m_UpdateRotation = m_ActiveAction.UpdateRotation();
-                        m_UpdateMovement = m_ActiveAction.UpdateMovement();
-                        m_UpdateAnimator = m_ActiveAction.UpdateAnimator();
-                    }
-                }
-            }
-
-
-		}
-
-
-
-        private void CharacterActionUpdate()
-        {
             m_UpdateRotation = true;
             m_UpdateMovement = true;
             m_UpdateAnimator = true;
@@ -379,7 +292,7 @@
                         else if (m_Actions[i].IsConcurrentAction())
                         {
                             if (m_Actions[i].CanStartAction())
-                           {
+                            {
                                 //  Start the Action and update the animator.
                                 m_Actions[i].StartAction();
                                 //m_Actions[i].UpdateAnimator();
@@ -410,15 +323,6 @@
                     m_Actions[i].UpdateAction();
                 }
             }
-        }
-
-
-		private void Update()
-		{
-            if (m_DeltaTime == 0) return;
-
-            CharacterActionUpdate();
-            //_CharacterActionUpdate();
 		}
 
 
@@ -440,17 +344,16 @@
 
 
 
+
         private bool CheckGround()
         {
             Color _stepColor = Color.blue;
 
 
-            if(m_Grounded)
-            {
+            if(m_Grounded) {
                 m_MoveDirection = m_Moving ? Vector3.Cross(m_Transform.right, m_GroundHit.normal) : Vector3.zero;
                 m_SlopeAngle = Vector3.Angle(m_Transform.forward, m_GroundHit.normal) - 90;
-            }
-            else{
+            } else {
                 m_MoveDirection = Vector3.zero;
                 m_SlopeAngle = 0;
             }
@@ -499,7 +402,7 @@
         private void UpdateRotation()
         {
             if (m_Aiming){
-                m_LookDirection = m_FocusPoint.position - m_Transform.position;
+                m_LookDirection = m_Transform.forward * 10 - m_Transform.position;
                 m_LookDirection.y = m_Transform.position.y;
 
                 if (m_LookDirection != Vector3.zero)
@@ -511,7 +414,7 @@
                 m_LookRotation = Quaternion.Slerp(m_Transform.rotation, m_LookRotation.normalized, m_RotationSpeed * m_DeltaTime);
                 m_Rigidbody.MoveRotation(m_LookRotation);
 
-                if (m_DrawDebugLine) Debug.DrawRay(m_Transform.position, m_LookDirection, Color.red);
+                //if (m_DrawDebugLine) Debug.DrawRay(m_Transform.position, m_LookDirection, Color.red);
             }
             else if(m_InputVector != Vector3.zero && m_LookDirection.sqrMagnitude > 0.2f)
             {
@@ -542,7 +445,6 @@
             else{
                 rotationDifference = 0;
             }
-
             //m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Transform.rotation, m_LookRotation.normalized, m_RotationSpeed * m_DeltaTime));
         }
 
@@ -550,7 +452,7 @@
         //  Apply any movement.
         private void UpdateMovement()
         {
-            //if (m_SlopeAngle >= m_SlopeLimit) return;
+            if (m_SlopeAngle >= m_SlopeLimit) return;
 
             if(m_Aiming)
             {
@@ -571,20 +473,20 @@
             {
                 m_Velocity = (m_Animator.deltaPosition * m_RootMotionSpeedMultiplier) / m_DeltaTime;
                 m_Velocity.y = m_Rigidbody.velocity.y;
-                m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, m_Acceleration * m_DeltaTime);
+                m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, 10 * m_DeltaTime);  //m_Acceleration
             }
-            //else{
-            //    if(m_Aiming){
-            //        m_Velocity = (m_Transform.TransformDirection(m_InputVector) * m_Speed);
-            //        m_Velocity.y = m_Rigidbody.velocity.y;
-            //        m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, m_Acceleration * m_DeltaTime);
-            //    }
-            //    else{
-            //        m_Velocity = m_MoveDirection + m_Transform.forward * m_Speed;
-            //        m_Rigidbody.velocity = m_Velocity;
-            //        m_Rigidbody.AddForce(m_MoveDirection * (m_Speed) * m_DeltaTime, ForceMode.VelocityChange);
-            //    }
-            //} 
+            else{
+                if(m_Aiming){
+                    m_Velocity = (m_Transform.TransformDirection(m_InputVector) * m_Speed);
+                    m_Velocity.y = m_Rigidbody.velocity.y;
+                    m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, m_Acceleration * m_DeltaTime);
+                }
+                else{
+                    m_Velocity = m_MoveDirection + m_Transform.forward * m_Speed;
+                    m_Rigidbody.velocity = m_Velocity;
+                    m_Rigidbody.AddForce(m_MoveDirection * (m_Speed) * m_DeltaTime, ForceMode.VelocityChange);
+                }
+            } 
 
 
             m_Moving = m_InputVector.sqrMagnitude > 0.1f;
@@ -689,18 +591,11 @@
 
 
 
-
         private void OnAimActionStart(bool aim)
         {
             m_Aiming = aim;
 
-            if(m_Aiming){
-                CameraState aimState = CameraController.Instance.GetCameraStateWithName("Aim");
-                CameraController.Instance.ChangeCameraState("Aim");
-            }
-            else{
-                CameraController.Instance.ChangeCameraState("Default");
-            }
+
 
             //  Call On Aim Delegate.
             OnAim(aim);
@@ -708,7 +603,6 @@
             //CameraController.Instance.FreeRotation = aim;
             //Debug.LogFormat("Camera Free Rotation is {0}", CameraController.Instance.FreeRotation);
         }
-
 
 
         private void OnActionActive(CharacterAction action, bool activated)
@@ -723,6 +617,8 @@
             //    Debug.LogFormat(" {0} is now not active.", action.GetType().Name);
             //}
         }
+
+
 
 
         public T GetAction<T>() where T : CharacterAction
@@ -783,17 +679,16 @@
 
         }
 
+
         public void TryStopAction(CharacterAction action)
         {
             if (action == null) return; 
 
-
-            if (action.CanStopAction())
-            {
+            if (action.CanStopAction()){
                 int index = Array.IndexOf(m_Actions, action);
                 if (m_ActiveAction == action)
                     m_ActiveAction = null;
-                m_ActiveActions[index] = null;
+
 
                 action.StopAction();
                 ActionStopped();
@@ -808,7 +703,7 @@
                 int index = Array.IndexOf(m_Actions, action);
                 if (m_ActiveAction == action)
                     m_ActiveAction = null;
-                m_ActiveActions[index] = null;
+
 
                 action.StopAction();
                 ActionStopped();
@@ -836,8 +731,6 @@
 
 
 
-		#region Debug 
-
 
 
 
@@ -860,17 +753,17 @@
             //}
             //if(Application.isPlaying){
             //    Gizmos.color = Color.green;
-            //    Gizmos.DrawSphere(LookPosition, 0.1f);
-            //    Gizmos.DrawLine(transform.position + (transform.up * 1.35f), LookPosition);
+            //    Gizmos.DrawSphere(m_LookDirection, 0.1f);
+            //    Gizmos.DrawLine(transform.position + (transform.up * 1.35f), m_LookDirection);
             //}
-            //if(Aiming && m_DrawDebugLine){
-            //    Gizmos.color = Color.red;
-            //    Gizmos.DrawSphere(LookPosition, 0.1f);
-            //    Gizmos.DrawLine(transform.position + (transform.up * 1.35f), LookPosition);
-            //}
+            if(Aiming && m_DrawDebugLine){
+                Gizmos.color = Color.green;
+                Gizmos.DrawSphere(m_LookAtPoint, 0.1f);
+                Gizmos.DrawLine(transform.position + (Vector3.up * 1.35f), m_LookAtPoint);
+            }
         }
 
-        #endregion
+
 
 
 

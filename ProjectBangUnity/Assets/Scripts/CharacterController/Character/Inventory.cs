@@ -8,11 +8,20 @@
 
     public class Inventory : MonoBehaviour
     {
-        public delegate void OnInventoryAddItem(Item item);
+        public delegate void OnInventoryUseItem(ItemType itemType, float remaining);
         public delegate void OnInventoryPickupItem(Item item, float count, bool immediatePickup, bool forceEquip);
         public delegate void OnInventoryEquipItem(Item item);
         public delegate void OnInventoryUnequipItem(Item item);
+        public delegate void OnInventoryAddItem(Item item);
         public delegate void OnInventoryRemoveItem(Item item, int slotID);
+
+        public event OnInventoryUseItem InventoryUseItem = delegate { };
+        public event OnInventoryPickupItem InventoryPickupItem = delegate { };
+        public event OnInventoryEquipItem InventoryEquipItem = delegate { };
+        public event OnInventoryUnequipItem InventoryUnequipItem = delegate { };
+        public event OnInventoryAddItem InventoryAddItem = delegate { };
+        public event OnInventoryRemoveItem InventoryRemoveItem = delegate{ };
+
 
 
         //[Header("-- Default Loadout --")]
@@ -25,14 +34,10 @@
         [SerializeField]
         protected CharacterEquipPoints m_EquipPoints;
 
-        [Header("-- Equipped ItemType --")]
         [SerializeField, DisplayOnly]
         protected ItemType m_EquippedItem;
-        //[SerializeField, DisplayOnly]
         protected int m_EquippedItemIndex = -1;
-        //[SerializeField, DisplayOnly]
         protected ItemType m_LastEquippedItem;
-        [SerializeField]
         protected bool m_Switching;
 
 
@@ -132,7 +137,6 @@
                     if (itemSlots[i].ID == 1) m_EquipPoints.LeftHandSlot = itemSlots[i];
                 }
             }
-
 		}
 
 
@@ -161,7 +165,8 @@
         {
             for (int i = 0; i < m_DefaultLoadout.Length; i++){
                 var loadoutItem = m_DefaultLoadout[i];
-                PickupItem(loadoutItem.ItemType, loadoutItem.Amount,loadoutItem.Equip);
+
+                PickupItem(loadoutItem.ItemType, loadoutItem.Amount, i == 0 ? true : loadoutItem.Equip);
             }
         }
 
@@ -184,10 +189,8 @@
                 }
                 else if (item is ConsumableItem){
                     //  Add the amount to the inventory consumableItem.
-
                     itemAddedToInventory = true;
                 }
-
                 //Debug.LogFormat("{0} is already in inventory. ", item);
             }
             //  Pickup item not in inventory.
@@ -226,11 +229,11 @@
             if(item is PrimaryItem)
             {
                 PrimaryItem primaryItem = (PrimaryItem)item;
-                m_Inventory[item].SetActive(false);
                 //m_Inventory[item].ItemAnimName = primaryItem.ItemAnimName;
-
                 if(equip){
                     EquipItem(item);
+                } else {
+                    m_Inventory[item].SetActive(false);
                 }
             }
             else if (item is ConsumableItem)
@@ -257,7 +260,6 @@
                 //itemObject.transform.localEulerAngles = itemObject.RotationOffset;
 
                 itemObject.Initialize(this);
-
                 return itemObject;
             }
 
@@ -266,8 +268,7 @@
 
 
 
-        public Item GetCurrentItem()
-        {
+        public Item GetCurrentItem(){
             return GetCurrentItem(m_EquippedItem);
         }
 
@@ -306,6 +307,7 @@
         }
 
 
+
         #region Inventory Actions
 
         public void UseItem(ItemType item, int amount)
@@ -316,12 +318,15 @@
             IUseableItem useableItem = (IUseableItem)GetCurrentItem(item);
             if(useableItem != null && useableItem.TryUse()){
                 //  Update the inventory.
+
                 //  Play animation.
                 if(item.GetType() == typeof(PrimaryItem)){
                     PrimaryItem primaryItem = (PrimaryItem)item;
                     //primaryItem.ConsumableItem.CurrentAmount -= amount;
                     //p.ConsumableItem.Capacity
                 }
+
+                InventoryUseItem(item, amount);
             }
         }
 
@@ -346,7 +351,6 @@
 
         public void SwitchItem(bool next)
         {
-            
             // If the current equipped item is the last in the inventory, than unequip item.
             if((next && m_EquippedItemIndex == m_Loadout.Length) || (next == false && m_EquippedItemIndex == 0)){
                 UnequipCurrentItem();
@@ -395,7 +399,6 @@
             //Debug.LogFormat("{0} is {1}", m_Loadout[itemIndex], m_Loadout[itemIndex] is PrimaryItem);
             if (m_Loadout[itemIndex] is PrimaryItem)
             {
-                
                 ////  Turn item object off.
                 //Item itemObject = GetCurrentItem(m_LastEquippedItem);
                 //if (itemObject != null)
@@ -404,11 +407,14 @@
                 //  Set equipped item and set index.
                 m_EquippedItemIndex = itemIndex;
                 m_EquippedItem = m_Loadout[itemIndex] as PrimaryItem;
-
+                //GetCurrentItem(m_EquippedItem).SetActive(true);
 
                 ////Debug.Log(m_Inventory[m_EquippedItem].Item);
                 //m_Inventory[m_EquippedItem].SetActive(true);
                 ////GetItem(m_EquippedItem).transform.parent = m_RightHandSlot.transform;
+
+                m_Animator.SetInteger(HashID.ItemID, GetItem(m_EquippedItem).ItemID);
+                m_Animator.SetInteger(HashID.MovementSetID, GetItem(m_EquippedItem).MovementSetID);
 
                 EventHandler.ExecuteEvent(gameObject, "OnInventoryEquip", GetItem(m_Loadout[itemIndex]));
                 return;
@@ -423,11 +429,10 @@
             //Item itemObject = GetCurrentItem();
             //if (itemObject != null)
                 //itemObject.SetActive(false);
-            
-
             m_EquippedItem = null;
             m_EquippedItemIndex = -1;
-
+            m_Animator.SetInteger(HashID.ItemID, 0);
+            m_Animator.SetInteger(HashID.MovementSetID, 0);
 
             EventHandler.ExecuteEvent(gameObject, "OnInventoryEquip", (Item)null);
         }
@@ -450,26 +455,9 @@
 
 
 
-        public event OnInventoryAddItem onInventoryAddItem = delegate
-        {
-            
-        };
-        public event OnInventoryPickupItem onInventoryPickupItem = delegate
-        {
-            
-        };
-        public event OnInventoryEquipItem onInventoryEquipItem = delegate 
-        {
-            Debug.LogFormat("OnInventoryEquipItem delegate has been triggered.");
-        };
-        public event OnInventoryUnequipItem onInventoryUnequipItem = delegate 
-        {
-            
-        };
-        public event OnInventoryRemoveItem onInventoryRemoveItem = delegate
-        { 
-            
-        };
+
+
+
 
 
 

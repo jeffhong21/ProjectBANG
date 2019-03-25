@@ -20,7 +20,7 @@ MonoBehaviour:
     type: 2}
   m_DropObject: {fileID: 1664603804014916, guid: a5d7222f4860f40d4832c850332890a6,
     type: 2}
-  m_CustomEquipPoint: rifleEquipPoint
+  m_CustomEquipPoint: RifleEquipPoint
   m_ConsumableItem:
     m_ItemType: {fileID: 11400000, guid: 2e5ced0da118d496a8fe7f5a455e840f, type: 2}
     m_Capacity: 8

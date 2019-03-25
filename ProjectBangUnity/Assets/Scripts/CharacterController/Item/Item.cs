@@ -8,6 +8,8 @@
         //
         // Fields
         //
+        [SerializeField]
+        protected ItemType m_ItemType;
         [Header("--  States  --")]
         [SerializeField]
         protected string m_ItemAnimName;
@@ -48,46 +50,40 @@
         protected Transform m_Transform;
 
 
+        public ItemType ItemType{
+            get { return m_ItemType; }
+        }
 
-
-        public string ItemAnimName
-        {
+        public string ItemAnimName{
             get { return m_ItemAnimName; }
             set { m_ItemAnimName = value; }
         }
 
-        public int ItemID
-        {
+        public int ItemID{
             get { return m_ItemID; }
         }
 
-        public int MovementSetID
-        {
+        public int MovementSetID{
             get { return m_MovementSetID; }
         }
 
-        public ItemAnimStates AnimStates
-        {
+        public ItemAnimStates AnimStates{
             get { return m_AnimStates; }
         }
 
-        public Vector3 PositionOffset
-        {
+        public Vector3 PositionOffset{
             get { return m_PositionOffset; }
         }
 
-        public Vector3 RotationOffset
-        {
+        public Vector3 RotationOffset{
             get { return m_RotationOffset; }
         }
 
-        public Transform NonDominantHandPosition
-        {
+        public Transform NonDominantHandPosition{
             get { return m_NonDominantHandPosition; }
         }
 
-        public GameObject User
-        {
+        public GameObject User{
             get { return m_Character; }
         }
 

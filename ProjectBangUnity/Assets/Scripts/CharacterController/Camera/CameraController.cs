@@ -25,6 +25,7 @@
         }
 
 
+
         [SerializeField, DisplayOnly]
         private string m_ActiveCameraState;
         //[SerializeField]
@@ -45,6 +46,7 @@
         private Transform m_YawPivot;
         [SerializeField, Tooltip("Vertical pivot point.")]
         private Transform m_PitchPivot;
+
 
         [Serializable]
         public class CursorOptions
@@ -95,8 +97,7 @@
 
 
 
-        private CharacterLocomotion m_Controller;
-        [SerializeField]
+
         private Camera m_Camera;
         private GameObject m_GameObject;
         private Transform m_Transform;
@@ -156,6 +157,8 @@
             m_Transform = transform;
             m_DeltaTime = Time.deltaTime;
 
+
+
             m_CameraStateLookup = new Dictionary<string, CameraState>();
             for (int i = 0; i < m_CameraStates.Length; i++){
                 //  Add the camera state.
@@ -188,7 +191,7 @@
 
         private void InitializeState()
         {
-            //m_YawPivot.localPosition = m_CameraState.CameraOffset;
+
 
         }
 
@@ -197,13 +200,13 @@
         public void SetMainTarget(GameObject target)
         {
             m_Character = target;
-            m_Controller = m_Character.transform.gameObject.GetComponent<CharacterLocomotion>();
             var animator = m_Character.GetComponent<Animator>();
 
             if(m_Character){
                 if (m_Anchor == null) m_Anchor = m_Character.transform;
                 if (m_AutoAnchor && animator!= null) 
                     m_Anchor = animator.GetBoneTransform(m_AutoAnchorBone);
+
 
                 InitializeState();
             }
@@ -241,8 +244,7 @@
         }
 
 
-        private float ClampAngle(float angle, float min, float max)
-        {
+        private float ClampAngle(float angle, float min, float max){
             do
             {
                 if (angle < -360)
@@ -253,6 +255,7 @@
 
             return Mathf.Clamp(angle, min, max);
         }    
+
 
 
 		private void LateUpdate()
@@ -269,6 +272,9 @@
             if(m_Camera.fieldOfView != m_CameraState.FieldOfView)
                 m_Camera.fieldOfView = Mathf.Lerp(m_Camera.fieldOfView, m_CameraState.FieldOfView, m_DeltaTime * m_CameraState.FieldOfViewSpeed);
         }
+
+
+
 
         [SerializeField]
         float rotationDifference;

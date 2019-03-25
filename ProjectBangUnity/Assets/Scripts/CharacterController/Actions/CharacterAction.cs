@@ -206,9 +206,14 @@
             m_IsActive = true;
             EventHandler.ExecuteEvent(m_GameObject, "OnCharacterActionActive", this, m_IsActive);
 
+            m_Animator.SetInteger(HashID.ActionID, m_ActionID);
+            m_Animator.SetTrigger(HashID.ActionChange);
+
             ActionStarted();
 
-            m_AnimatorMonitor.SetActionID(m_ActionID);
+
+
+            //m_AnimatorMonitor.SetActionID(m_ActionID);
             //m_AnimatorMonitor.SetActionTrigger(HashID.ActionChange);
 
             for (int index = 0; index < m_Animator.layerCount; index++){
@@ -222,8 +227,9 @@
 
         public void StopAction()
         {
-            m_AnimatorMonitor.SetActionID(0);
-            //m_Animator.ResetTrigger(HashID.ActionChange);
+            m_Animator.SetInteger(HashID.ActionID, 0);
+            m_Animator.ResetTrigger(HashID.ActionChange);
+            //m_AnimatorMonitor.SetActionID(0);
 
             ActionStopped();
 

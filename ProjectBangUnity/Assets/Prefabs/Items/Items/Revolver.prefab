@@ -233,7 +233,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1715612870132516}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.0958, z: 0.38}
+  m_LocalPosition: {x: 0, y: 0.0958, z: 0.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4041080498340978}
@@ -502,7 +502,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 379993255256e4dcc888a6ef06415d82, type: 3}
+  m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -599,6 +599,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61dbdf289aad34e608b9aebae0a464a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_ItemType: {fileID: 11400000, guid: 6c5d9ac65e6844feb81b0131f2050c07, type: 2}
   m_ItemAnimName: Revolver
   m_ItemID: 1
   m_MovementSetID: 1
@@ -612,24 +613,29 @@ MonoBehaviour:
   m_TwoHandedItem: 0
   m_NonDominantHandPosition: {fileID: 4037553092448768}
   m_HolsterTarget: {fileID: 0}
-  m_PositionOffset: {x: 0.084, y: -0.086, z: 0.362}
-  m_RotationOffset: {x: -3.68, y: -0.2, z: -84.842}
+  m_PositionOffset: {x: 0.203, y: 0, z: 0.471}
+  m_RotationOffset: {x: -2.51, y: -0.67, z: -90}
   m_Character: {fileID: 0}
   m_Controller: {fileID: 0}
   m_FirePoint: {fileID: 4433258886810430}
-  m_FireRate: 1
+  m_FireRate: 0.75
   m_FireCount: 1
   m_CurrentAmmo: 30
   m_MaxAmmo: 30
   m_AutoReload: 0
   m_RecoilAmount: 0.1
+  m_RotationRecoilAmount: 8
   m_Spread: 0.01
   m_Smoke: {fileID: 0}
   m_MuzzleFlash: {fileID: 1743301284569550, guid: ad2ab49d0a2a17148bd51c93d977bdbc,
     type: 2}
   m_SmokeLocation: {fileID: 4433258886810430}
-  m_FireSound:
-  - {fileID: 8300000, guid: 379993255256e4dcc888a6ef06415d82, type: 3}
+  m_FireSounds:
+  - {fileID: 8300000, guid: 8b95e9fdf165b43f19bd2cf092d2908e, type: 3}
+  - {fileID: 8300000, guid: 57ad283b5a5254e0d9a3b84140d2b9b8, type: 3}
+  - {fileID: 8300000, guid: 1b9ad99f846f04a1f9a25ffc07e21d0f, type: 3}
+  - {fileID: 8300000, guid: 6d3cbfa57e1d74c978a00ad75083661f, type: 3}
+  - {fileID: 8300000, guid: 53359f315e16f485393b03344dc3b09f, type: 3}
   m_FireSoundDelay: 0.1
   m_DamageAmount: 10
   m_ImpactForce: 5
@@ -637,6 +643,7 @@ MonoBehaviour:
   m_ImpactLayers:
     serializedVersion: 2
     m_Bits: 536874753
+  m_Tracer: {fileID: 1826699954357864, guid: 30d9d475bc1894461a741c5347e03cee, type: 2}
   m_Projectile: {fileID: 0}
   m_DefaultDecal: {fileID: 0}
   m_DefaultDust: {fileID: 1030604309152162, guid: ed017de91831b481e8c7d14e692443a6,

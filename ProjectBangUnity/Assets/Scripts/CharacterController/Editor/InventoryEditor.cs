@@ -17,7 +17,7 @@
         private Inventory m_Inventory;
         private ReorderableList m_DefaultLoadoutList;
 
-
+        private SerializedProperty m_Script;
         private SerializedProperty m_DefaultLoadout;
 
 
@@ -28,7 +28,7 @@
             if (target == null) return;
             m_Inventory = (Inventory)target;
 
-
+            m_Script = serializedObject.FindProperty("m_Script");
             m_DefaultLoadout = serializedObject.FindProperty("m_DefaultLoadout");
 
             m_DefaultLoadoutList = new ReorderableList(serializedObject, m_DefaultLoadout, true, true, true, true);
@@ -40,6 +40,10 @@
             serializedObject.Update();
 
             GUILayout.Space(12);
+            GUI.enabled = false;
+            EditorGUILayout.PropertyField(m_Script);
+            GUI.enabled = true;
+
             m_DefaultLoadout.isExpanded = EditorGUILayout.Foldout(m_DefaultLoadout.isExpanded, m_DefaultLoadout.displayName);
             if(m_DefaultLoadout.isExpanded) DrawReorderableList(m_DefaultLoadoutList);
 

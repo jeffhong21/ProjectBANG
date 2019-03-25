@@ -109,13 +109,13 @@ namespace CharacterController.AI
 
 		protected void Update()
 		{
-            if(m_isDamaged){
-                if(Time.timeSinceLevelLoad > m_damageDurationTimer){
-                    m_isDamaged = false;
-                    m_MovementID = MovementID.Default;
-                    m_Animator.SetInteger(HashID.MovementSetID, 0);
-                }
-            }
+            //if(m_isDamaged){
+            //    if(Time.timeSinceLevelLoad > m_damageDurationTimer){
+            //        m_isDamaged = false;
+            //        m_MovementID = MovementID.Default;
+            //        m_Animator.SetInteger(HashID.MovementSetID, 0);
+            //    }
+            //}
 
 
 		}
@@ -140,11 +140,11 @@ namespace CharacterController.AI
         {
             //var directionForce = (force - position).normalized;
             //Debug.LogFormat("{0} took {1} at position {2} with a force of {3} by attacker {4}",gameObject.name, amount, position, directionForce, attacker);
-            m_MovementID = MovementID.Injured;
-            m_Animator.SetInteger(HashID.MovementSetID, (int)m_MovementID);
+            //m_MovementID = MovementID.Injured;
+            //m_Animator.SetInteger(HashID.MovementSetID, (int)m_MovementID);
 
-            m_isDamaged = true;
-            m_damageDurationTimer = Time.timeSinceLevelLoad + m_damageDuration;
+            //m_isDamaged = true;
+            //m_damageDurationTimer = Time.timeSinceLevelLoad + m_damageDuration;
         }
 
 
