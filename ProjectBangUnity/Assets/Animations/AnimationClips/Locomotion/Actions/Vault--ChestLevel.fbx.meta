@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: ea7b28efa62634e8db1494abd116d967
+guid: bf83401b463bb4ccfae23f216091873c
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
@@ -36,23 +36,23 @@ ModelImporter:
     100060: LowerLeg_L
     100062: LowerLeg_R
     100064: Neck
-    100066: //RootNode
-    100068: Root
-    100070: Shoulder_L
-    100072: Shoulder_R
-    100074: Spine_01
-    100076: Spine_02
-    100078: Spine_03
-    100080: Thumb_01
-    100082: Thumb_011
-    100084: Thumb_02
-    100086: Thumb_021
-    100088: Thumb_03
-    100090: Thumb_031
-    100092: Toes_L
-    100094: Toes_R
-    100096: UpperLeg_L
-    100098: UpperLeg_R
+    100066: Root
+    100068: Shoulder_L
+    100070: Shoulder_R
+    100072: Spine_01
+    100074: Spine_02
+    100076: Spine_03
+    100078: Thumb_01
+    100080: Thumb_011
+    100082: Thumb_02
+    100084: Thumb_021
+    100086: Thumb_03
+    100088: Thumb_031
+    100090: Toes_L
+    100092: Toes_R
+    100094: UpperLeg_L
+    100096: UpperLeg_R
+    100098: //RootNode
     400000: Ankle_L
     400002: Ankle_R
     400004: Ball_L
@@ -86,24 +86,25 @@ ModelImporter:
     400060: LowerLeg_L
     400062: LowerLeg_R
     400064: Neck
-    400066: //RootNode
-    400068: Root
-    400070: Shoulder_L
-    400072: Shoulder_R
-    400074: Spine_01
-    400076: Spine_02
-    400078: Spine_03
-    400080: Thumb_01
-    400082: Thumb_011
-    400084: Thumb_02
-    400086: Thumb_021
-    400088: Thumb_03
-    400090: Thumb_031
-    400092: Toes_L
-    400094: Toes_R
-    400096: UpperLeg_L
-    400098: UpperLeg_R
-    7400000: rifle_cover_emerge
+    400066: Root
+    400068: Shoulder_L
+    400070: Shoulder_R
+    400072: Spine_01
+    400074: Spine_02
+    400076: Spine_03
+    400078: Thumb_01
+    400080: Thumb_011
+    400082: Thumb_02
+    400084: Thumb_021
+    400086: Thumb_03
+    400088: Thumb_031
+    400090: Toes_L
+    400092: Toes_R
+    400094: UpperLeg_L
+    400096: UpperLeg_R
+    400098: //RootNode
+    7400000: mixamo.com
+    7400002: Vault--ChestLevel
     9500000: //RootNode
   externalObjects: {}
   materials:
@@ -134,148 +135,32 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: rifle_cover_emerge
+      name: Vault--ChestLevel
       takeName: mixamo.com
-      firstFrame: 0
-      lastFrame: 36
+      firstFrame: 36
+      lastFrame: 84
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
-      loop: 1
+      loop: 0
       hasAdditiveReferencePose: 0
       loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 1
-      loopBlendPositionY: 1
+      loopBlendPositionY: 0
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 1
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 1
       heightFromFeet: 0
       mirror: 0
-      bodyMask: 01000000010000000100000001000000010000000000000000000000000000000000000001000000010000000000000000000000
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events: []
-      transformMask:
-      - path: 
-        weight: 1
-      - path: Character_Badguy_01
-        weight: 1
-      - path: Character_Business_Man_01
-        weight: 1
-      - path: Character_Cowboy_01
-        weight: 1
-      - path: Character_Cowgirl_01
-        weight: 1
-      - path: Character_Gunman_01
-        weight: 1
-      - path: Character_Sheriff_01
-        weight: 1
-      - path: Character_Woman_01
-        weight: 1
-      - path: Character_WorkingGirl_01
-        weight: 1
-      - path: Root
-        weight: 1
-      - path: Root/Hips
-        weight: 1
-      - path: Root/Hips/Spine_01
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/Finger_01
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/Finger_01/Finger_02
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/Finger_01/Finger_02/Finger_03
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/Finger_01/Finger_02/Finger_03/Finger_04
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/IndexFinger_01
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/IndexFinger_01/IndexFinger_02
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/IndexFinger_01/IndexFinger_02/IndexFinger_03
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/IndexFinger_01/IndexFinger_02/IndexFinger_03/IndexFinger_04
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/Thumb_01
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/Thumb_01/Thumb_02
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/Thumb_01/Thumb_02/Thumb_03
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/Finger_011
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/Finger_011/Finger_021
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/Finger_011/Finger_021/Finger_031
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/Finger_011/Finger_021/Finger_031/Finger_041
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/IndexFinger_011
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/IndexFinger_011/IndexFinger_021
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/IndexFinger_011/IndexFinger_021/IndexFinger_031
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/IndexFinger_011/IndexFinger_021/IndexFinger_031/IndexFinger_041
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/Thumb_011
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/Thumb_011/Thumb_021
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/Thumb_011/Thumb_021/Thumb_031
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Neck
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Neck/Head
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Neck/Head/Eyebrows
-        weight: 1
-      - path: Root/Hips/Spine_01/Spine_02/Spine_03/Neck/Head/Eyes
-        weight: 1
-      - path: Root/Hips/UpperLeg_L
-        weight: 1
-      - path: Root/Hips/UpperLeg_L/LowerLeg_L
-        weight: 1
-      - path: Root/Hips/UpperLeg_L/LowerLeg_L/Ankle_L
-        weight: 1
-      - path: Root/Hips/UpperLeg_L/LowerLeg_L/Ankle_L/Ball_L
-        weight: 1
-      - path: Root/Hips/UpperLeg_L/LowerLeg_L/Ankle_L/Ball_L/Toes_L
-        weight: 1
-      - path: Root/Hips/UpperLeg_R
-        weight: 1
-      - path: Root/Hips/UpperLeg_R/LowerLeg_R
-        weight: 1
-      - path: Root/Hips/UpperLeg_R/LowerLeg_R/Ankle_R
-        weight: 1
-      - path: Root/Hips/UpperLeg_R/LowerLeg_R/Ankle_R/Ball_R
-        weight: 1
-      - path: Root/Hips/UpperLeg_R/LowerLeg_R/Ankle_R/Ball_R/Toes_R
-        weight: 1
-      maskType: 1
-      maskSource: {fileID: 31900000, guid: 76d4b9b46088d4b3c9d36345158e20ad, type: 2}
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     isReadable: 1
   meshes:

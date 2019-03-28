@@ -6,7 +6,12 @@ namespace CharacterController
 
     public class Roll : CharacterAction
     {
-        protected const int ACTION_ID = 15;
+        public const int ACTION_ID = 15;
+        protected readonly float m_MaxRollDistance = 4f;
+        protected readonly float m_CheckHeight = 0.35f;
+
+        [SerializeField]
+        protected LayerMask m_StopRollLayer;
 
         protected Vector3 m_RollDirection;
         protected Vector3 m_StartDirection;
@@ -22,45 +27,51 @@ namespace CharacterController
         //
         // Methods
         //
+
+        public override bool CanStartAction()
+        {
+            var checkHeight = Vector3.up * m_CheckHeight;
+            Debug.DrawRay(m_Transform.position + checkHeight, m_Transform.forward * m_MaxRollDistance, Color.blue, 1f);
+            if (Physics.Raycast(m_Transform.position + checkHeight, m_Transform.forward, m_MaxRollDistance, m_StopRollLayer)){
+                return false;
+            }
+            return true;
+        }
+
+
         protected override void ActionStarted()
         {
             m_StartDirection = m_Transform.forward;
             if(m_RollDirection != Vector3.zero)
                 m_Controller.SetRotation(Quaternion.LookRotation(m_RollDirection, m_Transform.up));
-
-            //m_ActionIntData = Vector3.Dot(m_Transform.forward, m_RollDirection);
-            //if(m_ActionIntData < 1){
-            //    m_ActionIntData = Vector3.Dot(m_Transform.right, m_RollDirection);
-            //} else {
-            //    m_ActionIntData = 0;
-            //}
-            //m_Animator.SetInteger(HashID.ActionIntData, (int)m_ActionIntData);
-            //Debug.Log(m_ActionIntData);
+            
             m_Animator.SetInteger(HashID.ActionIntData, 0);
-        }
 
+
+        }
 
 
         protected override void ActionStopped()
         {
+
             m_Controller.SetRotation(Quaternion.LookRotation(m_StartDirection, m_Transform.up));
             m_RollDirection = Vector3.zero;
 
             //Debug.LogFormat("{0} Action has stopped {1}", GetType().Name, Time.time);
-
         }
 
-        //public override string GetDestinationState(int layer)
-        //{
-        //    //if (m_ActionIntData == 0) return "Roll_Forward";
-        //    //if (m_ActionIntData == 1) return "Roll_Right_Start";
-        //    //if (m_ActionIntData == -1) return "Roll_Left_Start";
-        //    m_StateName = "Roll_Forward";
-        //    return "Roll_Forward";
-        //}
+
+		public override bool UpdateMovement()
+		{
+            var velocity = m_Animator.deltaPosition / Time.deltaTime;
+            velocity.y = 0;
+            m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, velocity, 10 * Time.deltaTime);  //m_Acceleration
+            m_Rigidbody.AddForce(-m_Transform.forward * 1, ForceMode.Acceleration);
+            return false;
+		}
 
 
-        public override bool CanStopAction()
+		public override bool CanStopAction()
         {
             if (m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1){
                 return false;
@@ -79,7 +90,8 @@ namespace CharacterController
             }
 
             return false;
-        
+
+
         }
     }
 

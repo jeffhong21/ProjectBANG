@@ -42,6 +42,7 @@
 
 
         protected Dictionary<ItemType, Item> m_Inventory;
+        protected CharacterLocomotion m_Controller;
         protected AnimatorMonitor m_AnimatorMonitor;
         protected Animator m_Animator;
 
@@ -103,6 +104,7 @@
         //
 		private void Awake()
 		{
+            m_Controller = GetComponent<CharacterLocomotion>();
             m_AnimatorMonitor = GetComponent<AnimatorMonitor>();
             m_Animator = GetComponent<Animator>();
             m_Inventory = new Dictionary<ItemType, Item>();
@@ -315,19 +317,24 @@
             if (m_EquippedItem == null)
                 return;
 
-            IUseableItem useableItem = (IUseableItem)GetCurrentItem(item);
-            if(useableItem != null && useableItem.TryUse()){
-                //  Update the inventory.
+            if(m_Controller.Aiming){
+                IUseableItem useableItem = (IUseableItem)GetCurrentItem(item);
+                if (useableItem != null && useableItem.TryUse())
+                {
+                    //  Update the inventory.
 
-                //  Play animation.
-                if(item.GetType() == typeof(PrimaryItem)){
-                    PrimaryItem primaryItem = (PrimaryItem)item;
-                    //primaryItem.ConsumableItem.CurrentAmount -= amount;
-                    //p.ConsumableItem.Capacity
+                    //  Play animation.
+                    if (item.GetType() == typeof(PrimaryItem))
+                    {
+                        PrimaryItem primaryItem = (PrimaryItem)item;
+                        //primaryItem.ConsumableItem.CurrentAmount -= amount;
+                        //p.ConsumableItem.Capacity
+                    }
+
+                    InventoryUseItem(item, amount);
                 }
-
-                InventoryUseItem(item, amount);
             }
+
         }
 
 

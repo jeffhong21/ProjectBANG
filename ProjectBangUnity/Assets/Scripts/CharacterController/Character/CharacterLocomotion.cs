@@ -110,6 +110,14 @@
             set { m_Running = value; }
         }
 
+        public bool Aiming{
+            get{
+                if (m_Aiming && Grounded)
+                    return true;
+                return false;
+            }
+        }
+
 
         public float SpeedChangeMultiplier{
             get { return m_SpeedChangeMultiplier; }
@@ -132,13 +140,7 @@
             set { m_Aiming = value; }
         }
 
-        public bool Aiming{
-            get{
-                if(m_Aiming && Grounded)
-                    return true;
-                return false;
-            }
-        }
+
 
         public Vector3 InputVector{
             get { return m_InputVector; }
@@ -306,7 +308,6 @@
                         }
                     }
                 }
-
                 //  Next, if current Action is active, update overrides.
                 if (m_Actions[i].IsActive)
                 {
@@ -323,6 +324,10 @@
                     m_Actions[i].UpdateAction();
                 }
             }
+
+
+
+            m_Moving = m_InputVector.sqrMagnitude > 0.1f;
 		}
 
 
@@ -358,14 +363,14 @@
                 m_SlopeAngle = 0;
             }
 
-            Ray groundCheck = new Ray(m_Transform.position + Vector3.up * m_AlignToGroundDepthOffset, Vector3.down);
+            //  -- DEBUG DRAW RAY -- 
             if(m_DrawDebugLine) Debug.DrawRay(m_Transform.position + Vector3.up * m_AlignToGroundDepthOffset, Vector3.down, Color.white);
 
-            if (Physics.Raycast(groundCheck, out m_GroundHit, m_AlignToGroundDepthOffset + m_SkinWidth, m_Layers.SolidLayer))
+            if (Physics.Raycast(m_Transform.position + Vector3.up * m_AlignToGroundDepthOffset, Vector3.down, out m_GroundHit, m_AlignToGroundDepthOffset + m_SkinWidth, m_Layers.SolidLayer))
             {
                 var rayStart = (m_Transform.position + Vector3.up * m_MaxStepHeight) + m_Transform.forward * (m_CapsuleCollider.radius * 2);  //+ m_SkinWidth);
                 var rayEnd = Vector3.down * (m_MaxStepHeight - m_StepOffset);
-
+                //  -- DEBUG DRAW RAY -- 
                 if (m_DrawDebugLine) Debug.DrawRay(rayStart, rayEnd, Color.yellow);
 
                 if(m_InputVector.sqrMagnitude > 0.1f && m_Grounded)
@@ -386,9 +391,8 @@
 
                     }
                 }
-
-                if (m_DrawDebugLine)
-                    Debug.DrawRay( m_Transform.position, m_MoveDirection * m_StepSpeed * (m_Speed > 1 ? m_Speed : 1), _stepColor);
+                //  -- DEBUG DRAW RAY -- 
+                if (m_DrawDebugLine) Debug.DrawRay( m_Transform.position, m_MoveDirection * m_StepSpeed * (m_Speed > 1 ? m_Speed : 1), _stepColor);
 
                 return true;
             }
@@ -489,7 +493,7 @@
             } 
 
 
-            m_Moving = m_InputVector.sqrMagnitude > 0.1f;
+
         }
 
 
@@ -499,6 +503,8 @@
             m_AnimationMonitor.SetHorizontalInputValue(m_InputVector.x * m_Speed);
             m_Animator.SetBool(HashID.Moving, m_Moving);
         }
+
+
 
 
 
@@ -512,24 +518,23 @@
         }
 
 
+
         public void UpdateLookDirection(Transform referenceTransform = null)
         {
-            if (referenceTransform)
-            {
+            if (referenceTransform){
                 var forward = referenceTransform.TransformDirection(Vector3.forward);
                 forward.y = 0;
                 //get the right-facing direction of the referenceTransform
                 var right = referenceTransform.TransformDirection(Vector3.right);
-
                 // determine the direction the player will face based on input and the referenceTransform's right and forward directions
                 m_LookDirection = m_InputVector.x * right + m_InputVector.z * forward;
             }
             else{
                 m_LookDirection = m_InputVector.x * m_Transform.right + m_InputVector.z * m_Transform.forward;
             }
-                
-            
+
         }
+
 
 
 		public void MoveCharacter(float horizontalMovement, float forwardMovement, Quaternion lookRotation)
@@ -549,33 +554,13 @@
             m_Rigidbody.AddForce(m_MoveDirection * (m_Speed) * m_DeltaTime, ForceMode.VelocityChange);
 
 
-
-            m_Moving = m_InputVector.sqrMagnitude > 0.1f;
-
-
-            ////if (Mathf.Abs(horizontalMovement) < 1 && Mathf.Abs(forwardMovement) < 1) return;
-
-            //m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Transform.rotation, lookRotation.normalized, m_RotationSpeed * m_DeltaTime));
-            //if (m_UseRootMotion)
-            //{
-
-            //    m_Velocity = m_Transform.forward * forwardMovement;
-            //    m_Velocity += m_Transform.right * horizontalMovement;
-            //    m_Velocity.Normalize();
-            //}
-            //else
-            //{
-            //    m_Velocity = m_Transform.forward * forwardMovement * m_GroundSpeed.z;
-            //    m_Velocity += m_Transform.right * horizontalMovement * m_GroundSpeed.x;
-            //    m_Velocity.Normalize();
-            //    m_Rigidbody.velocity = m_Velocity * m_RootMotionSpeedMultiplier;
-            //}
         }
 
 
         public void StopMovement()
         {
             m_Rigidbody.velocity = Vector3.zero;
+            m_Moving = false;
         }
 
 
@@ -623,7 +608,12 @@
 
         public T GetAction<T>() where T : CharacterAction
         {
-            return GetComponent<T>();
+            for (int i = 0; i < m_Actions.Length; i++){
+                if (m_Actions[i] is T){
+                    return (T)m_Actions[i];
+                }
+            }
+            return null;
         }
 
 

@@ -239,8 +239,7 @@
 
             //AdjustFeetTarget(ref rightFootPosition, HumanBodyBones.RightFoot);
             //AdjustFeetTarget(ref leftFootPosition, HumanBodyBones.LeftFoot);
-
-            ////find and raycast to the ground to find positions
+            ////  Find and raycast to the ground to find positions
             //FeetPositionSolver(rightFootPosition, ref rightFootIkPosition, ref rightFootIkRotation); // handle the solver for right foot
             //FeetPositionSolver(leftFootPosition, ref leftFootIkPosition, ref leftFootIkRotation); //handle the solver for the left foot
         }

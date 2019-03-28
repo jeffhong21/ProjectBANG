@@ -9,7 +9,7 @@
     [Serializable]
     public abstract class CharacterAction : MonoBehaviour
     {
-        [SerializeField]
+        [SerializeField, HideInInspector]
         protected bool m_IsActive;
         [SerializeField, HideInInspector]
         protected string m_StateName;
@@ -22,7 +22,7 @@
         [SerializeField]
         protected KeyCode m_Keycode;
         [SerializeField]
-        protected ActionStartType m_StartType;
+        protected ActionStartType m_StartType = ActionStartType.Manual;
         [SerializeField]
         protected ActionStopType m_StopType = ActionStopType.Manual;
 

@@ -258,7 +258,7 @@
 
 
 
-		private void LateUpdate()
+		private void Update()
         {
             m_ActiveCameraState = ActiveState.name;
             if (m_Character == null) return;

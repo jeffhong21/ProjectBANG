@@ -141,6 +141,8 @@ namespace CharacterController
 
 		private void Update()
         {
+            CameraInput();
+
             if(m_Controller)
             {
                 m_ActionInputTimer += m_DeltaTime;
@@ -152,10 +154,12 @@ namespace CharacterController
                 Aim(m_AimInput);
                 //  Crouch
                 Crouch(m_CrouchInput);
-                //  Cover
-                EnterCover(m_CoverInput);
+                ////  Cover
+                //EnterCover(KeyCode.W);
                 //  Roll
-                Roll();
+                ForwardAction(KeyCode.W);
+                //  Dodge
+                Dodge();
                 // Run.
                 Run(m_RunInput);
 
@@ -178,7 +182,7 @@ namespace CharacterController
 
 		private void LateUpdate()
 		{
-            CameraInput();
+            //CameraInput();
             LockCameraRotation();
 		}
 
@@ -206,6 +210,9 @@ namespace CharacterController
 
 
 
+
+
+
         #region Input actions
 
         private void Aim(KeyCode keycode)
@@ -223,56 +230,75 @@ namespace CharacterController
                     CameraController.Instance.ChangeCameraState("TPS_Default");
                 }
             }
-
-
         }
 
 
-        private void Roll()
+        private void ForwardAction(KeyCode keycode)
         {
             if (m_ActionInputTimer < m_ActionInputDelay) return;
 
-            bool executeAction = false;
-            Vector3 rollDirection = m_Transform.forward;
-
-            if (CheckDoubleTap(KeyCode.W))
+            if (CheckDoubleTap(keycode))
             {
-                rollDirection = m_Transform.forward;
-                executeAction = true;
-            }
-            else if (CheckDoubleTap(KeyCode.A))
-            {
-                rollDirection = Vector3.Cross(m_Transform.forward.normalized, Vector3.up.normalized);
-
-                executeAction = true;
-            }
-            else if (CheckDoubleTap(KeyCode.D))
-            {
-                rollDirection = Vector3.Cross(m_Transform.forward.normalized, Vector3.up.normalized);
-                rollDirection = -rollDirection;
-
-                executeAction = true;
-            }
-            else{
-                rollDirection = Vector3.zero;
-                executeAction = false;
-            }
-
-            if(executeAction){
-                var action = m_Controller.GetAction<Roll>();
-                action.RollDirection = rollDirection;
-
-                m_Controller.TryStartAction(action);
+                var coverAction = m_Controller.GetAction<Cover>();
+                if (!coverAction.IsActive){
+                    //  If can't enter cover, than roll forward.
+                    if(m_Controller.TryStartAction(coverAction) == false){
+                        var rollAction = m_Controller.GetAction<Roll>();
+                        if (!rollAction.IsActive){
+                            m_Controller.TryStartAction(rollAction);
+                        }
+                    }
+                }
+                else{
+                    //  Stop Cover Action if it is active.
+                    m_Controller.TryStopAction(coverAction);
+                }
 
                 m_ActionInputTimer = 0;
             }
         }
 
 
+
+
+
+        private void Dodge()
+        {
+            if (m_ActionInputTimer < m_ActionInputDelay) return;
+
+            bool executeAction = false;
+            int actionIntData = 0;
+
+            if (CheckDoubleTap(KeyCode.S))
+            {
+                actionIntData = 0;
+                executeAction = true;
+            }
+            else if (CheckDoubleTap(KeyCode.A))
+            {
+                actionIntData = 1;
+                executeAction = true;
+            }
+            else if (CheckDoubleTap(KeyCode.D))
+            {
+                actionIntData = 2;
+                executeAction = true;
+            }
+
+            if(executeAction){
+                var action = m_Controller.GetAction<Dodge>();
+                if (action != null){
+                    action.SetDodgeDirection(actionIntData);
+                    m_Controller.TryStartAction(action);
+
+                    m_ActionInputTimer = 0;
+                }
+            }
+        }
+
+
         private void Crouch(KeyCode keycode)
         {
-            
-
             if (Input.GetKeyDown(keycode)){
                 var action = m_Controller.GetAction<Crouch>();
                 if (!action.IsActive)
@@ -298,34 +324,8 @@ namespace CharacterController
         }
 
 
-        private void QuickTurn(){
-            if (CheckDoubleTap(KeyCode.S))
-            {
-                ////var direction = (-m_Transform.forward) - m_Transform.position;
-                //var rotation = Quaternion.AngleAxis(180, Vector3.up);
-                //m_Controller.LookRotation = Quaternion.Slerp(m_Transform.rotation, rotation, 0.12f);
-            }
-        }
 
-        private void EnterCover(KeyCode keycode)
-        {
-            if (m_ActionInputTimer < m_ActionInputDelay) return;
 
-            if (Input.GetKeyDown(keycode))
-            {
-                var action = m_Controller.GetAction<Cover>();
-                if(!action.IsActive){
-                    bool actionSuccess = m_Controller.TryStartAction(action);
-                    //if(actionSuccess) Debug.LogFormat(" Entering Cover.");
-                } else {
-                    m_Controller.TryStopAction(action);
-                    //Debug.Log("Exiting cover.");
-                }
-
-                m_ActionInputTimer = 0;
-
-            }
-        }
 
 
         public void UseItem(KeyCode keycode)

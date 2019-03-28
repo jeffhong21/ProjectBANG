@@ -51,8 +51,6 @@ namespace CharacterController
 
 
 
-
-
 		protected override void Awake()
         {
             base.Awake();
@@ -96,9 +94,6 @@ namespace CharacterController
 
         protected override void ActionStarted()
         {
-            //m_Animator.SetTrigger(HashID.ActionChange);
-
-
             if (Physics.Raycast(m_HighCoverDetector.position, m_HighCoverDetector.forward, m_TakeCoverDistance, m_CoverLayer)){
                 m_HighCover = true;
             } else {
@@ -118,9 +113,12 @@ namespace CharacterController
 
         protected override void ActionStopped()
         {
+
+            //  Get merge index.
             var emergeIndex = 0;
             if (m_CanPopLeft || m_CanPopRight) emergeIndex = 1;
-
+            //if(!m_HighCover)
+                //emergeIndex = 2;
 
             m_Animator.SetInteger(HashID.ActionID, 0);
             m_Animator.SetInteger(HashID.ActionIntData, emergeIndex);
@@ -138,18 +136,11 @@ namespace CharacterController
                 }
             }
 
-
-            //m_Animator.ResetTrigger(HashID.ActionChange);
-        }
-
-
-        public override string GetDestinationState(int layer){
-            return "Cover";
         }
 
 
 
-        public override bool UpdateRotation()
+		public override bool UpdateRotation()
         {
             if (Mathf.Abs(m_Controller.InputVector.x) > 0.2)
             {
@@ -162,6 +153,7 @@ namespace CharacterController
             return false;
         }
 
+
         public override bool UpdateMovement()
         {
             m_HorizontalInput = m_Controller.InputVector.x;
@@ -169,13 +161,15 @@ namespace CharacterController
             //  Execute only when the character is moving.
             if (Mathf.Abs(m_HorizontalInput) > 0.2f)
             {
-                //  Check if character should be crouched or in high cover.
+                //  --  Set character height --
                 if (Physics.Raycast(m_HighCoverDetector.position, m_HighCoverDetector.forward, m_PopoutLength, m_CoverLayer)){
                     m_HighCover = true;
                 }
                 else{
                     m_HighCover = false;
                 }
+
+
                 //  -- Check if character has reached the edge of the cover. --
                 // Moving to the Left.
                 //  If Left Cover Popup does not hit a cover object, than character cannot move left..  
@@ -228,6 +222,9 @@ namespace CharacterController
 
             }
 
+
+
+
             if (m_Debug) Debug.DrawRay(m_ObjectDetector.position, m_ObjectDetector.forward * m_PopoutLength, m_DebugSettings.CenterColor);
             if (m_Debug) Debug.DrawRay(m_LeftCoverPopup.position, m_LeftCoverPopup.forward * m_PopoutLength, m_CanPopLeft ? m_DebugSettings.ChangeStateColor : m_DebugSettings.LeftColor);
             if (m_Debug) Debug.DrawRay(m_RightCoverPopup.position, m_RightCoverPopup.forward * m_PopoutLength, m_CanPopRight ? m_DebugSettings.ChangeStateColor : m_DebugSettings.RightColor);
@@ -241,10 +238,13 @@ namespace CharacterController
         public override bool UpdateAnimator()
         {
             //m_AnimatorMonitor.SetIntDataValue((int)m_CurrentCoverID);
-            m_AnimatorMonitor.SetHeightValue(m_HighCover ? 1 : 0.5f);
+
             m_AnimatorMonitor.SetHorizontalInputValue(m_HorizontalInput);
             m_AnimatorMonitor.SetForwardInputValue(m_ForwardInput);
             m_Animator.SetInteger(HashID.ActionID, m_ActionID);
+            m_Animator.SetBool(HashID.Crouching, !m_HighCover);
+            m_Animator.SetFloat(HashID.Height, m_HighCover ? 1 : 0.5f);
+
             //m_Animator.SetInteger(HashID.ActionIntData, m_ActionID);
             return false;
         }

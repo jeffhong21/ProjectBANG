@@ -693,7 +693,6 @@ GameObject:
   - component: {fileID: 114073733139308380}
   - component: {fileID: 114241857771727578}
   - component: {fileID: 114192664051248166}
-  - component: {fileID: 114072454928899778}
   - component: {fileID: 114774922100011690}
   m_Layer: 30
   m_Name: AIAgent
@@ -1905,24 +1904,6 @@ MonoBehaviour:
   showDefaultInspector: 0
   showDeleteAssetOption: 0
   selectAiAssetOnCreate: 0
---- !u!114 &114072454928899778
-MonoBehaviour:
-  m_ObjectHideFlags: 2
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1761652248440620}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 24f4915bd11574121a2a533c85cb7cc1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IsActive: 0
-  m_StateName: Fall
-  m_ActionID: 0
-  m_Keycode: 0
-  m_StartType: 0
-  m_StopType: 1
-  m_MinFallHeight: 1
 --- !u!114 &114073733139308380
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2291,7 +2272,6 @@ MonoBehaviour:
   m_StepSpeed: 4
   m_Acceleration: 20
   m_Actions:
-  - {fileID: 114072454928899778}
   - {fileID: 114774922100011690}
   m_ActiveAction: {fileID: 0}
   m_InputVector: {x: 0, y: 0, z: 0}
@@ -2466,7 +2446,7 @@ SkinnedMeshRenderer:
   m_Quality: 0
   m_UpdateWhenOffscreen: 0
   m_SkinnedMotionVectors: 1
-  m_Mesh: {fileID: 4300012, guid: ad9b136e9ac104c66b5fb99ea52cfb13, type: 3}
+  m_Mesh: {fileID: 4300010, guid: ad9b136e9ac104c66b5fb99ea52cfb13, type: 3}
   m_Bones:
   - {fileID: 4756614858799874}
   - {fileID: 4741954931594854}

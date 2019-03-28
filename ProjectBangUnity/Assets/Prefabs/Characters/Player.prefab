@@ -173,12 +173,13 @@ GameObject:
   - component: {fileID: 114776445558567580}
   - component: {fileID: 114908900733630684}
   - component: {fileID: 114484464717320762}
-  - component: {fileID: 114286754863660934}
   - component: {fileID: 114641910215582532}
   - component: {fileID: 114843526904343182}
   - component: {fileID: 114329433760099396}
   - component: {fileID: 114015622257898310}
   - component: {fileID: 114078442416988612}
+  - component: {fileID: 114866502275982722}
+  - component: {fileID: 114084608887600488}
   m_Layer: 31
   m_Name: Player
   m_TagString: Player
@@ -2424,6 +2425,24 @@ MonoBehaviour:
   m_rightFootTrigger: {fileID: 114737049880341320}
   m_currentStep: {fileID: 0}
   m_FootstepTimer: 0.25
+--- !u!114 &114084608887600488
+MonoBehaviour:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f63b6461ebd74ce5b163a437c794b2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: PickupItem
+  m_ActionID: 0
+  m_Keycode: 0
+  m_StartType: 1
+  m_StopType: 1
+  item: {fileID: 0}
 --- !u!114 &114127185106794922
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2491,23 +2510,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   m_TimeInvincibleAfterSpawn: 0
---- !u!114 &114286754863660934
-MonoBehaviour:
-  m_ObjectHideFlags: 2
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 935f069628fb44cde89d56865b07253d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IsActive: 0
-  m_StateName: Jump
-  m_ActionID: 0
-  m_Keycode: 0
-  m_StartType: 1
-  m_StopType: 1
 --- !u!114 &114311917172092944
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2555,6 +2557,9 @@ MonoBehaviour:
   m_Keycode: 0
   m_StartType: 1
   m_StopType: 0
+  m_StopRollLayer:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!114 &114429236655991950
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2736,6 +2741,23 @@ MonoBehaviour:
   m_Keycode: 0
   m_StartType: 1
   m_StopType: 1
+--- !u!114 &114866502275982722
+MonoBehaviour:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21aea7f0207b84276b6be19f42b6e306, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: Dodge
+  m_ActionID: 16
+  m_Keycode: 0
+  m_StartType: 1
+  m_StopType: 0
 --- !u!114 &114901688824212290
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2837,7 +2859,8 @@ MonoBehaviour:
   - {fileID: 114776445558567580}
   - {fileID: 114908900733630684}
   - {fileID: 114329433760099396}
-  - {fileID: 114286754863660934}
+  - {fileID: 114866502275982722}
+  - {fileID: 114084608887600488}
   - {fileID: 114843526904343182}
   - {fileID: 114484464717320762}
   - {fileID: 114641910215582532}

@@ -20,9 +20,12 @@
         public static readonly int ItemSubstateIndex = Animator.StringToHash("ItemSubstateIndex");
 
         public static readonly int Moving = Animator.StringToHash("Moving");
+        public static readonly int Aiming = Animator.StringToHash("Aiming");
+        public static readonly int Crouching = Animator.StringToHash("Crouching");
+
         public static readonly int Height = Animator.StringToHash("Height");
         public static readonly int Speed = Animator.StringToHash("Speed");
-        public static readonly int Aiming = Animator.StringToHash("Aiming");
+
 
 
         public static readonly int ActionChange = Animator.StringToHash("ActionChange");
@@ -51,7 +54,8 @@
             //{ 10, "Interact"},
             //{ 11, "PickupItem"},
             { 12, "Cover"},
-            { 15, "Roll"}
+            { 15, "Roll"},
+            { 16, "Dodge"}
         };
 
 
