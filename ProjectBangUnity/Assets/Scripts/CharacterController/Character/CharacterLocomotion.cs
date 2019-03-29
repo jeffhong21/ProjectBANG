@@ -334,6 +334,7 @@
 		private void FixedUpdate()
         {
             m_Grounded = CheckGround();
+            //m_Grounded = CheckGround_2();
 
             if (m_UpdateRotation) UpdateRotation();
             if (m_UpdateMovement) UpdateMovement();
@@ -346,7 +347,22 @@
 
 
 
+        private bool CheckGround_2()
+        {
+            m_MoveDirection = m_Transform.forward * m_InputVector.z + m_Transform.right * m_InputVector.x;
+            float radius = m_CapsuleCollider.radius * 0.9f;
+            if(Physics.SphereCast(m_Transform.position, radius, -Vector3.up, out m_GroundHit, m_CapsuleCollider.radius + m_AlignToGroundDepthOffset + m_SkinWidth, m_Layers.SolidLayer))
+            {
 
+                Vector3 targetPosition = m_Transform.position;
+                targetPosition.y = m_GroundHit.point.y;
+                m_Transform.position = targetPosition;
+                return true;
+            }
+
+
+            return false;
+        }
 
 
 
@@ -365,6 +381,7 @@
 
             //  -- DEBUG DRAW RAY -- 
             if(m_DrawDebugLine) Debug.DrawRay(m_Transform.position + Vector3.up * m_AlignToGroundDepthOffset, Vector3.down, Color.white);
+
 
             if (Physics.Raycast(m_Transform.position + Vector3.up * m_AlignToGroundDepthOffset, Vector3.down, out m_GroundHit, m_AlignToGroundDepthOffset + m_SkinWidth, m_Layers.SolidLayer))
             {
@@ -458,39 +475,28 @@
         {
             if (m_SlopeAngle >= m_SlopeLimit) return;
 
-            if(m_Aiming)
-            {
-                m_Speed = Mathf.Clamp01(Mathf.Abs(m_InputVector.x) + Mathf.Abs(m_InputVector.z));
-                m_Speed = Mathf.Clamp(m_Speed, 0, 1);
-                if (m_Running) m_Speed += 1f;
-
-            }
-            else{
-                m_Speed = Mathf.Clamp01(Mathf.Abs(m_InputVector.x) + Mathf.Abs(m_InputVector.z)) * m_SpeedChangeMultiplier;
-                //m_Speed = Mathf.Clamp(m_Speed, 0, 1);
-                //if (m_Running)
-                    //m_Speed += 0.5f;
-            }
-
-
+            //m_Velocity = m_MoveDirection + m_Transform.forward * m_Speed;
+            //m_Velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
+            //m_Rigidbody.AddForce(m_MoveDirection * (m_Speed) * m_DeltaTime, ForceMode.VelocityChange);
             if (m_UseRootMotion)
             {
                 m_Velocity = (m_Animator.deltaPosition * m_RootMotionSpeedMultiplier) / m_DeltaTime;
-                m_Velocity.y = m_Rigidbody.velocity.y;
-                m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, 10 * m_DeltaTime);  //m_Acceleration
+                m_Velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
+                //m_Rigidbody.velocity = m_Velocity;
+                m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, 20 * m_DeltaTime);  //m_Acceleration
             }
-            else{
-                if(m_Aiming){
-                    m_Velocity = (m_Transform.TransformDirection(m_InputVector) * m_Speed);
-                    m_Velocity.y = m_Rigidbody.velocity.y;
-                    m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, m_Acceleration * m_DeltaTime);
-                }
-                else{
-                    m_Velocity = m_MoveDirection + m_Transform.forward * m_Speed;
-                    m_Rigidbody.velocity = m_Velocity;
-                    m_Rigidbody.AddForce(m_MoveDirection * (m_Speed) * m_DeltaTime, ForceMode.VelocityChange);
-                }
-            } 
+            //else{
+            //    if(m_Aiming){
+            //        m_Velocity = (m_Transform.TransformDirection(m_InputVector) * m_Speed);
+            //        m_Velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
+            //        m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, m_Acceleration * m_DeltaTime);
+            //    }
+            //    else{
+            //        m_Velocity = m_MoveDirection + m_Transform.forward * m_Speed;
+            //        m_Velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
+            //        m_Rigidbody.AddForce(m_MoveDirection * (m_Speed) * m_DeltaTime, ForceMode.VelocityChange);
+            //    }
+            //} 
 
 
 
@@ -499,6 +505,7 @@
 
         private void UpdateAnimator()
         {
+            m_Speed = 1f;
             m_AnimationMonitor.SetForwardInputValue(m_InputVector.z * m_Speed);
             m_AnimationMonitor.SetHorizontalInputValue(m_InputVector.x * m_Speed);
             m_Animator.SetBool(HashID.Moving, m_Moving);
@@ -568,40 +575,15 @@
         {
             //if (m_UseRootMotion)
             //{
-            //    //m_Rigidbody.velocity = (m_Animator.deltaPosition * m_RootMotionSpeedMultiplier) / m_DeltaTime;
-            //    m_Rigidbody.velocity = m_Velocity;
+            //    m_Rigidbody.velocity = (m_Animator.deltaPosition * m_RootMotionSpeedMultiplier) / m_DeltaTime;
+            //    //m_Rigidbody.velocity = m_Velocity;
             //    //Debug.Log(m_Animator.deltaPosition);
             //}
         }
 
 
 
-        private void OnAimActionStart(bool aim)
-        {
-            m_Aiming = aim;
 
-
-
-            //  Call On Aim Delegate.
-            OnAim(aim);
-
-            //CameraController.Instance.FreeRotation = aim;
-            //Debug.LogFormat("Camera Free Rotation is {0}", CameraController.Instance.FreeRotation);
-        }
-
-
-        private void OnActionActive(CharacterAction action, bool activated)
-        {
-            //int index = Array.IndexOf(m_Actions, action);
-            //if(activated){
-            //    m_ActiveActions[index] = m_Actions[index];
-            //    Debug.LogFormat(" {0} is active.", action.GetType().Name);
-            //}
-            //else{
-            //    m_ActiveActions[index] = null;
-            //    Debug.LogFormat(" {0} is now not active.", action.GetType().Name);
-            //}
-        }
 
 
 
@@ -702,6 +684,40 @@
 
             TryStopAction(action);
         }
+
+
+
+
+
+
+
+        private void OnAimActionStart(bool aim)
+        {
+            m_Aiming = aim;
+
+
+
+            //  Call On Aim Delegate.
+            OnAim(aim);
+
+            //CameraController.Instance.FreeRotation = aim;
+            //Debug.LogFormat("Camera Free Rotation is {0}", CameraController.Instance.FreeRotation);
+        }
+
+
+        private void OnActionActive(CharacterAction action, bool activated)
+        {
+            //int index = Array.IndexOf(m_Actions, action);
+            //if(activated){
+            //    m_ActiveActions[index] = m_Actions[index];
+            //    Debug.LogFormat(" {0} is active.", action.GetType().Name);
+            //}
+            //else{
+            //    m_ActiveActions[index] = null;
+            //    Debug.LogFormat(" {0} is now not active.", action.GetType().Name);
+            //}
+        }
+
 
 
         public void ActionStopped()

@@ -7,11 +7,14 @@ namespace CharacterController
     [RequireComponent(typeof(SphereCollider), typeof(AudioSource))]
     public class CharacterFootTrigger : MonoBehaviour
     {
+        private string[] m_GroundTags = { "Ground" };
+
         [SerializeField]
         protected float radius = 0.1f;
         protected SphereCollider trigger;
         protected AudioSource audioSource;
         protected CharacterFootsteps m_Footsteps;
+
 
         private float timeDelay;
 
@@ -50,13 +53,37 @@ namespace CharacterController
         private void OnTriggerEnter(Collider other)
         {
             if(Time.timeSinceLevelLoad > timeDelay){
-                if (other.CompareTag("Ground")){
-                    if (m_Footsteps != null)
+                for (int i = 0; i < m_GroundTags.Length; i++)
+                {
+                    if (other.CompareTag(m_GroundTags[i]))
                     {
-                        m_Footsteps.StepOnMesh(this);
-                        m_Footsteps.PlayFootFallSound(this);
+                        if (m_Footsteps != null)
+                        {
+                            m_Footsteps.StepOnMesh(this);
+                            m_Footsteps.PlayFootFallSound(this);
+                        }
                     }
                 }
+                ////  Compare Layers.
+                //if(other.gameObject.layer == LayerMask.NameToLayer("Solid")){
+                //    if (m_Footsteps != null){
+                //        m_Footsteps.StepOnMesh(this);
+                //        m_Footsteps.PlayFootFallSound(this);
+                //    }
+                //}
+                ////  Compare Tags.
+                //else{
+                //    for (int i = 0; i < m_GroundTags.Length; i++){
+                //        if (other.CompareTag(m_GroundTags[i])){
+                //            if (m_Footsteps != null){
+                //                m_Footsteps.StepOnMesh(this);
+                //                m_Footsteps.PlayFootFallSound(this);
+                //            }
+                //        }
+                //    }
+                //}
+
+
             }
 
 

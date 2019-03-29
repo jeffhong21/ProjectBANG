@@ -178,7 +178,7 @@ namespace CharacterController
                     m_CanPopLeft = true;
                     m_StartPosition = m_Transform.position;
                     m_StopPosition = m_Transform.position - (m_Transform.right * 1.1f); //m_RightCoverPopup.position + (0.25f * (m_RightCoverPopup.right));
-
+                    m_StopPosition = m_StopPosition + m_Transform.forward * 0.892f;
                     // Set the InputVector.
                     m_HorizontalInput = Mathf.Clamp(m_HorizontalInput, 0, 1);
                     m_ForwardInput = m_Controller.InputVector.z;
@@ -193,7 +193,7 @@ namespace CharacterController
                     m_CanPopRight = true;
                     m_StartPosition = m_Transform.position;
                     m_StopPosition = m_Transform.position + (m_Transform.right * 1.1f); //m_RightCoverPopup.position + (0.25f * (m_RightCoverPopup.right));
-
+                    m_StopPosition = m_StopPosition + m_Transform.forward * 0.892f;
                     // Set the InputVector.
                     m_HorizontalInput = Mathf.Clamp(m_HorizontalInput, -1, 0);
                     m_ForwardInput = m_Controller.InputVector.z;
