@@ -8,7 +8,7 @@
     {
         public static readonly int HorizontalInput = Animator.StringToHash("HorizontalInput");
         public static readonly int ForwardInput = Animator.StringToHash("ForwardInput");
-        public static readonly int Yaw = Animator.StringToHash("Yaw");
+        public static readonly int Rotation = Animator.StringToHash("Rotation");
         public static readonly int ActionID = Animator.StringToHash("ActionID");
         public static readonly int ActionIntData = Animator.StringToHash("ActionIntData");
         public static readonly int ActionFloatData = Animator.StringToHash("ActionFloatData");
@@ -38,6 +38,7 @@
     public class AnimatorMonitor : MonoBehaviour
     {
         public readonly string BaseLayerName = "Base Layer";
+        public readonly string ItemLayerName = "Item Layer";
         public readonly string UpperBodyLayerName = "Upper Body Layer";
         public readonly string AdditiveLayerName = "Additive Layer";
         public readonly string FullBodyLayer = "Full Body Layer";
@@ -111,6 +112,11 @@
             get { return m_Animator.GetLayerIndex(BaseLayerName); }
         }
 
+        public int ItemLayerIndex
+        {
+            get { return m_Animator.GetLayerIndex(ItemLayerName); }
+        }
+
         public int UpperBodyLayerIndex
         {
             get { return m_Animator.GetLayerIndex(UpperBodyLayerName); }
@@ -168,27 +174,27 @@
         }
 
 
-		private void Update()
-		{
-            if(m_Animator.GetCurrentAnimatorClipInfo(BaseLayerIndex).Length > 0){
-                m_BaseState.clipName = m_Animator.GetCurrentAnimatorClipInfo(BaseLayerIndex)[0].clip.name;
-                m_BaseState.clipLength = m_Animator.GetCurrentAnimatorClipInfo(BaseLayerIndex)[0].clip.length;
-            }
-            m_BaseState.fullHashPath = m_Animator.GetCurrentAnimatorStateInfo(BaseLayerIndex).fullPathHash;
-            m_BaseState.shortNameHash = m_Animator.GetCurrentAnimatorStateInfo(BaseLayerIndex).shortNameHash;
-            m_BaseState.length = m_Animator.GetCurrentAnimatorStateInfo(BaseLayerIndex).length;
-            m_BaseState.normalizedTime = m_Animator.GetCurrentAnimatorStateInfo(BaseLayerIndex).normalizedTime % 1;
+		//private void Update()
+		//{
+  //          if(m_Animator.GetCurrentAnimatorClipInfo(BaseLayerIndex).Length > 0){
+  //              m_BaseState.clipName = m_Animator.GetCurrentAnimatorClipInfo(BaseLayerIndex)[0].clip.name;
+  //              m_BaseState.clipLength = m_Animator.GetCurrentAnimatorClipInfo(BaseLayerIndex)[0].clip.length;
+  //          }
+  //          m_BaseState.fullHashPath = m_Animator.GetCurrentAnimatorStateInfo(BaseLayerIndex).fullPathHash;
+  //          m_BaseState.shortNameHash = m_Animator.GetCurrentAnimatorStateInfo(BaseLayerIndex).shortNameHash;
+  //          m_BaseState.length = m_Animator.GetCurrentAnimatorStateInfo(BaseLayerIndex).length;
+  //          m_BaseState.normalizedTime = m_Animator.GetCurrentAnimatorStateInfo(BaseLayerIndex).normalizedTime % 1;
 
 
 
-            if (m_Animator.GetCurrentAnimatorClipInfo(UpperBodyLayerIndex).Length > 0){
-                m_UpperBodyState.clipName = m_Animator.GetCurrentAnimatorClipInfo(UpperBodyLayerIndex)[0].clip.name;
-                m_UpperBodyState.clipLength = m_Animator.GetCurrentAnimatorClipInfo(UpperBodyLayerIndex)[0].clip.length;
-            }
+  //          if (m_Animator.GetCurrentAnimatorClipInfo(UpperBodyLayerIndex).Length > 0){
+  //              m_UpperBodyState.clipName = m_Animator.GetCurrentAnimatorClipInfo(UpperBodyLayerIndex)[0].clip.name;
+  //              m_UpperBodyState.clipLength = m_Animator.GetCurrentAnimatorClipInfo(UpperBodyLayerIndex)[0].clip.length;
+  //          }
                 
-            m_UpperBodyState.length = m_Animator.GetCurrentAnimatorStateInfo(UpperBodyLayerIndex).length;
-            m_UpperBodyState.normalizedTime = m_Animator.GetCurrentAnimatorStateInfo(UpperBodyLayerIndex).normalizedTime % 1;
-		}
+  //          m_UpperBodyState.length = m_Animator.GetCurrentAnimatorStateInfo(UpperBodyLayerIndex).length;
+  //          m_UpperBodyState.normalizedTime = m_Animator.GetCurrentAnimatorStateInfo(UpperBodyLayerIndex).normalizedTime % 1;
+		//}
 
 
 		public virtual bool DetermineState(int layer, AnimatorStateData defaultState, bool checkAbilities, bool baseStart)

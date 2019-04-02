@@ -85,8 +85,11 @@
         private float m_SmoothYawVelocity;
         private float m_SmoothPitchVelocity;
         private float m_SmoothRotationVelocity;
+        private Vector3 m_CameraVelocitySmooth;
         [SerializeField]
         private float m_TargetYawAngle, m_TargetPitchAngle;
+
+        private Vector3 m_CurrentPosition, m_PreviousPosition;
 
 
         private Vector3 m_TargetPosition, m_YawPivotPosition, m_PitchPivotPosition;
@@ -179,6 +182,8 @@
 
 		private void OnEnable()
 		{
+            m_CurrentPosition = m_Transform.position;
+            m_PreviousPosition = m_CurrentPosition;
             Cursor.lockState = m_CursorOptions.lockCursor ? CursorLockMode.Locked : CursorLockMode.Confined;
             Cursor.visible = m_CursorOptions.cursorVisible;
 		}
@@ -191,8 +196,15 @@
 
         private void InitializeState()
         {
+            //////m_Camera.transform.LookAt(m_Character.transform, Vector3.up);
+            //var direction = m_Anchor.position - m_Camera.transform.position;
+            ////direction.Normalize();
+            //m_Camera.transform.rotation = Quaternion.LookRotation(-direction, Vector3.up);
 
-
+            //m_Camera.transform.localEulerAngles = Vector3.zero;
+            //var direction = m_Anchor.position - m_Camera.transform.position;
+            //var angle = Vector3.Angle(direction, m_Camera.transform.forward);
+            //m_Camera.transform.rotation = Quaternion.Euler(angle, 0, 0);
         }
 
 
@@ -258,50 +270,52 @@
 
 
 
-		private void Update()
+		private void LateUpdate()
         {
+            m_PreviousPosition = m_CurrentPosition;
+            m_CurrentPosition = m_Transform.position;
+
+
             m_ActiveCameraState = ActiveState.name;
             if (m_Character == null) return;
 
             UpdateCameraMovement();
 
             //HandleRotation();
-
+            //RotateCamera();
             HandlePosition();
 
             if(m_Camera.fieldOfView != m_CameraState.FieldOfView)
                 m_Camera.fieldOfView = Mathf.Lerp(m_Camera.fieldOfView, m_CameraState.FieldOfView, m_DeltaTime * m_CameraState.FieldOfViewSpeed);
+
+
         }
 
 
 
-
-        [SerializeField]
-        float rotationDifference;
         private void UpdateCameraMovement()
         {
             if (m_LockRotation) return;
 
+
+            //  Yaw
             m_Yaw = m_MouseInput.x; // * m_CameraState.TurnSpeed;
 
             m_SmoothYaw = Mathf.SmoothDamp(m_SmoothYaw, m_Yaw, ref m_SmoothYawVelocity, m_CameraState.TurnSmooth);
             m_TargetYawAngle += m_SmoothYaw * m_CameraState.TurnSpeed;
             if (m_CameraState.ApplyYawLimit)
                 m_TargetYawAngle = Mathf.Clamp(m_TargetYawAngle, m_CameraState.MinYaw, m_CameraState.MaxYaw);
-
-
-            if (m_CameraState.ApplyTurn){
-                //if (m_CameraState.ApplyYawLimit){
-                //    m_TargetRotation = Quaternion.Euler(0, m_Character.transform.eulerAngles.y, 0);//* m_YawPivotRotation;
-                //}
-                //else{
-                //    m_TargetRotation = Quaternion.Euler(0, m_TargetYawAngle, 0);//* m_YawPivotRotation;
-                //}
-                m_TargetRotation = Quaternion.Euler(0, m_TargetYawAngle, 0);//* m_YawPivotRotation;
-                m_Transform.rotation = Quaternion.Lerp(m_Transform.rotation, m_TargetRotation, m_CameraState.TurnSpeed * m_DeltaTime);
+            
+            if (m_CameraState.ApplyTurn)
+            {
+                //m_TargetRotation = Quaternion.Euler(0, m_TargetYawAngle, 0);//* m_YawPivotRotation;
+                //m_Transform.rotation = Quaternion.Lerp(m_Transform.rotation, m_TargetRotation, m_CameraState.TurnSpeed * m_DeltaTime);
+                m_YawPivotRotation = Quaternion.Euler(0, m_TargetYawAngle, 0);//* m_YawPivotRotation;
+                m_YawPivot.localRotation = Quaternion.Lerp(m_YawPivot.localRotation, m_YawPivotRotation, m_CameraState.TurnSpeed * m_DeltaTime);
             }
 
 
+            //  Pitch
             m_Pitch = m_MouseInput.y; // * m_CameraState.TurnSpeed;
 
             m_SmoothPitch = Mathf.SmoothDamp(m_SmoothPitch, m_Pitch, ref m_SmoothPitchVelocity, m_CameraState.TurnSmooth);
@@ -310,13 +324,22 @@
             if (m_CameraState.ApplyPitchLimit)
                 m_TargetPitchAngle = Mathf.Clamp(m_TargetPitchAngle, m_CameraState.MinPitch, m_CameraState.MaxPitch);
 
-            if (m_CameraState.ApplyTurn){
-                m_PitchPivotRotation = Quaternion.Slerp(m_PitchPivot.localRotation, Quaternion.Euler(m_TargetPitchAngle, 0, 0), m_CameraState.TurnSpeed * m_DeltaTime);
-                m_PitchPivot.localRotation = m_PitchPivotRotation;
+            if (m_CameraState.ApplyTurn)
+            {
+                m_PitchPivotRotation = Quaternion.Euler(m_TargetPitchAngle, 0, 0);
+                m_PitchPivot.localRotation = Quaternion.Slerp(m_PitchPivot.localRotation, Quaternion.Euler(m_TargetPitchAngle, 0, 0), m_CameraState.TurnSpeed * m_DeltaTime); ;
             }
 
-        }
+            //  Main controller
+            if (m_CameraState.ApplyRotation){
+                if (Quaternion.Angle(m_Transform.rotation, m_Character.transform.rotation) != 0){
+                    m_TargetRotation = Quaternion.FromToRotation(m_Transform.forward, m_Character.transform.forward);
+                    m_Transform.rotation = Quaternion.Lerp(m_Transform.rotation, m_TargetRotation * m_Transform.rotation, m_CameraState.RotationSpeed * m_DeltaTime);
+                }
+            }
 
+
+        }
 
 
         private void HandlePosition()
@@ -331,14 +354,24 @@
 
 
 
-            float time = 4 * m_DeltaTime;
-            m_YawPivot.localPosition = Vector3.Lerp(m_YawPivot.localPosition, m_YawPivotPosition, time);
-            m_Camera.transform.localPosition = Vector3.Lerp(m_Camera.transform.localPosition, m_CameraPosition, time);
 
+            m_YawPivot.localPosition = Vector3.Lerp(m_YawPivot.localPosition, m_YawPivotPosition, 4 * m_DeltaTime);
+            m_Camera.transform.localPosition = Vector3.Lerp(m_Camera.transform.localPosition, m_CameraPosition, 4 * m_DeltaTime);
 
-            m_TargetPosition = Vector3.Lerp(m_Transform.position, m_Anchor.position, time);
+            //m_TargetPosition = Vector3.Lerp(m_Transform.position, m_Anchor.position, time);
+            m_TargetPosition = Vector3.SmoothDamp(m_Transform.position, m_Anchor.position, ref m_CameraVelocitySmooth, 0.12f);
             m_Transform.position = m_TargetPosition;
+
+            //m_Transform.LookAt(m_Anchor, Vector3.up);
         }
+
+
+
+
+
+
+
+
 
 
 
@@ -442,40 +475,13 @@
 
         public void RotateCamera(float mouseX, float mouseY)
         {
-
             m_MouseInput.x = mouseX;
             m_MouseInput.y = mouseY;
-            //m_MouseInput.z = Mathf.Abs(m_Camera.transform.localPosition.z) + 5;
-            //if (m_LockRotation) return; 
-            //if (m_Character.transform == null) return;
 
-            //m_IsRotating = (mouseX > 0 && mouseY > 0);
-
-            //m_Yaw += mouseX * m_CameraState.TurnSpeed;
-            //m_Pitch -= mouseY * m_CameraState.PitchRotateSpeed;
-            //if (!m_Controller.Aiming) m_Yaw = Mathf.Clamp(m_Yaw, m_CameraState.MinYaw, m_CameraState.MaxYaw);
-            //m_Pitch = Mathf.Clamp(m_Pitch, m_CameraState.MinPitch, m_CameraState.MaxPitch);
-
-            //if (m_CameraState.TurnSmooth > 0){
-            //    m_SmoothYaw = Mathf.SmoothDamp(m_SmoothYaw, m_Yaw, ref m_SmoothYawVelocity, m_CameraState.TurnSmooth);
-            //    m_SmoothPitch = Mathf.SmoothDamp(m_SmoothPitch, m_Pitch, ref m_SmoothPitchVelocity, m_CameraState.TurnSmooth);
+            //if (m_PreviousPosition != m_CurrentPosition)
+            //{
+            //    m_MouseInput = Vector3.zero;
             //}
-            //else{
-            //    m_SmoothYaw = m_Yaw;
-            //    m_SmoothPitch = m_Pitch;
-            //}
-
-
-            //var eulerY = Mathf.SmoothDampAngle(m_Transform.eulerAngles.y, m_SmoothYaw, ref m_SmoothRotationVelocity, m_CameraState.TurnSmooth);
-            //m_Transform.rotation = Quaternion.Slerp(m_Transform.rotation, Quaternion.Euler(0, eulerY, 0), m_CameraState.TurnSmooth);
-
-            ////  Update the vertical axis fo the camera pivot.
-            //m_YawPivot.localRotation = Quaternion.Slerp(m_YawPivot.localRotation, Quaternion.Euler(0, m_SmoothYaw, 0), m_CameraState.TurnSmooth);
-            ////  Update the horizontal axis fo the camera pivot.
-            //m_PitchPivot.localRotation = Quaternion.Slerp(m_PitchPivot.localRotation, Quaternion.Euler(m_SmoothPitch, 0, 0), m_CameraState.TurnSmooth);
-
-            //m_YawPivotRotation = Quaternion.Slerp(m_YawPivot.localRotation, Quaternion.Euler(0, m_SmoothYaw, 0), m_CameraState.TurnSmooth);
-            //m_PitchPivotRotation = Quaternion.Slerp(m_PitchPivot.localRotation, Quaternion.Euler(m_SmoothPitch, 0, 0), m_CameraState.TurnSmooth);
         }
 
 
@@ -500,90 +506,6 @@
 
 
 
-
-
-
-        public void OrbitCamera(float mouseX, float mouseY)
-        {
-            //if (m_LockRotation) return; 
-            //float pivotStart = 0.25f;
-            //if(ScreenToViewPort.x < -pivotStart || ScreenToViewPort.x >  pivotStart )
-            //{
-            //    m_Yaw += mouseX * m_CameraState.TurnSpeed;
-            //    m_Yaw = Mathf.Clamp(m_Yaw, m_CameraState.MinYaw, m_CameraState.MaxYaw);
-
-            //    var yawSmoothDampSpeed = m_CameraState.TurnSmooth * Mathf.Abs(ScreenToViewPort.x);
-            //    if (yawSmoothDampSpeed > 0)
-            //        m_SmoothYaw = Mathf.SmoothDamp(m_SmoothYaw, m_Yaw, ref m_SmoothYawVelocity, yawSmoothDampSpeed);
-            //    else
-            //        m_SmoothYaw = m_Yaw;
-
-            //    m_Transform.rotation = Quaternion.Slerp(m_Transform.rotation, Quaternion.Euler(0, m_SmoothYaw, 0), m_CameraState.TurnSmooth);
-            //}
-            //else{
-            //    var directionToTarget = m_Character.transform.position - m_Transform.position;
-            //    var rotatioinToTarget = m_Transform.rotation;
-            //    if (directionToTarget != Vector3.zero)
-            //        rotatioinToTarget = Quaternion.LookRotation(directionToTarget, m_Transform.up);
-
-            //    var yawSmoothDampSpeed = m_CameraState.TurnSmooth * Mathf.Abs(ScreenToViewPort.x);
-            //    if (yawSmoothDampSpeed > 0)
-            //        m_SmoothYaw = Mathf.SmoothDamp(m_SmoothYaw, m_Yaw, ref m_SmoothYawVelocity, yawSmoothDampSpeed);
-            //    else
-            //        m_SmoothYaw = m_Yaw;
-
-            //    m_Transform.rotation = Quaternion.Slerp(rotatioinToTarget, Quaternion.Euler(0, m_SmoothYaw, 0), m_CameraState.TurnSmooth);
-
-            //}
-
-            //if (ScreenToViewPort.y < -pivotStart || ScreenToViewPort.y > pivotStart)
-            //{
-            //    m_Pitch -= mouseY * m_CameraState.PitchRotateSpeed;
-            //    m_Pitch = Mathf.Clamp(m_Pitch, m_CameraState.MinPitch, m_CameraState.MaxPitch);
-
-            //    var pitchSmoothDampSpeed = m_CameraState.TurnSmooth * Mathf.Abs(ScreenToViewPort.y);
-            //    if (pitchSmoothDampSpeed > 0)
-            //        m_SmoothPitch = Mathf.SmoothDamp(m_SmoothPitch, m_Pitch, ref m_SmoothPitchVelocity, pitchSmoothDampSpeed);
-            //    else
-            //        m_SmoothPitch = m_Pitch;
-
-            //    //  Update the X-axis of the camera pivot.
-            //    m_PitchPivot.localRotation = Quaternion.Slerp(m_PitchPivot.localRotation, Quaternion.Euler(m_SmoothPitch, 0, 0), m_CameraState.TurnSmooth);
-            //}
-
-
-
-            ////var eulerY = Mathf.Atan2(mouseX, Mathf.Abs(mouseY));
-            //eulerY = Mathf.Rad2Deg * m_CameraState.AdaptSpeed * m_DeltaTime;
-            //eulerY *= mouseX;
-            //eulerY += m_Transform.eulerAngles.y;
-
-            //m_Transform.rotation = Quaternion.Slerp(m_Transform.rotation, m_Character.transform.rotation, m_CameraState.AdaptSpeed * m_DeltaTime);
-
-
-
-            //m_Pitch -= mouseY * m_CameraState.PitchRotateSpeed;
-            //m_Pitch = Mathf.Clamp(m_Pitch, m_CameraState.MinPitch, m_CameraState.MaxPitch);
-
-            //if(m_CameraState.TurnSmooth > 0){
-            //    m_SmoothYaw = Mathf.SmoothDamp(m_SmoothYaw, m_Yaw, ref m_SmoothYawVelocity, m_CameraState.TurnSmooth);
-            //    m_SmoothPitch = Mathf.SmoothDamp(m_SmoothPitch, m_Pitch, ref m_SmoothPitchVelocity, m_CameraState.TurnSmooth);
-            //} else {
-            //    m_SmoothYaw = m_Yaw;
-            //    m_SmoothPitch = m_Pitch;
-            //}
-
-            //var eulerYaw = Quaternion.Euler(0, m_SmoothYaw, 0);
-            ////var targetEuler = Quaternion.Euler(0, m_Character.transform.eulerAngles.y, 0);
-            ////m_TargetRotation = eulerYaw * targetEuler;
-            //m_TargetRotation = eulerYaw;
-
-            //var eulerY = Mathf.SmoothDampAngle(m_Transform.eulerAngles.y, m_TargetRotation.eulerAngles.y, ref m_SmoothRotationVelocity, m_CameraState.TurnSmooth);
-            //m_Transform.rotation = Quaternion.Slerp(m_Transform.rotation, Quaternion.Euler(0, eulerY, 0), m_CameraState.TurnSmooth);
-
-            ////  Update the X-axis of the camera pivot.
-            //m_PitchPivot.localRotation = Quaternion.Slerp(m_PitchPivot.localRotation, Quaternion.Euler(m_SmoothPitch, 0, 0), m_CameraState.TurnSmooth);
-        }
 
 
 

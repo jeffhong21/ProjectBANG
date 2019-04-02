@@ -602,7 +602,7 @@ MonoBehaviour:
   m_ItemType: {fileID: 11400000, guid: 6c5d9ac65e6844feb81b0131f2050c07, type: 2}
   m_ItemAnimName: Revolver
   m_ItemID: 1
-  m_MovementSetID: 1
+  m_MovementSetID: 0
   m_AnimStates:
     m_DefaultStateName: Idle
     m_AimStateName: Aim

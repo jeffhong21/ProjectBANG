@@ -161,10 +161,9 @@ GameObject:
   - component: {fileID: 95278574169747482}
   - component: {fileID: 136461347018360410}
   - component: {fileID: 54223540320120752}
-  - component: {fileID: 114145946620604510}
   - component: {fileID: 114933608758217926}
-  - component: {fileID: 114752500204725904}
   - component: {fileID: 114311917172092944}
+  - component: {fileID: 114752500204725904}
   - component: {fileID: 114220855003856576}
   - component: {fileID: 114429236655991950}
   - component: {fileID: 114901688824212290}
@@ -2035,7 +2034,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: f343dcd6a3e4344d6ae1aef064e6d16e, type: 2}
+  - {fileID: 2100000, guid: 8b62efc3209cd4052baa23a5777877f5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2153,12 +2152,12 @@ Rigidbody:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1141768220188808}
   serializedVersion: 2
-  m_Mass: 50
+  m_Mass: 100
   m_Drag: 0
-  m_AngularDrag: 999
+  m_AngularDrag: 0
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 80
   m_CollisionDetection: 0
 --- !u!82 &82114426905116688
@@ -2384,6 +2383,7 @@ MonoBehaviour:
   m_StateName: MoveTowards
   m_ActionID: 0
   m_Keycode: 0
+  m_InputName: 
   m_StartType: 1
   m_StopType: 0
   m_ActionStartLocation: {x: 0, y: 0, z: 0}
@@ -2439,9 +2439,10 @@ MonoBehaviour:
   m_IsActive: 0
   m_StateName: PickupItem
   m_ActionID: 0
-  m_Keycode: 0
-  m_StartType: 1
-  m_StopType: 1
+  m_Keycode: 102
+  m_InputName: F
+  m_StartType: 2
+  m_StopType: 2
   item: {fileID: 0}
 --- !u!114 &114127185106794922
 MonoBehaviour:
@@ -2458,20 +2459,6 @@ MonoBehaviour:
   m_ItemSlotHolder: {fileID: 0}
   m_ItemSlotHolster: {fileID: 0}
   m_ParentBone: 0
---- !u!114 &114145946620604510
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 961839ed55f144df395c44935ee66d70, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  skin: {fileID: 11400000, guid: 306060a63293742a58f55d883810b331, type: 2}
-  randomSkin: 0
-  meshRenderer: {fileID: 137591622708054598}
 --- !u!114 &114191035625105832
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2555,6 +2542,7 @@ MonoBehaviour:
   m_StateName: Roll
   m_ActionID: 15
   m_Keycode: 0
+  m_InputName: 
   m_StartType: 1
   m_StopType: 0
   m_StopRollLayer:
@@ -2622,6 +2610,7 @@ MonoBehaviour:
   m_StateName: Aim
   m_ActionID: 0
   m_Keycode: 0
+  m_InputName: 
   m_StartType: 1
   m_StopType: 1
   m_ItemID: 0
@@ -2641,6 +2630,7 @@ MonoBehaviour:
   m_StateName: Take_Damage
   m_ActionID: 0
   m_Keycode: 0
+  m_InputName: 
   m_StartType: 0
   m_StopType: 0
   m_DamageTypeIndex: 0
@@ -2683,10 +2673,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_DefaultLoadout:
-  - m_Item: {fileID: 11400000, guid: 29d47eb19b2d3474080e5b333f73e67f, type: 2}
+  - m_Item: {fileID: 11400000, guid: 6c5d9ac65e6844feb81b0131f2050c07, type: 2}
     m_Amount: 1
     m_Equip: 0
-  - m_Item: {fileID: 11400000, guid: 6c5d9ac65e6844feb81b0131f2050c07, type: 2}
+  - m_Item: {fileID: 11400000, guid: 29d47eb19b2d3474080e5b333f73e67f, type: 2}
     m_Amount: 1
     m_Equip: 0
   m_Loadout: []
@@ -2709,6 +2699,7 @@ MonoBehaviour:
   m_StateName: Fall
   m_ActionID: 0
   m_Keycode: 0
+  m_InputName: 
   m_StartType: 0
   m_StopType: 0
   m_MinFallHeight: 1
@@ -2739,6 +2730,7 @@ MonoBehaviour:
   m_StateName: Crouch
   m_ActionID: 0
   m_Keycode: 0
+  m_InputName: 
   m_StartType: 1
   m_StopType: 1
 --- !u!114 &114866502275982722
@@ -2756,6 +2748,7 @@ MonoBehaviour:
   m_StateName: Dodge
   m_ActionID: 16
   m_Keycode: 0
+  m_InputName: 
   m_StartType: 1
   m_StopType: 0
 --- !u!114 &114901688824212290
@@ -2793,6 +2786,7 @@ MonoBehaviour:
   m_StateName: Cover
   m_ActionID: 12
   m_Keycode: 0
+  m_InputName: 
   m_StartType: 1
   m_StopType: 1
   m_TakeCoverDistance: 2
@@ -2814,7 +2808,7 @@ MonoBehaviour:
     m_LeftColor: {r: 0, g: 1, b: 0, a: 1}
     m_RightColor: {r: 0, g: 1, b: 0, a: 1}
     m_ChangeStateColor: {r: 1, g: 0, b: 0, a: 1}
-  m_Debug: 1
+  m_Debug: 0
 --- !u!114 &114921923587186984
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2826,6 +2820,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92019d84070ab4ad6939a5a7011333a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_MouseHorizontal: 0
+  m_MouseVertical: 0
   m_LayerMask:
     serializedVersion: 2
     m_Bits: 0
@@ -2843,9 +2839,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_UseRootMotion: 1
   m_RootMotionSpeedMultiplier: 1
+  m_MovementSpeed: 2.75
+  m_StrafeSpeed: 2
   m_SpeedChangeMultiplier: 1
   m_RotationSpeed: 8
-  m_AimRotationSpeed: 8
+  m_AimRotationSpeed: 12
   m_AlignToGround: 1
   m_AlignToGroundDepthOffset: 0.5
   m_GroundSpeed: {x: 1, y: 0, z: 1}
@@ -2866,10 +2864,17 @@ MonoBehaviour:
   - {fileID: 114641910215582532}
   - {fileID: 114015622257898310}
   m_ActiveAction: {fileID: 0}
+  m_MoveAmount: 0
+  m_Velocity: {x: 0, y: 0, z: 0}
+  m_RootMotionVelocity: {x: 0, y: 0, z: 0}
+  m_MoveDirection: {x: 0, y: 0, z: 0}
+  m_LookDirection: {x: 0, y: 0, z: 0}
   m_InputVector: {x: 0, y: 0, z: 0}
+  m_RelativeInputVector: {x: 0, y: 0, z: 0}
+  eulerY: 0
   _rigidbodyVelocity: {x: 0, y: 0, z: 0}
   _rigidbodyAngularVelocity: {x: 0, y: 0, z: 0}
-  m_DrawDebugLine: 0
+  m_DrawDebugLine: 1
 --- !u!135 &135562184133563358
 SphereCollider:
   m_ObjectHideFlags: 1
@@ -2903,7 +2908,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.3
+  m_Radius: 0.2
   m_Height: 1.8
   m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0}

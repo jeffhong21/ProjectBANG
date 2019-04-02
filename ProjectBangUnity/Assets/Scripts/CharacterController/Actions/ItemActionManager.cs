@@ -42,7 +42,7 @@
 
 		private void Start()
 		{
-            m_LayerIndex = m_AnimatorMonitor.UpperBodyLayerIndex;
+            m_LayerIndex = m_AnimatorMonitor.ItemLayerIndex;
 
 		}
 

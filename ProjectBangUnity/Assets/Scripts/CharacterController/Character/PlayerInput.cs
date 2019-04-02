@@ -36,11 +36,13 @@ namespace CharacterController
         private bool m_IsCrouching, m_IsRunning, m_IsAiming, m_InCover;
         [Header("-- Debug Settings --")]
         //[SerializeField, DisplayOnly]
-        private float m_Horizontal;
-        //[SerializeField, DisplayOnly]
-        private float m_Vertical;
+        private float m_Horizontal, m_Vertical;
         //[SerializeField, DisplayOnly]
         private Vector3 m_InputVector;
+        [SerializeField, DisplayOnly]
+        private float m_MouseHorizontal, m_MouseVertical;
+        private Vector3 m_MouseInputVector;
+
         private float m_RayLookDistance = 20f;
         [SerializeField]
         private LayerMask m_LayerMask;
@@ -151,13 +153,15 @@ namespace CharacterController
                 SetInputVector(m_UseAxisRaw);
                 SetTargetLookAt();
 
+                if (Input.GetKeyDown(KeyCode.X)) m_Controller.Running = !m_Controller.Running;
+
                 Aim(m_AimInput);
                 //  Crouch
                 Crouch(m_CrouchInput);
                 ////  Cover
                 //EnterCover(KeyCode.W);
                 //  Roll
-                ForwardAction(KeyCode.W);
+                ForwardAction(KeyCode.Space);
                 //  Dodge
                 Dodge();
                 // Run.
@@ -197,6 +201,18 @@ namespace CharacterController
 
             m_InputVector.Set(m_Horizontal, 0, m_Vertical);
             m_Controller.InputVector = m_InputVector;
+
+            m_MouseHorizontal = Input.GetAxis(m_RotateCameraXInput);
+            m_MouseVertical = Input.GetAxis(m_RotateCameraYInput);
+            var difference = m_CameraController.Camera.transform.position.y - m_Transform.position.y;
+            m_MouseInputVector.Set(m_MouseHorizontal, m_MouseVertical, difference);
+            //var viewPortToScreen = m_CameraController.Camera.ViewportToScreenPoint(m_MouseInputVector);
+            //m_Controller.RelativeInputVector = m_CameraController.Camera.ScreenToWorldPoint(m_MouseInputVector);
+
+            m_Controller.RelativeInputVector = m_MouseInputVector;
+            //  Set Look Rotation
+            //m_Controller.LookRotation = Quaternion.Euler(m_Transform.eulerAngles.x, m_CameraController.transform.eulerAngles.y, m_Transform.eulerAngles.z);
+
         }
 
 
@@ -396,22 +412,22 @@ namespace CharacterController
         # region Camera methods
 
         private void CameraInput()
-        {
+        {                                
             if (m_CameraController == null) return;
 
-            m_CameraController.RotateCamera(Input.GetAxis(m_RotateCameraXInput), Input.GetAxis(m_RotateCameraYInput));
+            m_CameraController.RotateCamera(m_MouseHorizontal, m_MouseVertical);
             m_CameraController.ZoomCamera(Input.GetAxisRaw(m_MouseScrollInput));
 
-            m_Controller.UpdateLookDirection(m_CameraController != null ? m_CameraController.transform : null);
-            if (m_Controller.Aiming) 
-                RotateWithAnotherTransform(m_CameraController.transform);
+            //m_Controller.UpdateLookDirection(m_CameraController != null ? m_CameraController.transform : null);
+            //RotateWithAnotherTransform(m_CameraController.transform);
+            //if (m_Controller.Aiming)  RotateWithAnotherTransform(m_CameraController.transform);
         }
 
 
         public virtual void RotateWithAnotherTransform(Transform referenceTransform)
         {
             //Quaternion rot = Quaternion.LookRotation()
-            var newRotation = new Vector3(transform.eulerAngles.x, referenceTransform.eulerAngles.y, transform.eulerAngles.z);
+            var newRotation = new Vector3(m_Transform.eulerAngles.x, referenceTransform.eulerAngles.y, m_Transform.eulerAngles.z);
             var targetRotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(newRotation), m_Controller.AimRotationSpeed * Time.fixedDeltaTime);
             m_Controller.SetRotation(Quaternion.Euler(newRotation));
         }

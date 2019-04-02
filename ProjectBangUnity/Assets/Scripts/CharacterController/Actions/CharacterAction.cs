@@ -22,11 +22,20 @@
         [SerializeField]
         protected KeyCode m_Keycode;
         [SerializeField]
+        protected string m_InputName;
+
+        protected string[] m_InputNames = new string[0];
+        [SerializeField]
         protected ActionStartType m_StartType = ActionStartType.Manual;
         [SerializeField]
         protected ActionStopType m_StopType = ActionStopType.Manual;
 
         [Space(12)]
+
+        //  Check double press variables.
+        private KeyCode m_FirstButtonPressed;
+        private float m_TimeOfFirstButtoonPressed;
+        private float m_DoublePressInputTime = 0.25f;
 
 
         protected CharacterLocomotion m_Controller;
@@ -124,12 +133,24 @@
             
         }
 
-		// Executed on every action to allow the action to update.
-		// The action may need to update if it needs to do something when inactive or show a GUI icon when the ability can be started.
-		public virtual void UpdateAction()
+
+        private bool CheckDoubleTap(KeyCode key)
         {
-            
+            if (Input.GetKeyDown(key) && m_FirstButtonPressed == key){
+                m_FirstButtonPressed = KeyCode.F12;
+                if (Time.time - m_TimeOfFirstButtoonPressed < m_DoublePressInputTime){
+                    return true;
+                }
+            }
+            if (Input.GetKeyDown(key) && m_FirstButtonPressed != key){
+                m_FirstButtonPressed = key;
+                m_TimeOfFirstButtoonPressed = Time.time;
+                return false;
+            }
+
+            return false;
         }
+
 
 
 
@@ -147,13 +168,22 @@
                         return true;
                     break;
                 case ActionStartType.ButtonDown:
-                    if (Input.GetKeyDown(m_Keycode))
-                    {
-                        if (m_IsActive == false)
+                    //for (int i = 0; i < m_InputNames.Length; i++)
+                    //{
+                    //    KeyCode keycode = (KeyCode)Enum.Parse(typeof(KeyCode), m_InputNames[0]);
+                    //}
+                    KeyCode keycode = (KeyCode)Enum.Parse(typeof(KeyCode), m_InputName);
+                    if (Input.GetKeyDown(keycode)){
+                        if (m_IsActive == false){
+                            if (m_StopType == ActionStopType.ButtonToggle)
+                                m_ActionStopToggle = true;
                             return true;
-                        if (m_StopType == ActionStopType.ButtonToggle)
-                            m_ActionStopToggle = true;
+                        }
                     }
+                    break;
+                case ActionStartType.DoublePress:
+                    if (m_IsActive == false)
+                        return true;
                     break;
             }
             return false;
@@ -176,12 +206,15 @@
                     m_IsActive = false;
                     return true;
                 case ActionStopType.Manual:
-                    m_IsActive = false;
-                    return true;
-
+                    if(m_IsActive){
+                        m_IsActive = false;
+                        return true;
+                    }
+                    return false;
 
                 case ActionStopType.ButtonUp:
-                    if (Input.GetKeyUp(m_Keycode)){
+                    KeyCode keycode = (KeyCode)Enum.Parse(typeof(KeyCode), m_InputName);
+                    if (Input.GetKeyUp(keycode)){
                         m_IsActive = false;
                         return true;
                     }
@@ -262,6 +295,13 @@
         public virtual bool OverrideItemState(int layer)
         {
             return false;
+        }
+
+        // Executed on every action to allow the action to update.
+        // The action may need to update if it needs to do something when inactive or show a GUI icon when the ability can be started.
+        public virtual void UpdateAction()
+        {
+
         }
 
 

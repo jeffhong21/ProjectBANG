@@ -9,13 +9,17 @@
     public class CharacterLocomotion : MonoBehaviour
     {
         public event Action<bool> OnAim = delegate {};
-        public enum MovementType {Combat, Adventure, TopDown };
+        public enum MovementType {Adventure, Combat, TopDown };
 
 
         [SerializeField, HideInInspector]
         protected bool m_UseRootMotion = true;
         [SerializeField, HideInInspector]
         protected float m_RootMotionSpeedMultiplier = 1;
+        [SerializeField, HideInInspector]
+        protected float m_MovementSpeed = 3.75f;
+        [SerializeField, HideInInspector]
+        protected float m_StrafeSpeed = 2.5f;
         [SerializeField, HideInInspector]
         protected float m_SpeedChangeMultiplier = 1;
         [SerializeField, HideInInspector]
@@ -57,13 +61,17 @@
         private bool m_Moving, m_Aiming, m_Running;
         //[SerializeField, DisplayOnly]
         private float m_Speed;
-        //[SerializeField, DisplayOnly]
-        private Vector3 m_Velocity, m_MoveDirection, m_LookDirection;
         [SerializeField, DisplayOnly]
-        private Vector3 m_InputVector;
+        private float m_MoveAmount;
+        [SerializeField, DisplayOnly]
+        private Vector3 m_Velocity, m_RootMotionVelocity, m_MoveDirection, m_LookDirection;
+        [SerializeField, DisplayOnly]
+        private Vector3 m_InputVector, m_RelativeInputVector;
         private Vector3 m_LookAtPoint;
         //[SerializeField, DisplayOnly]
-        private float rotationDifference , eulerY;
+        private float rotationDifference;
+        [SerializeField, DisplayOnly]
+        private float eulerY;
         private Quaternion m_LookRotation;
 
 
@@ -80,7 +88,7 @@
         private GameObject m_GameObject;
         private Transform m_Transform;
         private float m_DeltaTime;
-
+        private float m_FixedDeltaTime;
 
         bool m_UpdateRotation = true, m_UpdateMovement = true, m_UpdateAnimator = true;
 
@@ -147,9 +155,9 @@
             set { m_InputVector = value; }
         }
 
-        public Vector3 RelativeInputVector
-        {
-            get { return m_InputVector.normalized; }
+        public Vector3 RelativeInputVector{
+            get { return m_RelativeInputVector; }
+            set { m_RelativeInputVector = value; }
         }
 
         public Quaternion LookRotation{
@@ -199,19 +207,19 @@
             m_GameObject = gameObject;
             m_Transform = transform;
             m_DeltaTime = Time.deltaTime;
-
+            m_FixedDeltaTime = Time.fixedDeltaTime;
 
             if(m_Rigidbody == null) m_Rigidbody = m_GameObject.AddComponent<Rigidbody>();
             if(m_Layers == null) m_Layers = m_GameObject.AddComponent<LayerManager>();
-
-
-
 
         }
 
 
         protected void OnEnable()
 		{
+            m_Rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+
+
             EventHandler.RegisterEvent<CharacterAction, bool>(m_GameObject, "OnCharacterActionActive", OnActionActive);
             EventHandler.RegisterEvent<bool>(m_GameObject, "OnAimActionStart", OnAimActionStart);
 		}
@@ -221,22 +229,6 @@
             EventHandler.UnregisterEvent<CharacterAction, bool>(m_GameObject, "OnCharacterActionActive", OnActionActive);
             EventHandler.UnregisterEvent<bool>(m_GameObject, "OnAimActionStart", OnAimActionStart);
 		}
-
-
-        public void PlayInteractAnimation()
-        {
-            var actionIntId = UnityEngine.Random.Range(0, 3);
-            m_Animator.SetInteger(HashID.ActionIntData, actionIntId);
-            if(actionIntId == 0) m_Animator.CrossFade("Pickup_Item.Pickup_Item_Ground", 0.2f, 0);
-            else if (actionIntId == 1) m_Animator.CrossFade("Pickup_Item.Pickup_Item_Waist", 0.2f, 0);
-            else if (actionIntId == 2) m_Animator.CrossFade("Pickup_Item.Pickup_Objects_Ground", 0.2f, 0);
-                    
-            //Debug.Log("Playing Animation " + Animator.StringToHash("Pickup_Item.Pickup_Item_Ground") + " | ID: " + actionIntId );
-        }
-
-
-
-
 
 
 
@@ -327,14 +319,15 @@
 
 
 
-            m_Moving = m_InputVector.sqrMagnitude > 0.1f;
+            m_Moving = m_InputVector.sqrMagnitude > 0.2f;
 		}
 
 
 		private void FixedUpdate()
         {
-            m_Grounded = CheckGround();
-            //m_Grounded = CheckGround_2();
+            m_MoveAmount = Mathf.Abs(m_InputVector.x) + Mathf.Abs(m_InputVector.z);
+            //m_Grounded = CheckGround();
+            m_Grounded = CheckGround_2();
 
             if (m_UpdateRotation) UpdateRotation();
             if (m_UpdateMovement) UpdateMovement();
@@ -353,7 +346,6 @@
             float radius = m_CapsuleCollider.radius * 0.9f;
             if(Physics.SphereCast(m_Transform.position, radius, -Vector3.up, out m_GroundHit, m_CapsuleCollider.radius + m_AlignToGroundDepthOffset + m_SkinWidth, m_Layers.SolidLayer))
             {
-
                 Vector3 targetPosition = m_Transform.position;
                 targetPosition.y = m_GroundHit.point.y;
                 m_Transform.position = targetPosition;
@@ -422,51 +414,17 @@
         //  Update the rotation forces.
         private void UpdateRotation()
         {
-            if (m_Aiming){
-                m_LookDirection = m_Transform.forward * 10 - m_Transform.position;
-                m_LookDirection.y = m_Transform.position.y;
+            m_Rigidbody.angularDrag = (m_Aiming ? m_AimRotationSpeed : m_RotationSpeed) / 2;
 
-                if (m_LookDirection != Vector3.zero)
-                    m_LookRotation = Quaternion.LookRotation(m_LookDirection, m_Transform.up);
-                else
-                    m_LookRotation = m_Transform.rotation;
-                
-                rotationDifference = m_LookRotation.eulerAngles.y - m_Transform.eulerAngles.y;
-                m_LookRotation = Quaternion.Slerp(m_Transform.rotation, m_LookRotation.normalized, m_RotationSpeed * m_DeltaTime);
-                m_Rigidbody.MoveRotation(m_LookRotation);
+            eulerY = Mathf.Rad2Deg * (m_Aiming ? m_AimRotationSpeed : m_RotationSpeed) * m_DeltaTime;
+            eulerY *= m_RelativeInputVector.x;
+            //eulerY += m_Transform.eulerAngles.y;
 
-                //if (m_DrawDebugLine) Debug.DrawRay(m_Transform.position, m_LookDirection, Color.red);
-            }
-            else if(m_InputVector != Vector3.zero && m_LookDirection.sqrMagnitude > 0.2f)
-            {
-                //eulerY = Mathf.Atan2(m_InputVector.x, Mathf.Abs(m_InputVector.z));
-                //eulerY = Mathf.Rad2Deg * m_RotationSpeed * m_DeltaTime;
-                //eulerY *= m_InputVector.x;
-                //eulerY += m_Transform.eulerAngles.y;
-                //rotationDifference = eulerY - m_Transform.eulerAngles.y;
-                //if (rotationDifference < 0 || rotationDifference > 0) eulerY = m_Transform.eulerAngles.y;
-                //m_LookRotation = Quaternion.Euler(m_Transform.eulerAngles.x, eulerY, m_Transform.eulerAngles.z);
-                //m_LookRotation = Quaternion.Lerp(m_Transform.rotation, m_LookRotation.normalized, m_RotationSpeed * m_DeltaTime);
-                //m_Rigidbody.MoveRotation(m_LookRotation);
+            //eulerY = Mathf.Atan2(m_RelativeInputVector.z, m_RelativeInputVector.x * (m_Aiming ? m_AimRotationSpeed : m_RotationSpeed)) * Mathf.Rad2Deg;
 
-                var targetDirection = m_LookDirection.normalized;
-                m_LookRotation = Quaternion.LookRotation(targetDirection, m_Transform.up);
-                rotationDifference = m_LookRotation.eulerAngles.y - m_Transform.eulerAngles.y;
-                eulerY = m_Transform.eulerAngles.y;
+            m_LookRotation = m_LookRotation * Quaternion.AngleAxis(eulerY, m_Transform.up);
 
-                if(m_Grounded){
-                    if (rotationDifference < 0 || rotationDifference > 0)
-                        eulerY = m_LookRotation.eulerAngles.y;
-                    var euler = new Vector3(m_Transform.eulerAngles.x, eulerY, m_Transform.eulerAngles.z);
-                    m_Rigidbody.MoveRotation(Quaternion.Lerp(m_Transform.rotation, Quaternion.Euler(euler).normalized, m_RotationSpeed * m_DeltaTime));
-                }
-
-                //m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Transform.rotation, m_LookRotation.normalized, m_RotationSpeed * m_DeltaTime));
-            }
-            else{
-                rotationDifference = 0;
-            }
-            //m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Transform.rotation, m_LookRotation.normalized, m_RotationSpeed * m_DeltaTime));
+            //m_Rigidbody.AddRelativeTorque(Vector3.up * eulerY);
         }
 
 
@@ -475,44 +433,47 @@
         {
             if (m_SlopeAngle >= m_SlopeLimit) return;
 
-            //m_Velocity = m_MoveDirection + m_Transform.forward * m_Speed;
-            //m_Velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
-            //m_Rigidbody.AddForce(m_MoveDirection * (m_Speed) * m_DeltaTime, ForceMode.VelocityChange);
-            if (m_UseRootMotion)
-            {
-                m_Velocity = (m_Animator.deltaPosition * m_RootMotionSpeedMultiplier) / m_DeltaTime;
-                m_Velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
-                //m_Rigidbody.velocity = m_Velocity;
-                m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, 20 * m_DeltaTime);  //m_Acceleration
+            m_InputVector = m_InputVector.normalized;
+            m_MoveDirection = m_InputVector.x * m_Transform.right * m_StrafeSpeed + m_InputVector.z * m_Transform.forward * m_MovementSpeed;
+            if(m_MoveAmount > 0.1f){
+                m_Rigidbody.drag = 0;
+            } else {
+                m_Rigidbody.drag = m_Rigidbody.mass;
             }
-            //else{
-            //    if(m_Aiming){
-            //        m_Velocity = (m_Transform.TransformDirection(m_InputVector) * m_Speed);
-            //        m_Velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
-            //        m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, m_Acceleration * m_DeltaTime);
-            //    }
-            //    else{
-            //        m_Velocity = m_MoveDirection + m_Transform.forward * m_Speed;
-            //        m_Velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
-            //        m_Rigidbody.AddForce(m_MoveDirection * (m_Speed) * m_DeltaTime, ForceMode.VelocityChange);
-            //    }
-            //} 
 
-
-
+            m_Velocity = m_MoveDirection * m_MoveAmount;
+            m_Velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
+            //m_Rigidbody.AddRelativeForce(m_MoveDirection * m_FixedDeltaTime, (m_MoveAmount < 0.9f) ? ForceMode.VelocityChange : ForceMode.Acceleration);
         }
 
 
         private void UpdateAnimator()
         {
+            //m_Speed = m_Running ? 1 : 0.5f;
             m_Speed = 1f;
+
             m_AnimationMonitor.SetForwardInputValue(m_InputVector.z * m_Speed);
             m_AnimationMonitor.SetHorizontalInputValue(m_InputVector.x * m_Speed);
+            //m_Animator.SetFloat(HashID.Rotation, (m_RelativeInputVector.x > 0.2f || m_RelativeInputVector.x < -0.2f)  ? m_RelativeInputVector.x : 0, 0.1f, m_DeltaTime);
+            m_Animator.SetFloat(HashID.Rotation, m_RelativeInputVector.x, 0.1f, m_DeltaTime);
+
             m_Animator.SetBool(HashID.Moving, m_Moving);
         }
 
 
+        private void OnAnimatorMove()
+        {
+            if (m_UseRootMotion)
+            {
+                m_LookRotation = Quaternion.Slerp(m_Transform.rotation, m_LookRotation * m_Animator.deltaRotation, (m_Aiming ? m_AimRotationSpeed : m_RotationSpeed) * m_DeltaTime);
+                m_Rigidbody.MoveRotation(m_LookRotation.normalized);
 
+                m_RootMotionVelocity = m_Velocity + (m_Animator.deltaPosition * m_RootMotionSpeedMultiplier) / m_DeltaTime;
+                m_RootMotionVelocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
+                m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_RootMotionVelocity, m_MovementSpeed * m_DeltaTime);
+            }
+
+        }
 
 
         public void SetPosition(Vector3 position){
@@ -571,15 +532,6 @@
         }
 
 
-        private void OnAnimatorMove()
-        {
-            //if (m_UseRootMotion)
-            //{
-            //    m_Rigidbody.velocity = (m_Animator.deltaPosition * m_RootMotionSpeedMultiplier) / m_DeltaTime;
-            //    //m_Rigidbody.velocity = m_Velocity;
-            //    //Debug.Log(m_Animator.deltaPosition);
-            //}
-        }
 
 
 
@@ -587,6 +539,7 @@
 
 
 
+        #region Start Stop Action
 
         public T GetAction<T>() where T : CharacterAction
         {
@@ -645,7 +598,6 @@
         }
 
 
-
         public void TryStopAllActions()
         {
 
@@ -685,17 +637,15 @@
             TryStopAction(action);
         }
 
+        #endregion
 
 
 
-
-
+        #region On Action execute
 
         private void OnAimActionStart(bool aim)
         {
             m_Aiming = aim;
-
-
 
             //  Call On Aim Delegate.
             OnAim(aim);
@@ -719,13 +669,12 @@
         }
 
 
-
         public void ActionStopped()
         {
 
         }
 
-
+        #endregion
 
 
 
@@ -745,6 +694,19 @@
 
         protected void OnDrawGizmos()
         {
+            if(m_DrawDebugLine && Application.isPlaying)
+            {
+                if (Aiming){
+                    Gizmos.color = Color.green;
+                    Gizmos.DrawSphere(m_LookAtPoint, 0.1f);
+                    Gizmos.DrawLine(transform.position + (Vector3.up * 1.35f), m_LookAtPoint);
+                }
+
+                Gizmos.color = Color.blue;
+                Gizmos.DrawRay(m_Transform.position + m_DebugHeightOffset, m_MoveDirection);
+                GizmosUtils.DrawString("Move Direction", m_Transform.InverseTransformDirection(m_MoveDirection), Color.white);
+            }
+
             //if (m_DrawDebugLine)
             //{
             //    Gizmos.color = Color.green;
@@ -762,11 +724,7 @@
             //    Gizmos.DrawSphere(m_LookDirection, 0.1f);
             //    Gizmos.DrawLine(transform.position + (transform.up * 1.35f), m_LookDirection);
             //}
-            if(Aiming && m_DrawDebugLine){
-                Gizmos.color = Color.green;
-                Gizmos.DrawSphere(m_LookAtPoint, 0.1f);
-                Gizmos.DrawLine(transform.position + (Vector3.up * 1.35f), m_LookAtPoint);
-            }
+
         }
 
 

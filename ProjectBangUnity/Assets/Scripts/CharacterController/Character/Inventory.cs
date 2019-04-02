@@ -78,14 +78,7 @@
             }
         }
 
-        public bool IsSwitchingItem{
-            get {
-                if(GetCurrentItem() != null){
-                    var switching = m_Animator.GetCurrentAnimatorStateInfo(m_AnimatorMonitor.UpperBodyLayerIndex).shortNameHash == Animator.StringToHash(GetCurrentItem().ItemAnimName);
-                }
-                return m_Switching;
-            }
-        }
+
 
         public ItemType EquippedItemType{
             get { return m_EquippedItem; }

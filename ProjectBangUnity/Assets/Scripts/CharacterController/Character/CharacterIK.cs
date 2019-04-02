@@ -219,7 +219,7 @@
 
 		private void FixedUpdate()
         {
-            bodyPosition = m_Animator.bodyPosition;
+
 
             if (m_Animator == null) { return; }
 
@@ -251,6 +251,8 @@
 		private void OnAnimatorIK()
 		{
             if (m_Animator == null) { return; }
+
+            bodyPosition = m_Animator.bodyPosition;
 
             LookAtTarget();
             //PositionLowerBody();

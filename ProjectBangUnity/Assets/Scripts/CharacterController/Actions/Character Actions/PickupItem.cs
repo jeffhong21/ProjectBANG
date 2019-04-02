@@ -9,12 +9,14 @@ namespace CharacterController
 
         public GameObject item;
 
+        protected float m_StartTime;
+
         //
         // Methods
         //
         protected override void ActionStarted()
         {
-
+            m_StartTime = Time.time;
         }
 
 
@@ -23,7 +25,7 @@ namespace CharacterController
         {
             if (layer == 0)
             {
-                m_StateName = "Pickup_Item.Pickup_Item_Ground";
+                m_StateName = "PickupItem.PickupItem_Ground";
                 return m_StateName;
             }
             return "";
@@ -34,7 +36,6 @@ namespace CharacterController
         protected override void ActionStopped()
         {
             m_Animator.SetInteger(HashID.ActionID, 0);
-            //Debug.LogFormat("{0} Action has stopped {1}", GetType().Name, Time.time);
         }
 
 
@@ -42,29 +43,7 @@ namespace CharacterController
 
         public override bool CanStopAction()
         {
-            if (m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1)
-            {
-                return false;
-            }
-
-            if (m_Animator.GetCurrentAnimatorStateInfo(0).IsName(m_StateName))
-            {
-                if (m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1 - m_TransitionDuration)
-                {
-                    return true;
-                }
-                //Debug.LogFormat("Current state: {0} .  Normalized time.  {1} ",m_StateName, m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime);
-                return false;
-            }
-
-
-            if (m_Animator.GetCurrentAnimatorStateInfo(0).IsName(m_StateName) == false)
-            {
-                return true;
-            }
-
-            return false;
-
+            return m_StartTime + 1.5f < Time.time;
         }
     }
 

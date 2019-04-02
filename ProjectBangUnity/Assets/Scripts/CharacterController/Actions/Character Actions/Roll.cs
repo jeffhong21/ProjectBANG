@@ -47,7 +47,6 @@ namespace CharacterController
             
             m_Animator.SetInteger(HashID.ActionIntData, 0);
 
-
         }
 
 
@@ -66,7 +65,7 @@ namespace CharacterController
             var velocity = m_Animator.deltaPosition / Time.deltaTime;
             velocity.y = 0;
             m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, velocity, 10 * Time.deltaTime);  //m_Acceleration
-            m_Rigidbody.AddForce(-m_Transform.forward * 1, ForceMode.Acceleration);
+            m_Rigidbody.AddForce(m_Transform.forward * 2, ForceMode.Acceleration);
             return false;
 		}
 

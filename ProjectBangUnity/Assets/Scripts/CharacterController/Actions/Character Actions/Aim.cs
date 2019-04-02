@@ -52,7 +52,7 @@
 
         public override string GetDestinationState(int layer)
         {
-            if(layer == m_AnimatorMonitor.UpperBodyLayerIndex)
+            if(layer == m_AnimatorMonitor.ItemLayerIndex)
             {
                 return m_ItemName;
                 //if(m_Inventory.EquippedItemType != null){

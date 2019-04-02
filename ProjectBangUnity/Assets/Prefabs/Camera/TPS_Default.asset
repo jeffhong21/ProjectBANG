@@ -14,21 +14,21 @@ MonoBehaviour:
   StateName: TPS_Default
   ViewDistance: 3.5
   VerticalOffset: 0
-  ApplyYawLimit: 0
-  MinYaw: -180
-  MaxYaw: 180
+  ApplyYawLimit: 1
+  MinYaw: -135
+  MaxYaw: 135
   ApplyPitchLimit: 1
   MinPitch: -10
   MaxPitch: 65
   ApplyCameraOffset: 1
-  CameraOffset: {x: 0, y: 0, z: 0}
+  CameraOffset: {x: 0, y: 0.5, z: 0}
   FieldOfView: 64
   FieldOfViewSpeed: 5
-  ApplyTurn: 1
+  ApplyTurn: 0
   TurnSmooth: 0.12
-  TurnSpeed: 4
-  ApplyRotation: 0
-  RotationSpeed: 8
+  TurnSpeed: 2
+  ApplyRotation: 1
+  RotationSpeed: 6
   ApplyStepZoom: 0
   StepZoomSensitivity: 1
   MinStepZooom: -1

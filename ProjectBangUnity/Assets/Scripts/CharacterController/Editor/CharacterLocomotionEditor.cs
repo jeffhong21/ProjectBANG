@@ -41,6 +41,8 @@ namespace CharacterController
         private SerializedProperty m_UseRootMotion;
         private SerializedProperty m_RootMotionSpeedMultiplier;
         private SerializedProperty m_SpeedChangeMultiplier;
+        private SerializedProperty m_MovementSpeed;
+        private SerializedProperty m_StrafeSpeed;
         private SerializedProperty m_RotationSpeed;
         private SerializedProperty m_AimRotationSpeed;
         private SerializedProperty m_AlignToGround;
@@ -73,6 +75,8 @@ namespace CharacterController
             m_UseRootMotion = serializedObject.FindProperty("m_UseRootMotion");
             m_RootMotionSpeedMultiplier = serializedObject.FindProperty("m_RootMotionSpeedMultiplier");
             m_SpeedChangeMultiplier = serializedObject.FindProperty("m_SpeedChangeMultiplier");
+            m_MovementSpeed = serializedObject.FindProperty("m_MovementSpeed");
+            m_StrafeSpeed = serializedObject.FindProperty("m_StrafeSpeed");
             m_RotationSpeed = serializedObject.FindProperty("m_RotationSpeed");
             m_AimRotationSpeed = serializedObject.FindProperty("m_AimRotationSpeed");
             m_AlignToGround = serializedObject.FindProperty("m_AlignToGround");
@@ -104,6 +108,8 @@ namespace CharacterController
             {
                 EditorGUILayout.PropertyField(m_UseRootMotion);
                 EditorGUILayout.PropertyField(m_RootMotionSpeedMultiplier);
+                EditorGUILayout.PropertyField(m_MovementSpeed);
+                EditorGUILayout.PropertyField(m_StrafeSpeed);
                 EditorGUILayout.PropertyField(m_SpeedChangeMultiplier);
                 EditorGUILayout.PropertyField(m_RotationSpeed);
                 EditorGUILayout.PropertyField(m_AimRotationSpeed);

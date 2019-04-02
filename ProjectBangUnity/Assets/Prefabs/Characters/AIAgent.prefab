@@ -682,7 +682,6 @@ GameObject:
   - component: {fileID: 136021364020045450}
   - component: {fileID: 54245609895480114}
   - component: {fileID: 195902453104059552}
-  - component: {fileID: 114558140941445660}
   - component: {fileID: 114067928307790024}
   - component: {fileID: 114914555897092106}
   - component: {fileID: 114943009071803092}
@@ -2117,20 +2116,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   m_TimeInvincibleAfterSpawn: 0
---- !u!114 &114558140941445660
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1761652248440620}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 961839ed55f144df395c44935ee66d70, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  skin: {fileID: 11400000, guid: 623108bd7d2124a7ea8dd6cb5d36eed9, type: 2}
-  randomSkin: 1
-  meshRenderer: {fileID: 137137157353997064}
 --- !u!114 &114774922100011690
 MonoBehaviour:
   m_ObjectHideFlags: 2
@@ -2259,6 +2244,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_UseRootMotion: 1
   m_RootMotionSpeedMultiplier: 1
+  m_MovementSpeed: 3.75
   m_SpeedChangeMultiplier: 1
   m_RotationSpeed: 12
   m_AimRotationSpeed: 8
@@ -2274,10 +2260,15 @@ MonoBehaviour:
   m_Actions:
   - {fileID: 114774922100011690}
   m_ActiveAction: {fileID: 0}
+  m_MoveAmount: 0
+  m_Velocity: {x: 0, y: 0, z: 0}
+  m_MoveDirection: {x: 0, y: 0, z: 0}
+  m_LookDirection: {x: 0, y: 0, z: 0}
   m_InputVector: {x: 0, y: 0, z: 0}
   _rigidbodyVelocity: {x: 0, y: 0, z: 0}
   _rigidbodyAngularVelocity: {x: 0, y: 0, z: 0}
   m_DrawDebugLine: 0
+  rotationY: 0
 --- !u!135 &135193254563505052
 SphereCollider:
   m_ObjectHideFlags: 1

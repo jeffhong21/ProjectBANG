@@ -129,7 +129,7 @@ Material:
     - _GradientHeight_T: 1
     - _GradientSpace: 0
     - _HFogEnable: 0
-    - _HighlightCellOffset: -0.95
+    - _HighlightCellOffset: -1
     - _HighlightCellSharpness: 0.01
     - _IndirectDiffuseContribution: 0.354
     - _IndirectSpecularContribution: 1
@@ -162,7 +162,7 @@ Material:
     - _RealtimeShadow: 0
     - _RimEnable: 0
     - _RimIntensity: 0.028
-    - _RimOffset: 0.266
+    - _RimOffset: 0.767
     - _RimPower: 1
     - _RimSize: 1.09
     - _RimSmoothness: 0.387
