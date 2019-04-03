@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: ce6b39bbda8924397a33bd0aba76641c
+guid: 0475dd237f22f4c0e8da225d0be572f8
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
@@ -104,7 +104,7 @@ ModelImporter:
     400096: UpperLeg_L
     400098: UpperLeg_R
     7400000: mixamo.com
-    7400002: Running--Forward
+    7400002: Running--Strafe-Left-01
     9500000: //RootNode
   externalObjects: {}
   materials:
@@ -135,10 +135,10 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Running--Forward
+      name: Running--Strafe-Left-01
       takeName: mixamo.com
       firstFrame: 0
-      lastFrame: 27
+      lastFrame: 25
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

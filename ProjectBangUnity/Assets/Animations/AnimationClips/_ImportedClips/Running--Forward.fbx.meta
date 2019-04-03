@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: ce6b39bbda8924397a33bd0aba76641c
+guid: d39e96560cf354d27a04cd33488047e4
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
@@ -138,7 +138,7 @@ ModelImporter:
       name: Running--Forward
       takeName: mixamo.com
       firstFrame: 0
-      lastFrame: 27
+      lastFrame: 21
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -147,7 +147,7 @@ ModelImporter:
       hasAdditiveReferencePose: 0
       loopTime: 1
       loopBlend: 1
-      loopBlendOrientation: 1
+      loopBlendOrientation: 0
       loopBlendPositionY: 1
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 1

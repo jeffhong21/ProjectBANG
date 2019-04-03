@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 07a1f28a05c724647b63034086989f9c
+guid: 1837f653e076a4e1784fe01bf351870a
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
@@ -36,8 +36,8 @@ ModelImporter:
     100060: LowerLeg_L
     100062: LowerLeg_R
     100064: Neck
-    100066: Root
-    100068: //RootNode
+    100066: //RootNode
+    100068: Root
     100070: Shoulder_L
     100072: Shoulder_R
     100074: Spine_01
@@ -86,8 +86,8 @@ ModelImporter:
     400060: LowerLeg_L
     400062: LowerLeg_R
     400064: Neck
-    400066: Root
-    400068: //RootNode
+    400066: //RootNode
+    400068: Root
     400070: Shoulder_L
     400072: Shoulder_R
     400074: Spine_01
@@ -104,7 +104,6 @@ ModelImporter:
     400096: UpperLeg_L
     400098: UpperLeg_R
     7400000: mixamo.com
-    7400002: Running--Turn-Left
     9500000: //RootNode
   externalObjects: {}
   materials:
@@ -135,10 +134,10 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Running--Turn-Left
+      name: mixamo.com
       takeName: mixamo.com
       firstFrame: 0
-      lastFrame: 23
+      lastFrame: 20
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -147,10 +146,10 @@ ModelImporter:
       hasAdditiveReferencePose: 0
       loopTime: 1
       loopBlend: 1
-      loopBlendOrientation: 0
+      loopBlendOrientation: 1
       loopBlendPositionY: 1
       loopBlendPositionXZ: 0
-      keepOriginalOrientation: 0
+      keepOriginalOrientation: 1
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 1
       heightFromFeet: 0

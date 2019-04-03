@@ -213,15 +213,22 @@ namespace CharacterController
             //  Set Look Rotation
             //m_Controller.LookRotation = Quaternion.Euler(m_Transform.eulerAngles.x, m_CameraController.transform.eulerAngles.y, m_Transform.eulerAngles.z);
 
+
+
         }
 
 
         private void SetTargetLookAt()
         {
+            ////  Set Look Direction
+            //var direction = m_CameraController.Camera.transform.forward - m_CameraController.Camera.transform.position;
+            ////var lookDirection = Vector3.
+            //m_Controller.LookDirection = direction * 5;
+
             m_Ray.origin = m_CameraController.Camera.transform.position;
             m_Ray.direction = m_CameraController.Camera.transform.forward;
+            m_Controller.LookDirection = m_Ray.GetPoint(m_RayLookDistance) - m_CameraController.Camera.transform.position;
             m_Controller.LookAtPoint = m_Ray.GetPoint(m_RayLookDistance);
-            //m_Controller.LookDirection = m_CameraController.Camera.transform.forward * 10 - m_CameraController.Camera.transform.position;
         }
 
 
@@ -490,9 +497,9 @@ namespace CharacterController
             //}
             if (Application.isPlaying)
             {
-                Gizmos.color = Color.green;
-                Gizmos.DrawSphere(m_Ray.GetPoint(m_RayLookDistance), 0.1f);
-                Gizmos.DrawRay(m_Ray.origin, m_Ray.direction * m_RayLookDistance);
+                //Gizmos.color = Color.green;
+                //Gizmos.DrawSphere(m_Ray.GetPoint(m_RayLookDistance), 0.1f);
+                //Gizmos.DrawRay(m_Ray.origin, m_Ray.direction * m_RayLookDistance);
             }
         }
 

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: ce6b39bbda8924397a33bd0aba76641c
+guid: 07598f36111e347069bef489017f562b
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
@@ -104,7 +104,7 @@ ModelImporter:
     400096: UpperLeg_L
     400098: UpperLeg_R
     7400000: mixamo.com
-    7400002: Running--Forward
+    7400002: Running--Forward-Arc-Right
     9500000: //RootNode
   externalObjects: {}
   materials:
@@ -135,7 +135,7 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Running--Forward
+      name: Running--Forward-Arc-Right
       takeName: mixamo.com
       firstFrame: 0
       lastFrame: 27
@@ -147,10 +147,10 @@ ModelImporter:
       hasAdditiveReferencePose: 0
       loopTime: 1
       loopBlend: 1
-      loopBlendOrientation: 1
+      loopBlendOrientation: 0
       loopBlendPositionY: 1
       loopBlendPositionXZ: 0
-      keepOriginalOrientation: 1
+      keepOriginalOrientation: 0
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 1
       heightFromFeet: 0

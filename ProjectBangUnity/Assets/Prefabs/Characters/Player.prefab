@@ -2510,7 +2510,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bodyPosition: {x: 0, y: 0, z: 0}
   m_DebugDrawLookRay: 0
-  m_LookAtAimBodyWeight: 0
+  m_LookAtAimBodyWeight: 1
   m_LookAtBodyWeight: 0.12
   m_LookAtHeadWeight: 0.15
   m_LookAtEyesWeight: 0
@@ -2840,7 +2840,7 @@ MonoBehaviour:
   m_UseRootMotion: 1
   m_RootMotionSpeedMultiplier: 1
   m_MovementSpeed: 2.75
-  m_StrafeSpeed: 2
+  m_StrafeSpeed: 2.5
   m_SpeedChangeMultiplier: 1
   m_RotationSpeed: 8
   m_AimRotationSpeed: 12

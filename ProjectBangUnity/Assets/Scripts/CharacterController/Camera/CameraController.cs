@@ -279,11 +279,12 @@
             m_ActiveCameraState = ActiveState.name;
             if (m_Character == null) return;
 
-            UpdateCameraMovement();
 
+            UpdateCameraMovement();
             //HandleRotation();
             //RotateCamera();
             HandlePosition();
+
 
             if(m_Camera.fieldOfView != m_CameraState.FieldOfView)
                 m_Camera.fieldOfView = Mathf.Lerp(m_Camera.fieldOfView, m_CameraState.FieldOfView, m_DeltaTime * m_CameraState.FieldOfViewSpeed);
@@ -311,7 +312,7 @@
                 //m_TargetRotation = Quaternion.Euler(0, m_TargetYawAngle, 0);//* m_YawPivotRotation;
                 //m_Transform.rotation = Quaternion.Lerp(m_Transform.rotation, m_TargetRotation, m_CameraState.TurnSpeed * m_DeltaTime);
                 m_YawPivotRotation = Quaternion.Euler(0, m_TargetYawAngle, 0);//* m_YawPivotRotation;
-                m_YawPivot.localRotation = Quaternion.Lerp(m_YawPivot.localRotation, m_YawPivotRotation, m_CameraState.TurnSpeed * m_DeltaTime);
+                m_YawPivot.localRotation = Quaternion.Slerp(m_YawPivot.localRotation, m_YawPivotRotation, m_CameraState.TurnSpeed * m_DeltaTime);
             }
 
 
@@ -330,11 +331,15 @@
                 m_PitchPivot.localRotation = Quaternion.Slerp(m_PitchPivot.localRotation, Quaternion.Euler(m_TargetPitchAngle, 0, 0), m_CameraState.TurnSpeed * m_DeltaTime); ;
             }
 
+            //m_Camera.transform.LookAt(m_Character.transform);
+            var lookDirection = m_Character.transform.position + (Vector3.up * m_CameraState.VerticalOffset) - m_Camera.transform.position;
+            m_Camera.transform.rotation = Quaternion.LookRotation(lookDirection, Vector3.up);
+
             //  Main controller
             if (m_CameraState.ApplyRotation){
                 if (Quaternion.Angle(m_Transform.rotation, m_Character.transform.rotation) != 0){
                     m_TargetRotation = Quaternion.FromToRotation(m_Transform.forward, m_Character.transform.forward);
-                    m_Transform.rotation = Quaternion.Lerp(m_Transform.rotation, m_TargetRotation * m_Transform.rotation, m_CameraState.RotationSpeed * m_DeltaTime);
+                    m_Transform.rotation = Quaternion.Slerp(m_Transform.rotation, m_TargetRotation * m_Transform.rotation, m_CameraState.RotationSpeed * m_DeltaTime);
                 }
             }
 
@@ -347,12 +352,10 @@
             if (m_CameraState.ApplyCameraOffset)
                 m_YawPivot.localPosition = m_CameraState.CameraOffset;
             m_YawPivotPosition = m_YawPivot.localPosition;
-            m_YawPivotPosition.y = m_CameraState.VerticalOffset;
+            //m_YawPivotPosition.y = m_CameraState.VerticalOffset;
 
             m_CameraPosition = m_Camera.transform.localPosition;
             m_CameraPosition.z = -m_CameraState.ViewDistance;
-
-
 
 
             m_YawPivot.localPosition = Vector3.Lerp(m_YawPivot.localPosition, m_YawPivotPosition, 4 * m_DeltaTime);
@@ -360,6 +363,7 @@
 
             //m_TargetPosition = Vector3.Lerp(m_Transform.position, m_Anchor.position, time);
             m_TargetPosition = Vector3.SmoothDamp(m_Transform.position, m_Anchor.position, ref m_CameraVelocitySmooth, 0.12f);
+            m_TargetPosition.y = m_Transform.position.y;
             m_Transform.position = m_TargetPosition;
 
             //m_Transform.LookAt(m_Anchor, Vector3.up);
