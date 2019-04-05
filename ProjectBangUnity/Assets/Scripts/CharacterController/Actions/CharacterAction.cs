@@ -20,10 +20,6 @@
         //[SerializeField]
         protected float m_SpeedMultiplier = 1;
         [SerializeField]
-        protected KeyCode m_Keycode;
-        [SerializeField]
-        protected string m_InputName;
-
         protected string[] m_InputNames = new string[0];
         [SerializeField]
         protected ActionStartType m_StartType = ActionStartType.Manual;
@@ -32,6 +28,9 @@
 
         [Space(12)]
 
+        //  InputNames to KeyCodes
+        private KeyCode[] m_KeyCodes = new KeyCode[0];
+        protected int m_InputIndex = -1;
         //  Check double press variables.
         private KeyCode m_FirstButtonPressed;
         private float m_TimeOfFirstButtoonPressed;
@@ -104,8 +103,25 @@
             m_Transform = transform;
             //EventHandler.RegisterEvent<CharacterAction, bool>(m_GameObject, "OnCharacterActionActive", OnActionActive);
 
+
+            Initialize();
+        }
+
+		private void Initialize()
+		{
+            //  Setup state name.
             if (string.IsNullOrWhiteSpace(m_StateName)){
                 m_StateName = GetType().Name;
+            }
+
+            //  Translate input name to keycode.
+            if(m_StartType != ActionStartType.Automatic || m_StartType != ActionStartType.Manual || 
+               m_StopType != ActionStopType.Automatic || m_StopType != ActionStopType.Manual  )
+            {
+                m_KeyCodes = new KeyCode[m_InputNames.Length];
+                for (int i = 0; i < m_InputNames.Length; i++){
+                    m_KeyCodes[i] = (KeyCode)Enum.Parse(typeof(KeyCode), m_InputNames[i]);
+                }
             }
 
         }
@@ -157,35 +173,41 @@
         //  Checks if action can be started.
         public virtual bool CanStartAction()
         {
-            switch (m_StartType)
+            if (m_IsActive == false)
             {
-                case ActionStartType.Automatic:
-                    if (m_IsActive == false)
-                        return true;
-                    break;
-                case ActionStartType.Manual:
-                    if (m_IsActive == false)
-                        return true;
-                    break;
-                case ActionStartType.ButtonDown:
-                    //for (int i = 0; i < m_InputNames.Length; i++)
-                    //{
-                    //    KeyCode keycode = (KeyCode)Enum.Parse(typeof(KeyCode), m_InputNames[0]);
-                    //}
-                    KeyCode keycode = (KeyCode)Enum.Parse(typeof(KeyCode), m_InputName);
-                    if (Input.GetKeyDown(keycode)){
-                        if (m_IsActive == false){
-                            if (m_StopType == ActionStopType.ButtonToggle)
-                                m_ActionStopToggle = true;
+                switch (m_StartType)
+                {
+                    case ActionStartType.Automatic:
+                        if (m_IsActive == false)
                             return true;
+                        break;
+                    case ActionStartType.Manual:
+                        if (m_IsActive == false)
+                            return true;
+                        break;
+                    case ActionStartType.ButtonDown:
+                        
+                        for (int i = 0; i < m_KeyCodes.Length; i++){
+                            if (Input.GetKeyDown(m_KeyCodes[i])){
+                                if (m_StopType == ActionStopType.ButtonToggle)
+                                    m_ActionStopToggle = true;
+                                m_InputIndex = i;
+
+                                return true;
+                            }
                         }
-                    }
-                    break;
-                case ActionStartType.DoublePress:
-                    if (m_IsActive == false)
-                        return true;
-                    break;
+                        break;
+                    case ActionStartType.DoublePress:
+                        
+                        for (int i = 0; i < m_KeyCodes.Length; i++){
+                            if (CheckDoubleTap(m_KeyCodes[i])){
+                                return true;
+                            }
+                        }
+                        break;
+                }
             }
+
             return false;
         }
 
@@ -196,6 +218,7 @@
             switch (m_StopType)
             {
                 case ActionStopType.Automatic:
+                    
                     for (int index = 0; index < m_Animator.layerCount; index++){
                         if (m_Animator.GetCurrentAnimatorStateInfo(index).IsName(m_StateName)){
                             Debug.LogFormat("Stopping Action State {0}", m_StateName);
@@ -206,6 +229,7 @@
                     m_IsActive = false;
                     return true;
                 case ActionStopType.Manual:
+                    
                     if(m_IsActive){
                         m_IsActive = false;
                         return true;
@@ -213,15 +237,19 @@
                     return false;
 
                 case ActionStopType.ButtonUp:
-                    KeyCode keycode = (KeyCode)Enum.Parse(typeof(KeyCode), m_InputName);
-                    if (Input.GetKeyUp(keycode)){
+
+                    if (Input.GetKeyUp(m_KeyCodes[m_InputIndex]))
+                    {
+                        m_InputIndex = -1;
                         m_IsActive = false;
                         return true;
                     }
                     break;
                 case ActionStopType.ButtonToggle:
+                    
                     if (m_ActionStopToggle){
-                        if (Input.GetKeyDown(m_Keycode)){
+                        if (Input.GetKeyDown(m_KeyCodes[m_InputIndex])){
+                            m_InputIndex = -1;
                             m_ActionStopToggle = false;
                             m_IsActive = false;
                             return true;

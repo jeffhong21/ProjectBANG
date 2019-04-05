@@ -103,7 +103,7 @@ namespace CharacterController
             EditorGUILayout.PropertyField(m_Script);
             GUI.enabled = true;
             //m_ShowCharPhysicsFoldout = Foldout("Character Locomtion", m_ShowCharPhysicsFoldout);
-            m_ShowCharMotorFoldout = EditorGUILayout.Foldout(m_ShowCharMotorFoldout, PhysicsFoldoutHeader);
+            m_ShowCharMotorFoldout = EditorGUILayout.Foldout(m_ShowCharMotorFoldout, MotorFoldoutHeader);
             if(m_ShowCharMotorFoldout)
             {
                 EditorGUILayout.PropertyField(m_UseRootMotion);

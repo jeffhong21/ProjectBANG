@@ -36,7 +36,7 @@
         [Header("--  Targets --")]
         [SerializeField] private Transform m_RightHandTarget;
         [SerializeField] private Transform m_LeftHandTarget;
-        private Transform m_RightHand, m_LeftHand, m_UpperChest, m_RightShoulder;
+        private Transform m_RightHand, m_LeftHand, m_UpperChest, m_RightShoulder, m_Head;
         private Transform m_AimPivot;
 
         [Header("--  States --")]
@@ -102,7 +102,7 @@
             m_LeftHand = m_Animator.GetBoneTransform(HumanBodyBones.LeftHand).transform;
             m_UpperChest = m_Animator.GetBoneTransform(HumanBodyBones.UpperChest).transform;
             m_RightShoulder = m_Animator.GetBoneTransform(HumanBodyBones.RightShoulder).transform;
-
+            m_Head = m_Animator.GetBoneTransform(HumanBodyBones.Head).transform;
 
             m_AimPivot = new GameObject("Aim Pivot").transform;
             m_AimPivot.transform.parent = gameObject.transform;
@@ -225,6 +225,7 @@
 
             m_AimPivot.position = m_RightShoulder.position;
             m_TargetDirection = m_Controller.LookAtPoint - m_AimPivot.position;
+            //m_TargetDirection = (m_Head.position + m_Head.forward * 5) - m_AimPivot.position;
             if (m_TargetDirection == Vector3.zero)
                 m_TargetDirection = m_AimPivot.forward;
             m_TargetRotation = Quaternion.LookRotation(m_TargetDirection);
@@ -275,6 +276,7 @@
 
             m_Animator.SetLookAtWeight(m_TargetLookAtWeight, m_LookAtBodyWeight, m_LookAtHeadWeight, m_LookAtEyesWeight, m_LookAtClampWeight);
             m_Animator.SetLookAtPosition( m_Controller.LookAtPoint + m_LookAtOffset);
+            //m_Animator.SetLookAtPosition((m_Head.position + m_Head.forward * 5) + m_LookAtOffset);
             //m_Animator.SetLookAtPosition(m_Transform.forward + (Vector3.up * 1.35f) + m_LookAtOffset);
         }
 

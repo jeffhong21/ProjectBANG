@@ -36,7 +36,7 @@ namespace CharacterController
         private bool m_IsCrouching, m_IsRunning, m_IsAiming, m_InCover;
         [Header("-- Debug Settings --")]
         //[SerializeField, DisplayOnly]
-        private float m_Horizontal, m_Vertical;
+        private float m_Horizontal, m_Forward;
         //[SerializeField, DisplayOnly]
         private Vector3 m_InputVector;
         [SerializeField, DisplayOnly]
@@ -54,6 +54,7 @@ namespace CharacterController
         private Vector3 m_ScreenCenter = new Vector3(0.5f, 0.5f, 0);
         [SerializeField]
         private CameraController m_CameraController;
+        private Transform m_Camera;
         private CharacterLocomotion m_Controller;
         private ItemActionManager m_ItemAction;
         //private LayerManager m_LayerManager;
@@ -95,10 +96,12 @@ namespace CharacterController
             {
                 m_CameraController = Instantiate(m_CameraController) as CameraController;
                 m_CameraController.SetMainTarget(m_GameObject);
+                m_Camera = m_CameraController.Camera.transform;
             }
             else if(m_CameraController == null && CameraController.Instance != null){
                 m_CameraController = CameraController.Instance;
                 m_CameraController.SetMainTarget(m_GameObject);
+                m_Camera = m_CameraController.Camera.transform;
             }
             else{
                 Debug.LogError("Player has no Camera");
@@ -114,73 +117,96 @@ namespace CharacterController
 
 
 
-        private bool CheckDoubleTap(KeyCode key)
-        {
-            if(Input.GetKeyDown(key) && m_FirstButtonPressed == key){
-                m_FirstButtonPressed = KeyCode.F12;
-                if(Time.time - m_TimeOfFirstButtoonPressed < m_DoubleTapInputTime){
-                    return true;
-                }
-            }
-            if(Input.GetKeyDown(key) && m_FirstButtonPressed != key){
-                m_FirstButtonPressed = key;
-                m_TimeOfFirstButtoonPressed = Time.time;
-                return false;
-            }
-
-            return false;
-        }
 
 
-
-
+        [SerializeField]
+        float angleY;
 		private void FixedUpdate()
 		{
-            CameraInput();
-            //SetCameraPosition();
+            m_Horizontal = GetAxis(m_HorizontalInputName, false);
+            m_Forward = GetAxis(m_VerticalInputName, false);
+
+            m_MouseHorizontal = Input.GetAxis(m_RotateCameraXInput);
+            m_MouseVertical = Input.GetAxis(m_RotateCameraYInput);
+
+
+            if(m_CameraController != null){
+                m_InputVector = m_Horizontal * m_Camera.right + m_Forward * m_Camera.forward;
+                //m_InputVector.Set(m_Horizontal, 0, m_Forward);
+                m_Controller.InputVector = m_InputVector;
+            } else {
+                m_InputVector = m_Horizontal * Vector3.right + m_Forward * Vector3.forward;
+                m_Controller.InputVector = m_InputVector;
+            }
+
+
+
+            //m_Ray.origin = m_CameraController.Camera.transform.position;
+            //m_Ray.direction = m_CameraController.Camera.transform.forward;
+            //m_Controller.LookDirection = m_Ray.GetPoint(m_RayLookDistance) - m_CameraController.Camera.transform.position;
+            //m_Controller.LookAtPoint = m_Ray.GetPoint(m_RayLookDistance);
+
+            m_MouseInputVector.Set(m_MouseHorizontal, m_MouseVertical, m_CameraController.Camera.nearClipPlane);
+            var viewport = m_CameraController.Camera.ViewportToWorldPoint(m_MouseInputVector);
+
+            //var direction = m_Transform.position - m_CameraController.Camera.transform.position;
+            var direction = m_Transform.position - viewport;
+            direction.y = 0;
+            direction.Normalize();
+            //direction = direction * Mathf.Abs(m_CameraController.Camera.transform.localPosition.z);
+            //direction = direction * 5;
+
+
+            //m_Controller.LookDirection = (m_Transform.position + direction * Mathf.Abs(m_CameraController.Camera.transform.localPosition.z)) - m_CameraController.Camera.transform.position;
+            //m_Controller.LookDirection = m_Controller.LookDirection + (Vector3.up * 1.5f);
+
+            m_Controller.LookAtPoint = m_CameraController.Camera.transform.position + m_CameraController.Camera.transform.forward * 8;
+            //m_Controller.LookAtPoint = m_Transform.position + (Vector3.up * 1.5f) + m_Controller.LookDirection;
+
+            var lookDirection = m_Controller.LookAtPoint - m_Transform.position + (m_CameraController.Camera.transform.right * .5f);
+            //lookDirection = lookDirection - m_Transform.right * 0.5f;
+            lookDirection.y = 0;
+            //lookDirection.Normalize();
+            lookDirection = lookDirection.normalized * 5f;
+            m_Controller.LookDirection = lookDirection ;
+
+            //Debug.DrawRay(m_CameraController.Camera.transform.position, direction, Color.green);
+            Debug.DrawRay(m_Transform.position  + (m_CameraController.Camera.transform.right * .5f), lookDirection, Color.yellow);
+            Debug.DrawRay(m_CameraController.Camera.transform.position, m_CameraController.Camera.transform.forward * 8, Color.blue);
+
+
+            if(m_Controller.IndependentLook()){
+
+            }
+            else{
+                direction.y = m_Transform.position.y;
+                if (direction != Vector3.zero)
+                    m_Controller.LookRotation = Quaternion.LookRotation(direction, Vector3.up);
+                else
+                    m_Controller.LookRotation = m_Transform.rotation;
+
+
+            }
+
+            //m_Controller.LookDirection = m_CameraController.Camera.transform.forward * 10;
 		}
 
 
 		private void Update()
         {
+            //  Set input vectors.
+            //SetInputVector(m_UseAxisRaw);
+            SetTargetLookAt();
+            //  Aim
+            Aim(m_AimInput);
+            //  Use current item
+            UseItem(m_UseItemInput);
+            //  Reload
+            Reload(m_ReloadInput);
+
+
             CameraInput();
 
-            if(m_Controller)
-            {
-                m_ActionInputTimer += m_DeltaTime;
-
-                //  Set input vectors.
-                SetInputVector(m_UseAxisRaw);
-                SetTargetLookAt();
-
-                if (Input.GetKeyDown(KeyCode.X)) m_Controller.Running = !m_Controller.Running;
-
-                Aim(m_AimInput);
-                //  Crouch
-                Crouch(m_CrouchInput);
-                ////  Cover
-                //EnterCover(KeyCode.W);
-                //  Roll
-                ForwardAction(KeyCode.Space);
-                //  Dodge
-                Dodge();
-                // Run.
-                Run(m_RunInput);
-
-
-                //  Use current item
-                UseItem(m_UseItemInput);
-                //  Reload
-                Reload(m_ReloadInput);
-                //  Switch item back
-                SwitchItem(m_SwitchItemBack, true);
-                //  Switch item forward
-                SwitchItem(m_SwitchItemFwd, false);
-                //  Interact
-                Interact(m_InteractInput);
-            }
-
-            //  For Debugging.
             DebugButtonPress();
         }
 
@@ -197,9 +223,9 @@ namespace CharacterController
 		private void SetInputVector(bool useAxisRaw)
         {
             m_Horizontal = GetAxis(m_HorizontalInputName, useAxisRaw);
-            m_Vertical = GetAxis(m_VerticalInputName, useAxisRaw);
+            m_Forward = GetAxis(m_VerticalInputName, useAxisRaw);
 
-            m_InputVector.Set(m_Horizontal, 0, m_Vertical);
+            m_InputVector.Set(m_Horizontal, 0, m_Forward);
             m_Controller.InputVector = m_InputVector;
 
             m_MouseHorizontal = Input.GetAxis(m_RotateCameraXInput);
@@ -213,9 +239,8 @@ namespace CharacterController
             //  Set Look Rotation
             //m_Controller.LookRotation = Quaternion.Euler(m_Transform.eulerAngles.x, m_CameraController.transform.eulerAngles.y, m_Transform.eulerAngles.z);
 
-
-
         }
+
 
 
         private void SetTargetLookAt()
@@ -225,14 +250,41 @@ namespace CharacterController
             ////var lookDirection = Vector3.
             //m_Controller.LookDirection = direction * 5;
 
-            m_Ray.origin = m_CameraController.Camera.transform.position;
-            m_Ray.direction = m_CameraController.Camera.transform.forward;
-            m_Controller.LookDirection = m_Ray.GetPoint(m_RayLookDistance) - m_CameraController.Camera.transform.position;
-            m_Controller.LookAtPoint = m_Ray.GetPoint(m_RayLookDistance);
+            //m_Ray.origin = m_CameraController.Camera.transform.position;
+            //m_Ray.direction = m_CameraController.Camera.transform.forward;
+            //m_Controller.LookDirection = m_Ray.GetPoint(m_RayLookDistance) - m_CameraController.Camera.transform.position;
+            //m_Controller.LookAtPoint = m_Ray.GetPoint(m_RayLookDistance);
         }
 
 
 
+        #region Camera methods
+
+        private void CameraInput()
+        {
+            if (m_CameraController == null) return;
+
+            m_MouseHorizontal = Input.GetAxis(m_RotateCameraXInput);
+            m_MouseVertical = Input.GetAxis(m_RotateCameraYInput);
+
+            m_CameraController.RotateCamera(m_MouseHorizontal, m_MouseVertical);
+            m_CameraController.ZoomCamera(Input.GetAxisRaw(m_MouseScrollInput));
+
+
+        }
+
+
+
+        private void LockCameraRotation()
+        {
+            if (Input.GetKeyDown(KeyCode.L)){
+                if (CameraController.Instance != null){
+                    CameraController.LockRotation = !CameraController.LockRotation;
+                }
+            }
+        }
+
+        #endregion
 
 
 
@@ -256,101 +308,6 @@ namespace CharacterController
         }
 
 
-        private void ForwardAction(KeyCode keycode)
-        {
-            if (m_ActionInputTimer < m_ActionInputDelay) return;
-
-            if (CheckDoubleTap(keycode))
-            {
-                var coverAction = m_Controller.GetAction<Cover>();
-                if (!coverAction.IsActive){
-                    //  If can't enter cover, than roll forward.
-                    if(m_Controller.TryStartAction(coverAction) == false){
-                        var rollAction = m_Controller.GetAction<Roll>();
-                        if (!rollAction.IsActive){
-                            m_Controller.TryStartAction(rollAction);
-                        }
-                    }
-                }
-                else{
-                    //  Stop Cover Action if it is active.
-                    m_Controller.TryStopAction(coverAction);
-                }
-
-                m_ActionInputTimer = 0;
-            }
-        }
-
-
-
-
-
-        private void Dodge()
-        {
-            if (m_ActionInputTimer < m_ActionInputDelay) return;
-
-            bool executeAction = false;
-            int actionIntData = 0;
-
-            if (CheckDoubleTap(KeyCode.S))
-            {
-                actionIntData = 0;
-                executeAction = true;
-            }
-            else if (CheckDoubleTap(KeyCode.A))
-            {
-                actionIntData = 1;
-                executeAction = true;
-            }
-            else if (CheckDoubleTap(KeyCode.D))
-            {
-                actionIntData = 2;
-                executeAction = true;
-            }
-
-            if(executeAction){
-                var action = m_Controller.GetAction<Dodge>();
-                if (action != null){
-                    action.SetDodgeDirection(actionIntData);
-                    m_Controller.TryStartAction(action);
-
-                    m_ActionInputTimer = 0;
-                }
-            }
-        }
-
-
-        private void Crouch(KeyCode keycode)
-        {
-            if (Input.GetKeyDown(keycode)){
-                var action = m_Controller.GetAction<Crouch>();
-                if (!action.IsActive)
-                {
-                    m_IsCrouching = m_Controller.TryStartAction(action);
-                }
-                else{
-                    m_Controller.TryStopAction(action);
-                    m_IsCrouching = false;
-                }
-            }
-        }
-
-
-        private void Run(KeyCode keycode)
-        {
-            if (Input.GetKey(keycode)){
-                m_Controller.SpeedChangeMultiplier = 1.5f;
-            } else {
-                m_Controller.SpeedChangeMultiplier = 1f;
-            }
-            //m_Controller.Running = Input.GetKey(keycode);
-        }
-
-
-
-
-
-
         public void UseItem(KeyCode keycode)
         {
             if (Input.GetKeyDown(keycode)){
@@ -371,40 +328,6 @@ namespace CharacterController
         }
 
 
-        public void SwitchItem(KeyCode keycode, bool next)
-        {
-            if (Input.GetKeyDown(keycode))
-            {
-                m_ItemAction.SwitchItem(next);
-            }
-        }
-
-
-        public void EquipItem(KeyCode keycode, int index)
-        {
-            if (Input.GetKeyDown(keycode))
-            {
-                m_ItemAction.EquipItem(index);
-            }
-
-        }
-
-        public void Interact(KeyCode keycode)
-        {
-            if (Input.GetKeyDown(keycode))
-            {
-               // m_Controller.PlayInteractAnimation();
-
-                //var action = m_Controller.GetAction<MoveTowards>();
-                //if(action != null){
-                //    if (!action.IsActive){
-                //        action.ActionStartLocation = m_Transform.forward;
-                //        m_Controller.TryStartAction(action);
-                //    }
-                //}
-
-            }
-        }
 
 
         //public void DropItem(int itemID)
@@ -413,46 +336,6 @@ namespace CharacterController
         //}
 
         #endregion
-
-
-
-        # region Camera methods
-
-        private void CameraInput()
-        {                                
-            if (m_CameraController == null) return;
-
-            m_CameraController.RotateCamera(m_MouseHorizontal, m_MouseVertical);
-            m_CameraController.ZoomCamera(Input.GetAxisRaw(m_MouseScrollInput));
-
-            //m_Controller.UpdateLookDirection(m_CameraController != null ? m_CameraController.transform : null);
-            //RotateWithAnotherTransform(m_CameraController.transform);
-            //if (m_Controller.Aiming)  RotateWithAnotherTransform(m_CameraController.transform);
-        }
-
-
-        public virtual void RotateWithAnotherTransform(Transform referenceTransform)
-        {
-            //Quaternion rot = Quaternion.LookRotation()
-            var newRotation = new Vector3(m_Transform.eulerAngles.x, referenceTransform.eulerAngles.y, m_Transform.eulerAngles.z);
-            var targetRotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(newRotation), m_Controller.AimRotationSpeed * Time.fixedDeltaTime);
-            m_Controller.SetRotation(Quaternion.Euler(newRotation));
-        }
-
-
-
-
-        private void LockCameraRotation()
-        {
-            if (Input.GetKeyDown(KeyCode.L)){
-                if (CameraController.Instance != null){
-                    CameraController.LockRotation = !CameraController.LockRotation;
-                }
-            }
-        }
-
-        #endregion
-
 
 
 

@@ -82,12 +82,17 @@ namespace CharacterController
         //  Start
 		public override bool CanStartAction()
         {
-            RaycastHit hit;
-            if (Physics.Raycast(m_ObjectDetector.position, m_ObjectDetector.forward, out hit, m_TakeCoverDistance, m_CoverLayer)){
-                m_TargetPosition = hit.point + (hit.normal * (m_CapsuleCollider.radius * 0.33f));
-                m_TargetPosition.y = m_Controller.transform.position.y;
-                return true;
+            if(base.CanStartAction())
+            {
+                RaycastHit hit;
+                if (Physics.Raycast(m_ObjectDetector.position, m_ObjectDetector.forward, out hit, m_TakeCoverDistance, m_CoverLayer))
+                {
+                    m_TargetPosition = hit.point + (hit.normal * (m_CapsuleCollider.radius * 0.33f));
+                    m_TargetPosition.y = m_Controller.transform.position.y;
+                    return true;
+                }
             }
+
             return false;
         }
 
@@ -111,7 +116,10 @@ namespace CharacterController
         }
 
 
-        protected override void ActionStopped()
+
+
+
+		protected override void ActionStopped()
         {
 
             //  Get merge index.

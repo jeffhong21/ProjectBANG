@@ -83,8 +83,10 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
             m_PlayerInstance = Spawn(m_PlayerPrefab, m_SpawnPoints[0].Position, m_SpawnPoints[0].Rotation);
         }
 
-        if (m_CharacterHUD != null) m_CharacterHUD = Instantiate(m_CharacterHUD);
-        if (m_ItemHUD != null) m_ItemHUD = Instantiate(m_ItemHUD);
+        if (m_CharacterHUD != null)
+            m_CharacterHUD = Instantiate(m_CharacterHUD);
+        if (m_ItemHUD != null)
+            m_ItemHUD = Instantiate(m_ItemHUD);
 
         SetCameraTarget(m_PlayerInstance);
     }

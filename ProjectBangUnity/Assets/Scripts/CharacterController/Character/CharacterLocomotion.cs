@@ -57,13 +57,14 @@
 
 
         [Header("-- Debug --")]
+        [SerializeField, DisplayOnly]
         private bool m_Grounded = true;
         private bool m_Moving, m_Aiming, m_Running = true;
         //[SerializeField, DisplayOnly]
         private float m_Speed;
         [SerializeField, DisplayOnly]
-        private float m_MoveAmount;
-        [SerializeField, DisplayOnly]
+        private float m_MoveAmount, m_TurnAmount;
+        //[SerializeField, DisplayOnly]
         private Vector3 m_Velocity, m_RootMotionVelocity, m_MoveDirection, m_LookDirection;
         [SerializeField, DisplayOnly]
         private Vector3 m_InputVector, m_RelativeInputVector;
@@ -231,7 +232,6 @@
 		}
 
 
-
 		private void Update()
 		{
             if (m_DeltaTime == 0) return;
@@ -249,13 +249,15 @@
 
 		private void FixedUpdate()
         {
+            m_InputVector = m_InputVector.normalized;
 
             //m_Grounded = CheckGround();
             m_Grounded = CheckGround_2();
 
-            if (m_UpdateRotation) UpdateRotation();
-            if (m_UpdateMovement) UpdateMovement();
-
+            if (m_UpdateRotation)
+                UpdateRotation();
+            if (m_UpdateMovement)
+                UpdateMovement();
 
 
             _rigidbodyVelocity = m_Rigidbody.velocity;
@@ -263,12 +265,21 @@
         }
 
 
+        //  Should the character look independetly of the camera?  AI Agents do not need to use camera rotation.
+        public bool IndependentLook()
+        {
+            if(m_Aiming){
+                return false;
+            }
+            return true;
+        }
+
 
         private bool CheckGround_2()
         {
             m_MoveDirection = m_Transform.forward * m_InputVector.z + m_Transform.right * m_InputVector.x;
             float radius = m_CapsuleCollider.radius * 0.9f;
-            if(Physics.SphereCast(m_Transform.position, radius, -Vector3.up, out m_GroundHit, m_CapsuleCollider.radius + m_AlignToGroundDepthOffset + m_SkinWidth, m_Layers.SolidLayer))
+            if(Physics.SphereCast(m_Transform.position, radius, -Vector3.up, out m_GroundHit, m_CapsuleCollider.radius + m_SkinWidth, m_Layers.SolidLayer))
             {
                 Vector3 targetPosition = m_Transform.position;
                 targetPosition.y = m_GroundHit.point.y;
@@ -336,37 +347,39 @@
         //  Update the rotation forces.
         private void UpdateRotation()
         {
-            m_Rigidbody.angularDrag = (m_Aiming ? m_AimRotationSpeed : m_RotationSpeed) / 2;
+            ////m_Rigidbody.angularDrag = (m_Aiming ? m_AimRotationSpeed : m_RotationSpeed) / 2;
+            //eulerY = Mathf.Rad2Deg * (m_Aiming ? m_AimRotationSpeed : m_RotationSpeed) * m_DeltaTime;
+            //eulerY *= m_RelativeInputVector.x;
+            ////eulerY += m_Transform.eulerAngles.y;
+            ////eulerY = Mathf.Atan2(m_RelativeInputVector.z, m_RelativeInputVector.x * (m_Aiming ? m_AimRotationSpeed : m_RotationSpeed)) * Mathf.Rad2Deg;
+            //m_LookRotation = m_LookRotation * Quaternion.AngleAxis(eulerY, m_Transform.up);
+            ////m_Rigidbody.AddRelativeTorque(Vector3.up * eulerY);
 
-            eulerY = Mathf.Rad2Deg * (m_Aiming ? m_AimRotationSpeed : m_RotationSpeed) * m_DeltaTime;
-            eulerY *= m_RelativeInputVector.x;
-            //eulerY += m_Transform.eulerAngles.y;
-
-            //eulerY = Mathf.Atan2(m_RelativeInputVector.z, m_RelativeInputVector.x * (m_Aiming ? m_AimRotationSpeed : m_RotationSpeed)) * Mathf.Rad2Deg;
-
-            m_LookRotation = m_LookRotation * Quaternion.AngleAxis(eulerY, m_Transform.up);
-            //m_Rigidbody.AddRelativeTorque(Vector3.up * eulerY);
+            m_LookRotation = Quaternion.Slerp(m_Transform.rotation, m_LookRotation.normalized, m_RotationSpeed * m_DeltaTime);
+            m_Rigidbody.MoveRotation(m_LookRotation);
+            m_TurnAmount = Mathf.Atan2(m_InputVector.x, m_InputVector.z);
         }
 
 
         //  Apply any movement.
         private void UpdateMovement()
         {
-            if (m_SlopeAngle >= m_SlopeLimit) return;
+            //if (m_SlopeAngle >= m_SlopeLimit) return;
 
-            m_InputVector = m_InputVector.normalized;
             //m_MoveDirection = m_InputVector.normalized.x * m_Transform.right * m_StrafeSpeed + m_InputVector.normalized.z * m_Transform.forward * m_MovementSpeed;
-            m_MoveDirection = m_InputVector.x * m_Transform.right * m_StrafeSpeed + m_InputVector.z * m_Transform.forward * m_MovementSpeed;
+            m_MoveDirection = m_InputVector.x * m_Transform.right + m_InputVector.z * m_Transform.forward;
+            m_MoveDirection.z = m_MoveDirection.z * m_MovementSpeed;
+            m_MoveDirection.x = m_MoveDirection.x * m_StrafeSpeed;
+
+            m_Velocity = m_MoveDirection * m_MoveAmount;
+            m_Velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
+            m_Rigidbody.AddForce(m_Velocity, ForceMode.Acceleration);
 
             if(m_MoveAmount > 0.1f){
                 m_Rigidbody.drag = 0;
             } else {
-                m_Rigidbody.drag = m_Rigidbody.mass;
+                m_Rigidbody.drag = 5;
             }
-
-            m_Velocity = m_MoveDirection * m_MoveAmount;
-            m_Velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
-            m_Rigidbody.AddRelativeForce(m_MoveDirection * m_FixedDeltaTime, ForceMode.VelocityChange);
 
         }
 
@@ -396,12 +409,16 @@
         {
             if (m_UseRootMotion)
             {
-                m_LookRotation = Quaternion.Slerp(m_Transform.rotation, m_LookRotation * m_Animator.deltaRotation, (m_Aiming ? m_AimRotationSpeed : m_RotationSpeed) * m_DeltaTime);
-                m_Rigidbody.MoveRotation(m_LookRotation.normalized);
+                //m_LookRotation = Quaternion.Slerp(m_Transform.rotation, m_LookRotation * m_Animator.deltaRotation, (m_Aiming ? m_AimRotationSpeed : m_RotationSpeed) * m_DeltaTime);
+                //m_Rigidbody.MoveRotation(m_LookRotation.normalized);
 
-                m_RootMotionVelocity = m_Velocity + (m_Animator.deltaPosition * m_RootMotionSpeedMultiplier) / m_DeltaTime;
-                m_RootMotionVelocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
-                m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_RootMotionVelocity, m_MovementSpeed * m_DeltaTime);
+                //m_RootMotionVelocity = m_Velocity + (m_Animator.deltaPosition * m_RootMotionSpeedMultiplier) / m_DeltaTime;
+                //m_RootMotionVelocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
+                //m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_RootMotionVelocity, m_MovementSpeed * m_DeltaTime);
+
+                m_RootMotionVelocity = (m_Animator.deltaPosition * m_RootMotionSpeedMultiplier) / m_DeltaTime;
+                m_RootMotionVelocity.y = 0;
+                m_Rigidbody.velocity = m_RootMotionVelocity;
             }
 
         }
@@ -707,6 +724,9 @@
 
                 Gizmos.color = Color.magenta;
                 Gizmos.DrawRay(m_Transform.position + (Vector3.up * 1.35f), m_LookDirection);
+
+                Gizmos.color = Color.magenta;
+                Gizmos.DrawSphere(m_LookAtPoint, 0.2f);
             }
 
             //if (m_DrawDebugLine)

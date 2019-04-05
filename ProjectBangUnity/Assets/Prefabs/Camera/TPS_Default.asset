@@ -13,21 +13,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   StateName: TPS_Default
   ViewDistance: 3.5
-  VerticalOffset: 1.5
-  ApplyYawLimit: 1
-  MinYaw: 0
-  MaxYaw: 0
+  VerticalOffset: 1
+  ApplyYawLimit: 0
+  MinYaw: -75
+  MaxYaw: 75
   ApplyPitchLimit: 1
-  MinPitch: -45
+  MinPitch: -10
   MaxPitch: 65
   ApplyCameraOffset: 1
-  CameraOffset: {x: 0, y: 1, z: 0}
+  CameraOffset: {x: 0, y: 0, z: 0}
   FieldOfView: 64
   FieldOfViewSpeed: 5
   ApplyTurn: 1
   TurnSmooth: 0.12
-  TurnSpeed: 2
-  ApplyRotation: 1
+  TurnSpeed: 3
+  ApplyRotation: 0
   RotationSpeed: 6
   ApplyStepZoom: 0
   StepZoomSensitivity: 1

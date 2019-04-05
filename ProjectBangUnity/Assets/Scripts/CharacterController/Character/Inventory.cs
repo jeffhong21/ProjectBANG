@@ -24,11 +24,11 @@
 
 
 
-        //[Header("-- Default Loadout --")]
+        //[Header("-- Default CurrentLoadout --")]
         [SerializeField]
         protected ItemAmount[] m_DefaultLoadout;
         [SerializeField]
-        protected ItemType[] m_Loadout;
+        protected ItemType[] m_CurrentLoadout;
         //[SerializeField]
         protected int m_NextInventorySlot;
         [SerializeField]
@@ -57,8 +57,8 @@
             set { m_DefaultLoadout = value; }
         }
 
-        public ItemType[] Loadout{
-            get { return m_Loadout; }
+        public ItemType[] CurrentLoadout{
+            get { return m_CurrentLoadout; }
         }
 
         public int EquippedItemIndex{
@@ -67,13 +67,13 @@
                 if (m_EquippedItem == null)
                     m_EquippedItemIndex = -1;
                 else 
-                    m_EquippedItemIndex = Mathf.Clamp(value, 0, m_Loadout.Length);
+                    m_EquippedItemIndex = Mathf.Clamp(value, 0, m_CurrentLoadout.Length);
             }
         }
 
         public int NextInventorySlot{
             get{
-                m_NextInventorySlot = Array.IndexOf(m_Loadout, null);
+                m_NextInventorySlot = Array.IndexOf(m_CurrentLoadout, null);
                 return m_NextInventorySlot;
             }
         }
@@ -101,7 +101,7 @@
             m_AnimatorMonitor = GetComponent<AnimatorMonitor>();
             m_Animator = GetComponent<Animator>();
             m_Inventory = new Dictionary<ItemType, Item>();
-            m_Loadout = new ItemType[6];
+            m_CurrentLoadout = new ItemType[6];
 
             //  Setup item hands slots.
             CacheItemEquipSlots();
@@ -137,7 +137,7 @@
 
 		private void OnEnable()
 		{
-            EventHandler.RegisterEvent(gameObject, "OnItemEquip", OnItemEquip);
+            EventHandler.RegisterEvent(gameObject, "OnItemEquip", OnItemEquip); //  Event from animation
             EventHandler.RegisterEvent(gameObject, "OnItemUnequip", OnItemUnequip);
 		}
 
@@ -203,8 +203,8 @@
                     Item itemObject = InstantiateItem(item, parent);
                     PrimaryItem primaryItem = (PrimaryItem)item;
                     m_Inventory.Add(primaryItem, itemObject);
-                    //  Add item to the Loadout.
-                    m_Loadout[NextInventorySlot] = primaryItem;
+                    //  Add item to the CurrentLoadout.
+                    m_CurrentLoadout[NextInventorySlot] = primaryItem;
 
                     itemAddedToInventory = true;
                     //Debug.LogFormat("NextInventorySlot: {0} | m_NextInventorySlot: {1} | nextSlot {2} |", NextInventorySlot, m_NextInventorySlot, nextSlot);
@@ -293,9 +293,9 @@
         public ItemType GetNextItem(bool next)
         {
             int n = next ? 1 : -1;
-            for (int i = EquippedItemIndex + n; i < m_Loadout.Length || i < 0; i += n){
-                if(m_Loadout[i] != null){
-                    return m_Loadout[i];
+            for (int i = EquippedItemIndex + n; i < m_CurrentLoadout.Length || i < 0; i += n){
+                if(m_CurrentLoadout[i] != null){
+                    return m_CurrentLoadout[i];
                 }
             }
             return null;
@@ -352,7 +352,7 @@
         public void SwitchItem(bool next)
         {
             // If the current equipped item is the last in the inventory, than unequip item.
-            if((next && m_EquippedItemIndex == m_Loadout.Length) || (next == false && m_EquippedItemIndex == 0)){
+            if((next && m_EquippedItemIndex == m_CurrentLoadout.Length) || (next == false && m_EquippedItemIndex == 0)){
                 UnequipCurrentItem();
             }
             //  If nothiing is equipped, equip the first item.
@@ -364,7 +364,7 @@
                 m_EquippedItemIndex += nextItemIndex;
 
                 //  If next item is null, unequip item.
-                if(m_Loadout[m_EquippedItemIndex] == null){
+                if(m_CurrentLoadout[m_EquippedItemIndex] == null){
                     UnequipCurrentItem();
                 }
                 else{
@@ -380,7 +380,7 @@
         {
             if (m_Inventory.ContainsKey(item)){
                 if (item.GetType() == typeof(PrimaryItem)){
-                    var itemIndex = Array.IndexOf(m_Loadout, (PrimaryItem)item);
+                    var itemIndex = Array.IndexOf(m_CurrentLoadout, (PrimaryItem)item);
                     EquipItem(itemIndex);
                 }
             }
@@ -389,15 +389,20 @@
 
         public void EquipItem(int itemIndex)
         {
-            if (itemIndex >= m_Loadout.Length || itemIndex < 0){
+            if (itemIndex >= m_CurrentLoadout.Length || itemIndex < 0){
                 Debug.LogFormat("- {0}:  Equip ItemType index is incorrect.  ItemIndex: {1}", GetType(), itemIndex);
+                return;
+            }
+
+            if(m_CurrentLoadout[itemIndex] == m_EquippedItem){
+                UnequipCurrentItem();
                 return;
             }
 
             m_LastEquippedItem = m_EquippedItem;
 
-            //Debug.LogFormat("{0} is {1}", m_Loadout[itemIndex], m_Loadout[itemIndex] is PrimaryItem);
-            if (m_Loadout[itemIndex] is PrimaryItem)
+            //Debug.LogFormat("{0} is {1}", m_CurrentLoadout[itemIndex], m_CurrentLoadout[itemIndex] is PrimaryItem);
+            if (m_CurrentLoadout[itemIndex] is PrimaryItem)
             {
                 ////  Turn item object off.
                 //Item itemObject = GetCurrentItem(m_LastEquippedItem);
@@ -406,7 +411,7 @@
                 
                 //  Set equipped item and set index.
                 m_EquippedItemIndex = itemIndex;
-                m_EquippedItem = m_Loadout[itemIndex] as PrimaryItem;
+                m_EquippedItem = m_CurrentLoadout[itemIndex] as PrimaryItem;
                 //GetCurrentItem(m_EquippedItem).SetActive(true);
 
                 ////Debug.Log(m_Inventory[m_EquippedItem].Item);
@@ -416,7 +421,7 @@
                 m_Animator.SetInteger(HashID.ItemID, GetItem(m_EquippedItem).ItemID);
                 m_Animator.SetInteger(HashID.MovementSetID, GetItem(m_EquippedItem).MovementSetID);
 
-                EventHandler.ExecuteEvent(gameObject, "OnInventoryEquip", GetItem(m_Loadout[itemIndex]));
+                EventHandler.ExecuteEvent(gameObject, "OnInventoryEquip", GetItem(m_CurrentLoadout[itemIndex]));
                 return;
             }
         }
@@ -466,7 +471,9 @@
         {
             //m_Switching = true;
             //Debug.LogFormat("<color=magenta> OnItemEquip </color> | EquippedItem: {0}", m_EquippedItem);
-
+            if (m_LastEquippedItem != null)
+                GetItem(m_LastEquippedItem).SetActive(false);
+            
             if (m_EquippedItem != null)
                 m_Inventory[m_EquippedItem].SetActive(true);
         }
