@@ -62,13 +62,24 @@ namespace CharacterController.UI
 
         private void UseItem(ItemType itemType, float remaining)
         {
-            PrimaryItem item = (PrimaryItem)itemType;
-            m_ItemInfo.text = remaining + " / " + item.ConsumableItem.Capacity.ToString();
+            PrimaryItem primaryItem = (PrimaryItem)itemType;
+            //Debug.LogFormat("{0} was used.  {1} out of {2} remain loaded.", itemType.name, remaining, primaryItem.ConsumableItem.Capacity);
+
+            //m_ItemInfo.text = remaining + " | " + primaryItem.ConsumableItem.Capacity.ToString();
+            m_ItemInfo.text = string.Format("{0} | {1}", remaining, primaryItem.ConsumableItem.Capacity);
         }
 
         private void EquipItem(Item item)
         {
-            m_ItemInfo.text = item.name;
+            if(item == null){
+                m_ItemInfo.text = "";
+                m_ItemName.text = "Unarmed";
+            } else {
+                //var shootable = (ShootableWeapon)item;
+                m_ItemName.text = item.ItemType.name;
+                //m_ItemInfo.text = string.Format("{0} | {1}", shootable.CurrentAmmo, item.ItemType.ConsumableItem.Capacity);
+            }
+
         }
 
 	}

@@ -6,6 +6,8 @@ namespace CharacterController
     public class CharacterFootsteps : MonoBehaviour
     {
         [SerializeField]
+        protected bool m_SpawnFootprints;
+        [SerializeField]
         protected GameObject m_Decal;
         [SerializeField]
         protected AudioClip[] footstepClips = new AudioClip[0];
@@ -50,7 +52,7 @@ namespace CharacterController
 
         public void StepOnMesh(CharacterFootTrigger sender)
         {
-            if(Time.timeSinceLevelLoad > m_FootstepThreshold)
+            if(Time.timeSinceLevelLoad > m_FootstepThreshold && m_SpawnFootprints)
             {
                 m_currentStep = sender.transform;
                 RaycastHit hit;

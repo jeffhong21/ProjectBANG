@@ -103,9 +103,9 @@ ModelImporter:
     400094: Toes_R
     400096: UpperLeg_L
     400098: UpperLeg_R
-    7400000: Walk-Backward-Left
-    7400002: Pistol--Walk-Backward
-    7400004: Walk-Backward-Right
+    7400000: Walking Back Right
+    7400002: Walking Backwards
+    7400004: Walking Back Left
     9500000: //RootNode
   externalObjects: {}
   materials:
@@ -136,7 +136,7 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Pistol--Walk-Backward
+      name: Walking Backwards
       takeName: mixamo.com
       firstFrame: 0
       lastFrame: 31
@@ -164,7 +164,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Walk-Backward-Left
+      name: Walking Back Right
       takeName: mixamo.com
       firstFrame: 0
       lastFrame: 31
@@ -177,7 +177,7 @@ ModelImporter:
       loopTime: 1
       loopBlend: 1
       loopBlendOrientation: 0
-      loopBlendPositionY: 0
+      loopBlendPositionY: 1
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 0
       keepOriginalPositionY: 1
@@ -192,7 +192,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Walk-Backward-Right
+      name: Walking Back Left
       takeName: mixamo.com
       firstFrame: 0
       lastFrame: 31
@@ -205,7 +205,7 @@ ModelImporter:
       loopTime: 1
       loopBlend: 1
       loopBlendOrientation: 0
-      loopBlendPositionY: 0
+      loopBlendPositionY: 1
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 0
       keepOriginalPositionY: 1

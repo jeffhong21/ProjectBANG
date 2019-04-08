@@ -620,9 +620,9 @@ MonoBehaviour:
   m_FirePoint: {fileID: 4433258886810430}
   m_FireRate: 0.75
   m_FireCount: 1
-  m_CurrentAmmo: 30
-  m_MaxAmmo: 30
-  m_AutoReload: 0
+  m_CurrentAmmo: 18
+  m_MaxAmmo: 18
+  m_AutoReload: 1
   m_RecoilAmount: 0.1
   m_RotationRecoilAmount: 8
   m_Spread: 0.01
@@ -648,4 +648,4 @@ MonoBehaviour:
   m_DefaultDecal: {fileID: 0}
   m_DefaultDust: {fileID: 1030604309152162, guid: ed017de91831b481e8c7d14e692443a6,
     type: 2}
-  m_DrawAimLine: 0
+  m_DrawAimLine: 1

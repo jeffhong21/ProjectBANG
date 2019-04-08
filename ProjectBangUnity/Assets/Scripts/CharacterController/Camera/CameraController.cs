@@ -275,8 +275,8 @@
             m_CameraPosition.z = m_CameraPosition.z + (-m_CameraState.ViewDistance);
                 
 
-            m_PitchPivot.localPosition = Vector3.Lerp(m_PitchPivot.localPosition, m_PitchPivotPosition, 4 * m_DeltaTime);
-            m_Camera.transform.localPosition = Vector3.Lerp(m_Camera.transform.localPosition, m_CameraPosition, 4 * m_DeltaTime);
+            m_PitchPivot.localPosition = Vector3.Lerp(m_PitchPivot.localPosition, m_PitchPivotPosition, 12 * m_DeltaTime);
+            m_Camera.transform.localPosition = Vector3.Lerp(m_Camera.transform.localPosition, m_CameraPosition, 12 * m_DeltaTime);
 
             //m_TargetPosition = Vector3.Lerp(m_Transform.position, m_Anchor.position, time);
             m_TargetPosition = Vector3.SmoothDamp(m_Transform.position, m_Anchor.position, ref m_CameraVelocitySmooth, 0.12f);
@@ -343,8 +343,11 @@
 
 
             ////  Camera Look Towards Anchor.
-            //var lookDirection = m_Character.transform.position + (Vector3.up * m_CameraState.VerticalOffset) - m_Camera.transform.position;
-            //m_Camera.transform.rotation = Quaternion.LookRotation(lookDirection, Vector3.up);
+            //if (m_CameraState.ApplyCameraOffset){
+            //    var lookDirection = m_PitchPivot.transform.position - m_Camera.transform.position;
+            //    m_Camera.transform.rotation = Quaternion.LookRotation(lookDirection, Vector3.up);
+            //}
+
         }
 
 

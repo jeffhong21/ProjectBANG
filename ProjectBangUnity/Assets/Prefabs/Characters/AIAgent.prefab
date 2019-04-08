@@ -2065,7 +2065,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_DefaultLoadout: []
-  m_Loadout: []
+  m_CurrentLoadout: []
   m_EquipPoints:
     m_LeftHandSlot: {fileID: 114141458457246254}
     m_RightHandSlot: {fileID: 114845405759736800}
@@ -2118,7 +2118,7 @@ MonoBehaviour:
   m_TimeInvincibleAfterSpawn: 0
 --- !u!114 &114774922100011690
 MonoBehaviour:
-  m_ObjectHideFlags: 2
+  m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1761652248440620}
@@ -2130,7 +2130,7 @@ MonoBehaviour:
   m_IsActive: 0
   m_StateName: TakeDamage
   m_ActionID: 10
-  m_Keycode: 0
+  m_InputNames: []
   m_StartType: 0
   m_StopType: 0
   m_DamageTypeIndex: 0
@@ -2245,6 +2245,7 @@ MonoBehaviour:
   m_UseRootMotion: 1
   m_RootMotionSpeedMultiplier: 1
   m_MovementSpeed: 3.75
+  m_StrafeSpeed: 2.5
   m_SpeedChangeMultiplier: 1
   m_RotationSpeed: 12
   m_AimRotationSpeed: 8
@@ -2260,15 +2261,15 @@ MonoBehaviour:
   m_Actions:
   - {fileID: 114774922100011690}
   m_ActiveAction: {fileID: 0}
+  m_Grounded: 1
   m_MoveAmount: 0
-  m_Velocity: {x: 0, y: 0, z: 0}
-  m_MoveDirection: {x: 0, y: 0, z: 0}
-  m_LookDirection: {x: 0, y: 0, z: 0}
+  m_TurnAmount: 0
   m_InputVector: {x: 0, y: 0, z: 0}
+  m_RelativeInputVector: {x: 0, y: 0, z: 0}
+  eulerY: 0
   _rigidbodyVelocity: {x: 0, y: 0, z: 0}
   _rigidbodyAngularVelocity: {x: 0, y: 0, z: 0}
   m_DrawDebugLine: 0
-  rotationY: 0
 --- !u!135 &135193254563505052
 SphereCollider:
   m_ObjectHideFlags: 1
@@ -2413,7 +2414,7 @@ SkinnedMeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: f343dcd6a3e4344d6ae1aef064e6d16e, type: 2}
+  - {fileID: 2100000, guid: 43f33e4f2a38748f3a135a1495feb173, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

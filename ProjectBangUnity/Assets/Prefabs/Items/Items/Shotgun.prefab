@@ -611,7 +611,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61dbdf289aad34e608b9aebae0a464a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ItemType: {fileID: 0}
+  m_ItemType: {fileID: 11400000, guid: eff795c8b6e0c4b26b47624a847107c9, type: 2}
   m_ItemAnimName: Rifle
   m_ItemID: 2
   m_MovementSetID: 1
@@ -629,19 +629,19 @@ MonoBehaviour:
   m_RotationOffset: {x: -3.757, y: -0.897, z: -90.08401}
   m_Character: {fileID: 0}
   m_Controller: {fileID: 0}
-  m_FirePoint: {fileID: 4501097396352010, guid: d6d96d6a6b90843a49d7d851de6efc9c,
-    type: 2}
+  m_FirePoint: {fileID: 0}
   m_FireRate: 1
   m_FireCount: 1
   m_CurrentAmmo: 30
   m_MaxAmmo: 30
   m_AutoReload: 0
   m_RecoilAmount: 0.1
+  m_RotationRecoilAmount: 4
   m_Spread: 0.01
   m_Smoke: {fileID: 157586, guid: 2574ca206a571a342a7fab69fdfb87aa, type: 2}
   m_MuzzleFlash: {fileID: 0}
   m_SmokeLocation: {fileID: 4354005002595738}
-  m_FireSound: []
+  m_FireSounds: []
   m_FireSoundDelay: 0.1
   m_DamageAmount: 10
   m_ImpactForce: 5
@@ -649,6 +649,7 @@ MonoBehaviour:
   m_ImpactLayers:
     serializedVersion: 2
     m_Bits: 4294967295
+  m_Tracer: {fileID: 0}
   m_Projectile: {fileID: 0}
   m_DefaultDecal: {fileID: 166404, guid: 1b9f66cb9bb3047649bf932337e6b03a, type: 2}
   m_DefaultDust: {fileID: 1225023134673244, guid: b240e9cd471cf4e89b8f10b1b17812b3,

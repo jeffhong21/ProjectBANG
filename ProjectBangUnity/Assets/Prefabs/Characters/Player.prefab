@@ -168,18 +168,17 @@ GameObject:
   - component: {fileID: 114429236655991950}
   - component: {fileID: 114901688824212290}
   - component: {fileID: 114921923587186984}
-  - component: {fileID: 114786276463712790}
   - component: {fileID: 114776445558567580}
   - component: {fileID: 114908900733630684}
   - component: {fileID: 114484464717320762}
   - component: {fileID: 114641910215582532}
-  - component: {fileID: 114843526904343182}
   - component: {fileID: 114329433760099396}
   - component: {fileID: 114015622257898310}
   - component: {fileID: 114078442416988612}
   - component: {fileID: 114084608887600488}
   - component: {fileID: 114476249827600298}
   - component: {fileID: 114798496128796052}
+  - component: {fileID: 114031030444924998}
   m_Layer: 31
   m_Name: Player
   m_TagString: Player
@@ -2155,7 +2154,7 @@ Rigidbody:
   serializedVersion: 2
   m_Mass: 100
   m_Drag: 0
-  m_AngularDrag: 0
+  m_AngularDrag: 999
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 1
@@ -2167,7 +2166,7 @@ AudioSource:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1683485818438374}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
@@ -2262,7 +2261,7 @@ AudioSource:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1485629515918786}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
@@ -2371,7 +2370,7 @@ Animator:
   m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!114 &114015622257898310
 MonoBehaviour:
-  m_ObjectHideFlags: 1
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1141768220188808}
@@ -2387,6 +2386,24 @@ MonoBehaviour:
   m_StartType: 1
   m_StopType: 0
   m_ActionStartLocation: {x: 0, y: 0, z: 0}
+--- !u!114 &114031030444924998
+MonoBehaviour:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c80c40f5762314aa88bd0a12e74b5d0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: Shoot
+  m_ActionID: 0
+  m_InputNames:
+  - Mouse0
+  m_StartType: 2
+  m_StopType: 2
 --- !u!114 &114077551664450782
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2415,6 +2432,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa7477202022244aca8f8b4dfa3d0348, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_SpawnFootprints: 0
   m_Decal: {fileID: 1203368655300024, guid: 4bafa4351c495485790bee98073b5b46, type: 2}
   footstepClips:
   - {fileID: 8300000, guid: fc8da02e95435406f89db024451a0bb8, type: 3}
@@ -2427,7 +2445,7 @@ MonoBehaviour:
   m_FootstepTimer: 0.25
 --- !u!114 &114084608887600488
 MonoBehaviour:
-  m_ObjectHideFlags: 1
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1141768220188808}
@@ -2465,7 +2483,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1683485818438374}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7b35342f7be0e4c26a043469a2f91bb3, type: 3}
   m_Name: 
@@ -2529,7 +2547,7 @@ MonoBehaviour:
   m_LeftHandTarget: {fileID: 0}
 --- !u!114 &114329433760099396
 MonoBehaviour:
-  m_ObjectHideFlags: 1
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1141768220188808}
@@ -2596,7 +2614,7 @@ MonoBehaviour:
     clipLength: 0
 --- !u!114 &114476249827600298
 MonoBehaviour:
-  m_ObjectHideFlags: 1
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1141768220188808}
@@ -2616,7 +2634,7 @@ MonoBehaviour:
   m_StopType: 2
 --- !u!114 &114484464717320762
 MonoBehaviour:
-  m_ObjectHideFlags: 1
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1141768220188808}
@@ -2628,14 +2646,15 @@ MonoBehaviour:
   m_IsActive: 0
   m_StateName: Aim
   m_ActionID: 0
-  m_InputNames: []
-  m_StartType: 1
-  m_StopType: 1
+  m_InputNames:
+  - Mouse1
+  m_StartType: 2
+  m_StopType: 3
   m_ItemID: 0
   m_ItemName: 
 --- !u!114 &114641910215582532
 MonoBehaviour:
-  m_ObjectHideFlags: 1
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1141768220188808}
@@ -2672,7 +2691,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1485629515918786}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7b35342f7be0e4c26a043469a2f91bb3, type: 3}
   m_Name: 
@@ -2703,7 +2722,7 @@ MonoBehaviour:
   m_EquippedItem: {fileID: 0}
 --- !u!114 &114776445558567580
 MonoBehaviour:
-  m_ObjectHideFlags: 1
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1141768220188808}
@@ -2719,21 +2738,9 @@ MonoBehaviour:
   m_StartType: 0
   m_StopType: 0
   m_MinFallHeight: 1
---- !u!114 &114786276463712790
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c5fd0207bf574ec3bed3dfa045031d2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IsReloading: 0
 --- !u!114 &114798496128796052
 MonoBehaviour:
-  m_ObjectHideFlags: 1
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1141768220188808}
@@ -2755,23 +2762,6 @@ MonoBehaviour:
   m_ItemID: 0
   m_ItemName: 
   m_ItemType: {fileID: 0}
---- !u!114 &114843526904343182
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6154c3fa2c49643758284fb02e121cd3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IsActive: 0
-  m_StateName: Crouch
-  m_ActionID: 0
-  m_InputNames: []
-  m_StartType: 1
-  m_StopType: 1
 --- !u!114 &114901688824212290
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2794,7 +2784,7 @@ MonoBehaviour:
     m_Bits: 256
 --- !u!114 &114908900733630684
 MonoBehaviour:
-  m_ObjectHideFlags: 1
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1141768220188808}
@@ -2843,6 +2833,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_MouseHorizontal: 0
   m_MouseVertical: 0
+  m_LookDistance: 10
   m_LayerMask:
     serializedVersion: 2
     m_Bits: 0
@@ -2860,8 +2851,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_UseRootMotion: 1
   m_RootMotionSpeedMultiplier: 1
-  m_MovementSpeed: 2.75
-  m_StrafeSpeed: 2
+  m_MovementSpeed: 2
+  m_StrafeSpeed: 1.5
   m_SpeedChangeMultiplier: 1
   m_RotationSpeed: 8
   m_AimRotationSpeed: 12
@@ -2879,21 +2870,22 @@ MonoBehaviour:
   - {fileID: 114908900733630684}
   - {fileID: 114329433760099396}
   - {fileID: 114084608887600488}
-  - {fileID: 114843526904343182}
   - {fileID: 114798496128796052}
+  - {fileID: 114031030444924998}
   - {fileID: 114484464717320762}
   - {fileID: 114641910215582532}
   - {fileID: 114015622257898310}
   - {fileID: 114476249827600298}
   m_ActiveAction: {fileID: 0}
+  m_MovementType: 0
+  m_Grounded: 1
   m_MoveAmount: 0
   m_TurnAmount: 0
   m_InputVector: {x: 0, y: 0, z: 0}
   m_RelativeInputVector: {x: 0, y: 0, z: 0}
-  eulerY: 0
-  _rigidbodyVelocity: {x: 0, y: 0, z: 0}
-  _rigidbodyAngularVelocity: {x: 0, y: 0, z: 0}
   m_DrawDebugLine: 1
+  angleOut: 0
+  direction: 0
 --- !u!135 &135562184133563358
 SphereCollider:
   m_ObjectHideFlags: 1
@@ -2902,7 +2894,7 @@ SphereCollider:
   m_GameObject: {fileID: 1485629515918786}
   m_Material: {fileID: 0}
   m_IsTrigger: 1
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.1
   m_Center: {x: 0, y: 0, z: 0}
@@ -2914,7 +2906,7 @@ SphereCollider:
   m_GameObject: {fileID: 1683485818438374}
   m_Material: {fileID: 0}
   m_IsTrigger: 1
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.1
   m_Center: {x: 0, y: 0, z: 0}

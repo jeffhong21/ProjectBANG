@@ -239,25 +239,25 @@ namespace CharacterController.AI
 
 
 
-        public void _SetAgentMoveType()
-        {
-            int[] randmMoveTable = { 50, 25, 10 };
-            float[] speedMultiplier = { 1, 1.5f, 2f };
+        //public void _SetAgentMoveType()
+        //{
+        //    int[] randmMoveTable = { 50, 25, 10 };
+        //    float[] speedMultiplier = { 1, 1.5f, 2f };
 
-            var totalValue = 0;
-            for (int i = 0; i < randmMoveTable.Length; i++){
-                totalValue += randmMoveTable[i];
-            }
-            var randomNumber = UnityEngine.Random.Range(0, totalValue);
-            for (int index = 0; index < randmMoveTable.Length; index++){
-                if (randomNumber <= randmMoveTable[index])
-                    m_Controller.SpeedChangeMultiplier = speedMultiplier[index];
-                else
-                    randomNumber -= randmMoveTable[index];
-            }
+        //    var totalValue = 0;
+        //    for (int i = 0; i < randmMoveTable.Length; i++){
+        //        totalValue += randmMoveTable[i];
+        //    }
+        //    var randomNumber = UnityEngine.Random.Range(0, totalValue);
+        //    for (int index = 0; index < randmMoveTable.Length; index++){
+        //        if (randomNumber <= randmMoveTable[index])
+        //            m_Controller.SpeedChangeMultiplier = speedMultiplier[index];
+        //        else
+        //            randomNumber -= randmMoveTable[index];
+        //    }
 
 
-        }
+        //}
 
 
 

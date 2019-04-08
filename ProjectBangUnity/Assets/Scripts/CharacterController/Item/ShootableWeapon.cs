@@ -227,7 +227,7 @@
 
 
             //  Update current ammo.
-            m_CurrentAmmo -= m_FireCount;
+            //m_CurrentAmmo -= m_FireCount;
             //  Reload if auto reload is set.
             if (m_AutoReload && m_CurrentAmmo <= 0){
                 TryStartReload();
@@ -357,10 +357,16 @@
 
         private void OnDrawGizmos()
         {
-            if(m_DrawAimLine && m_FirePoint != null){
-                Gizmos.color = Color.yellow;
-                Gizmos.DrawRay(m_FirePoint.position, (m_FirePoint.forward * 50));  //  + (Vector3.up * m_FirePoint.position.y) 
+            if(Application.isPlaying){
+                if (m_DrawAimLine && m_FirePoint != null)
+                {
+                    Gizmos.color = Color.yellow;
+                    //Gizmos.DrawRay(m_FirePoint.position, (m_FirePoint.forward * 50));  //  + (Vector3.up * m_FirePoint.position.y) 
+                    Gizmos.DrawRay(m_FirePoint.position, m_Controller.LookDirection * 50);  //  + (Vector3.up * m_FirePoint.position.y) 
+
+                }
             }
+
         }
 
 

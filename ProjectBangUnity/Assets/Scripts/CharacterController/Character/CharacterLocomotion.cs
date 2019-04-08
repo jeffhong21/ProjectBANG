@@ -58,6 +58,8 @@
 
         [Header("-- Debug --")]
         [SerializeField, DisplayOnly]
+        private MovementType m_MovementType = MovementType.FreeMovement;
+        [SerializeField, DisplayOnly]
         private bool m_Grounded = true;
         private bool m_Moving, m_Aiming, m_Running = true;
         //[SerializeField, DisplayOnly]
@@ -65,20 +67,14 @@
         [SerializeField, DisplayOnly]
         private float m_MoveAmount, m_TurnAmount;
         //[SerializeField, DisplayOnly]
-        private Vector3 m_Velocity, m_RootMotionVelocity, m_MoveDirection, m_LookDirection;
+        private Vector3 m_Velocity, m_RootMotionVelocity, m_MoveDirection;
         [SerializeField, DisplayOnly]
         private Vector3 m_InputVector, m_RelativeInputVector;
-        private Vector3 m_LookAtPoint;
-        //[SerializeField, DisplayOnly]
-        private float rotationDifference;
-        [SerializeField, DisplayOnly]
-        private float eulerY;
         private Quaternion m_LookRotation;
 
 
-        [Header("-- Rigidbody Debug --")]
-        [SerializeField, DisplayOnly] private Vector3 _rigidbodyVelocity;
-        [SerializeField, DisplayOnly] private Vector3 _rigidbodyAngularVelocity;
+        private Vector3 m_LookDirection, m_LookAtPoint;
+
 
 
         private CapsuleCollider m_CapsuleCollider;
@@ -91,7 +87,7 @@
         private float m_DeltaTime;
         private float m_FixedDeltaTime;
 
-        bool m_UpdateRotation = true, m_UpdateMovement = true, m_UpdateAnimator = true;
+        bool m_UpdateRotation = true, m_UpdateMovement = true, m_UpdateAnimator = true, m_Move = true, m_CheckMovement = true;
 
         private RaycastHit m_GroundHit;
         private RaycastHit m_StepHit;
@@ -127,12 +123,10 @@
             }
         }
 
-
-        public float SpeedChangeMultiplier{
-            get { return m_SpeedChangeMultiplier; }
-            set { m_SpeedChangeMultiplier = value; }
+        public float TurnAmount{
+            get { return m_TurnAmount; }
+            set { m_TurnAmount = value; }
         }
-
 
         public float RotationSpeed{
             get { return m_RotationSpeed; }
@@ -158,7 +152,6 @@
 
         public Vector3 RelativeInputVector{
             get { return m_RelativeInputVector; }
-            set { m_RelativeInputVector = value; }
         }
 
         public Quaternion LookRotation{
@@ -177,21 +170,22 @@
         }
 
 
+        public CharacterAction[] CharActions{
+            get { return m_Actions; }
+            set { m_Actions = value; }
+        }
+
         public Vector3 LookDirection{
             get { return m_LookDirection; }
             set { m_LookDirection = value; }
         }
 
-        public Vector3 LookAtPoint
-        {
+        public Vector3 LookAtPoint{
             get { return m_LookAtPoint; }
             set { m_LookAtPoint = value; }
         }
 
-        public CharacterAction[] CharActions{
-            get { return m_Actions; }
-            set { m_Actions = value; }
-        }
+
 
 
         #endregion
@@ -231,44 +225,91 @@
             EventHandler.UnregisterEvent<bool>(m_GameObject, "OnAimActionStart", OnAimActionStart);
 		}
 
+        [SerializeField]
+        float angleOut, direction;
 
 		private void Update()
 		{
             if (m_DeltaTime == 0) return;
 
+            if (m_InputVector.magnitude > 1)
+                m_InputVector.Normalize();
             m_MoveAmount = Mathf.Abs(m_InputVector.x) + Mathf.Abs(m_InputVector.z);
+            //  Check if moving.
             m_Moving = m_InputVector.sqrMagnitude > 0.2f;
 
+
+            //Vector3 axisSign = Vector3.Cross(m_MoveDirection, m_Transform.forward);
+            //float angleRootMove = Vector3.Angle(m_Transform.forward, m_MoveDirection) * axisSign.y >= 0 ? -1f : 1f;
+            //angleOut = angleRootMove;
+            //angleRootMove /= 180f;
+            //direction = angleRootMove * 1.5f;
+            ////m_Grounded = CheckGround();
+            //m_Grounded = CheckGround_2();
+
+
+
+
+            //  Start Stop Actions.
             StartStopActions();
+            //
+            m_UpdateRotation = m_UpdateMovement = m_UpdateAnimator = m_Move = m_CheckMovement = true;
 
 
 
-            if (m_UpdateAnimator) UpdateAnimator();
+
+            for (int i = 0; i < m_Actions.Length; i++)
+            {
+                //  Next, if current Action is active, update overrides.
+                if (m_Actions[i].IsActive)
+                {
+                    if (m_CheckMovement)
+                    {
+                        m_CheckMovement = m_Actions[i].CheckMovement();
+                    }
+                    if (m_UpdateRotation)
+                    {
+                        m_UpdateRotation = m_Actions[i].UpdateRotation();
+                    }
+                    if (m_UpdateMovement)
+                    {
+                        m_UpdateMovement = m_Actions[i].UpdateMovement();
+                    }
+                    if (m_Move)
+                    {
+                        m_Move = m_Actions[i].Move();
+                    }
+                    if (m_UpdateAnimator)
+                    {
+                        m_UpdateAnimator = m_Actions[i].UpdateAnimator();
+                    }
+                    //  Call Action Update.
+                    m_Actions[i].UpdateAction();
+                }
+            }
+
+            if (m_Move)
+                Move();
+            if (m_UpdateAnimator)
+                UpdateAnimator();
 		}
 
 
 		private void FixedUpdate()
         {
-            m_InputVector = m_InputVector.normalized;
-
-            //m_Grounded = CheckGround();
-            m_Grounded = CheckGround_2();
-
             if (m_UpdateRotation)
                 UpdateRotation();
             if (m_UpdateMovement)
                 UpdateMovement();
 
 
-            _rigidbodyVelocity = m_Rigidbody.velocity;
-            _rigidbodyAngularVelocity = m_Rigidbody.angularVelocity;
         }
 
 
         //  Should the character look independetly of the camera?  AI Agents do not need to use camera rotation.
         public bool IndependentLook()
         {
-            if(m_Aiming){
+            if(m_Aiming || m_Moving){
                 return false;
             }
             return true;
@@ -279,7 +320,7 @@
         {
             m_MoveDirection = m_Transform.forward * m_InputVector.z + m_Transform.right * m_InputVector.x;
             float radius = m_CapsuleCollider.radius * 0.9f;
-            if(Physics.SphereCast(m_Transform.position, radius, -Vector3.up, out m_GroundHit, m_CapsuleCollider.radius + m_SkinWidth, m_Layers.SolidLayer))
+            if(Physics.SphereCast(m_Transform.position + Vector3.up * m_AlignToGroundDepthOffset, radius, -Vector3.up, out m_GroundHit, m_CapsuleCollider.radius + m_SkinWidth, m_Layers.SolidLayer))
             {
                 Vector3 targetPosition = m_Transform.position;
                 targetPosition.y = m_GroundHit.point.y;
@@ -310,6 +351,10 @@
 
             if (Physics.Raycast(m_Transform.position + Vector3.up * m_AlignToGroundDepthOffset, Vector3.down, out m_GroundHit, m_AlignToGroundDepthOffset + m_SkinWidth, m_Layers.SolidLayer))
             {
+                Vector3 targetPosition = m_Transform.position;
+                targetPosition.y = m_GroundHit.point.y;
+                m_Transform.position = targetPosition;
+
                 var rayStart = (m_Transform.position + Vector3.up * m_MaxStepHeight) + m_Transform.forward * (m_CapsuleCollider.radius * 2);  //+ m_SkinWidth);
                 var rayEnd = Vector3.down * (m_MaxStepHeight - m_StepOffset);
                 //  -- DEBUG DRAW RAY -- 
@@ -347,61 +392,79 @@
         //  Update the rotation forces.
         private void UpdateRotation()
         {
-            ////m_Rigidbody.angularDrag = (m_Aiming ? m_AimRotationSpeed : m_RotationSpeed) / 2;
-            //eulerY = Mathf.Rad2Deg * (m_Aiming ? m_AimRotationSpeed : m_RotationSpeed) * m_DeltaTime;
-            //eulerY *= m_RelativeInputVector.x;
-            ////eulerY += m_Transform.eulerAngles.y;
-            ////eulerY = Mathf.Atan2(m_RelativeInputVector.z, m_RelativeInputVector.x * (m_Aiming ? m_AimRotationSpeed : m_RotationSpeed)) * Mathf.Rad2Deg;
-            //m_LookRotation = m_LookRotation * Quaternion.AngleAxis(eulerY, m_Transform.up);
-            ////m_Rigidbody.AddRelativeTorque(Vector3.up * eulerY);
+            //m_TurnAmount += m_TurnAmount * m_RotationSpeed;
+            if(m_Moving)
+            {
+                m_TurnAmount = Mathf.Rad2Deg * m_TurnAmount * m_RotationSpeed;
+                m_TurnAmount = Mathf.Lerp(0, m_TurnAmount, m_DeltaTime);
+                m_LookRotation *= Quaternion.Euler(0, m_TurnAmount, 0);
+            }
+            //else{
+            //    m_TurnAmount = Mathf.Lerp(m_TurnAmount, 0, m_DeltaTime);
+            //}
 
-            m_LookRotation = Quaternion.Slerp(m_Transform.rotation, m_LookRotation.normalized, m_RotationSpeed * m_DeltaTime);
-            m_Rigidbody.MoveRotation(m_LookRotation);
-            m_TurnAmount = Mathf.Atan2(m_InputVector.x, m_InputVector.z);
+
+            m_LookRotation = Quaternion.Slerp(m_Transform.rotation, m_LookRotation, (m_Aiming ? m_AimRotationSpeed : m_RotationSpeed) * m_DeltaTime);
+            m_Transform.rotation = m_LookRotation;
+            //m_Rigidbody.MoveRotation(m_LookRotation.normalized);
+
+            //m_Rigidbody.AddTorque()
         }
 
 
         //  Apply any movement.
         private void UpdateMovement()
         {
-            //if (m_SlopeAngle >= m_SlopeLimit) return;
+            if (m_SlopeAngle >= m_SlopeLimit) return;
 
-            //m_MoveDirection = m_InputVector.normalized.x * m_Transform.right * m_StrafeSpeed + m_InputVector.normalized.z * m_Transform.forward * m_MovementSpeed;
-            m_MoveDirection = m_InputVector.x * m_Transform.right + m_InputVector.z * m_Transform.forward;
-            m_MoveDirection.z = m_MoveDirection.z * m_MovementSpeed;
-            m_MoveDirection.x = m_MoveDirection.x * m_StrafeSpeed;
+            ////m_MoveDirection = m_InputVector.normalized.x * m_Transform.right * m_StrafeSpeed + m_InputVector.normalized.z * m_Transform.forward * m_MovementSpeed;
+            //m_MoveDirection = m_InputVector.x * m_Transform.right + m_InputVector.z * m_Transform.forward;
+            //m_MoveDirection.z = m_MoveDirection.z * m_MovementSpeed;
+            //m_MoveDirection.x = m_MoveDirection.x * m_StrafeSpeed;
 
-            m_Velocity = m_MoveDirection * m_MoveAmount;
-            m_Velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
-            m_Rigidbody.AddForce(m_Velocity, ForceMode.Acceleration);
+            //m_Rigidbody.drag = m_MoveAmount > 0.1f ? 0 : 5;
 
-            if(m_MoveAmount > 0.1f){
-                m_Rigidbody.drag = 0;
-            } else {
-                m_Rigidbody.drag = 5;
-            }
-
+            //m_Velocity = m_MoveDirection * m_MoveAmount;
+            //m_Velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
+            ////m_Velocity.y = 0;
+            //m_Rigidbody.AddForce(m_Velocity.normalized, ForceMode.VelocityChange);
         }
 
 
-        private void UpdateAnimator()
+
+		private void Move()
+		{
+            switch(m_MovementType)
+            {
+                case MovementType.FreeMovement:
+                    //m_TurnAmount = Mathf.Atan2(m_InputVector.x, m_InputVector.z);
+                    //m_Transform.rotation = Quaternion.Euler(0, m_TurnAmount * (m_Aiming ? m_AimRotationSpeed : m_RotationSpeed) * m_DeltaTime, 0);
+                    break;
+                case MovementType.Combat:
+
+
+
+                    break;
+            }
+		}
+
+
+		private void UpdateAnimator()
         {
             //  Is Moving.
             m_Animator.SetBool(HashID.Moving, m_Moving);
 
-            //  Speed
-            if (m_Moving) m_Speed = m_Running ? 1 : 0.5f;
-            else m_Speed = 0;
-            m_Animator.SetFloat(HashID.Speed, m_Speed);
+
             // Rotation
             if(m_Moving){
-                m_Animator.SetFloat(HashID.Rotation, (m_RelativeInputVector.x > 2.0f || m_RelativeInputVector.x < -2.0f) ? m_RelativeInputVector.x : 0, 0.1f, m_DeltaTime);
-            } else {
-                m_Animator.SetFloat(HashID.Rotation, m_RelativeInputVector.x, 0.1f, m_DeltaTime);
+                if(Mathf.Abs(m_TurnAmount) > 0.5f)
+                    m_Animator.SetFloat(HashID.TurnAmount, Mathf.Clamp(m_TurnAmount, -1, 1), 0.2f, m_DeltaTime);  // Mathf.Clamp(m_TurnAmount, -1, 1)
+                else
+                    m_Animator.SetFloat(HashID.TurnAmount, 0, 0.2f, m_DeltaTime);
             }
             //  Movement Input
-            m_AnimationMonitor.SetForwardInputValue(m_InputVector.z * m_Speed);
-            m_AnimationMonitor.SetHorizontalInputValue(m_InputVector.x * m_Speed);
+            m_AnimationMonitor.SetForwardInputValue(m_InputVector.z);
+            m_AnimationMonitor.SetHorizontalInputValue(m_InputVector.x);
         }
 
 
@@ -409,13 +472,6 @@
         {
             if (m_UseRootMotion)
             {
-                //m_LookRotation = Quaternion.Slerp(m_Transform.rotation, m_LookRotation * m_Animator.deltaRotation, (m_Aiming ? m_AimRotationSpeed : m_RotationSpeed) * m_DeltaTime);
-                //m_Rigidbody.MoveRotation(m_LookRotation.normalized);
-
-                //m_RootMotionVelocity = m_Velocity + (m_Animator.deltaPosition * m_RootMotionSpeedMultiplier) / m_DeltaTime;
-                //m_RootMotionVelocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
-                //m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_RootMotionVelocity, m_MovementSpeed * m_DeltaTime);
-
                 m_RootMotionVelocity = (m_Animator.deltaPosition * m_RootMotionSpeedMultiplier) / m_DeltaTime;
                 m_RootMotionVelocity.y = 0;
                 m_Rigidbody.velocity = m_RootMotionVelocity;
@@ -471,10 +527,6 @@
 
         private void StartStopActions()
         {
-            m_UpdateRotation = true;
-            m_UpdateMovement = true;
-            m_UpdateAnimator = true;
-
             for (int i = 0; i < m_Actions.Length; i++)
             {
                 //  First, check if current Action can Start or Stop.
@@ -535,25 +587,8 @@
                         }
                     }
                 }
-                //  Next, if current Action is active, update overrides.
-                if (m_Actions[i].IsActive)
-                {
-                    if (m_UpdateRotation)
-                    {
-                        m_UpdateRotation = m_Actions[i].UpdateRotation();
-                    }
-                    if (m_UpdateMovement)
-                    {
-                        m_UpdateMovement = m_Actions[i].UpdateMovement();
-                    }
-                    if (m_UpdateAnimator)
-                    {
-                        m_UpdateAnimator = m_Actions[i].UpdateAnimator();
-                    }
-                    //  Call Action Update.
-                    m_Actions[i].UpdateAction();
-                }
             }
+
         }
 
 
@@ -662,7 +697,7 @@
         private void OnAimActionStart(bool aim)
         {
             m_Aiming = aim;
-
+            m_MovementType = m_Aiming ? MovementType.Combat : MovementType.FreeMovement;
             //  Call On Aim Delegate.
             OnAim(aim);
 

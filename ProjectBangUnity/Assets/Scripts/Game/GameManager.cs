@@ -13,9 +13,12 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     private GameObject m_PlayerPrefab;
     private GameObject m_PlayerInstance;
     [SerializeField]
-    private GameObject m_CharacterHUD;
-    [SerializeField]
-    private GameObject m_ItemHUD;
+    private GameObject m_IngameHUD;
+    private CharacterController.UI.IngameHUD m_IngameHudInstance;
+    //[SerializeField]
+    //private GameObject m_CharacterHUD;
+    //[SerializeField]
+    //private GameObject m_ItemHUD;
 
     [Header("-- Agent Settings--")]
     [SerializeField]
@@ -83,10 +86,12 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
             m_PlayerInstance = Spawn(m_PlayerPrefab, m_SpawnPoints[0].Position, m_SpawnPoints[0].Rotation);
         }
 
-        if (m_CharacterHUD != null)
-            m_CharacterHUD = Instantiate(m_CharacterHUD);
-        if (m_ItemHUD != null)
-            m_ItemHUD = Instantiate(m_ItemHUD);
+        //if (m_CharacterHUD != null)
+        //    m_CharacterHUD = Instantiate(m_CharacterHUD);
+        //if (m_ItemHUD != null)
+        //m_ItemHUD = Instantiate(m_ItemHUD);
+        m_IngameHudInstance = Instantiate(m_IngameHUD).GetComponent<CharacterController.UI.IngameHUD>();
+        m_IngameHudInstance.SetPanelActive(true);
 
         SetCameraTarget(m_PlayerInstance);
     }

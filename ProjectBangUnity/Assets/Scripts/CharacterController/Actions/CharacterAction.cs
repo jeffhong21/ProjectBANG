@@ -332,6 +332,19 @@
 
         }
 
+        //  Moves the character according to the input
+        public virtual bool Move()
+        {
+            return true;
+        }
+
+
+        //  Ensure the current movement direction is valid.
+        public virtual bool CheckMovement()
+        {
+            return true;
+        }
+
 
         public virtual bool UpdateMovement()
         {
@@ -383,7 +396,11 @@
 
 
 
-
+        public virtual float GetColliderHeightAdjustment()
+        {
+            
+            return m_CapsuleCollider.height;
+        }
 
 
         //  Returns the state the given layer should be on.

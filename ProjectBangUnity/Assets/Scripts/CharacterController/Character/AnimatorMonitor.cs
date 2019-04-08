@@ -8,7 +8,7 @@
     {
         public static readonly int HorizontalInput = Animator.StringToHash("HorizontalInput");
         public static readonly int ForwardInput = Animator.StringToHash("ForwardInput");
-        public static readonly int Rotation = Animator.StringToHash("Rotation");
+        public static readonly int TurnAmount = Animator.StringToHash("TurnAmount");
         public static readonly int ActionID = Animator.StringToHash("ActionID");
         public static readonly int ActionIntData = Animator.StringToHash("ActionIntData");
         public static readonly int ActionFloatData = Animator.StringToHash("ActionFloatData");
@@ -104,9 +104,9 @@
             get { return Input.GetAxis("Vertical"); }
         }
 
-        public float YawValue{
-            get { return m_Animator.GetFloat("Yaw"); }
-        }
+        //public float YawValue{
+        //    get { return m_Animator.GetFloat("Yaw"); }
+        //}
 
         public int BaseLayerIndex{
             get { return m_Animator.GetLayerIndex(BaseLayerName); }

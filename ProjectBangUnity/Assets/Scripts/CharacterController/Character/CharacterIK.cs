@@ -146,6 +146,10 @@
 
 
 
+        public void SetLookDirection(Vector3 direction){
+            
+        }
+
 
         private void HandleItem(Item item)
         {
@@ -210,8 +214,6 @@
             }
 
 
-
-
         }
 
 
@@ -219,8 +221,7 @@
 
 		private void FixedUpdate()
         {
-
-
+            
             if (m_Animator == null) { return; }
 
             m_AimPivot.position = m_RightShoulder.position;
@@ -230,12 +231,8 @@
                 m_TargetDirection = m_AimPivot.forward;
             m_TargetRotation = Quaternion.LookRotation(m_TargetDirection);
 
-
-
             m_AimPivot.rotation = Quaternion.Slerp(m_AimPivot.rotation, m_TargetRotation, Time.deltaTime * 15);
             //m_RightHandTarget.rotation = Quaternion.Slerp(m_RightHandTarget.rotation, m_TargetRotation, Time.deltaTime * 15);
-
-
 
 
             //AdjustFeetTarget(ref rightFootPosition, HumanBodyBones.RightFoot);
@@ -251,7 +248,7 @@
 
 		private void OnAnimatorIK()
 		{
-            if (m_Animator == null) { return; }
+            if (m_Animator == null) return;
 
             bodyPosition = m_Animator.bodyPosition;
 
@@ -342,7 +339,7 @@
         }
 
 
-        private void MovePelvisHeight()
+        void MovePelvisHeight()
         {
             if (rightFootIkPosition == Vector3.zero || leftFootIkPosition == Vector3.zero || lastPelvisPositionY == 0)
             {
@@ -364,11 +361,10 @@
         }
 
 
-        private void FeetPositionSolver(Vector3 footPosition, ref Vector3 feetIkPositions, ref Quaternion feetIkRotations)
+        void FeetPositionSolver(Vector3 footPosition, ref Vector3 feetIkPositions, ref Quaternion feetIkRotations)
         {
             //raycast handling section 
             RaycastHit feetOutHit;
-
 
             if (Physics.Raycast(footPosition, Vector3.down, out feetOutHit, raycastDownDistance + heightFromGroundRaycast, m_LayerManager.SolidLayer))
             {

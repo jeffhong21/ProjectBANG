@@ -30,7 +30,7 @@ namespace CharacterController
         public float MaxPitch = 70;
 
         public bool ApplyCameraOffset;
-        [Tooltip("The offset between the anchor and the location of the camera")]
+        [Tooltip("The offset between the anchor and the location of the camera.  This determines the cameras look direction.")]
         public Vector3 CameraOffset = new Vector3(0.5f, 0.9f, -2f);
 
         [Tooltip("The camera field of view")]

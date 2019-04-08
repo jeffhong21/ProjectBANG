@@ -302,29 +302,51 @@
         }
 
 
+        //  Returns the count for the current primary or secondary item. If primary item is specified then loadedCount specifies if the loaded or unloaded count should be returned.
+        public int GetCurrentItemCount(Type type, bool loadedCount)
+        {
+            if(type is PrimaryItem)
+            {
+                return 0;
+            }
+            return 0;
+        }
+
+        public void SetItemCount(ItemType itemType, int loadedCount, int unloadedCount)
+        {
+            
+        }
+
 
         #region Inventory Actions
 
-        public void UseItem(ItemType item, int amount)
+        public void UseItem(ItemType itemType, int amount)
         {
             if (m_EquippedItem == null)
                 return;
 
             if(m_Controller.Aiming){
-                IUseableItem useableItem = (IUseableItem)GetCurrentItem(item);
+                IUseableItem useableItem = (IUseableItem)GetCurrentItem(itemType);
                 if (useableItem != null && useableItem.TryUse())
                 {
                     //  Update the inventory.
 
-                    //  Play animation.
-                    if (item.GetType() == typeof(PrimaryItem))
+
+                    if (itemType.GetType() == typeof(PrimaryItem))
                     {
-                        PrimaryItem primaryItem = (PrimaryItem)item;
+                        PrimaryItem primaryItem = (PrimaryItem)itemType;
+                        var currentItem = (ShootableWeapon)GetItem(itemType);
+                        currentItem.CurrentAmmo -= amount;
+
+                        //  Need to also remove consumable ammo from inventory.
                         //primaryItem.ConsumableItem.CurrentAmount -= amount;
+
                         //p.ConsumableItem.Capacity
+
+                        InventoryUseItem(itemType, currentItem.CurrentAmmo);
                     }
 
-                    InventoryUseItem(item, amount);
+
                 }
             }
 
@@ -414,9 +436,10 @@
                 m_EquippedItem = m_CurrentLoadout[itemIndex] as PrimaryItem;
                 //GetCurrentItem(m_EquippedItem).SetActive(true);
 
-                ////Debug.Log(m_Inventory[m_EquippedItem].Item);
-                //m_Inventory[m_EquippedItem].SetActive(true);
-                ////GetItem(m_EquippedItem).transform.parent = m_RightHandSlot.transform;
+
+                //  Send equip event.
+                InventoryEquipItem(GetItem(m_CurrentLoadout[itemIndex]));
+
 
                 m_Animator.SetInteger(HashID.ItemID, GetItem(m_EquippedItem).ItemID);
                 m_Animator.SetInteger(HashID.MovementSetID, GetItem(m_EquippedItem).MovementSetID);
@@ -436,6 +459,9 @@
                 //itemObject.SetActive(false);
             m_EquippedItem = null;
             m_EquippedItemIndex = -1;
+            //  Send unequip event.
+            InventoryEquipItem((Item)null);
+
             m_Animator.SetInteger(HashID.ItemID, 0);
             m_Animator.SetInteger(HashID.MovementSetID, 0);
 
@@ -465,7 +491,7 @@
 
 
 
-
+        //  Triggered from Animation events
 
         private void OnItemEquip()
         {

@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Name: TPS_Aim
   m_EditorClassIdentifier: 
   StateName: TPS_Aim
-  ViewDistance: 2
-  VerticalOffset: 1.35
+  ViewDistance: 3
+  VerticalOffset: 1.56
   ApplyYawLimit: 0
   MinYaw: 0
   MaxYaw: 0
@@ -21,11 +21,11 @@ MonoBehaviour:
   MinPitch: -45
   MaxPitch: 65
   ApplyCameraOffset: 1
-  CameraOffset: {x: 0.5, y: 0, z: 0}
+  CameraOffset: {x: 0.75, y: 0, z: 0}
   FieldOfView: 35
   FieldOfViewSpeed: 5
   ApplyTurn: 1
-  TurnSmooth: 0.01
+  TurnSmooth: 0
   TurnSpeed: 3.75
   ApplyRotation: 0
   RotationSpeed: 12
