@@ -479,6 +479,23 @@
 
 
 
+        GUIStyle style = new GUIStyle();
+        GUIContent content = new GUIContent();
+        Vector2 size;
+        private void OnGUI()
+        {
+
+            if(LockRotation){
+                GUI.color = Color.red;
+                content.text = string.Format("LOCK ROTATION IS: {0}", LockRotation);
+                size = new GUIStyle(GUI.skin.label).CalcSize(content);
+                GUILayout.BeginArea(new Rect(Screen.width - size.x - 25, 15, size.x * 2, size.y * 2), GUI.skin.box);
+                GUILayout.Label(content);
+                //GUILayout.Label(string.Format("Normalized Time: {0}", normalizedTime.ToString()));
+                GUILayout.EndArea();
+            }
+
+        }
 
 
 

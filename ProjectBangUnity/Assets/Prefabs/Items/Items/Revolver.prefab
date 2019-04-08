@@ -648,4 +648,4 @@ MonoBehaviour:
   m_DefaultDecal: {fileID: 0}
   m_DefaultDust: {fileID: 1030604309152162, guid: ed017de91831b481e8c7d14e692443a6,
     type: 2}
-  m_DrawAimLine: 1
+  m_DrawAimLine: 0

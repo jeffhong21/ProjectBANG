@@ -54,7 +54,7 @@ GameObject:
   - component: {fileID: 81808721213615164}
   - component: {fileID: 114063490015681700}
   - component: {fileID: 114184676501862542}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -67,7 +67,7 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1496660069129776}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -179,19 +179,19 @@ MonoBehaviour:
   volumeTrigger: {fileID: 4903180862728622}
   volumeLayer:
     serializedVersion: 2
-    m_Bits: 3758100224
+    m_Bits: 1048576
   stopNaNPropagation: 1
   finalBlitToCameraTarget: 1
-  antialiasingMode: 1
+  antialiasingMode: 3
   temporalAntialiasing:
-    jitterSpread: 0.75
+    jitterSpread: 0.7
     sharpness: 0.25
     stationaryBlending: 0.95
     motionBlending: 0.85
   subpixelMorphologicalAntialiasing:
-    quality: 2
+    quality: 1
   fastApproximateAntialiasing:
-    fastMode: 0
+    fastMode: 1
     keepAlpha: 0
   fog:
     enabled: 1

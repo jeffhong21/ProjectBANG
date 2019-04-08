@@ -64,7 +64,7 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1143421296743378}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -72,33 +72,33 @@ Transform:
   - {fileID: 4677982671240170}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!4 &4677982671240170
 Transform:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1361719530405884}
-  m_LocalRotation: {x: 0.34598154, y: -0.6525076, z: 0.50340617, w: 0.44845614}
-  m_LocalPosition: {x: 0, y: 21, z: 0}
+  m_LocalRotation: {x: 0.163558, y: -0.43040836, z: 0.7028032, w: 0.5422777}
+  m_LocalPosition: {x: 0, y: 21, z: -21}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4010248980545058}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 75.3, y: -111, z: 0}
+  m_LocalEulerAnglesHint: {x: 51.478, y: -22.357, z: 93.80801}
 --- !u!4 &4920894576470100
 Transform:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1102011679955998}
-  m_LocalRotation: {x: 0.19149637, y: 0.7933114, z: -0.31249362, w: 0.48614195}
+  m_LocalRotation: {x: 0.945599, y: 0.034447294, z: -0.3054202, w: 0.10665086}
   m_LocalPosition: {x: 0, y: 21, z: 9.38}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4010248980545058}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 43, y: 117, z: 0}
+  m_LocalEulerAnglesHint: {x: 167.13, y: 35.8, z: 0}
 --- !u!108 &108131277308941514
 Light:
   m_ObjectHideFlags: 1
@@ -109,17 +109,17 @@ Light:
   serializedVersion: 8
   m_Type: 1
   m_Color: {r: 1, g: 0.9749257, b: 0.9009434, a: 1}
-  m_Intensity: 1
+  m_Intensity: 0.8
   m_Range: 10
   m_SpotAngle: 30
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 2
+    m_Type: 1
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
     m_Bias: 0.05
-    m_NormalBias: 0.4
+    m_NormalBias: 0
     m_NearPlane: 0.2
   m_Cookie: {fileID: 0}
   m_DrawHalo: 0
@@ -145,8 +145,8 @@ Light:
   m_Enabled: 1
   serializedVersion: 8
   m_Type: 1
-  m_Color: {r: 0.7216981, g: 0.84532213, b: 1, a: 1}
-  m_Intensity: 0.4
+  m_Color: {r: 1, g: 0.63290113, b: 0.4009434, a: 1}
+  m_Intensity: 0.45
   m_Range: 10
   m_SpotAngle: 30
   m_CookieSize: 10

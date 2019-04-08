@@ -1,4 +1,4 @@
-public enum ItemIdTypes
+public enum ItemTypeDefinition
 {
     Unarmed,
     Revolver,

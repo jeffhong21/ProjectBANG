@@ -79,6 +79,7 @@ namespace CharacterController
             {
                 m_CameraController = Instantiate(m_CameraController) as CameraController;
                 m_CameraController.SetMainTarget(m_GameObject);
+                Debug.Log("Instantiating a new Camera Controller through the player.");
             }
             else if(m_CameraController == null && CameraController.Instance != null){
                 m_CameraController = CameraController.Instance;
@@ -88,7 +89,7 @@ namespace CharacterController
                 Debug.LogError("Player has no Camera");
             }
 
-            m_Ray = new Ray(m_CameraController.Camera.transform.position, m_CameraController.Camera.transform.forward * 10);
+            //m_Ray = new Ray(m_CameraController.Camera.transform.position, m_CameraController.Camera.transform.forward * 10);
 		}
 
 
@@ -120,7 +121,7 @@ namespace CharacterController
 
             //  Set look at point.
             m_Controller.LookAtPoint = m_CameraController.Camera.transform.position + m_CameraController.Camera.transform.forward * m_LookDistance;
-            Debug.DrawRay(m_CameraController.Camera.transform.position, m_CameraController.Camera.transform.forward * m_LookDistance, Color.blue);
+            //Debug.DrawRay(m_CameraController.Camera.transform.position, m_CameraController.Camera.transform.forward * m_LookDistance, Color.blue);
 
             m_MouseInputVector.Set(m_MouseHorizontal, m_MouseVertical, m_CameraController.Camera.nearClipPlane);
             //var viewport = m_CameraController.Camera.ViewportToWorldPoint(m_MouseInputVector);

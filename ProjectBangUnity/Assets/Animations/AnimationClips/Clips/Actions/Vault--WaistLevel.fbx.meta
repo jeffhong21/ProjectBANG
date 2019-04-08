@@ -137,8 +137,8 @@ ModelImporter:
     - serializedVersion: 16
       name: Vault--WaistLevel
       takeName: mixamo.com
-      firstFrame: 36
-      lastFrame: 82
+      firstFrame: 0
+      lastFrame: 125
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

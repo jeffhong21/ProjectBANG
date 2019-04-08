@@ -7,22 +7,41 @@ namespace CharacterController
     public class Vault : CharacterAction
     {
         public const int ACTION_ID = 15;
-        protected readonly float m_MaxRollDistance = 4f;
-        protected readonly float m_CheckHeight = 0.35f;
+
+        protected float m_CheckHeight = 0.5f;
 
         [SerializeField]
-        protected LayerMask m_StopRollLayer;
+        protected float m_MoveToVaultDistance = 2f;
+        [SerializeField]
+        protected LayerMask m_VaultLayers;
+        [SerializeField]
+        protected float m_MaxVaultHeight = 2f;
+        [SerializeField]
+        protected float m_MaxVaultDepth = 1f;
+        [SerializeField]
+        protected float m_StartVaultOffset = 0.2f;
+        [SerializeField]
+        protected float m_MatchTargetOffset;
+        [SerializeField]
+        protected float m_StartMatchTarget;
+        [SerializeField]
+        protected float m_StopMatchTarget;
 
-        protected Vector3 m_RollDirection;
-        protected Vector3 m_StartDirection;
 
-        protected float m_ActionIntData;
 
-        public Vector3 RollDirection
-        {
-            get { return m_RollDirection; }
-            set { m_RollDirection = value; }
-        }
+        private Vector3 m_StartPosition;
+        private Vector3 m_EndPosition;
+        private RaycastHit m_MoveToVaultDistanceHit;
+        private RaycastHit m_HeightCheckHit;
+        private RaycastHit m_EndPositionHit;
+        private float m_StartTime;
+
+
+        [Header("-----  Debug -----")]
+        [SerializeField]
+        private string[] stateNames = { "Base Layer.Vault.Waist", "Base Layer.Vault.Chest", "Base Layer.Vault.Head" };
+        [SerializeField]
+        private int currentAnimIndex;
 
 
         //
@@ -31,44 +50,64 @@ namespace CharacterController
 
         public override bool CanStartAction()
         {
-            var checkHeight = Vector3.up * m_CheckHeight;
-            Debug.DrawRay(m_Transform.position + checkHeight, m_Transform.forward * m_MaxRollDistance, Color.blue, 1f);
-            if (Physics.Raycast(m_Transform.position + checkHeight, m_Transform.forward, m_MaxRollDistance, m_StopRollLayer))
+            if(base.CanStartAction())
             {
-                return false;
+                //Debug.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance, Color.green, 1f);
+                if(Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out m_MoveToVaultDistanceHit, m_MoveToVaultDistance, m_VaultLayers)){
+                    return true;
+                }
+
             }
-            return true;
+            return false;
         }
 
 
         protected override void ActionStarted()
         {
-            m_StartDirection = m_Transform.forward;
-            if (m_RollDirection != Vector3.zero)
-                m_Controller.SetRotation(Quaternion.LookRotation(m_RollDirection, m_Transform.up));
+            var heightCheckStart = m_MoveToVaultDistanceHit.point;
+            heightCheckStart.x += -m_StartVaultOffset;
+            heightCheckStart.y = m_Transform.position.y + m_MaxVaultHeight + m_StartVaultOffset;
+            heightCheckStart.z += m_StartVaultOffset;
 
-            m_Animator.SetInteger(HashID.ActionIntData, 0);
+            Debug.DrawRay(heightCheckStart, Vector3.down * heightCheckStart.y, Color.green, 3f);
+            if (Physics.Raycast(heightCheckStart, Vector3.down, out m_HeightCheckHit, heightCheckStart.y, m_VaultLayers))
+            {
+                if(m_HeightCheckHit.distance < m_MaxVaultHeight)
+                {
+                    m_StartPosition = m_HeightCheckHit.point + Vector3.up * m_StartVaultOffset;
+
+                    //Debug.DrawRay(m_MoveToVaultDistanceHit.point, -m_MoveToVaultDistanceHit.normal, Color.yellow, 3f);
+                    var depthCheck = (-m_MoveToVaultDistanceHit.normal + m_MoveToVaultDistanceHit.point) * m_MaxVaultDepth;
+                    depthCheck.y = heightCheckStart.y;
+
+                    Debug.DrawRay(depthCheck, Vector3.down * heightCheckStart.y, Color.green, 3f);
+                    if (Physics.Raycast(depthCheck, Vector3.down, out m_EndPositionHit, heightCheckStart.y, m_Layers.SolidLayer))
+                    {
+                        m_EndPosition = m_EndPositionHit.point;
+                    }
+                }
+            }
 
 
+            m_StartTime = Time.time;
+            Debug.LogFormat("Playing:  {0}.", stateNames[currentAnimIndex]);
         }
 
 
         protected override void ActionStopped()
         {
+            m_StartPosition = m_EndPosition = Vector3.zero;
 
-            m_Controller.SetRotation(Quaternion.LookRotation(m_StartDirection, m_Transform.up));
-            m_RollDirection = Vector3.zero;
 
+            currentAnimIndex++;
+            if (currentAnimIndex > stateNames.Length - 1) currentAnimIndex = 0;
             //Debug.LogFormat("{0} Action has stopped {1}", GetType().Name, Time.time);
         }
 
 
         public override bool UpdateMovement()
         {
-            var velocity = m_Animator.deltaPosition / Time.deltaTime;
-            velocity.y = 0;
-            m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, velocity, 10 * Time.deltaTime);  //m_Acceleration
-            m_Rigidbody.AddForce(-m_Transform.forward * 1, ForceMode.Acceleration);
+
             return false;
         }
 
@@ -76,29 +115,78 @@ namespace CharacterController
         public override bool CanStopAction()
         {
             if (m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1)
-            {
                 return false;
-            }
-
-            if (m_Animator.GetCurrentAnimatorStateInfo(0).IsName(m_StateName))
-            {
+            if (m_Animator.GetCurrentAnimatorStateInfo(0).IsName(stateNames[currentAnimIndex])){
                 if (m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1 - m_TransitionDuration)
-                {
                     return true;
-                }
-                //Debug.LogFormat("Current state: {0} .  Normalized time.  {1} ",m_StateName, m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime);
                 return false;
             }
 
-            if (m_Animator.GetCurrentAnimatorStateInfo(0).IsName(m_StateName) == false)
-            {
-                return true;
-            }
-
-            return false;
-
-
+            return m_StartTime + 1f < Time.time;
         }
+
+
+        //public override string GetDestinationState(int layer)
+        //{
+        //    if(layer == 0)
+        //        return stateNames[currentAnimIndex];
+        //    return "";
+        //}
+
+
+
+
+
+
+
+
+
+
+
+
+
+		private void OnDrawGizmos()
+		{
+            if(Application.isPlaying){
+                Gizmos.color = Color.green;
+                Gizmos.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance);
+
+                if(m_StartPosition != Vector3.zero){
+                    Gizmos.color = Color.magenta;
+                    Gizmos.DrawWireSphere(m_StartPosition, 0.2f);
+                }
+                if (m_EndPosition != Vector3.zero)
+                {
+                    Gizmos.color = Color.cyan;
+                    Gizmos.DrawWireSphere(m_EndPosition, 0.2f);
+                }
+
+            }
+		}
+
+
+
+
+
+
+
+
+
+
+
+		//private float normalizedTime;
+        //GUIStyle style = new GUIStyle();
+        //GUIContent content = new GUIContent();
+        //Vector2 size;
+        //private void OnGUI()
+        //{
+        //    content.text = string.Format("( {0} )", normalizedTime.ToString());
+        //    size = new GUIStyle(GUI.skin.label).CalcSize(content);
+        //    GUILayout.BeginArea(new Rect(10, 15, size.x * 2, size.y * 2), GUI.skin.box);
+        //    GUILayout.Label(content);
+        //    //GUILayout.Label(string.Format("Normalized Time: {0}", normalizedTime.ToString()));
+        //    GUILayout.EndArea();
+        //}
     }
 
 }

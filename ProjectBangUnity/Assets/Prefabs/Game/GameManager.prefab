@@ -53,9 +53,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_CameraController: {fileID: 114390585562722546, guid: 2190d19f6b1174b838fb0546abf24488,
     type: 2}
+  cameraLockDelay: 1
   m_PlayerPrefab: {fileID: 1141768220188808, guid: f80c1af589fb4412c8617fb38fe4c4f8,
     type: 2}
-  m_IngameHUD: {fileID: 114817887708759490, guid: 50cbca90eb5704c94a6475f65830d9d1,
+  m_IngameHUD: {fileID: 1160934962673990, guid: 50cbca90eb5704c94a6475f65830d9d1,
     type: 2}
   m_AgentPrefab: {fileID: 1761652248440620, guid: b1cb448fc4ca442f99ad678ba7966df9,
     type: 2}

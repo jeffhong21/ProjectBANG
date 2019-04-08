@@ -64,11 +64,11 @@
         private bool m_Moving, m_Aiming, m_Running = true;
         //[SerializeField, DisplayOnly]
         private float m_Speed;
-        [SerializeField, DisplayOnly]
+        //[SerializeField, DisplayOnly]
         private float m_MoveAmount, m_TurnAmount;
         //[SerializeField, DisplayOnly]
         private Vector3 m_Velocity, m_RootMotionVelocity, m_MoveDirection;
-        [SerializeField, DisplayOnly]
+        //[SerializeField, DisplayOnly]
         private Vector3 m_InputVector, m_RelativeInputVector;
         private Quaternion m_LookRotation;
 
@@ -225,8 +225,8 @@
             EventHandler.UnregisterEvent<bool>(m_GameObject, "OnAimActionStart", OnAimActionStart);
 		}
 
-        [SerializeField]
-        float angleOut, direction;
+        //[SerializeField]
+        //float angleOut, direction;
 
 		private void Update()
 		{

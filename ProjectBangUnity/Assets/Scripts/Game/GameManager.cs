@@ -6,8 +6,14 @@ using CharacterController;
 
 public class GameManager : SingletonMonoBehaviour<GameManager> 
 {
+
     [SerializeField]
-    private CameraController m_CameraController;
+    private GameObject m_CameraController;
+    [SerializeField]
+    private CameraController m_CameraControllerInstance;
+    [SerializeField]
+    private float cameraLockDelay = 1;
+
     [Header("-- Player Settings--")]
     [SerializeField]
     private GameObject m_PlayerPrefab;
@@ -44,14 +50,18 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 
         RemoveAssetsWithTag("Player", true);
 
-        if (CameraController.Instance == null && m_CameraController)
-            m_CameraController = Instantiate(m_CameraController) as CameraController;
-        
-        else if (m_CameraController == null && CameraController.Instance != null)
-            m_CameraController = CameraController.Instance;
-        
-        else
-            Debug.LogError("GameManager has no Camera");
+        //m_CameraController = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraController>();;
+        if (m_CameraControllerInstance == null){
+            if (CameraController.Instance == null && m_CameraController != null)
+                m_CameraControllerInstance = Instantiate(m_CameraController).GetComponent<CameraController>();
+
+            else if (m_CameraController == null && CameraController.Instance != null)
+                m_CameraControllerInstance = CameraController.Instance;
+            //else
+            //Debug.LogError("GameManager has no Camera");
+        }
+        m_CameraController.transform.position = Vector3.zero;
+
 
 
         GetAllSpawnPoints();
@@ -60,6 +70,8 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 
 	private void Start()
 	{
+        //  Lock the camera rotation for a few seconds.
+        StartCoroutine(LockCameraDelay());
         //  Initialize Player.
         InitializePlayer();
 
@@ -99,7 +111,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 
     private void SetCameraTarget(GameObject target)
     {
-        m_CameraController.SetMainTarget(target);
+        m_CameraControllerInstance.SetMainTarget(target);
     }
 
 
@@ -136,7 +148,12 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 
 
 
-
+    private IEnumerator LockCameraDelay()
+    {
+        CameraController.LockRotation = true;
+        yield return new WaitForSeconds(cameraLockDelay);
+        CameraController.LockRotation = false;
+    }
 
 
 

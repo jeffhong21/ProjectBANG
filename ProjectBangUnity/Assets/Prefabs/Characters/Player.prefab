@@ -179,6 +179,7 @@ GameObject:
   - component: {fileID: 114476249827600298}
   - component: {fileID: 114798496128796052}
   - component: {fileID: 114031030444924998}
+  - component: {fileID: 114139823554117216}
   m_Layer: 31
   m_Name: Player
   m_TagString: Player
@@ -2477,6 +2478,39 @@ MonoBehaviour:
   m_ItemSlotHolder: {fileID: 0}
   m_ItemSlotHolster: {fileID: 0}
   m_ParentBone: 0
+--- !u!114 &114139823554117216
+MonoBehaviour:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a33cd0f36f52540f39f9a4bf04b5add6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: Vault
+  m_ActionID: 0
+  m_InputNames:
+  - LeftControl
+  m_StartType: 2
+  m_StopType: 2
+  m_MoveToVaultDistance: 2
+  m_VaultLayers:
+    serializedVersion: 2
+    m_Bits: 134217728
+  m_MaxVaultHeight: 2
+  m_MaxVaultDepth: 1
+  m_StartVaultOffset: 0.2
+  m_MatchTargetOffset: 0
+  m_StartMatchTarget: 0
+  m_StopMatchTarget: 0
+  stateNames:
+  - Base Layer.Vault.Waist
+  - Base Layer.Vault.Chest
+  - Base Layer.Vault.Head
+  currentAnimIndex: 0
 --- !u!114 &114191035625105832
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2833,7 +2867,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_MouseHorizontal: 0
   m_MouseVertical: 0
-  m_LookDistance: 10
+  m_LookDistance: 50
   m_LayerMask:
     serializedVersion: 2
     m_Bits: 0
@@ -2867,6 +2901,7 @@ MonoBehaviour:
   m_Acceleration: 20
   m_Actions:
   - {fileID: 114776445558567580}
+  - {fileID: 114139823554117216}
   - {fileID: 114908900733630684}
   - {fileID: 114329433760099396}
   - {fileID: 114084608887600488}
@@ -2879,13 +2914,7 @@ MonoBehaviour:
   m_ActiveAction: {fileID: 0}
   m_MovementType: 0
   m_Grounded: 1
-  m_MoveAmount: 0
-  m_TurnAmount: 0
-  m_InputVector: {x: 0, y: 0, z: 0}
-  m_RelativeInputVector: {x: 0, y: 0, z: 0}
-  m_DrawDebugLine: 1
-  angleOut: 0
-  direction: 0
+  m_DrawDebugLine: 0
 --- !u!135 &135562184133563358
 SphereCollider:
   m_ObjectHideFlags: 1
