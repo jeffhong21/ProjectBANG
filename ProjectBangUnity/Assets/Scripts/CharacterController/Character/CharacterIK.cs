@@ -43,6 +43,13 @@
         private bool m_Aiming;
 
 
+        private Item m_CurrentItem;
+
+        private Vector3 m_LookAtPoint;
+        private Vector3 m_TargetDirection;
+        private Quaternion m_TargetRotation;
+
+
         private float m_TargetLookAtWeight;
         private float m_TargetHandWeight;
         private float m_HandIKAdjustmentVelocity;
@@ -54,19 +61,6 @@
         private Quaternion rightHandRotation, rightHandTargetRotation;
         private Vector3 leftHandPosition, leftHandIkPosition, leftHandTargetPosition;
         private Quaternion leftHandRotation, leftHandTargetRotation;
-
-
-
-        private Item m_CurrentItem;
-
-        private Vector3 m_TargetDirection;
-        private Quaternion m_TargetRotation;
-
-
-
-
-
-
 
 
         private Vector3 rightFootPosition, leftFootPosition, leftFootIkPosition, rightFootIkPosition;
@@ -146,10 +140,9 @@
 
 
 
-        public void SetLookDirection(Vector3 direction){
-            
-        }
 
+
+        #region Item Actions
 
         private void HandleItem(Item item)
         {
@@ -217,20 +210,26 @@
         }
 
 
+        #endregion
 
 
-		private void FixedUpdate()
+
+        private void FixedUpdate()
         {
-            
             if (m_Animator == null) { return; }
 
             m_AimPivot.position = m_RightShoulder.position;
-            m_TargetDirection = m_Controller.LookAtPoint - m_AimPivot.position;
+            //m_LookAtPoint = m_Head.position + m_Controller.LookDirection;
+            m_LookAtPoint = Vector3.Lerp(m_LookAtPoint, m_Head.position + m_Controller.LookDirection, Time.deltaTime);
+
+
+            m_TargetDirection = m_LookAtPoint - m_AimPivot.position;
             //m_TargetDirection = (m_Head.position + m_Head.forward * 5) - m_AimPivot.position;
             if (m_TargetDirection == Vector3.zero)
                 m_TargetDirection = m_AimPivot.forward;
             m_TargetRotation = Quaternion.LookRotation(m_TargetDirection);
 
+            //m_TargetRotation = Quaternion.LookRotation(m_LookAtPoint);
             m_AimPivot.rotation = Quaternion.Slerp(m_AimPivot.rotation, m_TargetRotation, Time.deltaTime * 15);
             //m_RightHandTarget.rotation = Quaternion.Slerp(m_RightHandTarget.rotation, m_TargetRotation, Time.deltaTime * 15);
 
@@ -267,14 +266,16 @@
             //else
             //    m_TargetLookAtWeight = 0;
 
+
+
             m_TargetHandWeight = Mathf.SmoothDamp(m_TargetHandWeight, m_HandIKWeight, ref m_HandIKAdjustmentVelocity, m_HandIKAdjustmentSpeed);
             m_TargetLookAtWeight = Mathf.SmoothDamp(m_TargetLookAtWeight, m_LookAtAimBodyWeight, ref m_LookAtAdjustmentVelocity, m_LookAtAdjustmentSpeed);
 
 
             m_Animator.SetLookAtWeight(m_TargetLookAtWeight, m_LookAtBodyWeight, m_LookAtHeadWeight, m_LookAtEyesWeight, m_LookAtClampWeight);
-            m_Animator.SetLookAtPosition( m_Controller.LookAtPoint + m_LookAtOffset);
-            //m_Animator.SetLookAtPosition((m_Head.position + m_Head.forward * 5) + m_LookAtOffset);
-            //m_Animator.SetLookAtPosition(m_Transform.forward + (Vector3.up * 1.35f) + m_LookAtOffset);
+            //m_Animator.SetLookAtPosition( m_Controller.LookAtPoint + m_LookAtOffset);
+            m_Animator.SetLookAtPosition(m_LookAtPoint + m_LookAtOffset);
+
         }
 
 
@@ -406,21 +407,28 @@
 
 		private void OnDrawGizmos()
 		{
-            if(m_DebugDrawLookRay){
-                if(m_Controller != null){
-                    //if (m_Controller.LookPosition != Vector3.zero)
-                    //{
-                    //    Gizmos.color = Color.green;
-                    //    Gizmos.DrawLine(m_UpperChest.position, m_Controller.LookPosition);
-                    //    Gizmos.DrawSphere(m_Controller.LookPosition, 0.1f);
-                    //}
-                }
-                if(Application.isPlaying){
-                    Gizmos.color = Color.magenta;
-                    Gizmos.DrawRay(m_AimPivot.position, (m_AimPivot.forward * 50));
+            if (Application.isPlaying)
+            {
+                if (m_DebugDrawLookRay)
+                {
+                    if (m_LookAtPoint != Vector3.zero)
+                    {
+                        Gizmos.color = Color.yellow;
+                        Gizmos.DrawLine(m_Transform.position + Vector3.up * 1.35f, m_LookAtPoint);
+                        Gizmos.DrawSphere(m_LookAtPoint, 0.1f);
+                    }
+
+                    if(m_Controller.Aiming)
+                    {
+                        Gizmos.color = Color.magenta;
+                        Gizmos.DrawRay(m_AimPivot.position, (m_AimPivot.forward * 50));
+                        GizmosUtils.DrawString("Aim Direction", m_AimPivot.position, Color.magenta);
+                    }
+
                 }
 
             }
+
 		}
 
 

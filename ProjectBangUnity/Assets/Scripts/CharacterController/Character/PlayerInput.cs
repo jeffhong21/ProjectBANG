@@ -119,31 +119,38 @@ namespace CharacterController
             }
 
 
-            //  Set look at point.
-            m_Controller.LookAtPoint = m_CameraController.Camera.transform.position + m_CameraController.Camera.transform.forward * m_LookDistance;
-            //Debug.DrawRay(m_CameraController.Camera.transform.position, m_CameraController.Camera.transform.forward * m_LookDistance, Color.blue);
+
 
             m_MouseInputVector.Set(m_MouseHorizontal, m_MouseVertical, m_CameraController.Camera.nearClipPlane);
             //var viewport = m_CameraController.Camera.ViewportToWorldPoint(m_MouseInputVector);
-            var direction = m_Controller.LookAtPoint - m_Transform.position;
-            //var direction = m_Transform.position - m_CameraController.Camera.transform.position;
-            //var direction = m_Transform.position - viewport;
+            //  Set look at point.
+            m_Controller.LookAtPoint = m_CameraController.Camera.transform.position + m_CameraController.Camera.transform.forward * m_LookDistance;
+            //Debug.DrawRay(m_CameraController.Camera.transform.position, m_CameraController.Camera.transform.forward * m_LookDistance, Color.blue);
+            var direction = (m_CameraController.Camera.transform.position + m_CameraController.Camera.transform.forward * m_LookDistance) - m_Transform.position;
             direction.y = 0;
             direction.Normalize();
-            //Debug.DrawRay(m_Transform.position +(Vector3.up * 1.35f), direction * m_LookDistance, Color.green);
 
-            m_Controller.LookDirection = m_CameraController.Camera.transform.forward * m_LookDistance;
-
+            //  Free Movement.
             if(m_Controller.IndependentLook())
             {
                 m_Controller.LookRotation = m_Transform.rotation;
+
+                m_Controller.LookDirection = m_CameraController.Camera.transform.forward * (direction.magnitude + 10);
             }
+            //  Aiming, Moving
             else{
                 direction.y = m_Transform.position.y;
                 if (direction != Vector3.zero)
                     m_Controller.LookRotation = Quaternion.LookRotation(direction, m_Transform.up);
                 else
                     m_Controller.LookRotation = m_Transform.rotation;
+
+                m_Controller.LookDirection = m_Transform.forward * 10;
+                //Debug.DrawRay(m_Transform.position +(Vector3.up * 1.35f), direction * m_LookDistance, Color.green);
+
+                //m_Controller.LookDirection = (m_Transform.position - m_CameraController.Camera.transform.position);
+                ////m_Controller.LookDirection.y = 0;
+                //m_Controller.LookDirection = m_Controller.LookDirection.normalized * (direction.magnitude + 10);
             }
 
 
@@ -188,8 +195,6 @@ namespace CharacterController
 
             m_CameraController.RotateCamera(m_MouseHorizontal, m_MouseVertical);
             m_CameraController.ZoomCamera(Input.GetAxisRaw(m_MouseScrollInput));
-
-
         }
 
 
@@ -228,8 +233,7 @@ namespace CharacterController
 
         private void DebugButtonPress()
         {
-            if (Input.GetKeyDown(KeyCode.P))
-            {
+            if (Input.GetKeyDown(KeyCode.P)){
                 //EventHandler.LogAllRegistered();
                 UnityEditor.Selection.activeGameObject = gameObject;
             }

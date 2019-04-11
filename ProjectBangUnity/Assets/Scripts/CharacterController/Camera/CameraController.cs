@@ -310,7 +310,7 @@
                 angle = Quaternion.Angle(m_Transform.rotation, m_Character.transform.rotation);
                 if (Quaternion.Angle(m_Transform.rotation, m_Character.transform.rotation) != 0){
                     m_TargetRotation = Quaternion.FromToRotation(m_Transform.forward, m_Character.transform.forward);
-                    m_Transform.rotation = Quaternion.Slerp(m_Transform.rotation, m_TargetRotation * m_Transform.rotation, m_CameraState.RotationSpeed * m_DeltaTime);
+                    m_Transform.rotation = Quaternion.Lerp(m_Transform.rotation, m_TargetRotation * m_Transform.rotation, m_CameraState.RotationSpeed * m_DeltaTime);
                 }
             }
 
@@ -337,8 +337,8 @@
             
             if (m_CameraState.ApplyTurn)
             {
-                m_Transform.rotation = Quaternion.Slerp(m_Transform.rotation, Quaternion.Euler(0, m_TargetYawAngle, 0), m_CameraState.TurnSpeed * m_DeltaTime);
-                m_PitchPivot.localRotation = Quaternion.Slerp(m_PitchPivot.localRotation, Quaternion.Euler(m_TargetPitchAngle, 0, 0), m_CameraState.TurnSpeed * m_DeltaTime); ;
+                m_Transform.rotation = Quaternion.Lerp(m_Transform.rotation, Quaternion.Euler(0, m_TargetYawAngle, 0), m_CameraState.TurnSpeed * m_DeltaTime);
+                m_PitchPivot.localRotation = Quaternion.Lerp(m_PitchPivot.localRotation, Quaternion.Euler(m_TargetPitchAngle, 0, 0), m_CameraState.TurnSpeed * m_DeltaTime); ;
             }
 
 

@@ -4,7 +4,7 @@ namespace CharacterController
     using System;
 
 
-    public class Cover : CharacterAction
+    public class Cover_01 : CharacterAction
     {
         private readonly bool hideflags = true;
 
@@ -33,7 +33,7 @@ namespace CharacterController
         protected Transform m_LeftCoverPopup;
 
 
-        protected RaycastHit m_ObjectDetectorHit;
+        protected RaycastHit m_RaycastHit;
         protected Quaternion m_TargetRotation;
         protected Vector3 m_TargetPosition;
 
@@ -87,7 +87,7 @@ namespace CharacterController
                 RaycastHit hit;
                 if (Physics.Raycast(m_ObjectDetector.position, m_ObjectDetector.forward, out hit, m_TakeCoverDistance, m_CoverLayer))
                 {
-                    m_TargetPosition = hit.point + (hit.normal * (m_CapsuleCollider.radius * 0.45f));
+                    m_TargetPosition = hit.point + (hit.normal * (m_CapsuleCollider.radius * 0.33f));
                     m_TargetPosition.y = m_Controller.transform.position.y;
                     return true;
                 }
@@ -129,20 +129,20 @@ namespace CharacterController
                 //emergeIndex = 2;
 
             m_Animator.SetInteger(HashID.ActionID, 0);
-            //m_Animator.SetInteger(HashID.ActionIntData, emergeIndex);
+            m_Animator.SetInteger(HashID.ActionIntData, emergeIndex);
             m_Animator.SetFloat(HashID.Height, 1);
 
             m_Controller.LookRotation = m_Transform.rotation;
 
-            //if (m_CanPopLeft || m_CanPopRight){
-            //    var action = m_Controller.GetAction<MoveTowards>();
-            //    if (action != null){
-            //        if (!action.IsActive){
-            //            action.ActionStartLocation = m_StopPosition;
-            //            m_Controller.TryStartAction(action);
-            //        }
-            //    }
-            //}
+            if (m_CanPopLeft || m_CanPopRight){
+                var action = m_Controller.GetAction<MoveTowards>();
+                if (action != null){
+                    if (!action.IsActive){
+                        action.ActionStartLocation = m_StopPosition;
+                        m_Controller.TryStartAction(action);
+                    }
+                }
+            }
 
         }
 
@@ -153,20 +153,14 @@ namespace CharacterController
             if (Mathf.Abs(m_Controller.InputVector.x) > 0.2)
             {
                 //Debug.DrawRay(m_ObjectDetector.position, m_ObjectDetector.forward, Color.magenta);
-                if (Physics.Raycast(m_ObjectDetector.position, m_ObjectDetector.forward, out m_ObjectDetectorHit, m_TakeCoverDistance, m_CoverLayer)){
-                    //m_TargetRotation = Quaternion.LookRotation(-m_ObjectDetectorHit.normal, m_Transform.up) * m_Transform.rotation;
-
-                    m_TargetRotation = Quaternion.FromToRotation(-m_Transform.forward, m_ObjectDetectorHit.normal) * m_Transform.rotation;
-                    m_Transform.rotation = m_TargetRotation;
-                    //m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Transform.rotation, m_TargetRotation.normalized, m_TakeCoverRotationSpeed * Time.deltaTime));
+                if (Physics.Raycast(m_ObjectDetector.position, m_ObjectDetector.forward, out m_RaycastHit, m_TakeCoverDistance, m_CoverLayer)){
+                    m_TargetRotation = Quaternion.FromToRotation(-m_Transform.forward, m_RaycastHit.normal) * m_Transform.rotation;
+                    m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Transform.rotation, m_TargetRotation.normalized, m_TakeCoverRotationSpeed * Time.deltaTime));
                 }
             }
             return false;
         }
 
-
-        [SerializeField]
-        float distance;
         //  Only allow movement on the relative x axis to prevent the character from moving away from the cover point.
         public override bool UpdateMovement()
         {
@@ -178,13 +172,10 @@ namespace CharacterController
                 //  --  Set character height --
                 if (Physics.Raycast(m_HighCoverDetector.position, m_HighCoverDetector.forward, m_PopoutLength, m_CoverLayer)){
                     m_HighCover = true;
-                } else {
+                }
+                else{
                     m_HighCover = false;
                 }
-                //m_HighCover = Physics.Raycast(m_HighCoverDetector.position, m_HighCoverDetector.forward, m_PopoutLength, m_CoverLayer) ? true : false;
-                distance = m_ObjectDetectorHit.distance;
-                if (distance > m_CapsuleCollider.radius + 0.02f)
-                    m_Transform.position = m_Transform.position + (Vector3.forward * (distance - m_CapsuleCollider.radius + 0.02f) * Time.deltaTime);
 
 
                 //  -- Check if character has reached the edge of the cover. --
@@ -198,13 +189,12 @@ namespace CharacterController
                     m_StopPosition = m_StopPosition + m_Transform.forward * 0.892f;
                     // Set the InputVector.
                     m_HorizontalInput = Mathf.Clamp(m_HorizontalInput, 0, 1);
-                    //m_HorizontalInput = Mathf.Clamp(m_HorizontalInput, -1, 0);
                     m_ForwardInput = m_Controller.InputVector.z;
 
                     m_Controller.InputVector.Set(m_HorizontalInput, m_Controller.InputVector.y, m_ForwardInput);
                     //  Move the character.
-                    //m_Controller.Velocity = m_Transform.right * m_HorizontalInput * Time.deltaTime;
-                    //m_Transform.position += m_Controller.Velocity;
+                    m_Controller.Velocity = m_Transform.right * m_HorizontalInput * Time.deltaTime;
+                    m_Transform.position += m_Controller.Velocity;
                 }
                 else if (!Physics.Raycast(m_RightCoverPopup.position, m_RightCoverPopup.forward, m_PopoutLength, m_CoverLayer))
                 {
@@ -214,13 +204,12 @@ namespace CharacterController
                     m_StopPosition = m_StopPosition + m_Transform.forward * 0.892f;
                     // Set the InputVector.
                     m_HorizontalInput = Mathf.Clamp(m_HorizontalInput, -1, 0);
-                    //m_HorizontalInput = Mathf.Clamp(m_HorizontalInput, 0, 1);
                     m_ForwardInput = m_Controller.InputVector.z;
 
                     m_Controller.InputVector.Set(m_HorizontalInput, m_Controller.InputVector.y, m_ForwardInput);
                     //  Move the character.
-                    //m_Controller.Velocity = m_Transform.right * m_HorizontalInput * Time.deltaTime;
-                    //m_Transform.position += m_Controller.Velocity;
+                    m_Controller.Velocity = m_Transform.right * m_HorizontalInput * Time.deltaTime;
+                    m_Transform.position += m_Controller.Velocity;
                 }
                 else
                 {
@@ -232,8 +221,8 @@ namespace CharacterController
                     m_ForwardInput = 0;
                     m_Controller.InputVector.Set(m_HorizontalInput, m_Controller.InputVector.y, m_ForwardInput);
                     //  Move the character.
-                    //m_Controller.Velocity = m_Transform.right * m_HorizontalInput * Time.deltaTime;
-                    //m_Transform.position += m_Controller.Velocity;
+                    m_Controller.Velocity = m_Transform.right * m_HorizontalInput * Time.deltaTime;
+                    m_Transform.position += m_Controller.Velocity;
                 }
 
 
@@ -261,8 +250,8 @@ namespace CharacterController
             m_AnimatorMonitor.SetHorizontalInputValue(m_HorizontalInput);
             m_AnimatorMonitor.SetForwardInputValue(m_ForwardInput);
             m_Animator.SetInteger(HashID.ActionID, m_ActionID);
-            //m_Animator.SetBool(HashID.Crouching, !m_HighCover);
-            m_Animator.SetFloat(HashID.Height, m_HighCover ? 1 : 0.5f, 0.1f, Time.deltaTime);
+            m_Animator.SetBool(HashID.Crouching, !m_HighCover);
+            m_Animator.SetFloat(HashID.Height, m_HighCover ? 1 : 0.5f);
 
             //m_Animator.SetInteger(HashID.ActionIntData, m_ActionID);
             return false;
@@ -384,11 +373,11 @@ namespace CharacterController
         //        direction = desiredRotation * direction;
 
         //        bool hit = false;
-        //        if (Physics.Raycast(m_ObjectDetector.position, direction, out m_ObjectDetectorHit, m_TakeCoverDistance, m_CoverLayer))
+        //        if (Physics.Raycast(m_ObjectDetector.position, direction, out m_RaycastHit, m_TakeCoverDistance, m_CoverLayer))
         //        {
         //            if (!drawAllLines) Debug.DrawRay(m_ObjectDetector.position, direction, hit ? Color.green : Color.magenta, 1);
         //            hit = true;
-        //            m_TargetPosition = m_ObjectDetectorHit.point + (m_ObjectDetectorHit.normal * (m_CapsuleCollider.radius * 1.0f));
+        //            m_TargetPosition = m_RaycastHit.point + (m_RaycastHit.normal * (m_CapsuleCollider.radius * 1.0f));
         //            m_TargetPosition.y = m_Controller.transform.position.y;
         //            return true;
         //        }

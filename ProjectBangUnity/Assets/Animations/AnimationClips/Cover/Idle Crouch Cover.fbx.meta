@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: fd54981145200499c8098252fc6f0229
+guid: 05ec7b8b5b37b4c7e966eec9d4c9107d
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
@@ -104,7 +104,8 @@ ModelImporter:
     400096: UpperLeg_L
     400098: UpperLeg_R
     7400000: mixamo.com
-    7400002: idle cover
+    7400002: idle cover crouched
+    7400004: Idle Crouch Cover
     9500000: //RootNode
   externalObjects: {}
   materials:
@@ -135,22 +136,22 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: idle cover
+      name: Idle Crouch Cover
       takeName: mixamo.com
       firstFrame: 0
-      lastFrame: 67
+      lastFrame: 77
       wrapMode: 0
-      orientationOffsetY: 180
+      orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 1
-      loopBlend: 1
-      loopBlendOrientation: 1
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
       loopBlendPositionY: 1
       loopBlendPositionXZ: 0
-      keepOriginalOrientation: 0
+      keepOriginalOrientation: 1
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 1
       heightFromFeet: 0

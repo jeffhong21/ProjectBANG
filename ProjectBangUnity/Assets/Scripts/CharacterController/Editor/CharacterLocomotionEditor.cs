@@ -247,6 +247,8 @@ namespace CharacterController
                 rect.x = elementRect.width + 12;
                 rect.width = 36; ;
                 action.enabled = EditorGUI.Toggle(rect, action.enabled);
+                //isActive.boolValue = EditorGUI.Toggle(rect, isActive.boolValue);
+                //isActive.boolValue = action.enabled;
 
                 elementObj.ApplyModifiedProperties();
 

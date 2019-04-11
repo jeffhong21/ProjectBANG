@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: fd54981145200499c8098252fc6f0229
+guid: f57f595cc19fe484489609f1abf9655d
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
@@ -25,15 +25,15 @@ ModelImporter:
     100038: Hand_R
     100040: Head
     100042: Hips
-    100044: //RootNode
-    100046: IndexFinger_01
-    100048: IndexFinger_011
-    100050: IndexFinger_02
-    100052: IndexFinger_021
-    100054: IndexFinger_03
-    100056: IndexFinger_031
-    100058: IndexFinger_04
-    100060: IndexFinger_041
+    100044: IndexFinger_01
+    100046: IndexFinger_011
+    100048: IndexFinger_02
+    100050: IndexFinger_021
+    100052: IndexFinger_03
+    100054: IndexFinger_031
+    100056: IndexFinger_04
+    100058: IndexFinger_041
+    100060: //RootNode
     100062: LowerLeg_L
     100064: LowerLeg_R
     100066: Neck
@@ -75,15 +75,15 @@ ModelImporter:
     400038: Hand_R
     400040: Head
     400042: Hips
-    400044: //RootNode
-    400046: IndexFinger_01
-    400048: IndexFinger_011
-    400050: IndexFinger_02
-    400052: IndexFinger_021
-    400054: IndexFinger_03
-    400056: IndexFinger_031
-    400058: IndexFinger_04
-    400060: IndexFinger_041
+    400044: IndexFinger_01
+    400046: IndexFinger_011
+    400048: IndexFinger_02
+    400050: IndexFinger_021
+    400052: IndexFinger_03
+    400054: IndexFinger_031
+    400056: IndexFinger_04
+    400058: IndexFinger_041
+    400060: //RootNode
     400062: LowerLeg_L
     400064: LowerLeg_R
     400066: Neck
@@ -104,7 +104,10 @@ ModelImporter:
     400096: UpperLeg_L
     400098: UpperLeg_R
     7400000: mixamo.com
-    7400002: idle cover
+    7400002: left cover sneak
+    7400004: Root
+    7400006: Left Cover Sneak
+    7400008: Right Cover Sneak
     9500000: //RootNode
   externalObjects: {}
   materials:
@@ -135,12 +138,12 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: idle cover
+      name: Right Cover Sneak
       takeName: mixamo.com
       firstFrame: 0
-      lastFrame: 67
+      lastFrame: 34
       wrapMode: 0
-      orientationOffsetY: 180
+      orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
@@ -150,7 +153,7 @@ ModelImporter:
       loopBlendOrientation: 1
       loopBlendPositionY: 1
       loopBlendPositionXZ: 0
-      keepOriginalOrientation: 0
+      keepOriginalOrientation: 1
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 1
       heightFromFeet: 0

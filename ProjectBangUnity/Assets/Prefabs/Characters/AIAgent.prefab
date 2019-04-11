@@ -2118,7 +2118,7 @@ MonoBehaviour:
   m_TimeInvincibleAfterSpawn: 0
 --- !u!114 &114774922100011690
 MonoBehaviour:
-  m_ObjectHideFlags: 1
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1761652248440620}
@@ -2261,15 +2261,11 @@ MonoBehaviour:
   m_Actions:
   - {fileID: 114774922100011690}
   m_ActiveAction: {fileID: 0}
+  m_MovementType: 0
   m_Grounded: 1
-  m_MoveAmount: 0
-  m_TurnAmount: 0
-  m_InputVector: {x: 0, y: 0, z: 0}
-  m_RelativeInputVector: {x: 0, y: 0, z: 0}
-  eulerY: 0
-  _rigidbodyVelocity: {x: 0, y: 0, z: 0}
-  _rigidbodyAngularVelocity: {x: 0, y: 0, z: 0}
+  m_Speed: 0
   m_DrawDebugLine: 0
+  RIGIDBODY_VELOCITY: {x: 0, y: 0, z: 0}
 --- !u!135 &135193254563505052
 SphereCollider:
   m_ObjectHideFlags: 1

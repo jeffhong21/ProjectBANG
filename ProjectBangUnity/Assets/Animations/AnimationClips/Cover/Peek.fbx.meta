@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: fd54981145200499c8098252fc6f0229
+guid: 19d2794f571404100ae01729f2a94ef9
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
@@ -25,24 +25,24 @@ ModelImporter:
     100038: Hand_R
     100040: Head
     100042: Hips
-    100044: //RootNode
-    100046: IndexFinger_01
-    100048: IndexFinger_011
-    100050: IndexFinger_02
-    100052: IndexFinger_021
-    100054: IndexFinger_03
-    100056: IndexFinger_031
-    100058: IndexFinger_04
-    100060: IndexFinger_041
-    100062: LowerLeg_L
-    100064: LowerLeg_R
-    100066: Neck
-    100068: Root
-    100070: Shoulder_L
-    100072: Shoulder_R
-    100074: Spine_01
-    100076: Spine_02
-    100078: Spine_03
+    100044: IndexFinger_01
+    100046: IndexFinger_011
+    100048: IndexFinger_02
+    100050: IndexFinger_021
+    100052: IndexFinger_03
+    100054: IndexFinger_031
+    100056: IndexFinger_04
+    100058: IndexFinger_041
+    100060: LowerLeg_L
+    100062: LowerLeg_R
+    100064: Neck
+    100066: Root
+    100068: Shoulder_L
+    100070: Shoulder_R
+    100072: Spine_01
+    100074: Spine_02
+    100076: Spine_03
+    100078: //RootNode
     100080: Thumb_01
     100082: Thumb_011
     100084: Thumb_02
@@ -75,24 +75,24 @@ ModelImporter:
     400038: Hand_R
     400040: Head
     400042: Hips
-    400044: //RootNode
-    400046: IndexFinger_01
-    400048: IndexFinger_011
-    400050: IndexFinger_02
-    400052: IndexFinger_021
-    400054: IndexFinger_03
-    400056: IndexFinger_031
-    400058: IndexFinger_04
-    400060: IndexFinger_041
-    400062: LowerLeg_L
-    400064: LowerLeg_R
-    400066: Neck
-    400068: Root
-    400070: Shoulder_L
-    400072: Shoulder_R
-    400074: Spine_01
-    400076: Spine_02
-    400078: Spine_03
+    400044: IndexFinger_01
+    400046: IndexFinger_011
+    400048: IndexFinger_02
+    400050: IndexFinger_021
+    400052: IndexFinger_03
+    400054: IndexFinger_031
+    400056: IndexFinger_04
+    400058: IndexFinger_041
+    400060: LowerLeg_L
+    400062: LowerLeg_R
+    400064: Neck
+    400066: Root
+    400068: Shoulder_L
+    400070: Shoulder_R
+    400072: Spine_01
+    400074: Spine_02
+    400076: Spine_03
+    400078: //RootNode
     400080: Thumb_01
     400082: Thumb_011
     400084: Thumb_02
@@ -104,7 +104,8 @@ ModelImporter:
     400096: UpperLeg_L
     400098: UpperLeg_R
     7400000: mixamo.com
-    7400002: idle cover
+    7400002: stand_cover_peek
+    7400004: Peek
     9500000: //RootNode
   externalObjects: {}
   materials:
@@ -135,22 +136,22 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: idle cover
+      name: Peek
       takeName: mixamo.com
       firstFrame: 0
-      lastFrame: 67
+      lastFrame: 82
       wrapMode: 0
-      orientationOffsetY: 180
+      orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 1
-      loopBlend: 1
-      loopBlendOrientation: 1
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
       loopBlendPositionY: 1
       loopBlendPositionXZ: 0
-      keepOriginalOrientation: 0
+      keepOriginalOrientation: 1
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 1
       heightFromFeet: 0

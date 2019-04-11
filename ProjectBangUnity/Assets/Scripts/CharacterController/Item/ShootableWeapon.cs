@@ -272,7 +272,11 @@
         protected virtual void HitscanFire()
         {
             RaycastHit hit;
-            var targetDirection = m_Controller.LookAtPoint - m_FirePoint.position;
+
+            //var targetDirection = m_Controller.LookAtPoint - m_FirePoint.position;
+            var targetDirection = (m_FirePoint.position + m_Controller.LookDirection) - m_FirePoint.position;
+
+
             //Debug.DrawRay(m_FirePoint.position, targetDirection, Color.blue, 1);
             if(Physics.Raycast(m_FirePoint.position, targetDirection, out hit, m_FireRange, m_ImpactLayers))
             {

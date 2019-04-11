@@ -2172,7 +2172,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 0.75
+  m_Volume: 0.5
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -2267,7 +2267,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 0.75
+  m_Volume: 0.5
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -2503,9 +2503,12 @@ MonoBehaviour:
   m_MaxVaultHeight: 2
   m_MaxVaultDepth: 1
   m_StartVaultOffset: 0.2
-  m_MatchTargetOffset: 0
-  m_StartMatchTarget: 0
-  m_StopMatchTarget: 0
+  m_HorizontalMatchTargetOffset: -0.2
+  m_VerticalMatchTargetOffset: 0
+  m_StartMatchTarget: 0.43
+  m_StopMatchTarget: 0.49
+  m_VerticalVelocity: {x: 0, y: 0, z: 0}
+  m_VerticalHeight: 0
   stateNames:
   - Base Layer.Vault.Waist
   - Base Layer.Vault.Chest
@@ -2561,7 +2564,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bodyPosition: {x: 0, y: 0, z: 0}
-  m_DebugDrawLookRay: 0
+  m_DebugDrawLookRay: 1
   m_LookAtAimBodyWeight: 1
   m_LookAtBodyWeight: 0.12
   m_LookAtHeadWeight: 0.15
@@ -2760,7 +2763,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 24f4915bd11574121a2a533c85cb7cc1, type: 3}
   m_Name: 
@@ -2837,7 +2840,7 @@ MonoBehaviour:
   m_TakeCoverDistance: 2
   m_CoverLayer:
     serializedVersion: 2
-    m_Bits: 768
+    m_Bits: 134218496
   m_TakeCoverRotationSpeed: 4
   m_ObjectDetectorHeight: 0.5
   m_HighCoverHeight: 1.35
@@ -2846,6 +2849,7 @@ MonoBehaviour:
   m_ForwardInput: 0
   m_CanPopLeft: 0
   m_CanPopRight: 0
+  distance: 0
   m_DebugSettings:
     m_GizmoSize: 0.2
     m_CubeSize: {x: 0.1, y: 0.1, z: 0.1}
@@ -2890,7 +2894,7 @@ MonoBehaviour:
   m_SpeedChangeMultiplier: 1
   m_RotationSpeed: 8
   m_AimRotationSpeed: 12
-  m_AlignToGround: 1
+  m_AlignToGround: 0
   m_AlignToGroundDepthOffset: 0.5
   m_GroundSpeed: {x: 1, y: 0, z: 1}
   m_SkinWidth: 0.08
@@ -2914,7 +2918,9 @@ MonoBehaviour:
   m_ActiveAction: {fileID: 0}
   m_MovementType: 0
   m_Grounded: 1
-  m_DrawDebugLine: 0
+  m_Speed: 0
+  m_DrawDebugLine: 1
+  RIGIDBODY_VELOCITY: {x: 0, y: 0, z: 0}
 --- !u!135 &135562184133563358
 SphereCollider:
   m_ObjectHideFlags: 1

@@ -26,7 +26,7 @@
         public static readonly int Height = Animator.StringToHash("Height");
         public static readonly int Speed = Animator.StringToHash("Speed");
 
-
+        public static readonly int ColliderHeight = Animator.StringToHash("ColliderHeight");
 
         public static readonly int ActionChange = Animator.StringToHash("ActionChange");
 

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: fd54981145200499c8098252fc6f0229
+guid: 2adf481a3febc467a9f806d6a6015f41
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
@@ -9,23 +9,23 @@ ModelImporter:
     100006: Ball_R
     100008: Clavicle_L
     100010: Clavicle_R
-    100012: Elbow_L
-    100014: Elbow_R
-    100016: Eyebrows
-    100018: Eyes
-    100020: Finger_01
-    100022: Finger_011
-    100024: Finger_02
-    100026: Finger_021
-    100028: Finger_03
-    100030: Finger_031
-    100032: Finger_04
-    100034: Finger_041
-    100036: Hand_L
-    100038: Hand_R
-    100040: Head
-    100042: Hips
-    100044: //RootNode
+    100012: //RootNode
+    100014: Elbow_L
+    100016: Elbow_R
+    100018: Eyebrows
+    100020: Eyes
+    100022: Finger_01
+    100024: Finger_011
+    100026: Finger_02
+    100028: Finger_021
+    100030: Finger_03
+    100032: Finger_031
+    100034: Finger_04
+    100036: Finger_041
+    100038: Hand_L
+    100040: Hand_R
+    100042: Head
+    100044: Hips
     100046: IndexFinger_01
     100048: IndexFinger_011
     100050: IndexFinger_02
@@ -59,23 +59,23 @@ ModelImporter:
     400006: Ball_R
     400008: Clavicle_L
     400010: Clavicle_R
-    400012: Elbow_L
-    400014: Elbow_R
-    400016: Eyebrows
-    400018: Eyes
-    400020: Finger_01
-    400022: Finger_011
-    400024: Finger_02
-    400026: Finger_021
-    400028: Finger_03
-    400030: Finger_031
-    400032: Finger_04
-    400034: Finger_041
-    400036: Hand_L
-    400038: Hand_R
-    400040: Head
-    400042: Hips
-    400044: //RootNode
+    400012: //RootNode
+    400014: Elbow_L
+    400016: Elbow_R
+    400018: Eyebrows
+    400020: Eyes
+    400022: Finger_01
+    400024: Finger_011
+    400026: Finger_02
+    400028: Finger_021
+    400030: Finger_03
+    400032: Finger_031
+    400034: Finger_04
+    400036: Finger_041
+    400038: Hand_L
+    400040: Hand_R
+    400042: Head
+    400044: Hips
     400046: IndexFinger_01
     400048: IndexFinger_011
     400050: IndexFinger_02
@@ -104,7 +104,9 @@ ModelImporter:
     400096: UpperLeg_L
     400098: UpperLeg_R
     7400000: mixamo.com
-    7400002: idle cover
+    7400002: crouched sneaking left
+    7400004: Left Crouch Cover Sneak
+    7400006: Right Crouch Cover Sneak
     9500000: //RootNode
   externalObjects: {}
   materials:
@@ -135,12 +137,12 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: idle cover
+      name: Right Crouch Cover Sneak
       takeName: mixamo.com
       firstFrame: 0
-      lastFrame: 67
+      lastFrame: 38
       wrapMode: 0
-      orientationOffsetY: 180
+      orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
@@ -150,7 +152,7 @@ ModelImporter:
       loopBlendOrientation: 1
       loopBlendPositionY: 1
       loopBlendPositionXZ: 0
-      keepOriginalOrientation: 0
+      keepOriginalOrientation: 1
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 1
       heightFromFeet: 0
