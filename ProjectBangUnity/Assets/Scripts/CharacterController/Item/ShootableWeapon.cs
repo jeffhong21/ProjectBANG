@@ -73,11 +73,20 @@
         private WaitForSeconds m_fireSoundSecondsDelay;
         private Quaternion m_Rotation;
 
+        //  Fire direction
+        private Vector3 m_LookSourceDirection;
+        private Vector3 m_TargetDirection;
+
 
 
         public int CurrentAmmo{
             get { return m_CurrentAmmo; }
             set { m_CurrentAmmo = value; }
+        }
+
+        public LayerMask ImpactLayers{
+            get { return m_ImpactLayers; }
+            //set { m_CurrentAmmo = value; }
         }
 
 
@@ -176,6 +185,21 @@
         }
 
 
+        //public void SetLookSourceDirection(Vector3 direction){
+        //    if(Vector3.Dot(m_FirePoint.forward, direction) < 0){
+        //        m_TargetDirection = m_FirePoint.forward;
+        //        Debug.LogFormat("Direction provided to {0} is behind it.", m_GameObject.name);
+        //    } else {
+        //        m_TargetDirection = direction;
+        //    }
+        //}
+
+        public void SetFireAtPoint(Vector3 point){
+            m_TargetDirection = point - m_FirePoint.position;
+        }
+
+
+
 
 
 
@@ -195,7 +219,10 @@
 
         protected virtual void Fire()
         {
-            //  Play gun shooting animation;
+
+            //var targetDirection = m_Controller.LookAtPoint - m_FirePoint.position;
+            //var targetDirection = (m_FirePoint.position + m_Controller.LookDirection) - m_FirePoint.position;
+            m_TargetDirection = (m_FirePoint.position + m_TargetDirection) - m_FirePoint.position;
 
             if (m_Projectile){
                 ProjectileFire();
@@ -229,10 +256,13 @@
             //  Update current ammo.
             //m_CurrentAmmo -= m_FireCount;
             //  Reload if auto reload is set.
+
             if (m_AutoReload && m_CurrentAmmo <= 0){
                 TryStartReload();
                 Debug.LogFormat("{0} is auto reloading.", m_GameObject.name);
             }
+
+            m_TargetDirection = m_FirePoint.forward;
         }
 
 
@@ -272,13 +302,8 @@
         protected virtual void HitscanFire()
         {
             RaycastHit hit;
-
-            //var targetDirection = m_Controller.LookAtPoint - m_FirePoint.position;
-            var targetDirection = (m_FirePoint.position + m_Controller.LookDirection) - m_FirePoint.position;
-
-
             //Debug.DrawRay(m_FirePoint.position, targetDirection, Color.blue, 1);
-            if(Physics.Raycast(m_FirePoint.position, targetDirection, out hit, m_FireRange, m_ImpactLayers))
+            if(Physics.Raycast(m_FirePoint.position, m_TargetDirection, out hit, m_FireRange, m_ImpactLayers))
             {
                 var damagableObject = hit.transform.GetComponentInParent<Health>();
                 Vector3 hitDirection = hit.transform.position - m_FirePoint.position;
@@ -298,7 +323,7 @@
                 else
                 {
                     //ObjectPoolManager.Instance.Spawn(m_DefaultDust, collisionPoint, Quaternion.FromToRotation(m_Transform.forward, collisionPointNormal));
-                    ObjectPoolManager.Instance.Spawn(m_DefaultDust, hit.point, Quaternion.LookRotation(hit.normal));
+                    ObjectPoolManager.Spawn(m_DefaultDust, hit.point, Quaternion.LookRotation(hit.normal));
                 }
 
 
@@ -366,7 +391,7 @@
                 {
                     Gizmos.color = Color.yellow;
                     //Gizmos.DrawRay(m_FirePoint.position, (m_FirePoint.forward * 50));  //  + (Vector3.up * m_FirePoint.position.y) 
-                    Gizmos.DrawRay(m_FirePoint.position, m_Controller.LookDirection * 50);  //  + (Vector3.up * m_FirePoint.position.y) 
+                    Gizmos.DrawRay(m_FirePoint.position, m_TargetDirection * 50);  //  + (Vector3.up * m_FirePoint.position.y) 
 
                 }
             }

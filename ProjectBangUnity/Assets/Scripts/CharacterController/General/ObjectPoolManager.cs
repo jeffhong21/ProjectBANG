@@ -1,24 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
-public class ObjectPoolManager : MonoBehaviour 
+public class ObjectPoolManager : MonoBehaviour
 {
     public static ObjectPoolManager Instance { get; private set; }
 
     [SerializeField]
     private List<Pool> m_Pools = new List<Pool>();
 
-    private Dictionary<GameObject, Queue<GameObject>> m_ObjectPool;
+    private static Dictionary<GameObject, Queue<GameObject>> m_ObjectPool;
 
-    private Transform m_Host;
+    private static Transform m_Host;
 
 
 
 
     protected void Awake()
     {
-        if (Instance != null){
+        if (Instance != null)
+        {
             Destroy(this);
             return;
         }
@@ -28,9 +30,11 @@ public class ObjectPoolManager : MonoBehaviour
         m_Host = transform;
 
 
-        for (int index = 0; index < m_Pools.Count; index++){
+        for (int index = 0; index < m_Pools.Count; index++)
+        {
             m_ObjectPool.Add(m_Pools[index].Prefab, new Queue<GameObject>());
-            for (int i = 0; i < m_Pools[index].Count; i++){
+            for (int i = 0; i < m_Pools[index].Count; i++)
+            {
                 Instantiate(m_Pools[index].Prefab, Vector3.zero, Quaternion.identity, m_Host);
             }
         }
@@ -41,11 +45,11 @@ public class ObjectPoolManager : MonoBehaviour
 
 
 
-    public GameObject Instantiate(GameObject original, Vector3 position, Quaternion rotation, Transform parent = null)
+    public static GameObject Instantiate(GameObject original, Vector3 position, Quaternion rotation, Transform parent = null)
     {
         //if (!m_ObjectPool.ContainsKey(original))
-            //m_ObjectPool.Add(original, new Queue<GameObject>());
-        
+        //m_ObjectPool.Add(original, new Queue<GameObject>());
+
         GameObject instantiatedObject = Instantiate(original);
         m_ObjectPool[original].Enqueue(instantiatedObject);
 
@@ -59,15 +63,17 @@ public class ObjectPoolManager : MonoBehaviour
     }
 
 
-    public GameObject Spawn(GameObject original, Vector3 position, Quaternion rotation, Transform parent = null)
+    public static GameObject Spawn(GameObject original, Vector3 position, Quaternion rotation, Transform parent = null)
     {
         GameObject instantiatedObject = null;
         if (m_ObjectPool.ContainsKey(original))
         {
-            if(m_ObjectPool[original].Count > 0){
+            if (m_ObjectPool[original].Count > 0)
+            {
                 instantiatedObject = m_ObjectPool[original].Dequeue();
             }
-            else{
+            else
+            {
                 instantiatedObject = Instantiate(original, Vector3.zero, Quaternion.identity, parent);
             }
 
@@ -76,7 +82,7 @@ public class ObjectPoolManager : MonoBehaviour
             instantiatedObject.transform.rotation = rotation;
             instantiatedObject.transform.SetParent(parent);
             instantiatedObject.SetActive(true);
-        } 
+        }
         //else{
         //    m_ObjectPool.Add(original, new Queue<GameObject>());
         //    instantiatedObject = Instantiate(original, Vector3.zero, Quaternion.identity, parent);
@@ -88,9 +94,14 @@ public class ObjectPoolManager : MonoBehaviour
     }
 
 
+    public static int OriginalInstanceID(GameObject instantiatedObject)
+    {
+        return 0;
+    }
 
-    public void Destroy(GameObject instantiatedObject)
-	{
+
+    public static void Destroy(GameObject instantiatedObject)
+    {
         if (m_ObjectPool.ContainsKey(instantiatedObject))
         {
             Debug.LogFormat("Returning {0} to pool", instantiatedObject);
@@ -103,10 +114,11 @@ public class ObjectPoolManager : MonoBehaviour
 
             m_ObjectPool[instantiatedObject].Enqueue(instantiatedObject.gameObject);
         }
-        else{
+        else
+        {
             Debug.LogFormat("Object pool does not contain {0}", instantiatedObject);
         }
-	}
+    }
 
 
 
@@ -117,7 +129,7 @@ public class ObjectPoolManager : MonoBehaviour
     {
         //public string ID;
         public GameObject Prefab;
-        [Range(0, 20)]
+
         public int Count;
     }
 }

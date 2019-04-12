@@ -161,7 +161,7 @@ namespace CharacterController
             else
             {
                 //ObjectPoolManager.Instance.Spawn(m_DefaultDust, collisionPoint, Quaternion.FromToRotation(m_Transform.forward, collisionPointNormal));
-                ObjectPoolManager.Instance.Spawn(m_DefaultDust, collisionPoint, Quaternion.LookRotation(collisionPointNormal));
+                //ObjectPoolManager.Instance.Spawn(m_DefaultDust, collisionPoint, Quaternion.LookRotation(collisionPointNormal));
             }
 
 

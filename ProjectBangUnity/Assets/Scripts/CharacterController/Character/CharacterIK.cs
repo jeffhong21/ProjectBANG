@@ -220,7 +220,7 @@
 
             m_AimPivot.position = m_RightShoulder.position;
             //m_LookAtPoint = m_Head.position + m_Controller.LookDirection;
-            m_LookAtPoint = Vector3.Lerp(m_LookAtPoint, m_Head.position + m_Controller.LookDirection, Time.deltaTime);
+            m_LookAtPoint = Vector3.Lerp(m_LookAtPoint, m_Head.position + m_Controller.LookDirection, Time.deltaTime * 15);
 
 
             m_TargetDirection = m_LookAtPoint - m_AimPivot.position;
@@ -303,7 +303,7 @@
 
         protected virtual void PositionLowerBody()
         {
-            MovePelvisHeight();
+            //MovePelvisHeight();
 
             //right foot ik position and rotation -- utilise the pro features in here
             m_Animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1);
@@ -413,7 +413,7 @@
                 {
                     if (m_LookAtPoint != Vector3.zero)
                     {
-                        Gizmos.color = Color.yellow;
+                        Gizmos.color = Color.cyan;
                         Gizmos.DrawLine(m_Transform.position + Vector3.up * 1.35f, m_LookAtPoint);
                         Gizmos.DrawSphere(m_LookAtPoint, 0.1f);
                     }

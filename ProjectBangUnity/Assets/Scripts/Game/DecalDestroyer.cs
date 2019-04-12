@@ -17,7 +17,7 @@ public class DecalDestroyer : MonoBehaviour
 
 	private IEnumerator Start()
     {
-        //currentDuration = 0;
+        currentDuration = 0;
 
         //if (meshRenderer == null)
         //{
@@ -31,7 +31,7 @@ public class DecalDestroyer : MonoBehaviour
         //}
 
         yield return new WaitForSeconds(lifeTime);
-        //ObjectPoolManager.Instance.Destroy(gameObject);
+        //ObjectPoolManager.Destroy(gameObject);
         Destroy(gameObject);
     }
 }

@@ -35,6 +35,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4572819961280480}
+  - component: {fileID: 114205801921529198}
   m_Layer: 0
   m_Name: PitchPivot
   m_TagString: Untagged
@@ -82,7 +83,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1649400292190392}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.5, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4903180862728622}
@@ -224,6 +225,17 @@ MonoBehaviour:
   m_BeforeTransparentBundles: []
   m_BeforeStackBundles: []
   m_AfterStackBundles: []
+--- !u!114 &114205801921529198
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1649400292190392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed9c0d858af6140a793fe6d3487fe687, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114390585562722546
 MonoBehaviour:
   m_ObjectHideFlags: 1

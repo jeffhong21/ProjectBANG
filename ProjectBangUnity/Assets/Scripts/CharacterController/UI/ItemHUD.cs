@@ -12,9 +12,9 @@ namespace CharacterController.UI
         [SerializeField]
         private TextMeshProUGUI m_ItemName;
         [SerializeField]
-        private TextMeshProUGUI m_ItemInfo;
-
-
+        private TextMeshProUGUI m_CurrentAmmo;
+        [SerializeField]
+        private TextMeshProUGUI m_TotalAmmo;
 
 
 
@@ -65,19 +65,21 @@ namespace CharacterController.UI
             PrimaryItem primaryItem = (PrimaryItem)itemType;
             //Debug.LogFormat("{0} was used.  {1} out of {2} remain loaded.", itemType.name, remaining, primaryItem.ConsumableItem.Capacity);
 
-            //m_ItemInfo.text = remaining + " | " + primaryItem.ConsumableItem.Capacity.ToString();
-            m_ItemInfo.text = string.Format("{0} | {1}", remaining, primaryItem.ConsumableItem.Capacity);
+            //m_CurrentAmmo.text = remaining + " | " + primaryItem.ConsumableItem.Capacity.ToString();
+            m_CurrentAmmo.text = remaining.ToString();
         }
 
         private void EquipItem(Item item)
         {
             if(item == null){
-                m_ItemInfo.text = "";
+                m_CurrentAmmo.text = "";
                 m_ItemName.text = "Unarmed";
             } else {
                 //var shootable = (ShootableWeapon)item;
                 m_ItemName.text = item.ItemType.name;
-                //m_ItemInfo.text = string.Format("{0} | {1}", shootable.CurrentAmmo, item.ItemType.ConsumableItem.Capacity);
+                var primaryWeapon = (PrimaryItem)item.ItemType;
+                m_TotalAmmo.text = primaryWeapon.ConsumableItem.Capacity.ToString();
+                //m_CurrentAmmo.text = string.Format("{0} | {1}", shootable.CurrentAmmo, item.ItemType.ConsumableItem.Capacity);
             }
 
         }

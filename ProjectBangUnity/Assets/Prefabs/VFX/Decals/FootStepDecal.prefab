@@ -141,3 +141,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lifeTime: 5
+  meshRenderer: {fileID: 0}
+  material: {fileID: 0}

@@ -267,7 +267,7 @@
 		{
             m_PitchPivotPosition = m_PitchPivot.localPosition;
             //m_PitchPivotPosition.z = -m_CameraState.ViewDistance;
-            m_PitchPivotPosition.y = m_CameraState.VerticalOffset;
+            //m_PitchPivotPosition.y = m_CameraState.VerticalOffset;
 
             m_CameraPosition = m_Camera.transform.localPosition;
             if (m_CameraState.ApplyCameraOffset)
@@ -275,12 +275,12 @@
             m_CameraPosition.z = m_CameraPosition.z + (-m_CameraState.ViewDistance);
                 
 
-            m_PitchPivot.localPosition = Vector3.Lerp(m_PitchPivot.localPosition, m_PitchPivotPosition, 12 * m_DeltaTime);
+            //m_PitchPivot.localPosition = Vector3.Lerp(m_PitchPivot.localPosition, m_PitchPivotPosition, 12 * m_DeltaTime);
             m_Camera.transform.localPosition = Vector3.Lerp(m_Camera.transform.localPosition, m_CameraPosition, 12 * m_DeltaTime);
 
-            //m_TargetPosition = Vector3.Lerp(m_Transform.position, m_Anchor.position, time);
-            m_TargetPosition = Vector3.SmoothDamp(m_Transform.position, m_Anchor.position, ref m_CameraVelocitySmooth, 0.12f);
-            m_TargetPosition.y = m_Transform.position.y;
+            //m_TargetPosition = Vector3.Lerp(m_Transform.position, m_Anchor.position, 12 * m_DeltaTime);
+            m_TargetPosition = Vector3.SmoothDamp(m_Transform.position, m_Anchor.position, ref m_CameraVelocitySmooth, 0.15f);
+            m_TargetPosition.y = m_Anchor.position.y + m_CameraState.VerticalOffset;
             m_Transform.position = m_TargetPosition;
 
 
@@ -310,6 +310,7 @@
                 angle = Quaternion.Angle(m_Transform.rotation, m_Character.transform.rotation);
                 if (Quaternion.Angle(m_Transform.rotation, m_Character.transform.rotation) != 0){
                     m_TargetRotation = Quaternion.FromToRotation(m_Transform.forward, m_Character.transform.forward);
+                    //m_TargetRotation = Quaternion.FromToRotation(Vector3.up, m_Character.transform.forward);
                     m_Transform.rotation = Quaternion.Lerp(m_Transform.rotation, m_TargetRotation * m_Transform.rotation, m_CameraState.RotationSpeed * m_DeltaTime);
                 }
             }

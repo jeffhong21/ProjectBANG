@@ -70,6 +70,7 @@
         private Vector3 m_Velocity, m_RootMotionVelocity, m_MoveDirection;
         //[SerializeField, DisplayOnly]
         private Vector3 m_InputVector, m_RelativeInputVector;
+        [SerializeField, DisplayOnly]
         private Quaternion m_LookRotation;
 
 
@@ -242,11 +243,6 @@
             m_Moving = m_InputVector.sqrMagnitude > 0.2f;
 
 
-            //Vector3 axisSign = Vector3.Cross(m_MoveDirection, m_Transform.forward);
-            //float angleRootMove = Vector3.Angle(m_Transform.forward, m_MoveDirection) * axisSign.y >= 0 ? -1f : 1f;
-            //angleOut = angleRootMove;
-            //angleRootMove /= 180f;
-            //m_Direction = angleRootMove * 1.5f;
 
             //m_Grounded = CheckGround();
             m_Grounded = CheckGround_2();
@@ -312,9 +308,14 @@
         //  Should the character look independetly of the camera?  AI Agents do not need to use camera rotation.
         public bool IndependentLook()
         {
-            if(m_Aiming || m_Moving){
+            if(m_Moving || m_Aiming){
                 return false;
             }
+
+            //if(m_Aiming){
+            //    return true;
+            //}
+
             return true;
         }
 
@@ -323,13 +324,10 @@
         {
             //m_MoveDirection = m_Transform.forward * m_InputVector.z + m_Transform.right * m_InputVector.x;
 
-            if (m_Grounded)
-            {
+            if (m_Grounded){
                 m_MoveDirection = m_Moving ? Vector3.Cross(m_Transform.right, m_GroundHit.normal) : Vector3.zero;
                 m_SlopeAngle = Vector3.Angle(m_Transform.forward, m_GroundHit.normal) - 90;
-            }
-            else
-            {
+            }else{
                 m_MoveDirection = Vector3.zero;
                 m_SlopeAngle = 0;
             }
@@ -343,26 +341,32 @@
                     m_StepRayStart = (m_Transform.position + Vector3.up * m_MaxStepHeight) + m_Transform.forward * (m_CapsuleCollider.radius * 2);  //+ m_SkinWidth);
                     m_StepRayDirection = Vector3.down * (m_MaxStepHeight - m_StepOffset);
 
-                    if (Physics.Raycast(m_StepRayStart, m_StepRayDirection, out m_StepHit, m_MaxStepHeight - m_StepOffset, m_Layers.SolidLayer)){
+                    if (m_DrawDebugLine) Debug.DrawRay(m_StepRayStart, m_StepRayDirection, Color.yellow);
+
+                    if (Physics.Raycast(m_StepRayStart, m_StepRayDirection, out m_StepHit, m_MaxStepHeight - m_StepOffset, m_Layers.SolidLayer) && !m_StepHit.collider.isTrigger ){
                         if (m_StepHit.point.y >= (m_Transform.position.y) && m_StepHit.point.y <= (m_Transform.position.y + m_StepOffset + m_SkinWidth)){
-                            m_MoveDirection = (m_StepHit.point - m_Transform.position).normalized * m_StepSpeed;
-                            m_Rigidbody.velocity = m_MoveDirection + Vector3.up * m_StepSpeed;
+                            //m_MoveDirection = (m_StepHit.point - m_Transform.position).normalized;
+                            m_MoveDirection = Vector3.Lerp(m_MoveDirection, (m_StepHit.point - m_Transform.position).normalized, m_StepSpeed * m_DeltaTime );
+                            m_Rigidbody.velocity += (m_MoveDirection + (Vector3.up * m_StepSpeed)) * m_StepSpeed * m_DeltaTime;
+                            m_Transform.position += (m_MoveDirection + (Vector3.up * m_StepSpeed)) * m_StepSpeed * m_DeltaTime;
                         }
                     }
                 }
 
+                if (m_DrawDebugLine) Debug.DrawRay(m_Transform.position, m_MoveDirection, Color.cyan);
 
-                //if(m_AlignToGround){
-                //    if (Mathf.Abs(Vector3.Angle(m_GroundHit.normal, Vector3.up)) < 85f)
-                //        m_Rigidbody.velocity = Vector3.ProjectOnPlane(m_Rigidbody.velocity, m_GroundHit.normal);
-                //} else {
-                //    Vector3 targetPosition = m_Transform.position;
-                //    targetPosition.y = m_GroundHit.point.y;
-                //    m_Transform.position = targetPosition;
-                //}
-                Vector3 targetPosition = m_Transform.position;
-                targetPosition.y = m_GroundHit.point.y;
-                m_Transform.position = targetPosition;
+                if(m_AlignToGround){
+                    if (Mathf.Abs(Vector3.Angle(m_GroundHit.normal, Vector3.up)) < 85f)
+                        m_Rigidbody.velocity = Vector3.ProjectOnPlane(m_Rigidbody.velocity, m_GroundHit.normal);
+                } else {
+                    Vector3 targetPosition = m_Transform.position;
+                    targetPosition.y = m_GroundHit.point.y;
+                    m_Transform.position = targetPosition;
+                }
+
+                //Vector3 targetPosition = m_Transform.position;
+                //targetPosition.y = m_GroundHit.point.y;
+                //m_Transform.position = targetPosition;
                 
                 return true;
             }
@@ -390,11 +394,11 @@
             if(m_DrawDebugLine) Debug.DrawRay(m_Transform.position + Vector3.up * m_AlignToGroundDepthOffset, Vector3.down, Color.white);
 
 
-            if (Physics.Raycast(m_Transform.position + Vector3.up * m_AlignToGroundDepthOffset, Vector3.down, out m_GroundHit, m_AlignToGroundDepthOffset + m_SkinWidth, m_Layers.SolidLayer))
+            //if (Physics.Raycast(m_Transform.position + Vector3.up * m_AlignToGroundDepthOffset, Vector3.down, out m_GroundHit, m_AlignToGroundDepthOffset + m_SkinWidth, m_Layers.SolidLayer))
+            if (Physics.SphereCast(m_Transform.position + Vector3.up * m_AlignToGroundDepthOffset, m_CapsuleCollider.radius * 0.9f,
+                      -Vector3.up, out m_GroundHit, m_CapsuleCollider.radius + m_SkinWidth, m_Layers.SolidLayer))
             {
-                Vector3 targetPosition = m_Transform.position;
-                targetPosition.y = m_GroundHit.point.y;
-                m_Transform.position = targetPosition;
+
 
                 var rayStart = (m_Transform.position + Vector3.up * m_MaxStepHeight) + m_Transform.forward * (m_CapsuleCollider.radius * 2);  //+ m_SkinWidth);
                 var rayEnd = Vector3.down * (m_MaxStepHeight - m_StepOffset);
@@ -407,7 +411,7 @@
                     {
                         if (m_StepHit.point.y >= (m_Transform.position.y) && m_StepHit.point.y <= (m_Transform.position.y + m_StepOffset + m_SkinWidth))
                         {
-                            m_MoveDirection = (m_StepHit.point - m_Transform.position).normalized * m_StepSpeed * (m_Speed > 1 ? m_Speed : 1);
+                            m_MoveDirection = (m_StepHit.point - m_Transform.position).normalized * m_StepSpeed ;//* (m_Speed > 1 ? m_Speed : 1);
                             m_Rigidbody.velocity = m_MoveDirection + Vector3.up * 1; // * m_StepSpeed * (m_Speed > 1 ? m_Speed : 1);// + (Vector3.up * m_Step);
                             //m_Transform.position += m_MoveDirection;
                             _stepColor = Color.magenta;
@@ -421,6 +425,10 @@
                 }
                 //  -- DEBUG DRAW RAY -- 
                 if (m_DrawDebugLine) Debug.DrawRay( m_Transform.position, m_MoveDirection * m_StepSpeed * (m_Speed > 1 ? m_Speed : 1), _stepColor);
+
+                Vector3 targetPosition = m_Transform.position;
+                targetPosition.y = m_GroundHit.point.y;
+                m_Transform.position = targetPosition;
 
                 return true;
             }
@@ -440,16 +448,15 @@
                 m_TurnAmount = Mathf.Lerp(0, m_TurnAmount, m_DeltaTime);
                 m_LookRotation *= Quaternion.Euler(0, m_TurnAmount, 0);
             }
-            //else{
-            //    m_TurnAmount = Mathf.Lerp(m_TurnAmount, 0, m_DeltaTime);
-            //}
+            else{
+                m_TurnAmount = Mathf.Lerp(m_TurnAmount, 0, m_DeltaTime);
+            }
 
 
-            m_LookRotation = Quaternion.Slerp(m_Transform.rotation, m_LookRotation, (m_Aiming ? m_AimRotationSpeed : m_RotationSpeed) * m_DeltaTime);
-            //m_Transform.rotation = m_LookRotation;
-            m_Rigidbody.MoveRotation(m_LookRotation.normalized);
+            m_LookRotation = Quaternion.Lerp(m_Transform.rotation, m_LookRotation, (m_Aiming ? m_AimRotationSpeed : m_RotationSpeed) * m_DeltaTime);
+            m_Transform.rotation = m_LookRotation;
+            //m_Rigidbody.MoveRotation(m_LookRotation.normalized);
 
-            //m_Rigidbody.AddTorque()
         }
 
 
@@ -468,7 +475,7 @@
             m_Velocity = m_MoveDirection * m_MoveAmount;
             m_Velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
             //m_Velocity.y = 0;
-            m_Rigidbody.AddForce(m_Velocity.normalized, ForceMode.VelocityChange);
+            m_Rigidbody.AddForce(m_Velocity, ForceMode.VelocityChange);
         }
 
 
@@ -545,18 +552,7 @@
  
 		public void MoveCharacter(float horizontalMovement, float forwardMovement, Quaternion lookRotation)
         {
-            //throw new NotImplementedException(string.Format("<color=yellow>{0}</color> MoveCharacter not Implemented.", GetType()));
-
-            m_InputVector.x = horizontalMovement;
-            m_InputVector.y = m_Rigidbody.velocity.y;
-            m_InputVector.z = forwardMovement;
-            m_LookRotation = lookRotation;
-
-            m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Transform.rotation, m_LookRotation.normalized, m_RotationSpeed * m_DeltaTime));
-
-            m_Velocity = m_MoveDirection + m_Transform.forward * m_Speed;
-            m_Rigidbody.velocity = m_Velocity;
-            m_Rigidbody.AddForce(m_MoveDirection * (m_Speed) * m_DeltaTime, ForceMode.VelocityChange);
+            throw new NotImplementedException(string.Format("<color=yellow>{0}</color> MoveCharacter not Implemented.", GetType()));
         }
 
 
@@ -805,7 +801,7 @@
                 //}
 
                 Gizmos.color = Color.blue;
-                Gizmos.DrawRay(m_Transform.position + m_DebugHeightOffset, m_MoveDirection);
+                Gizmos.DrawRay(m_Transform.position, m_MoveDirection);
                 GizmosUtils.DrawString("Move Direction", m_Transform.position + m_MoveDirection, Color.white);
 
                 //Gizmos.color = Color.cyan;

@@ -9,8 +9,6 @@
         [SerializeField]
         protected GameObject m_OriginalObject;
         [SerializeField]
-        protected GameObject m_DropObject;
-        [SerializeField]
         protected string m_CustomEquipPoint;
         [SerializeField]
         protected UseableConsumableItem m_ConsumableItem;
@@ -24,11 +22,6 @@
             set { m_OriginalObject = value; }
         }
 
-        public GameObject DropObject
-        {
-            get { return m_DropObject; }
-            set { m_DropObject = value; }
-        }
 
         public string CustomEquipPoint
         {

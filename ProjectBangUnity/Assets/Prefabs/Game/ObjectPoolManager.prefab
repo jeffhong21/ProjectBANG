@@ -52,7 +52,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Pools:
-  - Prefab: {fileID: 1225023134673244, guid: b240e9cd471cf4e89b8f10b1b17812b3, type: 2}
-    Count: 10
+  - Prefab: {fileID: 1203368655300024, guid: 4bafa4351c495485790bee98073b5b46, type: 2}
+    Count: 20
   - Prefab: {fileID: 1030604309152162, guid: ed017de91831b481e8c7d14e692443a6, type: 2}
     Count: 10

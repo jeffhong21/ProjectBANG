@@ -233,7 +233,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1715612870132516}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.0958, z: 0.6}
+  m_LocalPosition: {x: 0, y: 0.09579998, z: 0.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4041080498340978}
@@ -611,10 +611,12 @@ MonoBehaviour:
   m_CanAim: 1
   m_RequiredAim: 1
   m_TwoHandedItem: 0
+  m_ItemPickup: {fileID: 0}
   m_NonDominantHandPosition: {fileID: 4037553092448768}
   m_HolsterTarget: {fileID: 0}
   m_PositionOffset: {x: 0.203, y: 0, z: 0.471}
   m_RotationOffset: {x: -2.51, y: -0.67, z: -90}
+  m_ItemIKAdjustment: {fileID: 0}
   m_Character: {fileID: 0}
   m_Controller: {fileID: 0}
   m_FirePoint: {fileID: 4433258886810430}
@@ -639,10 +641,10 @@ MonoBehaviour:
   m_FireSoundDelay: 0.1
   m_DamageAmount: 10
   m_ImpactForce: 5
-  m_FireRange: 3.4028235e+38
+  m_FireRange: 50
   m_ImpactLayers:
     serializedVersion: 2
-    m_Bits: 536874753
+    m_Bits: 671092481
   m_Tracer: {fileID: 1826699954357864, guid: 30d9d475bc1894461a741c5347e03cee, type: 2}
   m_Projectile: {fileID: 0}
   m_DefaultDecal: {fileID: 0}

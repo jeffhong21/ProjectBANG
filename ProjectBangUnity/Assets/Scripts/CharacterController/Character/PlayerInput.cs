@@ -128,23 +128,30 @@ namespace CharacterController
             //Debug.DrawRay(m_CameraController.Camera.transform.position, m_CameraController.Camera.transform.forward * m_LookDistance, Color.blue);
             var direction = (m_CameraController.Camera.transform.position + m_CameraController.Camera.transform.forward * m_LookDistance) - m_Transform.position;
             direction.y = 0;
-            direction.Normalize();
 
-            //  Free Movement.
-            if(m_Controller.IndependentLook())
+
+
+            if(m_Controller.Aiming)
             {
-                m_Controller.LookRotation = m_Transform.rotation;
-
+                direction.y = m_Transform.position.y;
+                direction.Normalize();
+                //  Set the Look Rotation
+                m_Controller.LookRotation = direction != Vector3.zero ? m_Controller.LookRotation = Quaternion.LookRotation(direction, m_Transform.up) : m_Transform.rotation;
+                //  Set the Look Direction
                 m_Controller.LookDirection = m_CameraController.Camera.transform.forward * (direction.magnitude + 10);
             }
-            //  Aiming, Moving
+            //  Free Movement.
+            else if (m_Controller.IndependentLook())
+            {
+                m_Controller.LookRotation = m_Transform.rotation;
+                direction.Normalize();
+                m_Controller.LookDirection = m_CameraController.Camera.transform.forward * (direction.magnitude + 10);
+            }
+            //  Moving
             else{
                 direction.y = m_Transform.position.y;
-                if (direction != Vector3.zero)
-                    m_Controller.LookRotation = Quaternion.LookRotation(direction, m_Transform.up);
-                else
-                    m_Controller.LookRotation = m_Transform.rotation;
-
+                direction.Normalize();
+                m_Controller.LookRotation = direction != Vector3.zero ? m_Controller.LookRotation = Quaternion.LookRotation(direction, m_Transform.up) : m_Transform.rotation;
                 m_Controller.LookDirection = m_Transform.forward * 10;
                 //Debug.DrawRay(m_Transform.position +(Vector3.up * 1.35f), direction * m_LookDistance, Color.green);
 
@@ -158,11 +165,14 @@ namespace CharacterController
 		}
 
 
+        public ShakeTransformEventData data;
 		private void Update()
         {
             //  -- Character Actions
             //Aim(KeyCode.Mouse1);
-
+            if(Input.GetKeyDown(KeyCode.M)){
+                m_CameraController.Camera.GetComponentInParent<CameraShake>().AddShakeEvent(data);
+            }
             //  --
 
             CameraInput();

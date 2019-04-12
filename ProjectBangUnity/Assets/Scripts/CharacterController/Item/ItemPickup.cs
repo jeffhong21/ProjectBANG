@@ -157,13 +157,16 @@
 
         protected void Update()
         {
-            if(m_PlayDefaultAnimation){
-                if (m_IsRotating) UpdateRotation(m_DegreesPerSecond, m_RotateCounterClockwise);
-                if (m_IsBouncing)UpdateYPosition(m_Frequency, m_Amplitude);
-            }
+            //if(m_PlayDefaultAnimation){
+            //    if (m_IsRotating) UpdateRotation(m_DegreesPerSecond, m_RotateCounterClockwise);
+            //    if (m_IsBouncing)UpdateYPosition(m_Frequency, m_Amplitude);
+            //}
 
+            if (CameraController.Instance == null)
+                return;
+            var horizontalForward = Vector3.Scale(CameraController.Instance.Camera.transform.forward, new Vector3(1, 0, 1)).normalized;
+            m_TooltipUI.forward = horizontalForward;
 
-            //if(m_Camera != null && m_TooltipUI.gameObject.activeSelf) m_TooltipUI.LookAt(m_Camera);
         }
 
 
@@ -171,12 +174,12 @@
 
 
 
-        protected void DisableParticleSystems(ParticleSystem[] ps)
-        {
-            for (int i = 0; i < ps.Length; i++){
-                ps[i].gameObject.SetActive(false);
-            }
-        }
+        //protected void DisableParticleSystems(ParticleSystem[] ps)
+        //{
+        //    for (int i = 0; i < ps.Length; i++){
+        //        ps[i].gameObject.SetActive(false);
+        //    }
+        //}
 
 
 
@@ -241,33 +244,33 @@
 
 
 
-        protected void UpdateRotation(float degrees, bool rotateCounterClockwise, Space space = Space.World)
-        {
-            m_TargetRotation.x = 0;
-            m_TargetRotation.y = degrees * m_DeltaTime;
-            m_TargetRotation.z = 0;
+        //protected void UpdateRotation(float degrees, bool rotateCounterClockwise, Space space = Space.World)
+        //{
+        //    m_TargetRotation.x = 0;
+        //    m_TargetRotation.y = degrees * m_DeltaTime;
+        //    m_TargetRotation.z = 0;
 
-            if (rotateCounterClockwise)
-                m_TargetRotation = -m_TargetRotation;
+        //    if (rotateCounterClockwise)
+        //        m_TargetRotation = -m_TargetRotation;
 
-            // Spin object around Y-Axis
-            //itemHolder.transform.Rotate(new Vector3(0f, Time.deltaTime * degreesPerSecond, 0f), Space.World);
-            m_ObjectHolder.transform.Rotate(m_TargetRotation, space);
-        }
+        //    // Spin object around Y-Axis
+        //    //itemHolder.transform.Rotate(new Vector3(0f, Time.deltaTime * degreesPerSecond, 0f), Space.World);
+        //    m_ObjectHolder.transform.Rotate(m_TargetRotation, space);
+        //}
 
 
-        protected void UpdateYPosition(float frequency, float amplitude)
-        {
-            // Float up/down with a Sin()
-            var height = Mathf.Sin(Time.fixedTime * Mathf.PI * frequency) * amplitude;
-            m_TargetPosition = m_PositionOffset;
-            m_TargetPosition.y += height;
+        //protected void UpdateYPosition(float frequency, float amplitude)
+        //{
+        //    // Float up/down with a Sin()
+        //    var height = Mathf.Sin(Time.fixedTime * Mathf.PI * frequency) * amplitude;
+        //    m_TargetPosition = m_PositionOffset;
+        //    m_TargetPosition.y += height;
 
-            //  Set the itemHolder group position.
-            m_ObjectHolder.transform.position = m_TargetPosition;
+        //    //  Set the itemHolder group position.
+        //    m_ObjectHolder.transform.position = m_TargetPosition;
 
-            //plot.AddKey(Time.realtimeSinceStartup, height);
-        }
+        //    //plot.AddKey(Time.realtimeSinceStartup, height);
+        //}
 
 	}
 

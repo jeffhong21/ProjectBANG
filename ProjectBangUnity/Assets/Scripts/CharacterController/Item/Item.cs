@@ -19,13 +19,15 @@
         protected int m_MovementSetID;
         [SerializeField]
         protected ItemAnimStates m_AnimStates = new ItemAnimStates();
-        [Header("--  ItemType Settings --")]
+        [Header("--  Item Settings --")]
         [SerializeField]
         protected bool m_CanAim = true;
         [SerializeField]
         protected bool m_RequiredAim = true;
         [SerializeField]
         protected bool m_TwoHandedItem;
+        [SerializeField]
+        protected GameObject m_ItemPickup;
         [SerializeField, Tooltip("The ik position of the non dominant hand.")]      //  Currently not used.
         protected Transform m_NonDominantHandPosition;
         [SerializeField]
@@ -34,7 +36,8 @@
         protected Vector3 m_PositionOffset;
         [SerializeField]
         protected Vector3 m_RotationOffset;
-
+        [SerializeField]
+        protected ItemIKAdjustment m_ItemIKAdjustment;
 
 
 
@@ -52,6 +55,11 @@
 
         public ItemType ItemType{
             get { return m_ItemType; }
+        }
+
+        public GameObject ItemPickup{
+            get { return m_ItemPickup; }
+            set { m_ItemPickup = value; }
         }
 
         public string ItemAnimName{
@@ -79,6 +87,10 @@
             get { return m_RotationOffset; }
         }
 
+        public ItemIKAdjustment ItemIKAdjustment{
+            get { return m_ItemIKAdjustment; }
+        }
+
         public Transform NonDominantHandPosition{
             get { return m_NonDominantHandPosition; }
         }
@@ -86,6 +98,10 @@
         public GameObject User{
             get { return m_Character; }
         }
+
+
+
+
 
 
 

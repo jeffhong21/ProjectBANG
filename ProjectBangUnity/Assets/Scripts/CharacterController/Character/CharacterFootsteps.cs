@@ -58,8 +58,8 @@ namespace CharacterController
                 RaycastHit hit;
                 if (Physics.Raycast(m_currentStep.position, m_currentStep.TransformVector(-m_currentStep.up), out hit, 1f, m_Layers.SolidLayer))
                 {
-                    var footStep = Instantiate(m_Decal, null);
-                    var position = hit.point + Vector3.up * 0.001f;
+                    //var footStep = Instantiate(m_Decal, null);
+                    var position = hit.point + Vector3.up * 0.01f;
 
                     var rotation = Quaternion.LookRotation(m_Transform.forward, Vector3.up);
                     if (m_currentStep.localPosition.x > 0){
@@ -70,8 +70,7 @@ namespace CharacterController
                     //var newRotation = Quaternion.FromToRotation(m_Transform.forward, rotationDirection);
                     //rotation = rotation * newRotation;
 
-                    footStep.transform.position = position;
-                    footStep.transform.rotation = rotation;
+                    var footStep = ObjectPoolManager.Spawn(m_Decal, position, rotation);
                 }
 
                 m_FootstepThreshold = Time.timeSinceLevelLoad + m_FootstepTimer;

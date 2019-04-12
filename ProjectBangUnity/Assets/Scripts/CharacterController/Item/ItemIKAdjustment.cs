@@ -3,7 +3,7 @@
     using UnityEngine;
 
     [CreateAssetMenu(fileName = "Item Position", menuName = "Character Controller/Items/ItemType Position")]
-    public class ItemPositions : ScriptableObject
+    public class ItemIKAdjustment : ScriptableObject
     {
         public Vector3 position;
 

@@ -9,7 +9,7 @@ public class ObjectPool
     private string m_ID;
     [SerializeField]
     private GameObject m_Prefab;
-    [SerializeField, Range(0, 100)]
+    [SerializeField]
     private int m_Count;
     [SerializeField, HideInInspector]
     private int m_MaxCount;
