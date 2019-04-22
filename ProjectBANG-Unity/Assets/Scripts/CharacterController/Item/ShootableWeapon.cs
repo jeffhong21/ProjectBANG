@@ -323,7 +323,7 @@
                 else
                 {
                     //ObjectPoolManager.Instance.Spawn(m_DefaultDust, collisionPoint, Quaternion.FromToRotation(m_Transform.forward, collisionPointNormal));
-                    ObjectPoolManager.Spawn(m_DefaultDust, hit.point, Quaternion.LookRotation(hit.normal));
+                    ObjectPool.Instantiate(m_DefaultDust, hit.point, Quaternion.LookRotation(hit.normal));
                 }
 
 

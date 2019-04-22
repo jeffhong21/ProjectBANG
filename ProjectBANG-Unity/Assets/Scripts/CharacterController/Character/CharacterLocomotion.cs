@@ -9,42 +9,44 @@
     public class CharacterLocomotion : MonoBehaviour
     {
         public event Action<bool> OnAim = delegate {};
-        public enum MovementType {FreeMovement, Combat };
+        public enum MovementType { FreeMovement, Combat };
 
-
+        //  Locomotion variables
         [SerializeField, HideInInspector]
         protected bool m_UseRootMotion = true;
+        [SerializeField, HideInInspector, Tooltip("The amount of world velocity added to the controller every frame when moving.")]
+        protected float m_Acceleration = 30f;
         [SerializeField, HideInInspector]
         protected float m_RootMotionSpeedMultiplier = 1;
         [SerializeField, HideInInspector]
         protected float m_MovementSpeed = 3.75f;
         [SerializeField, HideInInspector]
-        protected float m_StrafeSpeed = 2.5f;
-        [SerializeField, HideInInspector]
-        protected float m_SpeedChangeMultiplier = 1;
-        [SerializeField, HideInInspector]
         protected float m_RotationSpeed = 4f;
         [SerializeField, HideInInspector]
         protected float m_AimRotationSpeed = 8f;
+
+        //  Physics variables
+        protected float m_Mass = 100;
+        protected float m_AngularDrag = 10;
         [SerializeField, HideInInspector]
         protected bool m_AlignToGround = true;
         [SerializeField, HideInInspector]
         protected float m_AlignToGroundDepthOffset = 0.5f;
-        //[SerializeField, HideInInspector]
-        //protected Vector3 m_GroundSpeed = new Vector3(1, 0, 1);
         [SerializeField, HideInInspector]
         protected float m_SkinWidth = 0.08f;
-        [SerializeField, HideInInspector]
-        protected float m_SlopeLimit = 45f;
+
+        //[SerializeField, HideInInspector]
+        protected float m_GravityModifier = 2f;
 
         [SerializeField, HideInInspector]
+        protected float m_SlopeLimit = 45f;
+        [SerializeField, HideInInspector]
         protected float m_MaxStepHeight = 0.65f;
-        [SerializeField, HideInInspector, Range(0, 0.3f) ]
+        [SerializeField, HideInInspector, Range(0, 0.3f), Tooltip("Minimum height to consider a step.")]
         protected float m_StepOffset = 0.15f;
         [SerializeField, HideInInspector]
         protected float m_StepSpeed = 4f;
-        [SerializeField, HideInInspector]
-        protected float m_Acceleration = 30f;
+
 
 
 
@@ -57,26 +59,21 @@
 
 
         [Header("-- Debug --")]
+        [SerializeField] bool m_DrawDebugLine;
         //[SerializeField, DisplayOnly]
         private MovementType m_MovementType = MovementType.FreeMovement;
         [SerializeField, DisplayOnly]
         private bool m_Grounded = true;
         //[SerializeField, DisplayOnly]
-        private bool m_Aiming;
-        private bool m_Moving, m_Running = true;
-        [SerializeField, DisplayOnly]
-        private float m_Speed;//, m_Direction;
+        private bool m_Aiming, m_Moving;
         //[SerializeField, DisplayOnly]
         private float m_InputMagnitude, m_TurnAmount;
         //[SerializeField, DisplayOnly]
-        private Vector3 m_Velocity, m_RootMotionVelocity;
+        private Vector3 m_Velocity;
         //[SerializeField, DisplayOnly]
         private Vector3 m_InputVector, m_RelativeInputVector;
+        private Vector3 m_LookDirection;
         private Quaternion m_LookRotation;
-
-
-        private Vector3 m_LookDirection, m_LookAtPoint;
-
 
 
 
@@ -91,18 +88,18 @@
         private float m_DeltaTime;
         private float m_FixedDeltaTime;
 
-        bool m_UpdateRotation = true, m_UpdateMovement = true, m_UpdateAnimator = true, m_Move = true, m_CheckMovement = true;
+        private bool m_UpdateRotation = true, m_UpdateMovement = true, m_UpdateAnimator = true, m_Move = true, m_CheckMovement = true;
 
-        private RaycastHit m_GroundHit;
-        private RaycastHit m_StepHit;
+        private RaycastHit m_GroundHit, m_StepHit;
         private bool m_OnStep;
         [SerializeField, DisplayOnly]
         private float m_SlopeAngle;
         private Vector3 m_StepRayStart, m_StepRayDirection;
 
-        [SerializeField] bool m_DrawDebugLine;
+
         [SerializeField] 
         private Vector3 RIGIDBODY_VELOCITY;
+
 
 
 
@@ -115,11 +112,6 @@
                 return m_Moving;
             }
             set { m_Moving = value; }
-        }
-
-        public bool Running{
-            get { return m_Running; }
-            set { m_Running = value; }
         }
 
         public bool Aiming{
@@ -187,11 +179,6 @@
             set { m_LookDirection = value; }
         }
 
-        public Vector3 LookAtPoint{
-            get { return m_LookAtPoint; }
-            set { m_LookAtPoint = value; }
-        }
-
 
 
 
@@ -215,17 +202,17 @@
             if(m_Rigidbody == null) m_Rigidbody = m_GameObject.AddComponent<Rigidbody>();
             if(m_Layers == null) m_Layers = m_GameObject.AddComponent<LayerManager>();
 
+            m_Rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+            //m_Rigidbody.mass = m_Mass;
         }
 
 
         protected void OnEnable()
 		{
-            m_Rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-
-
             EventHandler.RegisterEvent<CharacterAction, bool>(m_GameObject, "OnCharacterActionActive", OnActionActive);
             EventHandler.RegisterEvent<bool>(m_GameObject, "OnAimActionStart", OnAimActionStart);
 		}
+
 
 		protected void OnDisable()
 		{
@@ -233,8 +220,6 @@
             EventHandler.UnregisterEvent<bool>(m_GameObject, "OnAimActionStart", OnAimActionStart);
 		}
 
-        //[SerializeField]
-        //float angleOut, direction;
 
 		private void Update()
 		{
@@ -244,22 +229,18 @@
             if(m_InputMagnitude > 1)
                 m_InputVector.Normalize();
             m_RelativeInputVector = m_Transform.InverseTransformDirection(m_InputVector);
-            //if (m_InputVector.magnitude > 1)
-                //m_InputVector.Normalize();
-            //m_InputMagnitude = Mathf.Abs(m_InputVector.x) + Mathf.Abs(m_InputVector.z);
 
-            //  Check if moving.
-            //m_Moving = m_InputVector.sqrMagnitude > 0.2f;
             m_Moving = m_InputMagnitude > 0.1f;
 
 
-            //  Check if grounded.
-            CheckGround();
-
             //  Start Stop Actions.
             StartStopActions();
+
+            //  Check if grounded.
+            CheckGround();
             //
-            m_CheckMovement = m_UpdateRotation = m_UpdateMovement = m_UpdateAnimator = m_Move = true;
+            //m_CheckMovement = m_UpdateRotation = m_UpdateMovement = m_UpdateAnimator = m_Move = true;
+            m_CheckMovement = m_UpdateAnimator = m_Move = true;
             for (int i = 0; i < m_Actions.Length; i++)
             {
                 //  Next, if current Action is active, update overrides.
@@ -269,14 +250,14 @@
                     {
                         m_CheckMovement = m_Actions[i].CheckMovement();
                     }
-                    if (m_UpdateRotation)
-                    {
-                        m_UpdateRotation = m_Actions[i].UpdateRotation();
-                    }
-                    if (m_UpdateMovement)
-                    {
-                        m_UpdateMovement = m_Actions[i].UpdateMovement();
-                    }
+                    //if (m_UpdateRotation)
+                    //{
+                    //    m_UpdateRotation = m_Actions[i].UpdateRotation();
+                    //}
+                    //if (m_UpdateMovement)
+                    //{
+                    //    m_UpdateMovement = m_Actions[i].UpdateMovement();
+                    //}
                     if (m_UpdateAnimator)
                     {
                         m_UpdateAnimator = m_Actions[i].UpdateAnimator();
@@ -291,10 +272,10 @@
 
             if (m_CheckMovement)
                 CheckMovement();
-            if (m_UpdateRotation)
-                UpdateRotation();
-            if (m_UpdateMovement)
-                UpdateMovement();
+            //if (m_UpdateRotation)
+            //    UpdateRotation();
+            //if (m_UpdateMovement)
+                //UpdateMovement();
             if (m_UpdateAnimator)
                 UpdateAnimator();
 
@@ -304,8 +285,32 @@
 
 		private void FixedUpdate()
         {
-            if(!m_Grounded)
-                m_Rigidbody.AddForce((Physics.gravity * 2) - Physics.gravity);
+            m_UpdateRotation = m_UpdateMovement = true;
+            for (int i = 0; i < m_Actions.Length; i++)
+            {
+                //  Next, if current Action is active, update overrides.
+                if (m_Actions[i].IsActive)
+                {
+                    if (m_UpdateRotation)
+                    {
+                        m_UpdateRotation = m_Actions[i].UpdateRotation();
+                    }
+                    if (m_UpdateMovement)
+                    {
+                        m_UpdateMovement = m_Actions[i].UpdateMovement();
+                    }
+                }
+                //  Call Action Update.
+                m_Actions[i].UpdateAction();
+            }
+
+            if (m_UpdateRotation)
+                UpdateRotation();
+            if (m_UpdateMovement)
+                UpdateMovement();
+
+            //if (!m_Grounded)
+                //m_Rigidbody.AddForce(Physics.gravity);
         }
 
 
@@ -350,14 +355,13 @@
                     m_OnStep = false;
                     m_StepRayStart = (m_Transform.position + Vector3.up * m_MaxStepHeight) + m_Transform.forward * (m_CapsuleCollider.radius * 2);  //+ m_SkinWidth);
                     m_StepRayDirection = Vector3.down * (m_MaxStepHeight - m_StepOffset);
-                    //m_StepRayDirection = Vector3.down;
 
                     if (Physics.Raycast(m_StepRayStart, m_StepRayDirection, out m_StepHit, m_MaxStepHeight - m_StepOffset, m_Layers.GroundLayer) && !m_StepHit.collider.isTrigger)
                     {
                         if (m_StepHit.point.y >= (m_Transform.position.y) && m_StepHit.point.y <= (m_Transform.position.y + m_StepOffset + m_SkinWidth))
                         {
                             m_Velocity = Vector3.Lerp(m_Velocity + (m_StepHit.point - m_Transform.position), m_Velocity, m_StepSpeed * m_DeltaTime);
-                            m_Transform.position += (Vector3.up * (m_StepOffset)) * m_InputMagnitude;
+                            m_Transform.position += (Vector3.up * (m_StepOffset)) * m_InputMagnitude + (m_Velocity * m_DeltaTime);
                             m_Transform.position += m_Velocity * m_DeltaTime;
 
                             if (Mathf.Abs(Vector3.Angle(m_GroundHit.normal, Vector3.up)) < m_SlopeLimit)
@@ -366,8 +370,8 @@
                         m_OnStep = true;
                     }
 
+
                     m_Velocity = m_Velocity * (m_SlopeAngle < 0 ? -1 : 1);
-                    //m_Velocity.z = m_Velocity.z * (m_SlopeAngle < 0 ? -1 : 1);
                 }
                 else {
                     m_Velocity = Vector3.zero;
@@ -402,6 +406,7 @@
         //  Apply any movement.
         private void UpdateMovement()
         {
+            //  Keep the character glued to the ground.
             if (Mathf.Abs(Vector3.Angle(m_GroundHit.normal, Vector3.up)) < m_SlopeLimit)
                 m_Rigidbody.velocity = Vector3.ProjectOnPlane(m_Rigidbody.velocity, m_GroundHit.normal);
 
@@ -416,6 +421,9 @@
             if (m_SlopeAngle >= m_SlopeLimit)
                 return;
 
+            if (!m_Grounded)
+                m_Rigidbody.AddForce(Physics.gravity);
+            //m_Rigidbody.AddForce((Physics.gravity * m_GravityModifier) - Physics.gravity);
         }
 
 
@@ -424,20 +432,12 @@
 		{
             if (m_UseRootMotion)
             {
-                //m_RootMotionVelocity = m_Animator.deltaPosition / m_DeltaTime;
-                ////m_RootMotionVelocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
-                //m_RootMotionVelocity.y = m_Rigidbody.velocity.y;
-                ////m_Rigidbody.velocity = m_RootMotionVelocity;
-                //m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_RootMotionVelocity, m_Acceleration * m_DeltaTime);
-
                 m_Velocity = m_Animator.deltaPosition / m_DeltaTime;
                 m_Velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
-                //m_Velocity.y = m_Rigidbody.velocity.y;
-                //m_Rigidbody.velocity = m_RootMotionVelocity;
                 m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, m_Acceleration * m_DeltaTime);
-
             }
-            else{
+            else
+            {
                 switch (m_MovementType)
                 {
                     case MovementType.FreeMovement:
@@ -465,6 +465,7 @@
                 else
                     m_Animator.SetFloat(HashID.TurnAmount, 0, 0.2f, m_DeltaTime);
             }
+            //var localVelocity = Quaternion.Inverse(m_Transform.rotation) * (m_Rigidbody.velocity / m_Acceleration);
             //  Movement Input
             m_AnimationMonitor.SetForwardInputValue(m_InputVector.z);
             m_AnimationMonitor.SetHorizontalInputValue(m_InputVector.x);
@@ -746,7 +747,7 @@
 
         protected void OnDrawGizmos()
         {
-            float slopeCheckHeight = 0.5f;
+            //float slopeCheckHeight = 0.5f;
             //Quaternion rotation = Quaternion.AngleAxis(m_SlopeLimit, -transform.right);
             ////  Hypotenuse
             //Gizmos.color = _Magenta;
@@ -762,12 +763,6 @@
 
             if(m_DrawDebugLine && Application.isPlaying)
             {
-                //if (Aiming){
-                //    Gizmos.color = Color.green;
-                //    Gizmos.DrawSphere(m_LookAtPoint, 0.1f);
-                //    Gizmos.DrawLine(transform.position + (Vector3.up * 1.35f), m_LookAtPoint);
-                //}
-
                 Gizmos.color = Color.blue;
                 Gizmos.DrawRay(m_Transform.position, m_Velocity);
                 GizmosUtils.DrawString("m_Velocity", m_Transform.position + m_Velocity, Color.white);

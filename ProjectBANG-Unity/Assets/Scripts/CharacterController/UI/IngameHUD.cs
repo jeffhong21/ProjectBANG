@@ -16,6 +16,7 @@ namespace CharacterController.UI
         public void Awake()
         {
             m_Canvas = GetComponent<Canvas>();
+            SetPanelActive(true);
         }
 
         public void SetPanelActive(bool active)

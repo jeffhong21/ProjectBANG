@@ -148,7 +148,7 @@ MeshRenderer:
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 8b62efc3209cd4052baa23a5777877f5, type: 2}
+  - {fileID: 2100000, guid: f343dcd6a3e4344d6ae1aef064e6d16e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -399,10 +399,11 @@ GameObject:
   - component: {fileID: 114015622257898310}
   - component: {fileID: 114078442416988612}
   - component: {fileID: 114084608887600488}
-  - component: {fileID: 114476249827600298}
   - component: {fileID: 114798496128796052}
   - component: {fileID: 114031030444924998}
   - component: {fileID: 114139823554117216}
+  - component: {fileID: 2521750178379034832}
+  - component: {fileID: 1655704237}
   m_Layer: 31
   m_Name: Player
   m_TagString: Player
@@ -472,7 +473,7 @@ Rigidbody:
   serializedVersion: 2
   m_Mass: 100
   m_Drag: 0
-  m_AngularDrag: 7
+  m_AngularDrag: 10
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 1
@@ -491,10 +492,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_UseRootMotion: 1
+  m_Acceleration: 30
   m_RootMotionSpeedMultiplier: 1
   m_MovementSpeed: 2
-  m_StrafeSpeed: 1.5
-  m_SpeedChangeMultiplier: 1
   m_RotationSpeed: 8
   m_AimRotationSpeed: 12
   m_AlignToGround: 1
@@ -502,10 +502,10 @@ MonoBehaviour:
   m_SkinWidth: 0.08
   m_SlopeLimit: 45
   m_MaxStepHeight: 0.65
-  m_StepOffset: 0.15
+  m_StepOffset: 0.207
   m_StepSpeed: 4
-  m_Acceleration: 30
   m_Actions:
+  - {fileID: 1655704237}
   - {fileID: 114776445558567580}
   - {fileID: 114139823554117216}
   - {fileID: 114908900733630684}
@@ -515,23 +515,13 @@ MonoBehaviour:
   - {fileID: 114031030444924998}
   - {fileID: 114484464717320762}
   - {fileID: 114641910215582532}
+  - {fileID: 2521750178379034832}
   - {fileID: 114015622257898310}
-  - {fileID: 114476249827600298}
   m_ActiveAction: {fileID: 0}
-  m_MovementType: 0
+  m_DrawDebugLine: 0
   m_Grounded: 1
-  m_Aiming: 0
-  m_Speed: 0
-  m_InputMagnitude: 0
-  m_TurnAmount: 0
-  m_Velocity: {x: 0, y: 0, z: 0}
-  m_RootMotionVelocity: {x: 0, y: 0, z: 0}
-  m_InputVector: {x: 0, y: 0, z: 0}
-  m_RelativeInputVector: {x: 0, y: 0, z: 0}
   m_SlopeAngle: 0
-  m_DrawDebugLine: 1
   RIGIDBODY_VELOCITY: {x: 0, y: 0, z: 0}
-  stepHeight: 0
 --- !u!114 &114311917172092944
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -545,8 +535,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bodyPosition: {x: 0, y: 0, z: 0}
-  m_DebugDrawLookRay: 1
-  m_LookAtAimBodyWeight: 1
+  m_DebugDrawLookRay: 0
+  m_LookAtAimBodyWeight: 0
   m_LookAtBodyWeight: 0.12
   m_LookAtHeadWeight: 0.15
   m_LookAtEyesWeight: 0
@@ -738,25 +728,23 @@ MonoBehaviour:
   - Space
   m_StartType: 2
   m_StopType: 3
-  m_TakeCoverDistance: 2
+  m_TakeCoverDistance: 3
   m_CoverLayer:
     serializedVersion: 2
-    m_Bits: 100663296
+    m_Bits: 234881024
+  m_CoverMovementSpeed: 0.18
   m_TakeCoverRotationSpeed: 4
   m_ObjectDetectorHeight: 0.5
   m_HighCoverHeight: 1.35
   m_SideCoverDistance: 0.5
-  m_HorizontalInput: 0
-  m_ForwardInput: 0
-  m_CanPopLeft: 0
-  m_CanPopRight: 0
-  m_Spacing: 0
+  alignmentAngle: 0
+  rotationCheckPosition: {x: 0, y: 0, z: 0}
   m_DebugSettings:
-    m_GizmoSize: 0.2
+    m_GizmoSize: 0.1
     m_CubeSize: {x: 0.1, y: 0.1, z: 0.1}
     m_CenterColor: {r: 1, g: 0.80811393, b: 0, a: 1}
-    m_LeftColor: {r: 0, g: 1, b: 0, a: 1}
-    m_RightColor: {r: 0, g: 1, b: 0, a: 1}
+    m_LeftColor: {r: 0, g: 0.70466566, b: 1, a: 1}
+    m_RightColor: {r: 0, g: 0.7058824, b: 1, a: 1}
     m_ChangeStateColor: {r: 1, g: 0, b: 0, a: 1}
   m_Debug: 0
 --- !u!114 &114484464717320762
@@ -815,7 +803,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_IsActive: 0
   m_StateName: Roll
-  m_ActionID: 15
+  m_ActionID: 0
   m_InputNames: []
   m_StartType: 1
   m_StopType: 0
@@ -884,27 +872,6 @@ MonoBehaviour:
   m_StartType: 2
   m_StopType: 2
   item: {fileID: 0}
---- !u!114 &114476249827600298
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94ec0960e0d9d46e3aaadcdb48fd076e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IsActive: 0
-  m_StateName: GenericAction
-  m_ActionID: 0
-  m_InputNames:
-  - Alpha1
-  - Alpha2
-  - Alpha3
-  m_StartType: 2
-  m_StopType: 2
 --- !u!114 &114798496128796052
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -963,28 +930,71 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_IsActive: 0
   m_StateName: Vault
-  m_ActionID: 0
+  m_ActionID: 15
   m_InputNames:
   - LeftControl
   m_StartType: 2
   m_StopType: 2
-  m_MoveToVaultDistance: 2
+  m_MoveToVaultDistance: 3
   m_VaultLayers:
     serializedVersion: 2
     m_Bits: 33554432
-  m_MaxVaultHeight: 2
+  m_MaxVaultHeight: 1
   m_MaxVaultDepth: 1
   m_StartVaultOffset: 0.2
-  m_HorizontalMatchTargetOffset: -0.2
-  m_VerticalMatchTargetOffset: 0
-  m_StartMatchTarget: 0.43
+  m_MatchTargetOffset: 0.1
+  m_StartMatchTarget: 0.44
   m_StopMatchTarget: 0.49
-  m_VerticalVelocity: {x: 0, y: 0, z: 0}
-  m_VerticalHeight: 0
+  m_Debug: 1
+--- !u!114 &2521750178379034832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a4e7b03d117640dd9395532c24e86e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: Sprint
+  m_ActionID: 0
+  m_InputNames:
+  - LeftShift
+  m_StartType: 2
+  m_StopType: 2
+  m_SpeedChangeMultiplier: 2
+  m_MinSpeedChange: -2
+  m_MaxSpeedChange: 2
+  m_StaminaDecreaseRate: 0.5
+  m_StaminaIncreaseRate: 0.1
+  m_MaxStanima: 100
+  m_CurrentStanima: 100
+--- !u!114 &1655704237
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94ec0960e0d9d46e3aaadcdb48fd076e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: GenericAction
+  m_ActionID: 0
+  m_InputNames:
+  - Q
+  m_StartType: 2
+  m_StopType: 2
   stateNames:
-  - Base Layer.Vault.Waist
-  - Base Layer.Vault.Chest
-  - Base Layer.Vault.Head
+  - Base Layer.Vault.Climb
+  - Base Layer.Vault.Jump
+  - Base Layer.Vault.Box
   currentAnimIndex: 0
 --- !u!1 &1142656612551902
 GameObject:
@@ -1828,7 +1838,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f343dcd6a3e4344d6ae1aef064e6d16e, type: 2}
+  - {fileID: 2100000, guid: d77bac4f18ddc4e0f89778e25b2fc374, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

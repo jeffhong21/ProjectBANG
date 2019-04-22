@@ -17,7 +17,7 @@ namespace CharacterController
 
         private const string MotorFoldoutHeader = "Character Motor";
         private const string PhysicsFoldoutHeader = "Character Physics";
-
+        private const string ActionsFoldoutHeader = "Actions List";
 
         CharacterLocomotion m_Controller;
 
@@ -28,6 +28,7 @@ namespace CharacterController
 
         private bool m_ShowCharMotorFoldout = true;
         private bool m_ShowCharPhysicsFoldout;
+        private bool m_ShowActionListFoldout = true;
 
         private GUIStyle m_DefaultActionTextStyle = new GUIStyle();
         private GUIStyle m_ActiveActionTextStyle = new GUIStyle();
@@ -40,21 +41,18 @@ namespace CharacterController
         private SerializedProperty m_Actions;
         private SerializedProperty m_UseRootMotion;
         private SerializedProperty m_RootMotionSpeedMultiplier;
-        private SerializedProperty m_SpeedChangeMultiplier;
+        private SerializedProperty m_Acceleration;
         private SerializedProperty m_MovementSpeed;
-        private SerializedProperty m_StrafeSpeed;
         private SerializedProperty m_RotationSpeed;
         private SerializedProperty m_AimRotationSpeed;
         private SerializedProperty m_AlignToGround;
         private SerializedProperty m_AlignToGroundDepthOffset;
-        //private SerializedProperty m_GroundSpeed;
         private SerializedProperty m_SkinWidth;
         private SerializedProperty m_SlopeLimit;
 
         private SerializedProperty m_MaxStepHeight;
         private SerializedProperty m_StepOffset;
         private SerializedProperty m_StepSpeed;
-        private SerializedProperty m_Acceleration;
 
 
 
@@ -74,21 +72,18 @@ namespace CharacterController
             m_Actions = serializedObject.FindProperty("m_Actions");
             m_UseRootMotion = serializedObject.FindProperty("m_UseRootMotion");
             m_RootMotionSpeedMultiplier = serializedObject.FindProperty("m_RootMotionSpeedMultiplier");
-            m_SpeedChangeMultiplier = serializedObject.FindProperty("m_SpeedChangeMultiplier");
+            m_Acceleration = serializedObject.FindProperty("m_Acceleration");
             m_MovementSpeed = serializedObject.FindProperty("m_MovementSpeed");
-            m_StrafeSpeed = serializedObject.FindProperty("m_StrafeSpeed");
             m_RotationSpeed = serializedObject.FindProperty("m_RotationSpeed");
             m_AimRotationSpeed = serializedObject.FindProperty("m_AimRotationSpeed");
             m_AlignToGround = serializedObject.FindProperty("m_AlignToGround");
             m_AlignToGroundDepthOffset = serializedObject.FindProperty("m_AlignToGroundDepthOffset");
-            //m_GroundSpeed = serializedObject.FindProperty("m_GroundSpeed");
             m_SkinWidth = serializedObject.FindProperty("m_SkinWidth");
             m_SlopeLimit = serializedObject.FindProperty("m_SlopeLimit");
 
             m_MaxStepHeight = serializedObject.FindProperty("m_MaxStepHeight");
             m_StepOffset = serializedObject.FindProperty("m_StepOffset");
             m_StepSpeed = serializedObject.FindProperty("m_StepSpeed");
-            m_Acceleration = serializedObject.FindProperty("m_Acceleration");
 
             m_ActionsList = new ReorderableList(serializedObject, serializedObject.FindProperty("m_Actions"), true, true, true, true);
 		}
@@ -107,13 +102,15 @@ namespace CharacterController
             if(m_ShowCharMotorFoldout)
             {
                 EditorGUILayout.PropertyField(m_UseRootMotion);
+                //  Root motion related variables.
+                //EditorGUI.indentLevel++;
                 EditorGUILayout.PropertyField(m_RootMotionSpeedMultiplier);
+                //EditorGUI.indentLevel--;
+                //  Motion related variables.
                 EditorGUILayout.PropertyField(m_MovementSpeed);
-                EditorGUILayout.PropertyField(m_StrafeSpeed);
-                EditorGUILayout.PropertyField(m_SpeedChangeMultiplier);
+                EditorGUILayout.PropertyField(m_Acceleration);
                 EditorGUILayout.PropertyField(m_RotationSpeed);
                 EditorGUILayout.PropertyField(m_AimRotationSpeed);
-                //EditorGUILayout.PropertyField(m_GroundSpeed);
             }
 
             EditorGUILayout.Space();
@@ -128,17 +125,21 @@ namespace CharacterController
                 EditorGUILayout.PropertyField(m_MaxStepHeight);
                 EditorGUILayout.PropertyField(m_StepOffset);
                 EditorGUILayout.PropertyField(m_StepSpeed);
-                EditorGUILayout.PropertyField(m_Acceleration);
             }
+
             EditorGUILayout.Space();
 
-
             //  Draw Action List.
-            DrawReorderableList(m_ActionsList);
-            //  Draw Action Inspector.
-            EditorGUI.indentLevel++;
-            DrawActionInspector(m_SelectedAction);
-            EditorGUI.indentLevel--;
+            m_ShowActionListFoldout = EditorGUILayout.Foldout(m_ShowActionListFoldout, ActionsFoldoutHeader);
+            if(m_ShowActionListFoldout){
+
+                DrawReorderableList(m_ActionsList);
+                //  Draw Action Inspector.
+                EditorGUI.indentLevel++;
+                DrawActionInspector(m_SelectedAction);
+                EditorGUI.indentLevel--;
+            }
+
 
             GUILayout.Space(12);
             DrawPropertiesExcluding(serializedObject, m_DontIncude);
@@ -315,6 +316,7 @@ namespace CharacterController
 
             DestroyImmediate(characterAction, true);
             serializedObject.Update();
+            AssetDatabase.Refresh();
         }
 
 

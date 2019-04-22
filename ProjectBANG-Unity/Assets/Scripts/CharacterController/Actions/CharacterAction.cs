@@ -2,6 +2,7 @@
 {
     using UnityEngine;
     using System;
+    using System.Collections;
 
     public enum ActionStartType { Automatic, Manual, ButtonDown, DoublePress };
     public enum ActionStopType { Automatic, Manual, ButtonUp, ButtonToggle };
@@ -147,7 +148,26 @@
 
 		protected void MoveToTarget(Vector3 targetPosition, Quaternion targetRotation, float minMoveSpeed, Action onComplete)
         {
+            StartCoroutine(MoveToTarget(targetPosition, targetRotation, minMoveSpeed));
+            if(onComplete != null)
+                onComplete();
+        }
+
+        private IEnumerator MoveToTarget(Vector3 targetPosition, Quaternion targetRotation, float minMoveSpeed)
+        {
+            var startTime = Time.time;
             
+            var direction = targetPosition - m_Transform.position;
+            var distanceRemainingSqr = direction.sqrMagnitude;
+            while (distanceRemainingSqr >= 0.1f || startTime > startTime + 5)
+            {
+                var velocityDelta = targetPosition - m_Transform.position;
+                m_Transform.position += velocityDelta.normalized * minMoveSpeed * m_DeltaTime;
+
+                distanceRemainingSqr = velocityDelta.sqrMagnitude;
+                startTime += m_DeltaTime;
+                yield return null;
+            }
         }
 
 

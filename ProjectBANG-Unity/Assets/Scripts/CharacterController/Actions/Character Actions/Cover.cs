@@ -1,4 +1,4 @@
-namespace CharacterController
+    namespace CharacterController
 {
     using UnityEngine;
     using System;
@@ -17,7 +17,7 @@ namespace CharacterController
         [SerializeField]
         protected LayerMask m_CoverLayer;
         [SerializeField]
-        protected float m_CoverMovementSpeed = 3;
+        protected float m_CoverMovementSpeed = 1;
         [SerializeField]
         protected float m_TakeCoverRotationSpeed = 4;
 
@@ -28,7 +28,7 @@ namespace CharacterController
         [SerializeField]
         protected float m_SideCoverDistance = 0.5f;
 
-        [SerializeField, DisplayOnly]
+
         protected float m_Spacing;
 
         protected Transform m_DetectorHolder;
@@ -39,22 +39,21 @@ namespace CharacterController
 
 
         protected RaycastHit m_ObjectDetectorHit;
-        protected RaycastHit m_RotationDetectorHit;
+        protected RaycastHit m_RotationDetectorHit, m_EdgeDetectionHit;
 
         protected Quaternion m_TargetRotation;
         protected Vector3 m_TargetPosition;
 
-        [SerializeField, DisplayOnly]
+
         protected Vector3 m_Velocity;
-        [SerializeField, DisplayOnly]
-        protected float m_Direction;
-        [SerializeField, DisplayOnly]
+        protected int m_Direction;
+
         protected bool m_HighCover;
-        protected float m_PopoutLength = 0.65f;
-        [SerializeField, DisplayOnly]
+        protected float m_CheckCoverLength = 0.65f;
+
         protected float m_HorizontalInput, m_ForwardInput;
         protected Vector3 m_StartPosition, m_StopPosition;       //  Stop position when hitting side edge of cover
-        [SerializeField, DisplayOnly]
+
         protected bool m_CanPopLeft, m_CanPopRight;
 
 
@@ -94,6 +93,7 @@ namespace CharacterController
         {
             if(base.CanStartAction())
             {
+                RaycastHit startLocationHit;
                 if (Physics.Raycast(m_ObjectDetector.position, m_ObjectDetector.forward, out m_ObjectDetectorHit, m_TakeCoverDistance, m_CoverLayer))
                 {
                     m_TargetPosition = m_ObjectDetectorHit.point + (m_ObjectDetectorHit.normal * (m_CapsuleCollider.radius * 0.45f));
@@ -108,19 +108,11 @@ namespace CharacterController
 
         protected override void ActionStarted()
         {
-            m_HighCover = Physics.Raycast(m_HighCoverDetector.position, m_HighCoverDetector.forward, m_PopoutLength, m_CoverLayer) ? true : false;
+            m_HighCover = Physics.Raycast(m_HighCoverDetector.position, m_HighCoverDetector.forward, m_TakeCoverDistance, m_CoverLayer);
+            m_Animator.SetFloat(HashID.Height, m_HighCover ? 1 : 0.5f);
 
-
-            //m_Controller.SetPosition(m_TargetPosition);
-            var action = m_Controller.GetAction<MoveTowards>();
-            if(action != null){
-                if (!action.IsActive){
-                    action.ActionStartLocation = m_TargetPosition;
-                    m_Controller.TryStartAction(action);
-                }
-            }
-
-            //Debug.LogFormat("Dot product.  {0}", Vector3.Dot(m_Transform.forward, -m_ObjectDetectorHit.normal));
+            MoveToTarget(m_TargetPosition, Quaternion.identity, 1, null);
+            //Debug.LogFormat("Dot product.  {0}", Vector3.Dot(m_Transform.right, m_ObjectDetectorHit.normal));
             //var directionVector = Vector3.Reflect(m_Transform.forward * 2, m_ObjectDetectorHit.normal);
         }
 
@@ -130,7 +122,7 @@ namespace CharacterController
 
 		protected override void ActionStopped()
         {
-            m_HighCover = Physics.Raycast(m_HighCoverDetector.position, m_HighCoverDetector.forward, m_PopoutLength, m_CoverLayer);
+            m_HighCover = Physics.Raycast(m_HighCoverDetector.position, m_HighCoverDetector.forward, m_CheckCoverLength, m_CoverLayer);
             m_Animator.SetFloat(HashID.Height, m_HighCover ? 1 : 0.5f);
 
             m_Animator.SetInteger(HashID.ActionID, 0);
@@ -139,17 +131,6 @@ namespace CharacterController
 
             m_Controller.LookRotation = m_Transform.rotation;
 
-            //if (m_CanPopLeft || m_CanPopRight){
-            //    var action = m_Controller.GetAction<MoveTowards>();
-            //    if (action != null){
-            //        if (!action.IsActive){
-            //            action.ActionStartLocation = m_StopPosition;
-            //            m_Controller.TryStartAction(action);
-            //        }
-            //    }
-            //}
-
-            //m_Animator.SetFloat(HashID.Height, 1f);
         }
 
 
@@ -158,50 +139,17 @@ namespace CharacterController
 		public override bool CheckMovement()
 		{
             m_HorizontalInput = m_Controller.InputVector.x;
-            m_Direction = Mathf.Clamp(m_HorizontalInput, -1, 1);;
+
+            if(m_HorizontalInput > 0) m_Direction = 1;
+            else if (m_HorizontalInput < 0) m_Direction = -1;
+            else m_Direction = 0;
+            //m_Direction = Mathf.RoundToInt(Mathf.Clamp(m_HorizontalInput, -1, 1));
+
             //  Execute only when the character is moving.
             if (Mathf.Abs(m_HorizontalInput) > 0.1f)
             {
-                ////  -- Check if character has reached the edge of the cover. --
-                //// Moving to the Left.
-                //if(m_HorizontalInput < 0)
-                //{
-                //    if (Physics.Raycast(m_LeftCoverPopup.position, m_LeftCoverPopup.forward, out m_RotationDetectorHit, m_PopoutLength, m_CoverLayer))
-                //    {
-                //        m_TargetRotation = Quaternion.FromToRotation(-m_Transform.forward, m_RotationDetectorHit.normal);
-                //        //m_TargetRotation = Quaternion.LookRotation(m_ObjectDetectorHit.normal, m_Transform.up);
-                //    }
-                //    //  If Left Cover Popup does not hit a cover object, than character cannot move left..  
-                //    else{
-                //        m_CanPopLeft = true;
-                //        m_StartPosition = m_Transform.position;
-                //        m_StopPosition = m_Transform.position - (m_Transform.right * 1.1f); //m_RightCoverPopup.position + (0.25f * (m_RightCoverPopup.right));
-                //        m_StopPosition = m_StopPosition + m_Transform.forward * 0.892f;
-                //    }
-                //}
-                //else if (m_HorizontalInput > 0)
-                //{
-                //    if (Physics.Raycast(m_RightCoverPopup.position, m_RightCoverPopup.forward, out m_RotationDetectorHit, m_PopoutLength, m_CoverLayer))
-                //    {
-                //        m_TargetRotation = Quaternion.FromToRotation(-m_Transform.forward, m_RotationDetectorHit.normal);
-                //        //m_TargetRotation = Quaternion.LookRotation(m_ObjectDetectorHit.normal, m_Transform.up);
-                //    }
-                //    else{
-                //        m_CanPopRight = true;
-                //        m_StartPosition = m_Transform.position;
-                //        m_StopPosition = m_Transform.position + (m_Transform.right * 1.1f); //m_RightCoverPopup.position + (0.25f * (m_RightCoverPopup.right));
-                //        m_StopPosition = m_StopPosition + m_Transform.forward * 0.892f;
-                //    }
-                //}
-                //else
-                //{
-                //    m_TargetRotation = m_Transform.rotation;
-                //    m_CanPopRight = m_CanPopLeft = false;
-                //    m_StartPosition = m_StopPosition = Vector3.zero;
-                //}
-
-
-                if (Physics.Raycast(m_LeftCoverPopup.position, m_LeftCoverPopup.forward, out m_RotationDetectorHit, m_PopoutLength, m_CoverLayer) == false)
+                //  -- Check if character has reached the edge of the cover. --
+                if (Physics.Raycast(m_LeftCoverPopup.position, m_LeftCoverPopup.forward, out m_EdgeDetectionHit, m_CheckCoverLength, m_CoverLayer) == false)
                 {
                     m_CanPopLeft = true;
                     m_StartPosition = m_Transform.position;
@@ -209,7 +157,7 @@ namespace CharacterController
                     m_StopPosition = m_StopPosition + m_Transform.forward * 0.892f;
                 }
                 //  If Left Cover Popup does not hit a cover object, than character cannot move left..  
-                else if (Physics.Raycast(m_RightCoverPopup.position, m_RightCoverPopup.forward, out m_RotationDetectorHit, m_PopoutLength, m_CoverLayer) == false)
+                else if (Physics.Raycast(m_RightCoverPopup.position, m_RightCoverPopup.forward, out m_EdgeDetectionHit, m_CheckCoverLength, m_CoverLayer) == false)
                 {
                     m_CanPopRight = true;
                     m_StartPosition = m_Transform.position;
@@ -229,34 +177,35 @@ namespace CharacterController
 
         [SerializeField]
         private float alignmentAngle;
+        [SerializeField]
+        private Vector3 rotationCheckPosition;
+        private Vector3 moveDirection;
 		public override bool UpdateRotation()
         {
-            if (Mathf.Abs(m_HorizontalInput) > 0.1)
-            {
-                //m_Transform.rotation = m_TargetRotation * m_Transform.rotation;
-                alignmentAngle = Mathf.Abs(Quaternion.Angle(m_Transform.rotation, m_TargetRotation));
-            } else {
-                alignmentAngle = 0;
-            }
-
-
-            //if(alignmentAngle > 0){
-            //    m_Transform.rotation = m_TargetRotation * m_Transform.rotation;
-            //}
-            //m_Transform.rotation = m_TargetRotation * m_Transform.rotation;
-            //m_Transform.rotation = Quaternion.Lerp(m_Transform.rotation, m_TargetRotation * m_Transform.rotation, m_TakeCoverRotationSpeed * m_DeltaTime);
-            ////m_Transform.rotation = Quaternion.Lerp(m_Transform.rotation, m_TargetRotation * m_Transform.rotation, m_TakeCoverRotationSpeed * m_DeltaTime);
+            m_TargetRotation = m_Transform.rotation;
+            //rotationCheckPosition = m_ObjectDetector.position + (m_Direction * Vector3.right * m_CapsuleCollider.radius) + (-Vector3.forward * m_CapsuleCollider.radius);
+            rotationCheckPosition = m_ObjectDetector.position + (m_Direction * Vector3.right * m_CapsuleCollider.radius);
 
             if (Mathf.Abs(m_HorizontalInput) > 0.1)
             {
+                if (Physics.Raycast(rotationCheckPosition, m_ObjectDetector.forward, out m_RotationDetectorHit, m_CheckCoverLength, m_CoverLayer))
+                {
+                    //moveDirection = Vector3.Cross(m_RotationDetectorHit.normal, m_Transform.up);
+                    //moveDirection = moveDirection.normalized * m_Direction;
+                    //m_TargetRotation = Quaternion.LookRotation(moveDirection, m_Transform.up) * m_Transform.rotation;
 
-                //Debug.DrawRay(m_ObjectDetector.position, m_ObjectDetector.forward, Color.magenta);
-                if (Physics.Raycast(m_ObjectDetector.position, m_ObjectDetector.forward, out m_ObjectDetectorHit, m_TakeCoverDistance, m_CoverLayer)){
-                    m_TargetRotation = Quaternion.FromToRotation(-m_Transform.forward, m_ObjectDetectorHit.normal) * m_Transform.rotation;
-                    m_Transform.rotation = m_TargetRotation;
-                    //m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Transform.rotation, m_TargetRotation.normalized, m_TakeCoverRotationSpeed * m_DeltaTime));
+                    m_TargetRotation = Quaternion.FromToRotation(-m_Transform.forward, m_RotationDetectorHit.normal) * m_Transform.rotation;
+                    //m_TargetRotation.Normalize();
                 }
             }
+
+            alignmentAngle = Quaternion.Angle(m_Transform.rotation, m_TargetRotation);
+
+            //m_Transform.rotation = m_TargetRotation;
+            m_Transform.rotation = Quaternion.Lerp(m_TargetRotation, m_Transform.rotation, m_DeltaTime);
+            //m_Transform.rotation = Quaternion.RotateTowards(m_Transform.rotation, m_TargetRotation,  m_DeltaTime);
+
+
             return false;
         }
 
@@ -265,32 +214,24 @@ namespace CharacterController
         //  Only allow movement on the relative x axis to prevent the character from moving away from the cover point.
         public override bool UpdateMovement()
         {
-            //m_Spacing = m_ObjectDetectorHit.distance;
 
             //  Execute only when the character is moving.
-            if (Mathf.Abs(m_HorizontalInput) > 0.1f)
+            if (Mathf.Abs(m_HorizontalInput) > 0.1f){
+                m_HighCover = Physics.Raycast(m_HighCoverDetector.position, m_HighCoverDetector.forward, m_CheckCoverLength, m_CoverLayer) ? true : false;
+            }
+
+            //moveDirection = Vector3.Cross(m_Transform.right * m_Direction, m_Transform.up);
+            if (Physics.Raycast(m_ObjectDetector.position, m_ObjectDetector.forward, out m_ObjectDetectorHit, m_CheckCoverLength, m_CoverLayer))
             {
-                m_HighCover = Physics.Raycast(m_HighCoverDetector.position, m_HighCoverDetector.forward, m_PopoutLength, m_CoverLayer) ? true : false;
-                //  Character is switching directions.
-                if ((m_Direction >= 0 && m_HorizontalInput < 0))
+                var hitLocation = m_ObjectDetectorHit.point;
+                hitLocation.y = m_Transform.position.y;
+                m_Spacing = (hitLocation - m_Transform.position).magnitude;
+                if (m_Spacing > m_CapsuleCollider.radius + 0.02f)
                 {
-                    m_Direction = Mathf.Lerp(1, -1, m_DeltaTime);
-                }
-                else if (m_Direction < 0 && m_HorizontalInput >= 0)
-                {
-                    m_Direction = Mathf.Lerp(-1, 1, m_DeltaTime);
+                    m_Transform.position = Vector3.Lerp(m_Transform.position, m_Transform.position + m_Transform.forward * (m_Spacing - m_CapsuleCollider.radius + 0.02f), m_DeltaTime);
+                    //m_Transform.position = m_Transform.position + (Vector3.forward * (m_Spacing - m_CapsuleCollider.radius + 0.02f) * m_DeltaTime);
                 }
             }
-
-            var hitLocation = m_ObjectDetectorHit.point;
-            hitLocation.y = m_Transform.position.y;
-            m_Spacing = (hitLocation - m_Transform.position).magnitude;
-            if (m_Spacing > m_CapsuleCollider.radius + 0.02f){
-                m_Transform.position = Vector3.Lerp(m_Transform.position, m_Transform.position + m_Transform.forward * (m_Spacing - m_CapsuleCollider.radius + 0.02f), m_DeltaTime);
-                //m_Transform.position = Vector3.Lerp(m_Transform.position, m_Transform.position + m_Transform.forward * (m_Spacing - m_CapsuleCollider.radius + 0.02f), m_DeltaTime);
-                //m_Transform.position = m_Transform.position + (Vector3.forward * (m_Spacing - m_CapsuleCollider.radius + 0.02f) * m_DeltaTime);
-            }
-
 
 
             if(m_CanPopLeft){
@@ -305,19 +246,10 @@ namespace CharacterController
                 m_HorizontalInput = m_Controller.InputVector.x;
                 m_Controller.InputVector.Set(m_HorizontalInput, m_Controller.InputVector.y, 0);
             }
-
-            if(Mathf.Abs(m_HorizontalInput) >= 1)
-                m_Velocity = m_Transform.right * m_Controller.InputVector.x * m_CoverMovementSpeed;
-            else
-                m_Velocity = m_Transform.right * m_HorizontalInput;
+            m_Velocity = m_Transform.right * m_HorizontalInput * m_CoverMovementSpeed;
 
 
 
-
-            if (m_Debug) Debug.DrawRay(m_ObjectDetector.position, m_ObjectDetector.forward * m_PopoutLength, m_DebugSettings.CenterColor);
-            if (m_Debug) Debug.DrawRay(m_LeftCoverPopup.position, m_LeftCoverPopup.forward * m_PopoutLength, m_CanPopLeft ? m_DebugSettings.ChangeStateColor : m_DebugSettings.LeftColor);
-            if (m_Debug) Debug.DrawRay(m_RightCoverPopup.position, m_RightCoverPopup.forward * m_PopoutLength, m_CanPopRight ? m_DebugSettings.ChangeStateColor : m_DebugSettings.RightColor);
-            if (m_Debug) Debug.DrawRay(m_HighCoverDetector.position, m_HighCoverDetector.forward * m_PopoutLength, m_HighCover ? m_DebugSettings.ChangeStateColor : m_DebugSettings.CenterColor);
 
             return false;
         }
@@ -325,8 +257,10 @@ namespace CharacterController
 
         public override bool Move()
         {
+            m_Velocity += m_Animator.deltaPosition / m_DeltaTime;
             m_Controller.Velocity = m_Velocity;
-            m_Rigidbody.velocity = Vector3.Slerp(m_Rigidbody.velocity, m_Controller.Velocity, 20 * m_DeltaTime);
+            m_Rigidbody.velocity = m_Velocity;
+            //m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Controller.Velocity, 20 * m_DeltaTime);
 
             return false;
         }
@@ -336,16 +270,27 @@ namespace CharacterController
         public override bool UpdateAnimator()
         {
             //  Is Moving.
-            m_Animator.SetBool(HashID.Moving, Mathf.Abs(m_Controller.InputVector.x) > 0.1f);
+            m_Animator.SetBool(HashID.Moving, Mathf.Abs(m_HorizontalInput) > 0.1f);
             //m_AnimatorMonitor.SetIntDataValue((int)m_CurrentCoverID);
 
-            m_AnimatorMonitor.SetHorizontalInputValue(m_Controller.InputVector.x);
+            //m_Animator.SetBool(HashID.Crouching, !m_HighCover);
+            m_Animator.SetFloat(HashID.Height, m_HighCover ? 1 : 0.5f, 0.2f, m_DeltaTime);
+
+            m_AnimatorMonitor.SetHorizontalInputValue(m_HorizontalInput);
+            //if ((m_CanPopLeft || m_CanPopRight) && m_HorizontalInput == 0 && Mathf.Abs(m_Direction) == 1)
+            //{
+            //    m_Animator.SetInteger(HashID.ActionIntData, m_Direction);
+            //    m_AnimatorMonitor.SetHorizontalInputValue(m_HorizontalInput);
+            //} else {
+            //    m_Animator.SetInteger(HashID.ActionIntData, 0);
+            //    m_AnimatorMonitor.SetHorizontalInputValue(m_HorizontalInput);
+            //}
+
             m_ForwardInput = 0;
             m_AnimatorMonitor.SetForwardInputValue(m_ForwardInput);
 
             m_Animator.SetInteger(HashID.ActionID, m_ActionID);
-            //m_Animator.SetBool(HashID.Crouching, !m_HighCover);
-            m_Animator.SetFloat(HashID.Height, m_HighCover ? 1 : 0.5f, 0.1f, m_DeltaTime);
+
 
             //m_Animator.SetInteger(HashID.ActionIntData, m_ActionID);
             return false;
@@ -366,7 +311,7 @@ namespace CharacterController
         public class DebugSettings
         {
             [SerializeField]
-            private float m_GizmoSize = 0.2f;
+            private float m_GizmoSize = 0.1f;
             [SerializeField]
             private Vector3 m_CubeSize;
             [SerializeField]
@@ -395,92 +340,78 @@ namespace CharacterController
         }
 
 
-
-        private void DrawDebugLine(Transform detector, float lineLegnth, bool hitCover, Color defaultColor)
-        {
-            Debug.DrawLine(detector.position, detector.position + (detector.forward * lineLegnth), hitCover ? Color.green : defaultColor);
-        }
-
-
-
-        private void DrawGizmoLine(Transform detector, bool hitCover)
-        {
-            Gizmos.color = hitCover ? Color.green : Color.red;
-            Gizmos.DrawLine(detector.position, detector.position + (detector.forward * m_TakeCoverDistance));
-        }
-
-        Vector3 d_GizmoCubeSize = new Vector3(0.2f, 0.2f, 0.2f);
-
         protected virtual void OnDrawGizmosSelected()
         {
             if(Application.isPlaying && m_Debug)
             {
-                //if (m_Debug){
-                //    if (m_LeftCoverPopup) DrawGizmoLine(m_LeftCoverPopup, _hitLeft);
-                //    if (m_RightCoverPopup) DrawGizmoLine(m_RightCoverPopup, _hitRight);
-                //}
+                Gizmos.color = m_DebugSettings.CenterColor;
+                Gizmos.DrawRay(m_ObjectDetector.position, m_ObjectDetector.forward * m_CheckCoverLength);
+
+                Gizmos.color = m_HighCover ? m_DebugSettings.CenterColor : m_DebugSettings.ChangeStateColor;
+                Gizmos.DrawRay(m_HighCoverDetector.position, m_HighCoverDetector.forward * m_CheckCoverLength);
+
+                Gizmos.color = Color.cyan;
+                Gizmos.DrawSphere(rotationCheckPosition, 0.1f);
+
+                Gizmos.DrawRay(rotationCheckPosition, m_ObjectDetector.forward);
+
+
+                Gizmos.color = Color.red;
+                Gizmos.DrawRay(m_ObjectDetector.position, moveDirection);
 
                 if (m_LeftCoverPopup && m_RightCoverPopup)
                 {
                     Gizmos.color = m_CanPopLeft ?  m_DebugSettings.ChangeStateColor : m_DebugSettings.LeftColor;
-                    Gizmos.DrawCube(m_LeftCoverPopup.position, d_GizmoCubeSize);
+                    Gizmos.DrawRay(m_LeftCoverPopup.position, m_LeftCoverPopup.forward * m_CheckCoverLength);
+                    //Gizmos.DrawCube(m_LeftCoverPopup.position, d_GizmoCubeSize);
+                    Gizmos.DrawSphere(m_LeftCoverPopup.position, m_DebugSettings.GizmoSize);
                     GizmosUtils.DrawString("Left Cover", m_LeftCoverPopup.position + Vector3.up * 0.5f, Color.black);
                     if ( m_CanPopLeft){
                         Gizmos.color = m_DebugSettings.LeftColor;
                         Gizmos.DrawWireSphere(m_StopPosition, 0.25f);
                     }
-                    //Gizmos.DrawRay(m_LeftCoverPopup.position, m_LeftCoverPopup.forward * m_PopoutLength);
 
-                    //Debug.DrawRay(m_LeftCoverPopup.position, m_LeftCoverPopup.forward, m_CanPopLeft ? Color.green : Color.magenta);
 
                     Gizmos.color = m_CanPopRight ? m_DebugSettings.ChangeStateColor : m_DebugSettings.RightColor;
-                    Gizmos.DrawCube(m_RightCoverPopup.position, d_GizmoCubeSize);
+                    Gizmos.DrawRay(m_RightCoverPopup.position, m_RightCoverPopup.forward * m_CheckCoverLength);
+                    //Gizmos.DrawCube(m_RightCoverPopup.position, d_GizmoCubeSize);
+                    Gizmos.DrawSphere(m_RightCoverPopup.position, m_DebugSettings.GizmoSize);
                     GizmosUtils.DrawString("Right Cover", m_RightCoverPopup.position + Vector3.up * 0.5f, Color.black);
                     if(m_CanPopRight){
                         Gizmos.color = m_DebugSettings.RightColor;
                         Gizmos.DrawWireSphere(m_StopPosition, 0.25f);
                     }
-                    //Gizmos.DrawRay(m_LeftCoverPopup.position, m_LeftCoverPopup.forward * m_PopoutLength);
+
                 }
             }
 
         }
 
 
+        GUIStyle style = new GUIStyle();
+        GUIContent content = new GUIContent();
+        Vector2 size;
+        Color debugTextColor = new Color(0, 0.6f, 1f, 1);
+        GUIStyle textStyle = new GUIStyle();
+        Rect location = new Rect();
+        private void OnGUI()
+        {
+            if (Application.isPlaying && m_Debug && m_IsActive)
+            {
+                GUI.color = debugTextColor;
+                textStyle.fontStyle = FontStyle.Bold;
+                content.text = string.Format("Alignment Angle: {0}\n", alignmentAngle.ToString());
+                content.text += string.Format("Direction: {0} | Horizontal Input: {1}\n", m_Direction.ToString(), m_HorizontalInput.ToString());
+                content.text += string.Format("Spacing: {0} | Distance: {1}\n", m_Spacing, m_ObjectDetectorHit.distance);
+                size = new GUIStyle(GUI.skin.label).CalcSize(content);
+                location.Set(5, 15, size.x * 2, size.y * 2);
+                GUILayout.BeginArea(location);
+                GUILayout.Label(content);
+                //GUILayout.Label(string.Format("Normalized Time: {0}", normalizedTime.ToString()));
+                GUILayout.EndArea();
+            }
 
-
-        //private bool CanEnterCover(bool drawAllLines = false)
-        //{
-        //    float coverViewAngle = 135;
-        //    int numOfRays = 6;
-
-        //    float halfAngle = coverViewAngle / 2.0f;
-        //    Quaternion leftRayRotation = Quaternion.AngleAxis(-halfAngle, Vector3.up);
-        //    Vector3 leftRayDirection = leftRayRotation * (m_ObjectDetector.forward * m_TakeCoverDistance);
-        //    Vector3 direction = leftRayDirection;
-
-        //    float amountEach = coverViewAngle / (numOfRays);
-        //    for (int i = 0; i < numOfRays; i++)
-        //    {
-        //        if (i == 0) continue;
-        //        Quaternion desiredRotation = Quaternion.AngleAxis(amountEach, Vector3.up);
-        //        direction = desiredRotation * direction;
-
-        //        bool hit = false;
-        //        if (Physics.Raycast(m_ObjectDetector.position, direction, out m_ObjectDetectorHit, m_TakeCoverDistance, m_CoverLayer))
-        //        {
-        //            if (!drawAllLines) Debug.DrawRay(m_ObjectDetector.position, direction, hit ? Color.green : Color.magenta, 1);
-        //            hit = true;
-        //            m_TargetPosition = m_ObjectDetectorHit.point + (m_ObjectDetectorHit.normal * (m_CapsuleCollider.radius * 1.0f));
-        //            m_TargetPosition.y = m_Controller.transform.position.y;
-        //            return true;
-        //        }
-        //        if (drawAllLines) Debug.DrawRay(m_ObjectDetector.position, direction, hit ? Color.green : Color.magenta, 1);
-        //    }
-        //    return false;
-        //}
-
-
+        }
 
 
     }

@@ -5,10 +5,13 @@ ModelImporter:
   internalIDToNameTable:
   - first:
       74: -203655887218126122
-    second: Left Peek Crouch
+    second: Right Crouch Peeking Idle
   - first:
       74: -6576225596894810531
-    second: Right Peek Crouch
+    second: Right Crouch Peeking Enter
+  - first:
+      74: 5996080607698981509
+    second: Right Crouch Peeking Exit
   externalObjects: {}
   materials:
     importMaterials: 1
@@ -38,11 +41,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Right Peek Crouch
+      name: Right Crouch Peeking Enter
       takeName: mixamo.com
       internalID: -6576225596894810531
       firstFrame: 0
-      lastFrame: 90
+      lastFrame: 20
       wrapMode: 0
       orientationOffsetY: 180
       level: 0
@@ -56,9 +59,9 @@ ModelImporter:
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 1
       keepOriginalPositionY: 1
-      keepOriginalPositionXZ: 0
+      keepOriginalPositionXZ: 1
       heightFromFeet: 0
-      mirror: 0
+      mirror: 1
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events: []
@@ -67,11 +70,11 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Left Peek Crouch
+      name: Right Crouch Peeking Idle
       takeName: mixamo.com
       internalID: -203655887218126122
-      firstFrame: 0
-      lastFrame: 90
+      firstFrame: 21
+      lastFrame: 22
       wrapMode: 0
       orientationOffsetY: 180
       level: 0
@@ -85,7 +88,36 @@ ModelImporter:
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 1
       keepOriginalPositionY: 1
-      keepOriginalPositionXZ: 0
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 1
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Right Crouch Peeking Exit
+      takeName: mixamo.com
+      internalID: 5996080607698981509
+      firstFrame: 21
+      lastFrame: 54
+      wrapMode: 0
+      orientationOffsetY: 180
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
       heightFromFeet: 0
       mirror: 1
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000

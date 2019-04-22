@@ -70,7 +70,7 @@ namespace CharacterController
                     //var newRotation = Quaternion.FromToRotation(m_Transform.forward, rotationDirection);
                     //rotation = rotation * newRotation;
 
-                    var footStep = ObjectPoolManager.Spawn(m_Decal, position, rotation);
+                    var footStep = ObjectPool.Instantiate(m_Decal, position, rotation);
                 }
 
                 m_FootstepThreshold = Time.timeSinceLevelLoad + m_FootstepTimer;

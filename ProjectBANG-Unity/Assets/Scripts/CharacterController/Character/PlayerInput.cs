@@ -27,7 +27,7 @@ namespace CharacterController
         //[SerializeField]
         //private LayerMask m_LayerMask;
 
-
+        private Vector3 m_LookDirection;
         private Ray m_Ray;
 
 
@@ -122,42 +122,38 @@ namespace CharacterController
 
 
             m_MouseInputVector.Set(m_MouseHorizontal, m_MouseVertical, m_CameraController.Camera.nearClipPlane);
-            //var viewport = m_CameraController.Camera.ViewportToWorldPoint(m_MouseInputVector);
-            //  Set look at point.
-            m_Controller.LookAtPoint = m_CameraController.Camera.transform.position + m_CameraController.Camera.transform.forward * m_LookDistance;
-            //Debug.DrawRay(m_CameraController.Camera.transform.position, m_CameraController.Camera.transform.forward * m_LookDistance, Color.blue);
-            var direction = (m_CameraController.Camera.transform.position + m_CameraController.Camera.transform.forward * m_LookDistance) - m_Transform.position;
-            direction.y = 0;
+            m_LookDirection = (m_CameraController.Camera.transform.position + m_CameraController.Camera.transform.forward * m_LookDistance) - m_Transform.position;
+            m_LookDirection.y = 0;
 
 
 
             if(m_Controller.Aiming)
             {
-                direction.y = m_Transform.position.y;
-                direction.Normalize();
+                m_LookDirection.y = m_Transform.position.y;
+                m_LookDirection.Normalize();
                 //  Set the Look Rotation
-                m_Controller.LookRotation = direction != Vector3.zero ? m_Controller.LookRotation = Quaternion.LookRotation(direction, m_Transform.up) : m_Transform.rotation;
-                //  Set the Look Direction
-                m_Controller.LookDirection = m_CameraController.Camera.transform.forward * (direction.magnitude + 10);
+                m_Controller.LookRotation = m_LookDirection != Vector3.zero ? m_Controller.LookRotation = Quaternion.LookRotation(m_LookDirection, m_Transform.up) : m_Transform.rotation;
+                //  Set the Look m_LookDirection
+                m_Controller.LookDirection = m_CameraController.Camera.transform.forward * (m_LookDirection.magnitude + 10);
             }
             //  Free Movement.
             else if (m_Controller.IndependentLook())
             {
                 m_Controller.LookRotation = m_Transform.rotation;
-                direction.Normalize();
-                m_Controller.LookDirection = m_CameraController.Camera.transform.forward * (direction.magnitude + 10);
+                m_LookDirection.Normalize();
+                m_Controller.LookDirection = m_CameraController.Camera.transform.forward * (m_LookDirection.magnitude + 10);
             }
             //  Moving
             else{
-                direction.y = m_Transform.position.y;
-                direction.Normalize();
-                m_Controller.LookRotation = direction != Vector3.zero ? m_Controller.LookRotation = Quaternion.LookRotation(direction, m_Transform.up) : m_Transform.rotation;
+                m_LookDirection.y = m_Transform.position.y;
+                m_LookDirection.Normalize();
+                m_Controller.LookRotation = m_LookDirection != Vector3.zero ? m_Controller.LookRotation = Quaternion.LookRotation(m_LookDirection, m_Transform.up) : m_Transform.rotation;
                 m_Controller.LookDirection = m_Transform.forward * 10;
-                //Debug.DrawRay(m_Transform.position +(Vector3.up * 1.35f), direction * m_LookDistance, Color.green);
+                //Debug.DrawRay(m_Transform.position +(Vector3.up * 1.35f), m_LookDirection * m_LookDistance, Color.green);
 
                 //m_Controller.LookDirection = (m_Transform.position - m_CameraController.Camera.transform.position);
                 ////m_Controller.LookDirection.y = 0;
-                //m_Controller.LookDirection = m_Controller.LookDirection.normalized * (direction.magnitude + 10);
+                //m_Controller.LookDirection = m_Controller.LookDirection.normalized * (m_LookDirection.magnitude + 10);
             }
 
 
