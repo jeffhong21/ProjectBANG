@@ -15,7 +15,7 @@
         [SerializeField]
         protected LayerMask m_VaultLayers;
         [SerializeField, Tooltip("The highest level the character can vault over.")]
-        protected float m_MaxVaultHeight = 1.5f;
+        protected float m_MaxVaultHeight = 2f;
         [SerializeField, Tooltip("How deep the character can vault over.")]
         protected float m_MaxVaultDepth = 1f;
         [SerializeField, Tooltip("The offset between the vault point and the point that the character should start to vault at")]
@@ -45,12 +45,13 @@
 
 
         private Quaternion m_MatchRotation;
-        private RaycastHit m_MoveToVaultDistanceHit, m_HeightCheckHit, m_EndPositionHit;
+        private RaycastHit m_MoveToVaultDistanceHit, m_MatchPositionHit, m_EndPositionHit;
         private float m_StartTime;
 
         private float m_ColliderHeight;
         private Vector3 m_ColliderCenter;
 
+        private MatchTargetWeightMask m_MatchTargetWeightMask = new MatchTargetWeightMask(Vector3.one, 1);
 
         [SerializeField] bool m_Debug;
 
@@ -62,12 +63,11 @@
         {
             if(base.CanStartAction())
             {
-                if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance, Color.green, 3f);
                 if(Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out m_MoveToVaultDistanceHit, m_MoveToVaultDistance, m_VaultLayers)){
-                    CachePositions();
-                    return true;
+                    if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance, Color.green);
+                    return CachePositions();
                 }
-                //return true;
+
             }
             return false;
         }
@@ -76,31 +76,31 @@
         private bool CachePositions()
         {
             var heightCheckStart = m_MoveToVaultDistanceHit.point;
-            heightCheckStart.y += m_MaxVaultHeight - m_CheckHeight;
+            heightCheckStart.y += (m_MaxVaultHeight + m_StartVaultOffset) - m_CheckHeight;
 
 
-            if(m_Debug) Debug.DrawRay(heightCheckStart, Vector3.down * m_MaxVaultHeight, Color.cyan, 3f);
+            if(m_Debug) Debug.DrawRay(heightCheckStart, Vector3.down * m_MaxVaultHeight, Color.cyan, 1f);
 
-            if (Physics.Raycast(heightCheckStart, Vector3.down, out m_HeightCheckHit, m_MaxVaultHeight, m_VaultLayers)){
+            if (Physics.Raycast(heightCheckStart, Vector3.down, out m_MatchPositionHit, m_MaxVaultHeight, m_VaultLayers)){
                 //  cache HeightCheckHit distance.
-                var heightCheckDist = m_HeightCheckHit.distance;
+                var heightCheckDist = m_MatchPositionHit.distance;
                 if (heightCheckDist < m_MaxVaultHeight){
                     //  Get the objet to vault over height.
                     m_VaultObjectHeight = m_MaxVaultHeight - heightCheckDist;
                     //  Get the position of when the characters hand is placed on the object.
-                    m_MatchPosition = m_HeightCheckHit.point + Vector3.up * m_StartVaultOffset;
+                    m_MatchPosition = m_MatchPositionHit.point + (Vector3.up * m_MatchTargetOffset) + (m_Transform.forward * m_MatchTargetOffset);
 
                     //if(m_Debug) Debug.DrawRay(m_MoveToVaultDistanceHit.point, -m_MoveToVaultDistanceHit.normal, Color.yellow, 3f);
 
                     var depthCheck = (-m_MoveToVaultDistanceHit.normal + m_MoveToVaultDistanceHit.point) * m_MaxVaultDepth;
                     depthCheck.y = heightCheckStart.y;
 
-                    if (m_Debug) Debug.DrawRay(depthCheck, Vector3.down * heightCheckStart.y, Color.green, 3f);
+                    if (m_Debug) Debug.DrawRay(depthCheck, Vector3.down * heightCheckStart.y, Color.cyan, 1f);
                     if (Physics.Raycast(depthCheck, Vector3.down, out m_EndPositionHit, m_MaxVaultHeight + m_StartVaultOffset, m_Layers.GroundLayer))
                     {
                         m_EndPosition = m_EndPositionHit.point;
-                        m_StartPosition = (m_Transform.position - m_MoveToVaultDistanceHit.point) * m_MoveToVaultDistance;
-                        //m_StartPosition = m_Transform.position;
+                        m_StartPosition = m_MoveToVaultDistanceHit.point + (m_Transform.position - m_MoveToVaultDistanceHit.point) * m_StartVaultOffset;
+                        m_StartPosition.y = m_Transform.position.y;
                         return true;
                     }
                 }
@@ -113,64 +113,48 @@
         protected override void ActionStarted()
         {
             //  Cache variables
-            m_Animator.applyRootMotion = true;
             m_ColliderHeight = m_CapsuleCollider.height;
             m_ColliderCenter = m_CapsuleCollider.center;
 
-            if(m_VaultObjectHeight <= 0.7f){
-                m_Animator.SetInteger(HashID.ActionIntData, 1);
-                m_StateName = "Vault.Chest";
-            }
-            else if (m_VaultObjectHeight <= 0.8f)
-            {
-                m_Animator.SetInteger(HashID.ActionIntData, 2);
-                m_StateName = "Vault.Head";
-            }
-            //else if (m_VaultObjectHeight <= 1.75f && m_VaultObjectHeight >= 1.15f)
-            //{
-            //    m_Animator.SetInteger(HashID.ActionIntData, 3);
-            //    m_StateName = "Vault.Climb";
-            //}
-            else{
-                m_StateName = "Vault";
-            }
 
-
+            m_Animator.SetInteger(HashID.ActionIntData, 2);
+            m_StateName = "Vault.Head";
 
             m_StartTime = Time.time;
             //Debug.LogFormat("Playing:  {0}.  ColliderHeight is : {1}", stateNames[currentAnimIndex], m_VaultObjectHeight);
         }
 
 
-
+        float m_HeightDifference;
         //  Move over the vault object based off of the root motion forces.
         public override bool UpdateMovement()
         {
             m_ColliderAnimHeight = m_Animator.GetFloat(HashID.ColliderHeight);
             m_VerticalHeight = Mathf.Clamp01(1 - Mathf.Abs(m_ColliderAnimHeight));
 
-            m_CapsuleCollider.height = m_ColliderHeight * Mathf.Abs(m_ColliderAnimHeight);
-            //m_CapsuleCollider.center.y 
+            m_HeightDifference =  (float)System.Math.Round(m_MatchPosition.y - m_Transform.position.y, 2);
+
+
 
             m_VerticalHeight *= m_HeightMultiplier;
             m_VerticalHeight = (float)System.Math.Round(m_VerticalHeight, 2);
+            m_VerticalVelocity = Vector3.up * (m_VerticalHeight * (m_VaultObjectHeight + m_MatchTargetOffset));
 
-
-            //m_VerticalVelocity = Vector3.up * (m_VerticalHeight * (m_VaultObjectHeight + m_MatchTargetOffset));
-            m_VerticalVelocity = Vector3.up * (m_VerticalHeight * m_VaultObjectHeight);
-
+            m_CapsuleCollider.height = m_ColliderHeight * Mathf.Abs(m_ColliderAnimHeight);
+            m_CapsuleCollider.center = Vector3.up * (m_CapsuleCollider.height / 2);
+            m_CapsuleCollider.center = m_CapsuleCollider.center + m_VerticalVelocity;
             return true;
         }
 
 
 		public override bool Move()
 		{
-            m_Animator.MatchTarget(m_MatchPosition, m_Transform.rotation, AvatarTarget.RightHand, new MatchTargetWeightMask(Vector3.one, 1), m_StartMatchTarget, m_StopMatchTarget);
+            m_Animator.ApplyBuiltinRootMotion();
+            m_Animator.MatchTarget(m_MatchPosition, m_Transform.rotation, AvatarTarget.RightHand, m_MatchTargetWeightMask, m_StartMatchTarget, m_StopMatchTarget);
             m_Velocity = m_Animator.deltaPosition / m_DeltaTime;
-            //if (m_ColliderAnimHeight > 0) m_Velocity = m_Velocity * 0.5f;
 
+            m_Velocity = m_Velocity * Mathf.Clamp01(1 - Mathf.Abs(m_ColliderAnimHeight));
             m_Velocity += m_VerticalVelocity;
-            //m_Rigidbody.velocity = Vector3.SmoothDamp(m_Rigidbody.velocity, m_Velocity, ref m_SmoothVelocityDamp, 0.5f);
             m_Rigidbody.velocity = m_Velocity;
 
             //Debug.LogFormat("Target Matching: {0}", m_Animator.isMatchingTarget);
@@ -182,7 +166,6 @@
 
 		protected override void ActionStopped()
         {
-            m_Animator.applyRootMotion = false;
             m_CapsuleCollider.height = m_ColliderHeight;
             m_StartPosition = m_MatchPosition = m_EndPosition = Vector3.zero;
 
@@ -234,6 +217,7 @@
                 if(m_StartPosition != Vector3.zero){
                     Gizmos.color = Color.magenta;
                     Gizmos.DrawWireSphere(m_StartPosition, 0.2f);
+                    GizmosUtils.DrawString("Start Position", m_StartPosition, Color.white);
                 }
                 if (m_MatchPosition != Vector3.zero)
                 {
@@ -267,8 +251,10 @@
                 textStyle.fontStyle = FontStyle.Bold;
 
                 content.text = string.Format("Vertical Height: {0}\n", m_VerticalHeight.ToString());
+                content.text += string.Format("Height Difference: {0}\n", m_HeightDifference);
                 content.text += string.Format("Vertical Object Height: {0}\n", m_VaultObjectHeight);
                 content.text += string.Format("Vertical Velocity: {0}\n", m_VerticalVelocity);
+                content.text += string.Format("Rigidbody Velocity: {0}\n", m_Rigidbody.velocity);
                 //content.text += string.Format("Velocity: {0}\n", m_Velocity);
                 content.text += string.Format("Normalize Time: {0}\n", GetNormalizedTime());
                 content.text += string.Format("Matching Target: {0}\n", m_Animator.isMatchingTarget);

@@ -8,7 +8,8 @@
     {
         public static readonly int HorizontalInput = Animator.StringToHash("HorizontalInput");
         public static readonly int ForwardInput = Animator.StringToHash("ForwardInput");
-        public static readonly int TurnAmount = Animator.StringToHash("TurnAmount");
+        public static readonly int Rotation = Animator.StringToHash("Rotation");
+        public static readonly int InputVector = Animator.StringToHash("InputVector");
         public static readonly int ActionID = Animator.StringToHash("ActionID");
         public static readonly int ActionIntData = Animator.StringToHash("ActionIntData");
         public static readonly int ActionFloatData = Animator.StringToHash("ActionFloatData");

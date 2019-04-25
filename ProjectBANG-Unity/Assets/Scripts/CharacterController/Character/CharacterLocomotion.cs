@@ -70,7 +70,7 @@
         private float m_InputMagnitude, m_TurnAmount;
         //[SerializeField, DisplayOnly]
         private Vector3 m_Velocity;
-        //[SerializeField, DisplayOnly]
+        [SerializeField, DisplayOnly]
         private Vector3 m_InputVector, m_RelativeInputVector;
         private Vector3 m_LookDirection;
         private Quaternion m_LookRotation;
@@ -220,6 +220,11 @@
             EventHandler.UnregisterEvent<bool>(m_GameObject, "OnAimActionStart", OnAimActionStart);
 		}
 
+        [SerializeField]
+        float m_LateralDirection, m_LateralVelocity;
+        float m_ForwardDirection;
+        [SerializeField]
+        float m_AngleRootToMove;
 
 		private void Update()
 		{
@@ -230,7 +235,32 @@
                 m_InputVector.Normalize();
             m_RelativeInputVector = m_Transform.InverseTransformDirection(m_InputVector);
 
+            Quaternion referentialShift = Quaternion.FromToRotation(Vector3.forward, Vector3.Normalize(m_Transform.forward));
+            Vector3 moveDirection = referentialShift * m_RelativeInputVector;
+            Vector3 axisSign = Vector3.Cross(moveDirection, m_Transform.forward);
+            m_AngleRootToMove = Vector3.Angle(m_Transform.forward, moveDirection) * (axisSign.y >= 0 ? -1f : 1f);
+
+            if(m_InputVector.x != 0){
+                m_LateralDirection = Mathf.SmoothDamp(m_LateralDirection, m_InputVector.x, ref m_LateralVelocity, 0.25f);
+                m_LateralDirection = (float)Math.Round(m_LateralDirection, 2);
+            }
+
+            //m_LateralDirection = Mathf.Clamp(Mathf.Round(m_LateralDirection), -1, 1);
+            //if (m_InputVector.x > 0) m_LateralDirection = 1;
+            //else if (m_InputVector.x < 0) m_LateralDirection = -1;
+            //else m_LateralDirection = 0;
+
+            if ((m_LateralDirection > 0 && m_InputVector.x < 0) || (m_LateralDirection < 0 && m_InputVector.x > 0))
+            {
+                Debug.DrawRay(m_Transform.position + Vector3.up * 0.35f, m_Transform.right * m_LateralDirection, Color.magenta, 1);
+                Debug.DrawRay(m_Transform.position + Vector3.up * 0.5f, m_Transform.right * m_InputVector.x, Color.cyan, 1);
+                //Debug.Break();
+            }
+
+            //m_LateralDirection = Mathf.Clamp(Mathf.Round(m_InputVector.x), -1, 1);
+            m_ForwardDirection = Mathf.Clamp(Mathf.Round(m_InputVector.z), -1, 1);
             m_Moving = m_InputMagnitude > 0.1f;
+
 
 
             //  Start Stop Actions.
@@ -461,9 +491,9 @@
             // Rotation
             if(m_Moving){
                 if(Mathf.Abs(m_TurnAmount) > 1f)
-                    m_Animator.SetFloat(HashID.TurnAmount, Mathf.Clamp(m_TurnAmount, -1, 1), 0.2f, m_DeltaTime);  // Mathf.Clamp(m_TurnAmount, -1, 1)
+                    m_Animator.SetFloat(HashID.Rotation, Mathf.Clamp(m_TurnAmount, -1, 1), 0.2f, m_DeltaTime);  // Mathf.Clamp(m_TurnAmount, -1, 1)
                 else
-                    m_Animator.SetFloat(HashID.TurnAmount, 0, 0.2f, m_DeltaTime);
+                    m_Animator.SetFloat(HashID.Rotation, 0, 0.2f, m_DeltaTime);
             }
             //var localVelocity = Quaternion.Inverse(m_Transform.rotation) * (m_Rigidbody.velocity / m_Acceleration);
             //  Movement Input

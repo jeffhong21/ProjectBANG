@@ -4,6 +4,7 @@
     {
         Cover,
         Vault,
+        Climb,
         PickupItem,
         Fall,
         TakeDamage,

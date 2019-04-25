@@ -4,7 +4,7 @@ namespace CharacterController
     using System.Collections;
 
 
-    public class Dodge : CharacterAction
+    public class ChangeDirections : CharacterAction
     {
         public const int ACTION_ID = 16;
 

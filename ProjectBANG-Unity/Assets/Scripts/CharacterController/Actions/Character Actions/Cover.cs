@@ -246,10 +246,6 @@
                 m_HorizontalInput = m_Controller.InputVector.x;
                 m_Controller.InputVector.Set(m_HorizontalInput, m_Controller.InputVector.y, 0);
             }
-            m_Velocity = m_Transform.right * m_HorizontalInput * m_CoverMovementSpeed;
-
-
-
 
             return false;
         }
@@ -257,11 +253,14 @@
 
         public override bool Move()
         {
+            m_Velocity = m_Transform.right * m_HorizontalInput * m_CoverMovementSpeed;
             m_Velocity += m_Animator.deltaPosition / m_DeltaTime;
+            m_Velocity = m_Velocity * Math.Abs(m_HorizontalInput);
+
             m_Controller.Velocity = m_Velocity;
             m_Rigidbody.velocity = m_Velocity;
-            //m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Controller.Velocity, 20 * m_DeltaTime);
 
+            //m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Controller.Velocity, 20 * m_DeltaTime);
             return false;
         }
 
@@ -342,7 +341,7 @@
 
         protected virtual void OnDrawGizmosSelected()
         {
-            if(Application.isPlaying && m_Debug)
+            if(Application.isPlaying && m_Debug && m_IsActive)
             {
                 Gizmos.color = m_DebugSettings.CenterColor;
                 Gizmos.DrawRay(m_ObjectDetector.position, m_ObjectDetector.forward * m_CheckCoverLength);

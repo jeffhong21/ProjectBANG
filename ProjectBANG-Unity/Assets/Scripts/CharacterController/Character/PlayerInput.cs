@@ -164,6 +164,10 @@ namespace CharacterController
         public ShakeTransformEventData data;
 		private void Update()
         {
+            if (Input.GetKeyDown(KeyCode.B))
+            {
+                UnityEditor.Selection.activeGameObject = m_GameObject;
+            }
             //  -- Character Actions
             //Aim(KeyCode.Mouse1);
             if(Input.GetKeyDown(KeyCode.M)){

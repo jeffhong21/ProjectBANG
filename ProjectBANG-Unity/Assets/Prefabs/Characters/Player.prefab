@@ -746,7 +746,7 @@ MonoBehaviour:
     m_LeftColor: {r: 0, g: 0.70466566, b: 1, a: 1}
     m_RightColor: {r: 0, g: 0.7058824, b: 1, a: 1}
     m_ChangeStateColor: {r: 1, g: 0, b: 0, a: 1}
-  m_Debug: 0
+  m_Debug: 1
 --- !u!114 &114484464717320762
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -935,16 +935,16 @@ MonoBehaviour:
   - LeftControl
   m_StartType: 2
   m_StopType: 2
-  m_MoveToVaultDistance: 3
+  m_MoveToVaultDistance: 2
   m_VaultLayers:
     serializedVersion: 2
     m_Bits: 33554432
-  m_MaxVaultHeight: 1
+  m_MaxVaultHeight: 2
   m_MaxVaultDepth: 1
   m_StartVaultOffset: 0.2
   m_MatchTargetOffset: 0.1
-  m_StartMatchTarget: 0.44
-  m_StopMatchTarget: 0.49
+  m_StartMatchTarget: 0.54
+  m_StopMatchTarget: 0.6
   m_Debug: 1
 --- !u!114 &2521750178379034832
 MonoBehaviour:
@@ -992,9 +992,8 @@ MonoBehaviour:
   m_StartType: 2
   m_StopType: 2
   stateNames:
-  - Base Layer.Vault.Climb
-  - Base Layer.Vault.Jump
-  - Base Layer.Vault.Box
+  - Base Layer.Climb.Climb
+  - Base Layer.Climb.Jump
   currentAnimIndex: 0
 --- !u!1 &1142656612551902
 GameObject:
