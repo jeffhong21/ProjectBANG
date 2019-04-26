@@ -8,22 +8,24 @@ namespace CharacterController
     {
         public const int ACTION_ID = 16;
 
-        protected float m_CheckHeight = 0.45f;
-
+        protected float m_CheckHeight = 0.4f;
+        [Header("-- Vault Settings --")]
         [SerializeField]
         protected float m_MoveToVaultDistance = 4f;
         [SerializeField]
         protected LayerMask m_ClimbableLayers;
         [SerializeField, Tooltip("The highest level the character can climb.")]
-        protected float m_MaxClimbHeight = 2f;
+        protected float m_MaxClimbHeight = 3f;
+        [SerializeField]
+        protected float m_MinClimbHeight = 1.5f;
         [SerializeField, Tooltip("The offset between the vault point and the point that the character should start to vault at")]
         protected float m_StartVaultOffset = 0.2f;
         [SerializeField, Tooltip("The offset between the vault point and the point that the character places their hands")]
         protected float m_MatchTargetOffset = 0.1f;
         [SerializeField]
-        protected float m_StartMatchTarget;
+        protected float m_StartMatchTarget = 0.01f;
         [SerializeField]
-        protected float m_StopMatchTarget;
+        protected float m_StopMatchTarget = 0.1f;
         [SerializeField]
         protected AvatarTarget m_AvatarTarget = AvatarTarget.RightHand;
 
@@ -31,25 +33,23 @@ namespace CharacterController
 
         //[SerializeField]
         Vector3 m_VerticalVelocity;
-        //[SerializeField]
-        float m_VerticalHeight;
-        float m_HeightMultiplier = 2f;
 
-        float m_ColliderAnimHeight;
+
         //[SerializeField]
         private Vector3 m_Velocity;
         private float m_ClimbHeight;
         private Vector3 m_StartPosition;
         private Vector3 m_EndPosition;
 
-        private bool m_ClimbStart;
+
 
         private Quaternion m_MatchRotation;
-        private RaycastHit m_MoveToVaultDistanceHit, m_MatchPositionHit, m_EndPositionHit;
+        private RaycastHit m_MoveToVaultDistanceHit, m_MatchPositionHit;
         private float m_StartTime;
 
         private float m_ColliderHeight;
         private Vector3 m_ColliderCenter;
+        private Vector3 m_HeightCheckStart;
 
         private MatchTargetWeightMask m_MatchTargetWeightMask = new MatchTargetWeightMask(Vector3.one, 1);
 
@@ -65,11 +65,9 @@ namespace CharacterController
             {
                 if (Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out m_MoveToVaultDistanceHit, m_MoveToVaultDistance, m_ClimbableLayers))
                 {
-                    if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance, Color.green);
+                    //if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance, Color.green);
                     return CachePositions();
                 }
-                return true;
-
             }
             return false;
         }
@@ -77,13 +75,11 @@ namespace CharacterController
 
         private bool CachePositions()
         {
-            var heightCheckStart = m_MoveToVaultDistanceHit.point;
-            heightCheckStart.y += (m_MaxClimbHeight + m_StartVaultOffset) - m_CheckHeight;
+            m_HeightCheckStart = m_MoveToVaultDistanceHit.point;
+            m_HeightCheckStart.y += (m_MaxClimbHeight + m_StartVaultOffset) - m_CheckHeight;
 
-
-            if (m_Debug) Debug.DrawRay(heightCheckStart, Vector3.down * m_MaxClimbHeight, Color.cyan, 1f);
-
-            if (Physics.Raycast(heightCheckStart, Vector3.down, out m_MatchPositionHit, m_MaxClimbHeight, m_ClimbableLayers))
+            //if (m_Debug) Debug.DrawRay(heightCheckStart, Vector3.down * (m_MaxClimbHeight - m_MinClimbHeight), Color.cyan, 1f);
+            if (Physics.Raycast(m_HeightCheckStart, Vector3.down, out m_MatchPositionHit, (m_MaxClimbHeight - m_MinClimbHeight), m_ClimbableLayers))
             {
                 //  cache HeightCheckHit distance.
                 var heightCheckDist = m_MatchPositionHit.distance;
@@ -104,6 +100,9 @@ namespace CharacterController
         Quaternion targetRotation;
         protected override void ActionStarted()
         {
+            //m_CapsuleCollider.isTrigger = true;
+            //m_Rigidbody.useGravity = false;
+
             //m_Animator.SetInteger(HashID.ActionIntData, 2);
             //m_StateName = "Vault.Head";
             m_ColliderCenter = m_CapsuleCollider.center;
@@ -125,8 +124,10 @@ namespace CharacterController
             m_VerticalVelocity = Vector3.up * (m_ClimbHeight + m_MatchTargetOffset) * m_DeltaTime;
             if (m_HeightDifference >= 0.1f)
                 m_Rigidbody.AddForce(m_VerticalVelocity, ForceMode.VelocityChange);
+            
             return true;
         }
+
 
 
         public override bool Move()
@@ -141,7 +142,8 @@ namespace CharacterController
             m_Rigidbody.velocity = m_Velocity;
 
             //Debug.LogFormat("Target Matching: {0}", m_Animator.isMatchingTarget);
-            return true;
+
+            return false;
         }
 
 
@@ -151,8 +153,10 @@ namespace CharacterController
         {
             m_CapsuleCollider.center = m_ColliderCenter;
             //m_CapsuleCollider.height = m_ColliderHeight;
-            m_StartPosition = m_EndPosition = Vector3.zero;
+            m_CapsuleCollider.isTrigger = false;
+            m_Rigidbody.useGravity = true;
 
+            m_StartPosition = m_EndPosition = Vector3.zero;
             //Debug.LogFormat("{0} Action has stopped {1}", GetType().Name, Time.time);
         }
 
@@ -198,6 +202,16 @@ namespace CharacterController
             if (Application.isPlaying && m_IsActive)
             {
                 Gizmos.color = Color.green;
+                //  First raycast that checks if there's something in front.
+                Gizmos.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance);
+
+                Gizmos.color = Color.cyan;
+                //  Second raycast for height checking.
+                Gizmos.DrawRay(m_HeightCheckStart, Vector3.down * (m_MaxClimbHeight - m_MinClimbHeight));
+
+
+
+                Gizmos.color = Color.green;
                 Gizmos.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance);
 
                 if (m_StartPosition != Vector3.zero)
@@ -214,6 +228,8 @@ namespace CharacterController
                 }
             }
         }
+
+
 
 
     }

@@ -44,13 +44,15 @@ namespace CharacterController
         private SerializedProperty m_Acceleration;
         private SerializedProperty m_MovementSpeed;
         private SerializedProperty m_RotationSpeed;
-        private SerializedProperty m_AimRotationSpeed;
-        private SerializedProperty m_AlignToGround;
-        private SerializedProperty m_AlignToGroundDepthOffset;
+        private SerializedProperty m_SlopeForceDown;
+
+        private SerializedProperty m_Mass;
         private SerializedProperty m_SkinWidth;
         private SerializedProperty m_SlopeLimit;
-
         private SerializedProperty m_MaxStepHeight;
+
+        private SerializedProperty m_AlignToGround;
+        private SerializedProperty m_AlignToGroundDepthOffset;
         private SerializedProperty m_StepOffset;
         private SerializedProperty m_StepSpeed;
 
@@ -75,13 +77,16 @@ namespace CharacterController
             m_Acceleration = serializedObject.FindProperty("m_Acceleration");
             m_MovementSpeed = serializedObject.FindProperty("m_MovementSpeed");
             m_RotationSpeed = serializedObject.FindProperty("m_RotationSpeed");
-            m_AimRotationSpeed = serializedObject.FindProperty("m_AimRotationSpeed");
-            m_AlignToGround = serializedObject.FindProperty("m_AlignToGround");
-            m_AlignToGroundDepthOffset = serializedObject.FindProperty("m_AlignToGroundDepthOffset");
+            m_SlopeForceDown = serializedObject.FindProperty("m_SlopeForceDown");
+
+            m_Mass = serializedObject.FindProperty("m_Mass");
+            m_MaxStepHeight = serializedObject.FindProperty("m_MaxStepHeight");
+            m_MaxStepHeight = serializedObject.FindProperty("m_MaxStepHeight");
             m_SkinWidth = serializedObject.FindProperty("m_SkinWidth");
             m_SlopeLimit = serializedObject.FindProperty("m_SlopeLimit");
 
-            m_MaxStepHeight = serializedObject.FindProperty("m_MaxStepHeight");
+            m_AlignToGround = serializedObject.FindProperty("m_AlignToGround");
+            m_AlignToGroundDepthOffset = serializedObject.FindProperty("m_AlignToGroundDepthOffset");
             m_StepOffset = serializedObject.FindProperty("m_StepOffset");
             m_StepSpeed = serializedObject.FindProperty("m_StepSpeed");
 
@@ -110,21 +115,22 @@ namespace CharacterController
                 EditorGUILayout.PropertyField(m_MovementSpeed);
                 EditorGUILayout.PropertyField(m_Acceleration);
                 EditorGUILayout.PropertyField(m_RotationSpeed);
-                EditorGUILayout.PropertyField(m_AimRotationSpeed);
+                EditorGUILayout.PropertyField(m_SlopeForceDown);
             }
 
             EditorGUILayout.Space();
 
             m_ShowCharPhysicsFoldout  = EditorGUILayout.Foldout(m_ShowCharPhysicsFoldout, PhysicsFoldoutHeader);
-            if(m_ShowCharPhysicsFoldout){
-
-                EditorGUILayout.PropertyField(m_AlignToGround);
-                EditorGUILayout.PropertyField(m_AlignToGroundDepthOffset);
+            if(m_ShowCharPhysicsFoldout)
+            {
+                EditorGUILayout.PropertyField(m_Mass);
                 EditorGUILayout.PropertyField(m_SkinWidth);
                 EditorGUILayout.PropertyField(m_SlopeLimit);
                 EditorGUILayout.PropertyField(m_MaxStepHeight);
                 EditorGUILayout.PropertyField(m_StepOffset);
                 EditorGUILayout.PropertyField(m_StepSpeed);
+                EditorGUILayout.PropertyField(m_AlignToGround);
+                EditorGUILayout.PropertyField(m_AlignToGroundDepthOffset);
             }
 
             EditorGUILayout.Space();

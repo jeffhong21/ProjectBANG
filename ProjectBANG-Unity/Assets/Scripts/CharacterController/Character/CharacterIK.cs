@@ -259,12 +259,12 @@
 
         protected virtual void LookAtTarget()
         {
-            //Vector3 directionTowardsTarget = m_Controller.LookAtPoint - m_Transform.position;
+            //Vector3 directionTowardsTarget = m_LookAtPoint - m_Transform.position;
             //float angle = Vector3.Angle(m_Transform.forward, directionTowardsTarget);
             //if (angle < 76)
             //    m_TargetLookAtWeight = 1;
             //else
-            //    m_TargetLookAtWeight = 0;
+                //m_TargetLookAtWeight = 0;
 
 
 
@@ -296,7 +296,6 @@
 
             m_Animator.SetIKPositionWeight(AvatarIKGoal.RightHand, m_TargetHandWeight);
             m_Animator.SetIKPosition(AvatarIKGoal.RightHand, m_RightHandTarget.position);
-
         }
 
 

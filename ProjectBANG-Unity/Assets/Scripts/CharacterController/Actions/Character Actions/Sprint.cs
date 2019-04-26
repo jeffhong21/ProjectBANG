@@ -21,6 +21,7 @@ namespace CharacterController
 
         [SerializeField, DisplayOnly]
         private float m_CurrentStanima = 100;
+        [SerializeField, DisplayOnly]
         private Vector3 m_SpeedInput;
 
 
@@ -32,6 +33,15 @@ namespace CharacterController
             base.Awake();
 
             m_CurrentStanima = m_MaxStanima;
+		}
+
+
+		public override bool CanStartAction()
+		{
+            if(base.CanStartAction()){
+                return m_CurrentStanima > (m_MaxStanima * 0.1f);
+            }
+            return false;
 		}
 
 
@@ -59,14 +69,14 @@ namespace CharacterController
 
         public override bool Move()
         {
-            if (m_CurrentStanima > 0)
-            {
-                m_SpeedInput = m_Controller.InputVector;
-                m_SpeedInput.z = Mathf.Clamp(m_Controller.InputVector.z * m_SpeedChangeMultiplier, m_MinSpeedChange, m_MaxSpeedChange);
-                m_Controller.InputVector = m_SpeedInput;
 
-                m_CurrentStanima = Mathf.Clamp(m_CurrentStanima - m_StaminaDecreaseRate, 0, 100);
-            }
+            m_SpeedInput = m_Controller.InputVector;
+            m_SpeedInput.z = Mathf.Clamp(m_Controller.InputVector.z * m_SpeedChangeMultiplier, m_MinSpeedChange, m_MaxSpeedChange);
+            m_Controller.InputVector = m_SpeedInput;
+
+            m_CurrentStanima = Mathf.Clamp(m_CurrentStanima - m_StaminaDecreaseRate, 0, 100);
+
+            //m_Rigidbody.AddForce(m_Transform.forward, ForceMode.VelocityChange);
 
             return true;
         }

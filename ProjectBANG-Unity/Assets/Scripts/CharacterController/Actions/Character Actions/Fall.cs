@@ -21,7 +21,7 @@ namespace CharacterController
 
         public override bool CanStartAction()
         {
-            //if(Mathf.Abs(m_Rigidbody.velocity.y) > m_MinFallHeight ){
+            //if(Mathf.Abs(m_Rigidbody.velocity.y) > m_MinFallHeight && m_Controller.Grounded == false){
             //    return true;
             //}
 
@@ -31,7 +31,7 @@ namespace CharacterController
 
 		public override bool CanStopAction()
 		{
-            if (m_Rigidbody.velocity.y == 0){
+            if (m_Rigidbody.velocity.y <= m_MinFallHeight){
                 return true;
             }
 

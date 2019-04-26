@@ -1,17 +1,19 @@
 ﻿namespace CharacterController
 {
     using UnityEngine;
-    using System.Collections;
+
 
 
     public class Vault : CharacterAction
     {
         public const int ACTION_ID = 15;
 
-        protected float m_CheckHeight = 0.45f;
+        protected float m_CheckHeight = 0.4f;
 
+
+        [Header("-- Vault Settings --")]
         [SerializeField]
-        protected float m_MoveToVaultDistance = 2f;
+        protected float m_MoveToVaultDistance = 4f;
         [SerializeField]
         protected LayerMask m_VaultLayers;
         [SerializeField, Tooltip("The highest level the character can vault over.")]
@@ -42,7 +44,7 @@
         private Vector3 m_StartPosition;
         private Vector3 m_EndPosition;
         private Vector3 m_MatchPosition;
-
+        float m_HeightDifference;
 
         private Quaternion m_MatchRotation;
         private RaycastHit m_MoveToVaultDistanceHit, m_MatchPositionHit, m_EndPositionHit;
@@ -51,7 +53,7 @@
         private float m_ColliderHeight;
         private Vector3 m_ColliderCenter;
 
-        private MatchTargetWeightMask m_MatchTargetWeightMask = new MatchTargetWeightMask(Vector3.one, 1);
+        private MatchTargetWeightMask m_MatchTargetWeightMask = new MatchTargetWeightMask(Vector3.one, 0);
 
         [SerializeField] bool m_Debug;
 
@@ -112,25 +114,31 @@
 
         protected override void ActionStarted()
         {
+            //m_CapsuleCollider.isTrigger = true;
+            //m_Rigidbody.useGravity = false;
             //  Cache variables
             m_ColliderHeight = m_CapsuleCollider.height;
             m_ColliderCenter = m_CapsuleCollider.center;
 
 
             m_Animator.SetInteger(HashID.ActionIntData, 2);
-            m_StateName = "Vault.Head";
+            //m_StateName = "Vault.Head";
+
 
             m_StartTime = Time.time;
             //Debug.LogFormat("Playing:  {0}.  ColliderHeight is : {1}", stateNames[currentAnimIndex], m_VaultObjectHeight);
         }
 
 
-        float m_HeightDifference;
+
         //  Move over the vault object based off of the root motion forces.
         public override bool UpdateMovement()
         {
+            //  Gives a 1-0.5 value.  1 means collider is at normal height.
             m_ColliderAnimHeight = m_Animator.GetFloat(HashID.ColliderHeight);
             m_VerticalHeight = Mathf.Clamp01(1 - Mathf.Abs(m_ColliderAnimHeight));
+
+            m_CapsuleCollider.center = m_ColliderCenter - (m_ColliderCenter * m_VerticalHeight);
 
             m_HeightDifference =  (float)System.Math.Round(m_MatchPosition.y - m_Transform.position.y, 2);
 
@@ -143,6 +151,12 @@
             m_CapsuleCollider.height = m_ColliderHeight * Mathf.Abs(m_ColliderAnimHeight);
             m_CapsuleCollider.center = Vector3.up * (m_CapsuleCollider.height / 2);
             m_CapsuleCollider.center = m_CapsuleCollider.center + m_VerticalVelocity;
+
+            if (m_HeightDifference >= 0.1f)
+            {
+                m_Rigidbody.AddForce(m_VerticalVelocity * 2, ForceMode.VelocityChange);
+            }
+
             return true;
         }
 
@@ -150,14 +164,18 @@
 		public override bool Move()
 		{
             m_Animator.ApplyBuiltinRootMotion();
-            m_Animator.MatchTarget(m_MatchPosition, m_Transform.rotation, AvatarTarget.RightHand, m_MatchTargetWeightMask, m_StartMatchTarget, m_StopMatchTarget);
+
+            m_Animator.MatchTarget(m_MatchPosition, Quaternion.identity, AvatarTarget.RightHand, m_MatchTargetWeightMask, m_StartMatchTarget, m_StopMatchTarget);
+
             m_Velocity = m_Animator.deltaPosition / m_DeltaTime;
 
-            m_Velocity = m_Velocity * Mathf.Clamp01(1 - Mathf.Abs(m_ColliderAnimHeight));
+            //m_Velocity = m_Velocity * Mathf.Clamp01(1 - Mathf.Abs(m_ColliderAnimHeight));
             m_Velocity += m_VerticalVelocity;
+
             m_Rigidbody.velocity = m_Velocity;
 
             //Debug.LogFormat("Target Matching: {0}", m_Animator.isMatchingTarget);
+
             return true;
 		}
 
@@ -167,7 +185,11 @@
 		protected override void ActionStopped()
         {
             m_CapsuleCollider.height = m_ColliderHeight;
+            m_CapsuleCollider.center = m_ColliderCenter;
             m_StartPosition = m_MatchPosition = m_EndPosition = Vector3.zero;
+
+            m_CapsuleCollider.isTrigger = false;
+            m_Rigidbody.useGravity = true;
 
             //Debug.LogFormat("{0} Action has stopped {1}", GetType().Name, Time.time);
         }

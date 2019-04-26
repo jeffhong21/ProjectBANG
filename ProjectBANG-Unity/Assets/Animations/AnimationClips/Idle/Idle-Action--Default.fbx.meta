@@ -1,11 +1,317 @@
 fileFormatVersion: 2
-guid: d7c8c6efadf3f4fc49efea266e098dcc
+guid: b293b90e257474a539f8891a5ad7e968
 ModelImporter:
   serializedVersion: 26
   internalIDToNameTable:
   - first:
-      74: -203655887218126122
-    second: Run to Start Climbing
+      1: 100000
+    second: Ankle_L
+  - first:
+      1: 100002
+    second: Ankle_R
+  - first:
+      1: 100004
+    second: Ball_L
+  - first:
+      1: 100006
+    second: Ball_R
+  - first:
+      1: 100008
+    second: Clavicle_L
+  - first:
+      1: 100010
+    second: Clavicle_R
+  - first:
+      1: 100012
+    second: Elbow_L
+  - first:
+      1: 100014
+    second: Elbow_R
+  - first:
+      1: 100016
+    second: Eyebrows
+  - first:
+      1: 100018
+    second: Eyes
+  - first:
+      1: 100020
+    second: Finger_01
+  - first:
+      1: 100022
+    second: Finger_011
+  - first:
+      1: 100024
+    second: Finger_02
+  - first:
+      1: 100026
+    second: Finger_021
+  - first:
+      1: 100028
+    second: Finger_03
+  - first:
+      1: 100030
+    second: Finger_031
+  - first:
+      1: 100032
+    second: Finger_04
+  - first:
+      1: 100034
+    second: Finger_041
+  - first:
+      1: 100036
+    second: Hand_L
+  - first:
+      1: 100038
+    second: Hand_R
+  - first:
+      1: 100040
+    second: Head
+  - first:
+      1: 100042
+    second: Hips
+  - first:
+      1: 100044
+    second: //RootNode
+  - first:
+      1: 100046
+    second: IndexFinger_01
+  - first:
+      1: 100048
+    second: IndexFinger_011
+  - first:
+      1: 100050
+    second: IndexFinger_02
+  - first:
+      1: 100052
+    second: IndexFinger_021
+  - first:
+      1: 100054
+    second: IndexFinger_03
+  - first:
+      1: 100056
+    second: IndexFinger_031
+  - first:
+      1: 100058
+    second: IndexFinger_04
+  - first:
+      1: 100060
+    second: IndexFinger_041
+  - first:
+      1: 100062
+    second: LowerLeg_L
+  - first:
+      1: 100064
+    second: LowerLeg_R
+  - first:
+      1: 100066
+    second: Neck
+  - first:
+      1: 100068
+    second: Root
+  - first:
+      1: 100070
+    second: Shoulder_L
+  - first:
+      1: 100072
+    second: Shoulder_R
+  - first:
+      1: 100074
+    second: Spine_01
+  - first:
+      1: 100076
+    second: Spine_02
+  - first:
+      1: 100078
+    second: Spine_03
+  - first:
+      1: 100080
+    second: Thumb_01
+  - first:
+      1: 100082
+    second: Thumb_011
+  - first:
+      1: 100084
+    second: Thumb_02
+  - first:
+      1: 100086
+    second: Thumb_021
+  - first:
+      1: 100088
+    second: Thumb_03
+  - first:
+      1: 100090
+    second: Thumb_031
+  - first:
+      1: 100092
+    second: Toes_L
+  - first:
+      1: 100094
+    second: Toes_R
+  - first:
+      1: 100096
+    second: UpperLeg_L
+  - first:
+      1: 100098
+    second: UpperLeg_R
+  - first:
+      4: 400000
+    second: Ankle_L
+  - first:
+      4: 400002
+    second: Ankle_R
+  - first:
+      4: 400004
+    second: Ball_L
+  - first:
+      4: 400006
+    second: Ball_R
+  - first:
+      4: 400008
+    second: Clavicle_L
+  - first:
+      4: 400010
+    second: Clavicle_R
+  - first:
+      4: 400012
+    second: Elbow_L
+  - first:
+      4: 400014
+    second: Elbow_R
+  - first:
+      4: 400016
+    second: Eyebrows
+  - first:
+      4: 400018
+    second: Eyes
+  - first:
+      4: 400020
+    second: Finger_01
+  - first:
+      4: 400022
+    second: Finger_011
+  - first:
+      4: 400024
+    second: Finger_02
+  - first:
+      4: 400026
+    second: Finger_021
+  - first:
+      4: 400028
+    second: Finger_03
+  - first:
+      4: 400030
+    second: Finger_031
+  - first:
+      4: 400032
+    second: Finger_04
+  - first:
+      4: 400034
+    second: Finger_041
+  - first:
+      4: 400036
+    second: Hand_L
+  - first:
+      4: 400038
+    second: Hand_R
+  - first:
+      4: 400040
+    second: Head
+  - first:
+      4: 400042
+    second: Hips
+  - first:
+      4: 400044
+    second: //RootNode
+  - first:
+      4: 400046
+    second: IndexFinger_01
+  - first:
+      4: 400048
+    second: IndexFinger_011
+  - first:
+      4: 400050
+    second: IndexFinger_02
+  - first:
+      4: 400052
+    second: IndexFinger_021
+  - first:
+      4: 400054
+    second: IndexFinger_03
+  - first:
+      4: 400056
+    second: IndexFinger_031
+  - first:
+      4: 400058
+    second: IndexFinger_04
+  - first:
+      4: 400060
+    second: IndexFinger_041
+  - first:
+      4: 400062
+    second: LowerLeg_L
+  - first:
+      4: 400064
+    second: LowerLeg_R
+  - first:
+      4: 400066
+    second: Neck
+  - first:
+      4: 400068
+    second: Root
+  - first:
+      4: 400070
+    second: Shoulder_L
+  - first:
+      4: 400072
+    second: Shoulder_R
+  - first:
+      4: 400074
+    second: Spine_01
+  - first:
+      4: 400076
+    second: Spine_02
+  - first:
+      4: 400078
+    second: Spine_03
+  - first:
+      4: 400080
+    second: Thumb_01
+  - first:
+      4: 400082
+    second: Thumb_011
+  - first:
+      4: 400084
+    second: Thumb_02
+  - first:
+      4: 400086
+    second: Thumb_021
+  - first:
+      4: 400088
+    second: Thumb_03
+  - first:
+      4: 400090
+    second: Thumb_031
+  - first:
+      4: 400092
+    second: Toes_L
+  - first:
+      4: 400094
+    second: Toes_R
+  - first:
+      4: 400096
+    second: UpperLeg_L
+  - first:
+      4: 400098
+    second: UpperLeg_R
+  - first:
+      74: 7400000
+    second: mixamo.com
+  - first:
+      74: 7400002
+    second: Idle-Action--Default
+  - first:
+      95: 9500000
+    second: //RootNode
   externalObjects: {}
   materials:
     importMaterials: 1
@@ -35,11 +341,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Run to Start Climbing
+      name: Idle-Action--Default
       takeName: mixamo.com
-      internalID: -203655887218126122
+      internalID: 7400002
       firstFrame: 0
-      lastFrame: 106
+      lastFrame: 300
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -48,14 +354,14 @@ ModelImporter:
       hasAdditiveReferencePose: 0
       loopTime: 0
       loopBlend: 0
-      loopBlendOrientation: 0
-      loopBlendPositionY: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 0
       keepOriginalPositionY: 1
-      keepOriginalPositionXZ: 0
+      keepOriginalPositionXZ: 1
       heightFromFeet: 0
-      mirror: 0
+      mirror: 1
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events: []
@@ -63,7 +369,7 @@ ModelImporter:
       maskType: 3
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages: []
     globalScale: 1

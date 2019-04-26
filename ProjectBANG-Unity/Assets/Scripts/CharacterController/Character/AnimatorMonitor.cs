@@ -215,13 +215,13 @@
 
         public void SetHorizontalInputValue(float value)
         {
-            m_Animator.SetFloat(HashID.HorizontalInput, value, m_HorizontalInputDampTime, Time.deltaTime);
+            m_Animator.SetFloat(HashID.HorizontalInput, value, m_HorizontalInputDampTime,  Time.deltaTime);
         }
 
 
         public void SetForwardInputValue(float value)
         {
-            m_Animator.SetFloat(HashID.ForwardInput, value, m_ForwardInputDampTime, Time.deltaTime);
+            m_Animator.SetFloat(HashID.ForwardInput, value, m_ForwardInputDampTime,  Time.deltaTime);
         }
 
         public void SetActionID(int value)

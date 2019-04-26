@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: bf83401b463bb4ccfae23f216091873c
+guid: c621c3989ec9c45ada2b0dc020c654e7
 ModelImporter:
   serializedVersion: 26
   internalIDToNameTable:
@@ -104,55 +104,55 @@ ModelImporter:
     second: Neck
   - first:
       1: 100066
-    second: Root
+    second: //RootNode
   - first:
       1: 100068
-    second: Shoulder_L
+    second: Root
   - first:
       1: 100070
-    second: Shoulder_R
+    second: Shoulder_L
   - first:
       1: 100072
-    second: Spine_01
+    second: Shoulder_R
   - first:
       1: 100074
-    second: Spine_02
+    second: Spine_01
   - first:
       1: 100076
-    second: Spine_03
+    second: Spine_02
   - first:
       1: 100078
-    second: Thumb_01
+    second: Spine_03
   - first:
       1: 100080
-    second: Thumb_011
+    second: Thumb_01
   - first:
       1: 100082
-    second: Thumb_02
+    second: Thumb_011
   - first:
       1: 100084
-    second: Thumb_021
+    second: Thumb_02
   - first:
       1: 100086
-    second: Thumb_03
+    second: Thumb_021
   - first:
       1: 100088
-    second: Thumb_031
+    second: Thumb_03
   - first:
       1: 100090
-    second: Toes_L
+    second: Thumb_031
   - first:
       1: 100092
-    second: Toes_R
+    second: Toes_L
   - first:
       1: 100094
-    second: UpperLeg_L
+    second: Toes_R
   - first:
       1: 100096
-    second: UpperLeg_R
+    second: UpperLeg_L
   - first:
       1: 100098
-    second: //RootNode
+    second: UpperLeg_R
   - first:
       4: 400000
     second: Ankle_L
@@ -254,61 +254,64 @@ ModelImporter:
     second: Neck
   - first:
       4: 400066
-    second: Root
+    second: //RootNode
   - first:
       4: 400068
-    second: Shoulder_L
+    second: Root
   - first:
       4: 400070
-    second: Shoulder_R
+    second: Shoulder_L
   - first:
       4: 400072
-    second: Spine_01
+    second: Shoulder_R
   - first:
       4: 400074
-    second: Spine_02
+    second: Spine_01
   - first:
       4: 400076
-    second: Spine_03
+    second: Spine_02
   - first:
       4: 400078
-    second: Thumb_01
+    second: Spine_03
   - first:
       4: 400080
-    second: Thumb_011
+    second: Thumb_01
   - first:
       4: 400082
-    second: Thumb_02
+    second: Thumb_011
   - first:
       4: 400084
-    second: Thumb_021
+    second: Thumb_02
   - first:
       4: 400086
-    second: Thumb_03
+    second: Thumb_021
   - first:
       4: 400088
-    second: Thumb_031
+    second: Thumb_03
   - first:
       4: 400090
-    second: Toes_L
+    second: Thumb_031
   - first:
       4: 400092
-    second: Toes_R
+    second: Toes_L
   - first:
       4: 400094
-    second: UpperLeg_L
+    second: Toes_R
   - first:
       4: 400096
-    second: UpperLeg_R
+    second: UpperLeg_L
   - first:
       4: 400098
-    second: //RootNode
+    second: UpperLeg_R
   - first:
       74: 7400000
     second: mixamo.com
   - first:
       74: 7400002
-    second: Vault--ChestLevel
+    second: roll_to_run
+  - first:
+      74: 7400004
+    second: Roll--RunToRoll
   - first:
       95: 9500000
     second: //RootNode
@@ -341,11 +344,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Vault--ChestLevel
+      name: Roll--RunToRoll
       takeName: mixamo.com
-      internalID: 7400002
-      firstFrame: 20
-      lastFrame: 112
+      internalID: 7400004
+      firstFrame: 0
+      lastFrame: 42
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -355,76 +358,15 @@ ModelImporter:
       loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 1
-      loopBlendPositionY: 0
+      loopBlendPositionY: 1
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 1
-      keepOriginalPositionY: 0
-      keepOriginalPositionXZ: 0
-      heightFromFeet: 1
-      mirror: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
-      curves:
-      - name: ColliderHeight
-        curve:
-          serializedVersion: 2
-          curve:
-          - serializedVersion: 3
-            time: 0
-            value: 1
-            inSlope: 0
-            outSlope: 0
-            tangentMode: 0
-            weightedMode: 0
-            inWeight: 0
-            outWeight: 0
-          - serializedVersion: 3
-            time: 0.32
-            value: 1
-            inSlope: 0
-            outSlope: 0
-            tangentMode: 0
-            weightedMode: 0
-            inWeight: 0
-            outWeight: 0
-          - serializedVersion: 3
-            time: 0.48
-            value: 0.5
-            inSlope: 0
-            outSlope: 0
-            tangentMode: 0
-            weightedMode: 0
-            inWeight: 0
-            outWeight: 0
-          - serializedVersion: 3
-            time: 0.56
-            value: 0.5
-            inSlope: 0
-            outSlope: 6.2212667
-            tangentMode: 1
-            weightedMode: 0
-            inWeight: 0.33333334
-            outWeight: 0.041867662
-          - serializedVersion: 3
-            time: 0.68
-            value: 1
-            inSlope: 0
-            outSlope: 0
-            tangentMode: 0
-            weightedMode: 0
-            inWeight: 0.6428514
-            outWeight: 0.33333334
-          - serializedVersion: 3
-            time: 1
-            value: 1
-            inSlope: 0
-            outSlope: 0
-            tangentMode: 0
-            weightedMode: 0
-            inWeight: 0
-            outWeight: 0
-          preInfinity: 3
-          postInfinity: 3
-          rotationOrder: 4
+      curves: []
       events: []
       transformMask: []
       maskType: 3

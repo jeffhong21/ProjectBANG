@@ -50,7 +50,14 @@ namespace CharacterController
 
 
 
-        public void StepOnMesh(CharacterFootTrigger sender)
+		private void OnEnable()
+		{
+			
+		}
+
+
+
+		public void StepOnMesh(CharacterFootTrigger sender)
         {
             if(Time.timeSinceLevelLoad > m_FootstepThreshold && m_SpawnFootprints)
             {

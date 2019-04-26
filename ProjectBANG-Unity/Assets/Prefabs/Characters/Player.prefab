@@ -404,6 +404,8 @@ GameObject:
   - component: {fileID: 114139823554117216}
   - component: {fileID: 2521750178379034832}
   - component: {fileID: 1655704237}
+  - component: {fileID: 1005418446}
+  - component: {fileID: 1005418447}
   m_Layer: 31
   m_Name: Player
   m_TagString: Player
@@ -477,7 +479,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 1
-  m_Constraints: 80
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &114933608758217926
 MonoBehaviour:
@@ -496,32 +498,38 @@ MonoBehaviour:
   m_RootMotionSpeedMultiplier: 1
   m_MovementSpeed: 2
   m_RotationSpeed: 8
-  m_AimRotationSpeed: 12
-  m_AlignToGround: 1
-  m_AlignToGroundDepthOffset: 0.5
+  m_SlopeForceDown: 1.25
+  m_Mass: 100
   m_SkinWidth: 0.08
   m_SlopeLimit: 45
-  m_MaxStepHeight: 0.65
-  m_StepOffset: 0.207
+  m_MaxStepHeight: 0.25
+  m_StepOffset: 0.1
+  m_AlignToGroundDepthOffset: 0.5
+  m_AlignToGround: 1
   m_StepSpeed: 4
   m_Actions:
   - {fileID: 1655704237}
   - {fileID: 114776445558567580}
+  - {fileID: 1005418447}
+  - {fileID: 1005418446}
   - {fileID: 114139823554117216}
   - {fileID: 114908900733630684}
   - {fileID: 114329433760099396}
+  - {fileID: 2521750178379034832}
   - {fileID: 114084608887600488}
   - {fileID: 114798496128796052}
   - {fileID: 114031030444924998}
   - {fileID: 114484464717320762}
   - {fileID: 114641910215582532}
-  - {fileID: 2521750178379034832}
   - {fileID: 114015622257898310}
   m_ActiveAction: {fileID: 0}
   m_DrawDebugLine: 0
   m_Grounded: 1
   m_SlopeAngle: 0
   RIGIDBODY_VELOCITY: {x: 0, y: 0, z: 0}
+  m_LateralDirection: 0
+  m_LateralVelocity: 0
+  m_AngleRootToMove: 0
 --- !u!114 &114311917172092944
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -569,8 +577,8 @@ MonoBehaviour:
   - m_Item: {fileID: 11400000, guid: 6c5d9ac65e6844feb81b0131f2050c07, type: 2}
     m_Amount: 1
     m_Equip: 0
-  - m_Item: {fileID: 11400000, guid: 29d47eb19b2d3474080e5b333f73e67f, type: 2}
-    m_Amount: 1
+  - m_Item: {fileID: 11400000, guid: bdd3162984edf42f28ced688514ae0d6, type: 2}
+    m_Amount: 18
     m_Equip: 0
   m_CurrentLoadout: []
   m_EquipPoints:
@@ -689,7 +697,7 @@ MonoBehaviour:
   m_MouseVertical: 0
   m_LookDistance: 50
   m_CameraController: {fileID: 0}
-  data: {fileID: 11400000, guid: abf5e36b17f824b7881262833bc6b1e3, type: 2}
+  data: {fileID: 11400000, guid: 6f83744f6de2a43df9ff61d5195a996c, type: 2}
 --- !u!114 &114776445558567580
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -804,12 +812,10 @@ MonoBehaviour:
   m_IsActive: 0
   m_StateName: Roll
   m_ActionID: 0
-  m_InputNames: []
-  m_StartType: 1
-  m_StopType: 0
-  m_StopRollLayer:
-    serializedVersion: 2
-    m_Bits: 256
+  m_InputNames:
+  - Space
+  m_StartType: 3
+  m_StopType: 2
 --- !u!114 &114015622257898310
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -992,9 +998,68 @@ MonoBehaviour:
   m_StartType: 2
   m_StopType: 2
   stateNames:
-  - Base Layer.Climb.Climb
-  - Base Layer.Climb.Jump
+  - Base Layer.Parkour.JumpOnPlatform
   currentAnimIndex: 0
+--- !u!114 &1005418446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f63261ba55984bd9bef1d9b5d24d153, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: Climb
+  m_ActionID: 0
+  m_InputNames:
+  - LeftControl
+  m_StartType: 2
+  m_StopType: 2
+  m_MoveToVaultDistance: 4
+  m_ClimbableLayers:
+    serializedVersion: 2
+    m_Bits: 83886080
+  m_MaxClimbHeight: 3
+  m_MinClimbHeight: 1.5
+  m_StartVaultOffset: 0.2
+  m_MatchTargetOffset: 0.1
+  m_StartMatchTarget: 0.44
+  m_StopMatchTarget: 0.52
+  m_AvatarTarget: 5
+  m_Debug: 1
+--- !u!114 &1005418447
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 935f069628fb44cde89d56865b07253d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: JumpOnPlatform
+  m_ActionID: 0
+  m_InputNames:
+  - LeftControl
+  m_StartType: 2
+  m_StopType: 2
+  m_MoveToJumpDistance: 2
+  m_MaxHeight: 1.25
+  m_CheckLayers:
+    serializedVersion: 2
+    m_Bits: 67108864
+  m_HorizontalMatchTargetOffset: -0.5
+  m_VerticalMatchTargetOffset: 0.1
+  m_StartMatchTarget: 0.28
+  m_StopMatchTarget: 0.34
+  m_AvatarTarget: 4
 --- !u!1 &1142656612551902
 GameObject:
   m_ObjectHideFlags: 0
@@ -1837,7 +1902,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d77bac4f18ddc4e0f89778e25b2fc374, type: 2}
+  - {fileID: 2100000, guid: f343dcd6a3e4344d6ae1aef064e6d16e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

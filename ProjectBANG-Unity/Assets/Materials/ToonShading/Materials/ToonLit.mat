@@ -28,7 +28,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Ramp:
-        m_Texture: {fileID: 2800000, guid: b4f0e6d41c4ce432ea44edb86ef028b0, type: 3}
+        m_Texture: {fileID: 2800000, guid: 9190cdc05f7ed4b0b8657c2d93ec5715, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ToonShade:
