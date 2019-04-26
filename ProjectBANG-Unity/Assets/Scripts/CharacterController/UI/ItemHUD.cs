@@ -84,5 +84,20 @@ namespace CharacterController.UI
 
         }
 
+        private void OnUnequipItem(Item item){
+
+        }
+
+        private void OnInventoryPickupItem(Item item, int count)
+        {
+            
+        }
+
+        private void OnInventoryRemoveItem(Item item)
+        {
+
+        }
+
+
 	}
 }

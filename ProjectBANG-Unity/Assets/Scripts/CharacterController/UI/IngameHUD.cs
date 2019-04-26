@@ -24,6 +24,6 @@ namespace CharacterController.UI
             gameObject.SetActive(active);
         }
 
-
+        
     }
 }
