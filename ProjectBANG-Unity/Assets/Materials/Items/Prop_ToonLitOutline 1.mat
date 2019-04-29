@@ -36,7 +36,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ToonRamp:
-        m_Texture: {fileID: 2800000, guid: 52e66a9243cdfed44b5e906f5910d35b, type: 3}
+        m_Texture: {fileID: 2800000, guid: 9190cdc05f7ed4b0b8657c2d93ec5715, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ToonShade:
@@ -50,8 +50,8 @@ Material:
     m_Floats:
     - _ASEOutlineWidth: 0.02
     - _Outline: 0.004
-    - _RimOffset: 0.24
-    - _RimPower: 0.5
+    - _RimOffset: -0.05
+    - _RimPower: 0.62
     - _Shininess: 0.7
     - __dirty: 1
     m_Colors:

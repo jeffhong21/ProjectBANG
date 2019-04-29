@@ -11,10 +11,11 @@ namespace CharacterController
         private string m_RotateCameraYInput = "Mouse Y";
         private string m_MouseScrollInput = "Mouse ScrollWheel";
 
-        private bool m_AxisRaw = false;
+        private bool m_AxisRaw = true;
 
 
         [Header("-- Debug Settings --")]
+        public ShakeTransformEventData data;
         //[SerializeField, DisplayOnly]
         private float m_Horizontal, m_Forward;
         //[SerializeField, DisplayOnly]
@@ -100,8 +101,13 @@ namespace CharacterController
 
 
 
-		private void FixedUpdate()
+        private void Update()
 		{
+            //  LOCK CAMERA
+            if (LockCameraRotation() == true) return;
+            //  -----------
+
+
             m_Horizontal = GetAxis(m_HorizontalInputName, m_AxisRaw);
             m_Forward = GetAxis(m_VerticalInputName, m_AxisRaw);
 
@@ -113,6 +119,8 @@ namespace CharacterController
                 m_InputVector.Set(m_Horizontal, 0, m_Forward);
                 m_Controller.InputVector = m_InputVector;
                 m_Controller.TurnAmount = m_MouseHorizontal;
+                //m_Controller.TurnAmount = Mathf.Atan2(m_MouseHorizontal, 0);
+
             } else {
                 m_InputVector = m_Horizontal * Vector3.right + m_Forward * Vector3.forward;
                 m_Controller.InputVector = m_InputVector;
@@ -132,14 +140,14 @@ namespace CharacterController
                 m_LookDirection.y = m_Transform.position.y;
                 m_LookDirection.Normalize();
                 //  Set the Look Rotation
-                m_Controller.LookRotation = m_LookDirection != Vector3.zero ? m_Controller.LookRotation = Quaternion.LookRotation(m_LookDirection, m_Transform.up) : m_Transform.rotation;
+                //m_Controller.LookRotation = m_LookDirection != Vector3.zero ? m_Controller.LookRotation = Quaternion.LookRotation(m_LookDirection, m_Transform.up) : m_Transform.rotation;
                 //  Set the Look m_LookDirection
                 m_Controller.LookDirection = m_CameraController.Camera.transform.forward * (m_LookDirection.magnitude + 10);
             }
             //  Free Movement.
             else if (m_Controller.IndependentLook())
             {
-                m_Controller.LookRotation = m_Transform.rotation;
+                //m_Controller.LookRotation = m_Transform.rotation;
                 m_LookDirection.Normalize();
                 m_Controller.LookDirection = m_CameraController.Camera.transform.forward * (m_LookDirection.magnitude + 10);
             }
@@ -147,8 +155,11 @@ namespace CharacterController
             else{
                 m_LookDirection.y = m_Transform.position.y;
                 m_LookDirection.Normalize();
-                m_Controller.LookRotation = m_LookDirection != Vector3.zero ? m_Controller.LookRotation = Quaternion.LookRotation(m_LookDirection, m_Transform.up) : m_Transform.rotation;
-                m_Controller.LookDirection = m_Transform.forward * 10;
+                //m_Controller.LookRotation = m_LookDirection != Vector3.zero ? m_Controller.LookRotation = Quaternion.LookRotation(m_LookDirection, m_Transform.up) : m_Transform.rotation;
+
+                //m_Controller.LookDirection = m_Transform.forward * 10;
+                m_Controller.LookDirection = m_CameraController.Camera.transform.forward * (m_LookDirection.magnitude + 10);
+
                 //Debug.DrawRay(m_Transform.position +(Vector3.up * 1.35f), m_LookDirection * m_LookDistance, Color.green);
 
                 //m_Controller.LookDirection = (m_Transform.position - m_CameraController.Camera.transform.position);
@@ -157,34 +168,31 @@ namespace CharacterController
             }
 
 
-
-		}
-
-
-        public ShakeTransformEventData data;
-		private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.B))
-            {
-                UnityEditor.Selection.activeGameObject = m_GameObject;
-            }
-            //  -- Character Actions
-            //Aim(KeyCode.Mouse1);
-            if(Input.GetKeyDown(KeyCode.M)){
-                m_CameraController.Camera.GetComponentInParent<CameraShake>().AddShakeEvent(data);
-            }
-            //  --
-
             CameraInput();
 
             DebugButtonPress();
-        }
-
-		private void LateUpdate()
-		{
-            //CameraInput();
-            LockCameraRotation();
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                var health = GetComponent<CharacterHealth>();
+                health.TakeDamage(10, m_Transform.position + Vector3.up, -m_Transform.right, m_GameObject);
+            }
 		}
+
+
+
+
+		//private void Update()
+        //{
+
+
+
+        //}
+
+		//private void LateUpdate()
+		//{
+  //          //CameraInput();
+  //          LockCameraRotation();
+		//}
 
 
 
@@ -205,17 +213,26 @@ namespace CharacterController
 
             m_CameraController.RotateCamera(m_MouseHorizontal, m_MouseVertical);
             m_CameraController.ZoomCamera(Input.GetAxisRaw(m_MouseScrollInput));
+
+            if (Input.GetKeyDown(KeyCode.M))
+            {
+                m_CameraController.Camera.GetComponentInParent<CameraShake>().AddShakeEvent(data);
+            }
         }
 
 
 
-        private void LockCameraRotation()
+        private bool LockCameraRotation()
         {
             if (Input.GetKeyDown(KeyCode.L)){
                 if (CameraController.Instance != null){
                     CameraController.LockRotation = !CameraController.LockRotation;
                 }
+                m_Controller.TurnAmount = 0;
+
+                return true;
             }
+            return false;
         }
 
 

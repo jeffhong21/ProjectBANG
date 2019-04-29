@@ -403,7 +403,7 @@
                 content.text += string.Format("Direction: {0} | Horizontal Input: {1}\n", m_Direction.ToString(), m_HorizontalInput.ToString());
                 content.text += string.Format("Spacing: {0} | Distance: {1}\n", m_Spacing, m_ObjectDetectorHit.distance);
                 size = new GUIStyle(GUI.skin.label).CalcSize(content);
-                location.Set(5, 15, size.x * 2, size.y * 2);
+                location.Set(5, 15 + size.y * 2, size.x * 2, size.y * 2);
                 GUILayout.BeginArea(location);
                 GUILayout.Label(content);
                 //GUILayout.Label(string.Format("Normalized Time: {0}", normalizedTime.ToString()));

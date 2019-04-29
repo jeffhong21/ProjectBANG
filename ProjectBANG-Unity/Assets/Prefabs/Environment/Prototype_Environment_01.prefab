@@ -6007,6 +6007,7 @@ Transform:
   - {fileID: 4951613202455327883}
   - {fileID: 5742404765313323442}
   - {fileID: 2114111885486095776}
+  - {fileID: 3545541009164759025}
   m_Father: {fileID: 851917720230507323}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -10729,7 +10730,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 1f852eb75e1b7406db34a820e24661f8, type: 2}
+  - {fileID: 2100000, guid: 807e4f315e30f433ca3ecf702749ae0b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -13082,7 +13083,6 @@ Transform:
   - {fileID: 6365045932008278276}
   - {fileID: 1522035660461385928}
   - {fileID: 4756773627532398233}
-  - {fileID: 3545541009164759025}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -13426,8 +13426,8 @@ GameObject:
   - component: {fileID: 8061099080358140682}
   - component: {fileID: 1192913032060933910}
   - component: {fileID: 728741406199245296}
-  m_Layer: 0
-  m_Name: Cube
+  m_Layer: 27
+  m_Name: Slope
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13444,8 +13444,8 @@ Transform:
   m_LocalPosition: {x: 16.41, y: 0, z: 10.78}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 851917720230507323}
-  m_RootOrder: 6
+  m_Father: {fileID: 8543365074196325}
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 51.799004, z: 0}
 --- !u!33 &387128058285386211
 MeshFilter:

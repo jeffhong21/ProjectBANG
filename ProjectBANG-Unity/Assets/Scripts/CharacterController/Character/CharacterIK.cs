@@ -234,37 +234,39 @@
             //m_RightHandTarget.rotation = Quaternion.Slerp(m_RightHandTarget.rotation, m_TargetRotation, Time.deltaTime * 15);
 
 
-            //AdjustFeetTarget(ref rightFootPosition, HumanBodyBones.RightFoot);
-            //AdjustFeetTarget(ref leftFootPosition, HumanBodyBones.LeftFoot);
-            ////  Find and raycast to the ground to find positions
-            //FeetPositionSolver(rightFootPosition, ref rightFootIkPosition, ref rightFootIkRotation); // handle the solver for right foot
-            //FeetPositionSolver(leftFootPosition, ref leftFootIkPosition, ref leftFootIkRotation); //handle the solver for the left foot
+            AdjustFeetTarget(ref rightFootPosition, HumanBodyBones.RightFoot);
+            AdjustFeetTarget(ref leftFootPosition, HumanBodyBones.LeftFoot);
+            //  Find and raycast to the ground to find positions
+            FeetPositionSolver(rightFootPosition, ref rightFootIkPosition, ref rightFootIkRotation); // handle the solver for right foot
+            FeetPositionSolver(leftFootPosition, ref leftFootIkPosition, ref leftFootIkRotation); //handle the solver for the left foot
         }
 
 
 
 
-
+        public bool disableIK;
 		private void OnAnimatorIK()
 		{
             if (m_Animator == null) return;
 
             bodyPosition = m_Animator.bodyPosition;
 
+            if (disableIK) return;
+
             LookAtTarget();
-            //PositionLowerBody();
+            PositionLowerBody();
             PositionHands();
 		}
 
-
+        float lookAtWeightVelocity;
         protected virtual void LookAtTarget()
         {
-            //Vector3 directionTowardsTarget = m_LookAtPoint - m_Transform.position;
-            //float angle = Vector3.Angle(m_Transform.forward, directionTowardsTarget);
-            //if (angle < 76)
-            //    m_TargetLookAtWeight = 1;
-            //else
-                //m_TargetLookAtWeight = 0;
+            Vector3 directionTowardsTarget = m_LookAtPoint - m_Transform.position;
+            float angle = Vector3.Angle(m_Transform.forward, directionTowardsTarget);
+            if (angle < 76)
+                m_TargetLookAtWeight = Mathf.SmoothDamp(m_TargetLookAtWeight, 1, ref lookAtWeightVelocity, 0.1f);
+            else
+                m_TargetLookAtWeight = Mathf.SmoothDamp(m_TargetLookAtWeight, 0, ref lookAtWeightVelocity, 0.1f);
 
 
 
@@ -302,7 +304,7 @@
 
         protected virtual void PositionLowerBody()
         {
-            //MovePelvisHeight();
+            MovePelvisHeight();
 
             //right foot ik position and rotation -- utilise the pro features in here
             m_Animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1);

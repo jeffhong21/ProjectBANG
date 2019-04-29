@@ -344,8 +344,8 @@ ModelImporter:
       name: Vault--ChestLevel
       takeName: mixamo.com
       internalID: 7400002
-      firstFrame: 20
-      lastFrame: 112
+      firstFrame: 44
+      lastFrame: 100
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -361,7 +361,7 @@ ModelImporter:
       keepOriginalPositionY: 0
       keepOriginalPositionXZ: 0
       heightFromFeet: 1
-      mirror: 1
+      mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves:
       - name: ColliderHeight
@@ -378,7 +378,7 @@ ModelImporter:
             inWeight: 0
             outWeight: 0
           - serializedVersion: 3
-            time: 0.32
+            time: 0.2
             value: 1
             inSlope: 0
             outSlope: 0
@@ -387,7 +387,7 @@ ModelImporter:
             inWeight: 0
             outWeight: 0
           - serializedVersion: 3
-            time: 0.48
+            time: 0.34
             value: 0.5
             inSlope: 0
             outSlope: 0
@@ -396,7 +396,7 @@ ModelImporter:
             inWeight: 0
             outWeight: 0
           - serializedVersion: 3
-            time: 0.56
+            time: 0.52
             value: 0.5
             inSlope: 0
             outSlope: 6.2212667
@@ -405,7 +405,7 @@ ModelImporter:
             inWeight: 0.33333334
             outWeight: 0.041867662
           - serializedVersion: 3
-            time: 0.68
+            time: 0.78
             value: 1
             inSlope: 0
             outSlope: 0

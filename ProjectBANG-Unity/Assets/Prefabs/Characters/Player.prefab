@@ -321,7 +321,7 @@ Transform:
   m_GameObject: {fileID: 1137133856526118}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.038, y: 0, z: 0}
-  m_LocalScale: {x: 0.0288975, y: 0.0288975, z: 0.0288975}
+  m_LocalScale: {x: 0.045, y: 0.03, z: 0.0288975}
   m_Children: []
   m_Father: {fileID: 4904713043851708}
   m_RootOrder: 0
@@ -406,6 +406,7 @@ GameObject:
   - component: {fileID: 1655704237}
   - component: {fileID: 1005418446}
   - component: {fileID: 1005418447}
+  - component: {fileID: 1005418448}
   m_Layer: 31
   m_Name: Player
   m_TagString: Player
@@ -494,10 +495,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_UseRootMotion: 1
-  m_Acceleration: 30
   m_RootMotionSpeedMultiplier: 1
-  m_MovementSpeed: 2
-  m_RotationSpeed: 8
+  m_Acceleration: 0.18
+  m_MotorDamping: 0.2
+  m_MovementSpeed: 1.25
+  m_RotationSpeed: 10
   m_SlopeForceDown: 1.25
   m_Mass: 100
   m_SkinWidth: 0.08
@@ -511,25 +513,26 @@ MonoBehaviour:
   - {fileID: 1655704237}
   - {fileID: 114776445558567580}
   - {fileID: 1005418447}
-  - {fileID: 1005418446}
   - {fileID: 114139823554117216}
+  - {fileID: 1005418446}
   - {fileID: 114908900733630684}
   - {fileID: 114329433760099396}
   - {fileID: 2521750178379034832}
   - {fileID: 114084608887600488}
+  - {fileID: 1005418448}
   - {fileID: 114798496128796052}
   - {fileID: 114031030444924998}
   - {fileID: 114484464717320762}
   - {fileID: 114641910215582532}
   - {fileID: 114015622257898310}
   m_ActiveAction: {fileID: 0}
-  m_DrawDebugLine: 0
+  m_DrawDebugLine: 1
   m_Grounded: 1
+  m_InputVector: {x: 0, y: 0, z: 0}
+  m_RelativeInputVector: {x: 0, y: 0, z: 0}
+  GroundNormal: {x: 0, y: 0, z: 0}
   m_SlopeAngle: 0
   RIGIDBODY_VELOCITY: {x: 0, y: 0, z: 0}
-  m_LateralDirection: 0
-  m_LateralVelocity: 0
-  m_AngleRootToMove: 0
 --- !u!114 &114311917172092944
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -680,7 +683,7 @@ MonoBehaviour:
     m_Bits: 50
   m_GroundLayer:
     serializedVersion: 2
-    m_Bits: 134217728
+    m_Bits: 218103808
 --- !u!114 &114921923587186984
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -949,8 +952,17 @@ MonoBehaviour:
   m_MaxVaultDepth: 1
   m_StartVaultOffset: 0.2
   m_MatchTargetOffset: 0.1
-  m_StartMatchTarget: 0.54
-  m_StopMatchTarget: 0.6
+  m_StartMatchTarget: 0.26
+  m_StopMatchTarget: 0.4
+  m_ActionStates:
+  - stateName: Chest_Level
+    matchTargetOffset: 0.1
+    startMatchTarget: 0.26
+    stopMatchTarget: 0.4
+  - stateName: Vault_Head_Height
+    matchTargetOffset: 0.1
+    startMatchTarget: 0.26
+    stopMatchTarget: 0.4
   m_Debug: 1
 --- !u!114 &2521750178379034832
 MonoBehaviour:
@@ -978,6 +990,7 @@ MonoBehaviour:
   m_StaminaIncreaseRate: 0.1
   m_MaxStanima: 100
   m_CurrentStanima: 100
+  m_SpeedInput: {x: 0, y: 0, z: 0}
 --- !u!114 &1655704237
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1020,11 +1033,11 @@ MonoBehaviour:
   m_StartType: 2
   m_StopType: 2
   m_MoveToVaultDistance: 4
-  m_ClimbableLayers:
+  m_MaxHeight: 3
+  m_MinHeight: 1.5
+  m_CheckLayers:
     serializedVersion: 2
     m_Bits: 83886080
-  m_MaxClimbHeight: 3
-  m_MinClimbHeight: 1.5
   m_StartVaultOffset: 0.2
   m_MatchTargetOffset: 0.1
   m_StartMatchTarget: 0.44
@@ -1055,11 +1068,31 @@ MonoBehaviour:
   m_CheckLayers:
     serializedVersion: 2
     m_Bits: 67108864
-  m_HorizontalMatchTargetOffset: -0.5
+  m_HorizontalMatchTargetOffset: -0.2
   m_VerticalMatchTargetOffset: 0.1
   m_StartMatchTarget: 0.28
   m_StopMatchTarget: 0.34
   m_AvatarTarget: 4
+--- !u!114 &1005418448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69e70c6fec1ce434cb9c52a20bab850c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: QuickMovement
+  m_ActionID: 0
+  m_InputNames: []
+  m_StartType: 0
+  m_StopType: 0
+  m_LateralDirection: 0
+  m_AngleRootToMove: 0
 --- !u!1 &1142656612551902
 GameObject:
   m_ObjectHideFlags: 0
@@ -1433,8 +1466,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1310913941267906}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.038, y: -0.000000074505806, z: 0.000000014901161}
-  m_LocalScale: {x: 0.028897498, y: 0.028897498, z: 0.028897503}
+  m_LocalPosition: {x: -0.038, y: 0, z: 0}
+  m_LocalScale: {x: 0.045, y: 0.03, z: 0.028897503}
   m_Children: []
   m_Father: {fileID: 4904713043851708}
   m_RootOrder: 1
@@ -1902,7 +1935,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f343dcd6a3e4344d6ae1aef064e6d16e, type: 2}
+  - {fileID: 2100000, guid: 12bf96c5f9e25425badfd93934d68774, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

@@ -41,6 +41,7 @@
         protected CharacterLocomotion m_Controller;
         protected Rigidbody m_Rigidbody;
         protected CapsuleCollider m_CapsuleCollider;
+        protected CharacterIK m_CharacterIK;
         protected Animator m_Animator;
         protected AnimatorMonitor m_AnimatorMonitor;
         protected LayerManager m_Layers;
@@ -97,6 +98,7 @@
             m_CapsuleCollider = GetComponent<CapsuleCollider>();
             m_Rigidbody = GetComponent<Rigidbody>();
             m_Animator = GetComponent<Animator>();
+            m_CharacterIK = GetComponent<CharacterIK>();
             m_AnimatorMonitor = GetComponent<AnimatorMonitor>();
             m_Layers = GetComponent<LayerManager>();
             m_Inventory = GetComponent<Inventory>();
@@ -310,6 +312,7 @@
         public void StopAction()
         {
             m_Animator.SetInteger(HashID.ActionID, 0);
+            m_Animator.SetInteger(HashID.ActionIntData, 0);
             m_Animator.ResetTrigger(HashID.ActionChange);
             //m_AnimatorMonitor.SetActionID(0);
 
