@@ -126,8 +126,8 @@
         protected override void ActionStarted()
         {
             m_CharacterIK.disableIK = true;
-            //m_CapsuleCollider.isTrigger = true;
-            //m_Rigidbody.useGravity = false;
+
+
             //  Cache variables
             m_ColliderHeight = m_CapsuleCollider.height;
             m_ColliderCenter = m_CapsuleCollider.center;
@@ -143,9 +143,27 @@
 
 
 
+        //private void VaultMovement()
+        //{
+        //    var centerPoint = m_MatchPosition;
+        //    //centerPoint -= Vector3.up;
+        //    var startRelCenter = m_StartPosition - centerPoint;
+        //    var endRelCenter = m_EndPosition - centerPoint;
+        //    float startTime = Time.time;
+        //    float journeyTime = 1;
+        //    float speed = 1;
+        //    float fracComplete = (Time.time - startTime) / journeyTime * speed;
+        //    m_Transform.position = Vector3.Slerp(startRelCenter, endRelCenter, fracComplete * speed);
+        //    m_Transform.position += centerPoint;
+        //}
+
+
+
         //  Move over the vault object based off of the root motion forces.
         public override bool UpdateMovement()
         {
+            //VaultMovement();
+
             //  Gives a 1-0.5 value.  1 means collider is at normal height.
             m_ColliderAnimHeight = m_Animator.GetFloat(HashID.ColliderHeight);
             m_VerticalHeight = Mathf.Clamp01(1 - Mathf.Abs(m_ColliderAnimHeight));
@@ -203,8 +221,9 @@
             m_CapsuleCollider.center = m_ColliderCenter;
             m_StartPosition = m_MatchPosition = m_EndPosition = Vector3.zero;
 
-            m_CapsuleCollider.isTrigger = false;
-            m_Rigidbody.useGravity = true;
+            //m_Rigidbody.isKinematic = false;
+            //m_CapsuleCollider.isTrigger = false;
+            //m_Rigidbody.useGravity = true;
 
             //Debug.LogFormat("{0} Action has stopped {1}", GetType().Name, Time.time);
         }
@@ -279,57 +298,27 @@
 
 
 
-        GUIStyle style = new GUIStyle();
-        GUIContent content = new GUIContent();
-        Vector2 size;
-        //Color debugTextColor = new Color(0, 0.6f, 1f, 1);
-        GUIStyle textStyle = new GUIStyle();
-        Rect location = new Rect();
-        private void OnGUI()
-        {
-            if (Application.isPlaying && m_IsActive)
-            {
-                GUI.color = Color.black;
-                textStyle.fontStyle = FontStyle.Bold;
 
-                content.text = string.Format("Vertical Height: {0}\n", m_VerticalHeight.ToString());
-                content.text += string.Format("Height Difference: {0}\n", m_HeightDifference);
-                content.text += string.Format("Distance Remaing: {0}\n", (m_EndPosition - m_Transform.position).sqrMagnitude);
-                content.text += string.Format("Vertical Object Height: {0}\n", m_VaultObjectHeight);
-                content.text += string.Format("Vertical Velocity: {0}\n", m_VerticalVelocity);
-                content.text += string.Format("Rigidbody Velocity: {0}\n", m_Rigidbody.velocity);
-                //content.text += string.Format("Velocity: {0}\n", m_Velocity);
-                content.text += string.Format("Normalize Time: {0}\n", GetNormalizedTime());
-                content.text += string.Format("Matching Target: {0}\n", m_Animator.isMatchingTarget);
-                size = new GUIStyle(GUI.skin.label).CalcSize(content);
-                location.Set(5, 15 + size.y * 2, size.x * 2, size.y * 2);
-                GUILayout.BeginArea(location, GUI.skin.box);
-                GUILayout.Label(content);
-                //GUILayout.Label(string.Format("Normalized Time: {0}", normalizedTime.ToString()));
-                GUILayout.EndArea();
-            }
 
-        }
+		protected override void DrawOnGUI()
+		{
+            content.text = string.Format("Vertical Height: {0}\n", m_VerticalHeight.ToString());
+            content.text += string.Format("Height Difference: {0}\n", m_HeightDifference);
+            content.text += string.Format("Distance Remaing: {0}\n", (m_EndPosition - m_Transform.position).sqrMagnitude);
+            content.text += string.Format("Vertical Object Height: {0}\n", m_VaultObjectHeight);
+            content.text += string.Format("Vertical Velocity: {0}\n", m_VerticalVelocity);
+            content.text += string.Format("Rigidbody Velocity: {0}\n", m_Rigidbody.velocity);
+            //content.text += string.Format("Velocity: {0}\n", m_Velocity);
+            content.text += string.Format("Normalize Time: {0}\n", GetNormalizedTime());
+            content.text += string.Format("Matching Target: {0}\n", m_Animator.isMatchingTarget);
+
+            GUILayout.Label(content);
+		}
 
 
 
 
-
-
-		//private float normalizedTime;
-        //GUIStyle style = new GUIStyle();
-        //GUIContent content = new GUIContent();
-        //Vector2 size;
-        //private void OnGUI()
-        //{
-        //    content.text = string.Format("( {0} )", normalizedTime.ToString());
-        //    size = new GUIStyle(GUI.skin.label).CalcSize(content);
-        //    GUILayout.BeginArea(new Rect(10, 15, size.x * 2, size.y * 2), GUI.skin.box);
-        //    GUILayout.Label(content);
-        //    //GUILayout.Label(string.Format("Normalized Time: {0}", normalizedTime.ToString()));
-        //    GUILayout.EndArea();
-        //}
-    }
+	}
 
 }
 

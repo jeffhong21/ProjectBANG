@@ -29,6 +29,7 @@
         protected AvatarTarget m_AvatarTarget = AvatarTarget.LeftHand;
 
 
+
         private Vector3 m_Velocity, m_VerticalVelocity;
         private float m_PlatformHeight;
         private Vector3 m_StartPosition, m_EndPosition, m_MatchPosition;
@@ -96,8 +97,12 @@
             var m_HeightDifference = (float)System.Math.Round(m_MatchPosition.y - m_Transform.position.y, 2);
 
             m_VerticalVelocity = Vector3.up * (m_PlatformHeight + m_VerticalMatchTargetOffset) * m_DeltaTime;
+            //m_VerticalVelocity = m_Transform.up + (m_Transform.up * m_CapsuleCollider.height);
+            //m_VerticalVelocity = m_VerticalVelocity * m_DeltaTime;
             if (m_HeightDifference >= 0.1f){
-                m_Rigidbody.AddForce(m_VerticalVelocity * m_JumpForce, ForceMode.VelocityChange);
+                //m_Rigidbody.AddForce(m_VerticalVelocity * m_JumpForce, ForceMode.VelocityChange);
+                m_Rigidbody.AddForce(m_VerticalVelocity, ForceMode.VelocityChange);
+
             }
 
 

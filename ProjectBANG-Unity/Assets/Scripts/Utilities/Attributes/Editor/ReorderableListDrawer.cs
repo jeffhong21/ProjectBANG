@@ -6,18 +6,13 @@ using System.Collections.Generic;
 [CustomPropertyDrawer(typeof(ReorderableListAttribute))]
 public class ReorderableListDrawer : PropertyDrawer
 {
-    private Dictionary<string, ReorderableList> reorderableListsByPropertyName = new Dictionary<string, ReorderableList>();
 
-    string GetPropertyKeyName(SerializedProperty property)
-    {
-        return property.serializedObject.targetObject.GetInstanceID() + "/" + property.name;
-    }
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
         if (property.isArray)
         {
-            var key = GetPropertyKeyName(property);
+
 
             ReorderableList reorderableList = new ReorderableList(property.serializedObject, property, true, true, true, true)
             {

@@ -404,9 +404,8 @@ GameObject:
   - component: {fileID: 114139823554117216}
   - component: {fileID: 2521750178379034832}
   - component: {fileID: 1655704237}
-  - component: {fileID: 1005418446}
-  - component: {fileID: 1005418447}
   - component: {fileID: 1005418448}
+  - component: {fileID: 3774449784211641878}
   m_Layer: 31
   m_Name: Player
   m_TagString: Player
@@ -512,9 +511,8 @@ MonoBehaviour:
   m_Actions:
   - {fileID: 1655704237}
   - {fileID: 114776445558567580}
-  - {fileID: 1005418447}
+  - {fileID: 3774449784211641878}
   - {fileID: 114139823554117216}
-  - {fileID: 1005418446}
   - {fileID: 114908900733630684}
   - {fileID: 114329433760099396}
   - {fileID: 2521750178379034832}
@@ -547,7 +545,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bodyPosition: {x: 0, y: 0, z: 0}
   m_DebugDrawLookRay: 0
-  m_LookAtAimBodyWeight: 0
+  m_LookAtAimBodyWeight: 1
   m_LookAtBodyWeight: 0.12
   m_LookAtHeadWeight: 0.15
   m_LookAtEyesWeight: 0
@@ -564,6 +562,7 @@ MonoBehaviour:
   m_FootPositionAdjustmentSpeed: 0.284
   m_RightHandTarget: {fileID: 0}
   m_LeftHandTarget: {fileID: 0}
+  disableIK: 1
 --- !u!114 &114752500204725904
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -696,11 +695,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92019d84070ab4ad6939a5a7011333a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  data: {fileID: 11400000, guid: 6f83744f6de2a43df9ff61d5195a996c, type: 2}
   m_MouseHorizontal: 0
   m_MouseVertical: 0
   m_LookDistance: 50
   m_CameraController: {fileID: 0}
-  data: {fileID: 11400000, guid: 6f83744f6de2a43df9ff61d5195a996c, type: 2}
 --- !u!114 &114776445558567580
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -720,6 +719,9 @@ MonoBehaviour:
   m_StartType: 0
   m_StopType: 0
   m_MinFallHeight: 1
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 134217728
 --- !u!114 &114908900733630684
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1011,68 +1013,10 @@ MonoBehaviour:
   m_StartType: 2
   m_StopType: 2
   stateNames:
-  - Base Layer.Parkour.JumpOnPlatform
+  - Base Layer.SteppingOnPlatform.SteppingOnPlatform-0
+  - Base Layer.SteppingOnPlatform.SteppingOnPlatform-50
+  - Base Layer.SteppingOnPlatform.SteppingOnPlatform-100
   currentAnimIndex: 0
---- !u!114 &1005418446
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9f63261ba55984bd9bef1d9b5d24d153, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IsActive: 0
-  m_StateName: Climb
-  m_ActionID: 0
-  m_InputNames:
-  - LeftControl
-  m_StartType: 2
-  m_StopType: 2
-  m_MoveToVaultDistance: 4
-  m_MaxHeight: 3
-  m_MinHeight: 1.5
-  m_CheckLayers:
-    serializedVersion: 2
-    m_Bits: 83886080
-  m_StartVaultOffset: 0.2
-  m_MatchTargetOffset: 0.1
-  m_StartMatchTarget: 0.44
-  m_StopMatchTarget: 0.52
-  m_AvatarTarget: 5
-  m_Debug: 1
---- !u!114 &1005418447
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 935f069628fb44cde89d56865b07253d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IsActive: 0
-  m_StateName: JumpOnPlatform
-  m_ActionID: 0
-  m_InputNames:
-  - LeftControl
-  m_StartType: 2
-  m_StopType: 2
-  m_MoveToJumpDistance: 2
-  m_MaxHeight: 1.25
-  m_CheckLayers:
-    serializedVersion: 2
-    m_Bits: 67108864
-  m_HorizontalMatchTargetOffset: -0.2
-  m_VerticalMatchTargetOffset: 0.1
-  m_StartMatchTarget: 0.28
-  m_StopMatchTarget: 0.34
-  m_AvatarTarget: 4
 --- !u!114 &1005418448
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1093,6 +1037,47 @@ MonoBehaviour:
   m_StopType: 0
   m_LateralDirection: 0
   m_AngleRootToMove: 0
+--- !u!114 &3774449784211641878
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c01eb0da1c5e446ab394e6736460ef1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: ClimbObject
+  m_ActionID: 16
+  m_InputNames:
+  - LeftControl
+  m_StartType: 2
+  m_StopType: 2
+  m_MoveToVaultDistance: 3
+  m_MaxHeight: 3
+  m_MinHeight: 0.5
+  m_CheckLayers:
+    serializedVersion: 2
+    m_Bits: 83886080
+  m_MatchStates:
+  - stateName: Jump
+    minHeightStart: 0.5
+    horizontalMatchOffset: -0.2
+    verticalMatchOffset: 0.1
+    startMatchTarget: 0.2
+    stopMatchTarget: 0.34
+    avatarTarget: 4
+  - stateName: Climb
+    minHeightStart: 1.5
+    horizontalMatchOffset: 0.1
+    verticalMatchOffset: 0.1
+    startMatchTarget: 0.44
+    stopMatchTarget: 0.52
+    avatarTarget: 5
+  m_Debug: 0
 --- !u!1 &1142656612551902
 GameObject:
   m_ObjectHideFlags: 0

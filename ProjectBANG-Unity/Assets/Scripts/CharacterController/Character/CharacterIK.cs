@@ -254,7 +254,7 @@
             if (disableIK) return;
 
             LookAtTarget();
-            PositionLowerBody();
+            //PositionLowerBody();
             PositionHands();
 		}
 

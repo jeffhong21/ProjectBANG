@@ -92,7 +92,7 @@ namespace CharacterController
 
 
 
-        Quaternion targetRotation;
+
         protected override void ActionStarted()
         {
             //m_CapsuleCollider.isTrigger = true;
@@ -101,7 +101,7 @@ namespace CharacterController
             //m_Animator.SetInteger(HashID.ActionIntData, 2);
             //m_StateName = "Vault.Head";
             m_ColliderCenter = m_CapsuleCollider.center;
-            targetRotation = m_Transform.rotation;
+
             m_StartTime = Time.time;
             //Debug.LogFormat("Playing:  {0}.  ColliderHeight is : {1}", stateNames[currentAnimIndex], m_PlatformHeight);
         }
@@ -111,12 +111,14 @@ namespace CharacterController
         //  Move over the vault object based off of the root motion forces.
         public override bool UpdateMovement()
         {
-            //m_CapsuleCollider.center = m_ColliderCenter + (-Vector3.forward * m_CapsuleCollider.radius / 2);
+            m_CapsuleCollider.center = m_ColliderCenter + (m_Transform.forward * m_CapsuleCollider.radius / 1);
 
             var m_HeightDifference = (float)System.Math.Round(m_MatchPosition.y - m_Transform.position.y, 2);
 
 
-            m_VerticalVelocity = Vector3.up * (m_PlatformHeight + m_MatchTargetOffset) * m_DeltaTime;
+            //m_VerticalVelocity = m_Transform.up * (m_PlatformHeight + m_MatchTargetOffset) * m_DeltaTime;
+            m_VerticalVelocity = m_Transform.up + (m_Transform.up * m_CapsuleCollider.height);
+            m_VerticalVelocity = m_VerticalVelocity * m_DeltaTime;
             if (m_HeightDifference >= 0.1f)
                 m_Rigidbody.AddForce(m_VerticalVelocity, ForceMode.VelocityChange);
             
@@ -133,7 +135,9 @@ namespace CharacterController
 
             m_Velocity = m_Animator.deltaPosition / m_DeltaTime;
 
-            m_Velocity += m_VerticalVelocity * m_JumpForce;
+            //m_Velocity += m_VerticalVelocity * m_JumpForce;
+            m_Velocity += m_VerticalVelocity * 1;
+
             //m_Velocity.x = 0;
             //m_Velocity.z = 0;
             m_Rigidbody.velocity = m_Velocity;

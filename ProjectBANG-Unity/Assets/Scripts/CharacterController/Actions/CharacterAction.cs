@@ -59,29 +59,34 @@
         //
         // Properties
         //
-        public bool IsActive { 
-            get { return m_IsActive;}
+        public bool IsActive
+        {
+            get { return m_IsActive; }
             set { m_IsActive = value; }
         }
 
-        public int ActionID{
+        public int ActionID
+        {
             get { return m_ActionID; }
             set { m_ActionID = value; }
         }
 
 
-        public float SpeedMultiplier{
+        public float SpeedMultiplier
+        {
             get { return m_SpeedMultiplier; }
             set { m_SpeedMultiplier = value; }
         }
 
 
-        public ActionStartType StartType{
+        public ActionStartType StartType
+        {
             get { return m_StartType; }
             //set { m_StartType = value; }
         }
 
-        public ActionStopType StopType{
+        public ActionStopType StopType
+        {
             get { return m_StopType; }
             //set { m_StopType = value; }
         }
@@ -111,19 +116,21 @@
             Initialize();
         }
 
-		private void Initialize()
-		{
+        private void Initialize()
+        {
             //  Setup state name.
-            if (string.IsNullOrWhiteSpace(m_StateName)){
+            if (string.IsNullOrWhiteSpace(m_StateName))
+            {
                 m_StateName = GetType().Name;
             }
 
             //  Translate input name to keycode.
-            if(m_StartType != ActionStartType.Automatic || m_StartType != ActionStartType.Manual || 
-               m_StopType != ActionStopType.Automatic || m_StopType != ActionStopType.Manual  )
+            if (m_StartType != ActionStartType.Automatic || m_StartType != ActionStartType.Manual ||
+               m_StopType != ActionStopType.Automatic || m_StopType != ActionStopType.Manual)
             {
                 m_KeyCodes = new KeyCode[m_InputNames.Length];
-                for (int i = 0; i < m_InputNames.Length; i++){
+                for (int i = 0; i < m_InputNames.Length; i++)
+                {
                     m_KeyCodes[i] = (KeyCode)Enum.Parse(typeof(KeyCode), m_InputNames[i]);
                 }
             }
@@ -132,9 +139,9 @@
 
 
         protected void OnEnable()
-		{
+        {
 
-		}
+        }
 
         protected void OnDisable()
         {
@@ -142,23 +149,23 @@
         }
 
 
-		private void OnValidate()
-		{
+        private void OnValidate()
+        {
             if (string.IsNullOrEmpty(m_StateName)) m_StateName = GetType().Name;
-		}
+        }
 
 
-		protected void MoveToTarget(Vector3 targetPosition, Quaternion targetRotation, float minMoveSpeed, Action onComplete)
+        protected void MoveToTarget(Vector3 targetPosition, Quaternion targetRotation, float minMoveSpeed, Action onComplete)
         {
             StartCoroutine(MoveToTarget(targetPosition, targetRotation, minMoveSpeed));
-            if(onComplete != null)
+            if (onComplete != null)
                 onComplete();
         }
 
         private IEnumerator MoveToTarget(Vector3 targetPosition, Quaternion targetRotation, float minMoveSpeed)
         {
             var startTime = Time.time;
-            
+
             var direction = targetPosition - m_Transform.position;
             var distanceRemainingSqr = direction.sqrMagnitude;
             while (distanceRemainingSqr >= 0.1f || startTime > startTime + 5)
@@ -175,13 +182,16 @@
 
         private bool CheckDoubleTap(KeyCode key)
         {
-            if (Input.GetKeyDown(key) && m_FirstButtonPressed == key){
+            if (Input.GetKeyDown(key) && m_FirstButtonPressed == key)
+            {
                 m_FirstButtonPressed = KeyCode.F12;
-                if (Time.time - m_TimeOfFirstButtoonPressed < m_DoublePressInputTime){
+                if (Time.time - m_TimeOfFirstButtoonPressed < m_DoublePressInputTime)
+                {
                     return true;
                 }
             }
-            if (Input.GetKeyDown(key) && m_FirstButtonPressed != key){
+            if (Input.GetKeyDown(key) && m_FirstButtonPressed != key)
+            {
                 m_FirstButtonPressed = key;
                 m_TimeOfFirstButtoonPressed = Time.time;
                 return false;
@@ -209,9 +219,11 @@
                             return true;
                         break;
                     case ActionStartType.ButtonDown:
-                        
-                        for (int i = 0; i < m_KeyCodes.Length; i++){
-                            if (Input.GetKeyDown(m_KeyCodes[i])){
+
+                        for (int i = 0; i < m_KeyCodes.Length; i++)
+                        {
+                            if (Input.GetKeyDown(m_KeyCodes[i]))
+                            {
                                 if (m_StopType == ActionStopType.ButtonToggle)
                                     m_ActionStopToggle = true;
                                 m_InputIndex = i;
@@ -221,9 +233,11 @@
                         }
                         break;
                     case ActionStartType.DoublePress:
-                        
-                        for (int i = 0; i < m_KeyCodes.Length; i++){
-                            if (CheckDoubleTap(m_KeyCodes[i])){
+
+                        for (int i = 0; i < m_KeyCodes.Length; i++)
+                        {
+                            if (CheckDoubleTap(m_KeyCodes[i]))
+                            {
                                 return true;
                             }
                         }
@@ -241,9 +255,11 @@
             switch (m_StopType)
             {
                 case ActionStopType.Automatic:
-                    
-                    for (int index = 0; index < m_Animator.layerCount; index++){
-                        if (m_Animator.GetCurrentAnimatorStateInfo(index).IsName(m_StateName)){
+
+                    for (int index = 0; index < m_Animator.layerCount; index++)
+                    {
+                        if (m_Animator.GetCurrentAnimatorStateInfo(index).IsName(m_StateName))
+                        {
                             Debug.LogFormat("Stopping Action State {0}", m_StateName);
                             return false;
                         }
@@ -252,8 +268,9 @@
                     m_IsActive = false;
                     return true;
                 case ActionStopType.Manual:
-                    
-                    if(m_IsActive){
+
+                    if (m_IsActive)
+                    {
                         m_IsActive = false;
                         return true;
                     }
@@ -269,9 +286,11 @@
                     }
                     break;
                 case ActionStopType.ButtonToggle:
-                    
-                    if (m_ActionStopToggle){
-                        if (Input.GetKeyDown(m_KeyCodes[m_InputIndex])){
+
+                    if (m_ActionStopToggle)
+                    {
+                        if (Input.GetKeyDown(m_KeyCodes[m_InputIndex]))
+                        {
                             m_InputIndex = -1;
                             m_ActionStopToggle = false;
                             m_IsActive = false;
@@ -300,8 +319,10 @@
             //m_AnimatorMonitor.SetActionID(m_ActionID);
             //m_AnimatorMonitor.SetActionTrigger(HashID.ActionChange);
 
-            for (int index = 0; index < m_Animator.layerCount; index++){
-                if (string.IsNullOrEmpty(GetDestinationState(index)) == false){
+            for (int index = 0; index < m_Animator.layerCount; index++)
+            {
+                if (string.IsNullOrEmpty(GetDestinationState(index)) == false)
+                {
                     m_Animator.CrossFade(GetDestinationState(index), m_TransitionDuration, index);
                 }
             }
@@ -340,7 +361,7 @@
         //  When an action is about to be stopped, notify which action is starting.
         public virtual void ActionWillStart(CharacterAction nextAction)
         {
-            
+
         }
 
         //  Should the action override the item's high priority state?
@@ -410,7 +431,8 @@
         public virtual bool CheckGround()
         {
             RaycastHit hit;
-            if (Physics.Raycast(m_Transform.position + Vector3.up * 0.5f, Vector3.down, out hit, 2, m_Layers.GroundLayer)){
+            if (Physics.Raycast(m_Transform.position + Vector3.up * 0.5f, Vector3.down, out hit, 2, m_Layers.GroundLayer))
+            {
                 return true;
             }
             return false;
@@ -422,7 +444,7 @@
 
         public virtual float GetColliderHeightAdjustment()
         {
-            
+
             return m_CapsuleCollider.height;
         }
 
@@ -436,14 +458,16 @@
 
         public virtual float GetTransitionDuration()
         {
-            return m_TransitionDuration;
+            int layerIndex = 0;
+            float transitionDuration = m_Animator.GetAnimatorTransitionInfo(layerIndex).duration;
+            return transitionDuration;
         }
 
 
         public virtual float GetNormalizedTime()
         {
             //float normalizedTime = m_Animator.GetCurrentAnimatorStateInfo(m_AnimatorMonitor.BaseLayerIndex).normalizedTime % 1;
-            return m_Animator.GetCurrentAnimatorStateInfo(m_AnimatorMonitor.BaseLayerIndex).normalizedTime % 1;;
+            return m_Animator.GetCurrentAnimatorStateInfo(m_AnimatorMonitor.BaseLayerIndex).normalizedTime % 1; ;
         }
 
 
@@ -453,6 +477,44 @@
 
 
 
+        #region Debug
+
+        private GUIStyle style = new GUIStyle();
+
+        private Vector2 size;
+        //Color debugTextColor = new Color(0, 0.6f, 1f, 1);
+        private GUIStyle textStyle = new GUIStyle();
+        private Rect location = new Rect();
+
+        protected GUIContent content = new GUIContent();
+
+        private void OnGUI()
+        {
+            if (Application.isPlaying && m_IsActive)
+            {
+                GUI.color = Color.black;
+                textStyle.fontStyle = FontStyle.Bold;
+                size = new GUIStyle(GUI.skin.label).CalcSize(content);
+                location.Set(5, 15 + size.y * 2, size.x * 2, size.y * 2);
+                GUILayout.BeginArea(location, GUI.skin.box);
+
+                GUILayout.Label(string.Format("Transition Duration: {0}", GetTransitionDuration()));
+                DrawOnGUI();
+
+                //GUILayout.Label(string.Format("Normalized Time: {0}", normalizedTime.ToString()));
+
+                GUILayout.EndArea();
+            }
+        }
+
+
+        protected virtual void DrawOnGUI()
+        {
+            content.text = "";
+        }
+
+
+        #endregion
 
     }
 }

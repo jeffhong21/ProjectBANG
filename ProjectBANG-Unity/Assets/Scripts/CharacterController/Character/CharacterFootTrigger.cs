@@ -14,7 +14,7 @@ namespace CharacterController
         protected SphereCollider trigger;
         protected AudioSource audioSource;
         protected CharacterFootsteps m_Footsteps;
-
+        protected LayerManager layerManager;
 
         private float timeDelay;
 
@@ -29,6 +29,7 @@ namespace CharacterController
 
         private void Awake()
         {
+            layerManager = GetComponentInParent<LayerManager>();
             trigger = GetComponent<SphereCollider>();
             audioSource = GetComponent<AudioSource>();
 
@@ -55,6 +56,14 @@ namespace CharacterController
             if(Time.timeSinceLevelLoad > timeDelay){
                 for (int i = 0; i < m_GroundTags.Length; i++)
                 {
+                    //Debug.Log(other.gameObject.name + " | " + other.gameObject.layer);
+                    //if(other.gameObject.layer == layerManager.GroundLayer){
+                    //    if (m_Footsteps != null)
+                    //    {
+                    //        m_Footsteps.StepOnMesh(this);
+                    //        m_Footsteps.PlayFootFallSound(this);
+                    //    }
+                    //}
                     if (other.CompareTag(m_GroundTags[i]))
                     {
                         if (m_Footsteps != null)

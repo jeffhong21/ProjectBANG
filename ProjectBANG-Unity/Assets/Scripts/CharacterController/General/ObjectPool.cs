@@ -71,6 +71,7 @@ public class ObjectPool : MonoBehaviour
             for (int i = 0; i < m_Pools[index].Count; i++)
             {
                 GameObject instance = Instantiate(m_Pools[index].Prefab, Vector3.zero, Quaternion.identity, m_Host);
+                instance.SetActive(false);
                 if(m_InstanceIdLookup.ContainsKey(instance.GetInstanceID()) == false){
                     m_InstanceIdLookup.Add(instance.GetInstanceID(), m_Pools[index].Prefab.GetInstanceID());
                 }

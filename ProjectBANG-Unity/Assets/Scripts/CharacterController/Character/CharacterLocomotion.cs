@@ -271,31 +271,35 @@
 		}
 
 
-		//private void FixedUpdate()
-        //{
-        //    //if (m_Grounded)
-        //    //{
-        //    //    if (m_InputMagnitude > 0)
-        //    //    {
-        //    //        if (Mathf.Abs(m_SlopeAngle) > 0)
-        //    //        {
-        //    //              Going down a slope
-        //    //            if(m_SlopeAngle < 0)
-        //    //            m_Rigidbody.AddForce(Vector3.up * m_SlopeForceDown * m_SlopeAngle * m_DeltaTime + Physics.gravity, ForceMode.VelocityChange);
-        //    //            //  Going up a slope.
-        //    //            else
-        //    //            m_Rigidbody.AddForce(Vector3.up * m_SlopeForceDown * m_SlopeAngle * m_DeltaTime + Physics.gravity, ForceMode.VelocityChange);
-        //    //        }
+		private void FixedUpdate()
+        {
+            //if (m_Grounded)
+            //{
+            //    if (m_InputMagnitude > 0)
+            //    {
+            //        if (Mathf.Abs(m_SlopeAngle) > 0)
+            //        {
+            //              Going down a slope
+            //            if(m_SlopeAngle < 0)
+            //            m_Rigidbody.AddForce(Vector3.up * m_SlopeForceDown * m_SlopeAngle * m_DeltaTime + Physics.gravity, ForceMode.VelocityChange);
+            //            //  Going up a slope.
+            //            else
+            //            m_Rigidbody.AddForce(Vector3.up * m_SlopeForceDown * m_SlopeAngle * m_DeltaTime + Physics.gravity, ForceMode.VelocityChange);
+            //        }
 
-        //    //    }
-        //    //}
+            //    }
+            //}
 
-        //    //if (!m_Grounded)
-        //    //m_Rigidbody.AddForce(Vector3.Scale(Physics.gravity * m_GravityModifier, Vector3.down));
+            if (m_InputMagnitude > 0)
+            {
+                if (!m_Grounded)
+                    m_Rigidbody.AddForce((m_Transform.up + Physics.gravity) * m_DeltaTime, ForceMode.VelocityChange);
+            }
 
-        //    //if (m_SlopeAngle >= m_SlopeLimit)
-        //    //return;
-        //}
+
+            //if (m_SlopeAngle >= m_SlopeLimit)
+            //return;
+        }
 
 
         //  Should the character look independetly of the camera?  AI Agents do not need to use camera rotation.
@@ -311,16 +315,49 @@
 
         private void CheckGround()
         {
-            if(Physics.SphereCast(m_Transform.position + Vector3.up * m_AlignToGroundDepthOffset, m_CapsuleCollider.radius * 0.9f, 
-                                  -Vector3.up, out m_GroundHit, m_CapsuleCollider.radius + m_SkinWidth, m_Layers.GroundLayer))
+            if (m_CapsuleCollider != null)
             {
-                m_SlopeAngle = (float)Math.Round(Vector3.Angle(m_Transform.forward, m_GroundHit.normal) - 90, 2);
-                m_Grounded =  true;
+                float distance = 10f;
+                //  Position of the SphereCast origin starting at the base of the capsule.
+                Vector3 pos = m_Transform.position + Vector3.up * (m_CapsuleCollider.radius);
+
+                if (Physics.Raycast(m_Transform.position + Vector3.up * (m_CapsuleCollider.height / 2), Vector3.down,
+                                   out m_GroundHit, m_CapsuleCollider.height / 2 + 2f, m_Layers.GroundLayer))
+                {
+                    distance = m_Transform.position.y - m_GroundHit.point.y;
+                }
+                if (Physics.SphereCast(m_Transform.position + Vector3.up * (m_CapsuleCollider.radius), m_CapsuleCollider.radius * 0.9f,
+                                       -Vector3.up, out m_GroundHit, m_CapsuleCollider.radius + 2f, m_Layers.GroundLayer))
+                {
+                    // check if sphereCast distance is small than the ray cast distance
+                    if (distance > (m_GroundHit.distance - m_CapsuleCollider.radius * 0.1f))
+                        distance = (m_GroundHit.distance - m_CapsuleCollider.radius * 0.1f);
+                }
+                var groundDistance = (float)Math.Round(distance, 2);
+                if(groundDistance <= 0.05f){
+                    m_SlopeAngle = (float)Math.Round(Vector3.Angle(m_Transform.forward, m_GroundHit.normal) - 90, 2);
+                    m_Grounded = true;
+                }
+                else
+                {
+                    m_SlopeAngle = 0;
+                    m_Grounded = false;
+                    //m_Rigidbody.AddForce((m_Transform.up + Physics.gravity) * m_DeltaTime, ForceMode.VelocityChange);
+                }
             }
-            else{
-                m_SlopeAngle = 0;
-                m_Grounded = false;
-            }
+
+
+            //if(Physics.SphereCast(m_Transform.position + Vector3.up * m_AlignToGroundDepthOffset, m_CapsuleCollider.radius * 0.9f, 
+            //                      -Vector3.up, out m_GroundHit, m_CapsuleCollider.radius + m_SkinWidth, m_Layers.GroundLayer))
+            //{
+            //    m_SlopeAngle = (float)Math.Round(Vector3.Angle(m_Transform.forward, m_GroundHit.normal) - 90, 2);
+            //    m_Grounded =  true;
+            //}
+            //else{
+            //    m_SlopeAngle = 0;
+            //    m_Grounded = false;
+            //}
+
             GroundNormal = m_GroundHit.normal;
         }
 
@@ -366,9 +403,6 @@
                                 m_Rigidbody.AddForce(Vector3.up * m_SlopeForceDown * Time.deltaTime, ForceMode.VelocityChange);
                                 //m_Velocity = m_Velocity + Vector3.up * m_SlopeForceDown;
 
-                                //if (Mathf.Abs(Vector3.Angle(m_GroundHit.normal, Vector3.up)) < m_SlopeLimit)
-                                    //m_Rigidbody.velocity = Vector3.ProjectOnPlane(m_Rigidbody.velocity, m_GroundHit.normal);
-                                
                                 m_OnStep = true;
                             }
                         }

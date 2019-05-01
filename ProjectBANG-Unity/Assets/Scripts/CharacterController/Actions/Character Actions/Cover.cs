@@ -387,33 +387,42 @@
         }
 
 
-        GUIStyle style = new GUIStyle();
-        GUIContent content = new GUIContent();
-        Vector2 size;
-        Color debugTextColor = new Color(0, 0.6f, 1f, 1);
-        GUIStyle textStyle = new GUIStyle();
-        Rect location = new Rect();
-        private void OnGUI()
-        {
-            if (Application.isPlaying && m_Debug && m_IsActive)
-            {
-                GUI.color = debugTextColor;
-                textStyle.fontStyle = FontStyle.Bold;
-                content.text = string.Format("Alignment Angle: {0}\n", alignmentAngle.ToString());
-                content.text += string.Format("Direction: {0} | Horizontal Input: {1}\n", m_Direction.ToString(), m_HorizontalInput.ToString());
-                content.text += string.Format("Spacing: {0} | Distance: {1}\n", m_Spacing, m_ObjectDetectorHit.distance);
-                size = new GUIStyle(GUI.skin.label).CalcSize(content);
-                location.Set(5, 15 + size.y * 2, size.x * 2, size.y * 2);
-                GUILayout.BeginArea(location);
-                GUILayout.Label(content);
-                //GUILayout.Label(string.Format("Normalized Time: {0}", normalizedTime.ToString()));
-                GUILayout.EndArea();
-            }
+        //GUIStyle style = new GUIStyle();
+        //GUIContent content = new GUIContent();
+        //Vector2 size;
+        //Color debugTextColor = new Color(0, 0.6f, 1f, 1);
+        //GUIStyle textStyle = new GUIStyle();
+        //Rect location = new Rect();
+        //private void OnGUI()
+        //{
+        //    if (Application.isPlaying && m_Debug && m_IsActive)
+        //    {
+        //        GUI.color = debugTextColor;
+        //        textStyle.fontStyle = FontStyle.Bold;
+        //        content.text = string.Format("Alignment Angle: {0}\n", alignmentAngle.ToString());
+        //        content.text += string.Format("Direction: {0} | Horizontal Input: {1}\n", m_Direction.ToString(), m_HorizontalInput.ToString());
+        //        content.text += string.Format("Spacing: {0} | Distance: {1}\n", m_Spacing, m_ObjectDetectorHit.distance);
+        //        size = new GUIStyle(GUI.skin.label).CalcSize(content);
+        //        location.Set(5, 15 + size.y * 2, size.x * 2, size.y * 2);
+        //        GUILayout.BeginArea(location);
+        //        GUILayout.Label(content);
+        //        //GUILayout.Label(string.Format("Normalized Time: {0}", normalizedTime.ToString()));
+        //        GUILayout.EndArea();
+        //    }
 
-        }
+        //}
+
+		protected override void DrawOnGUI()
+		{
+            content.text = string.Format("Alignment Angle: {0}\n", alignmentAngle.ToString());
+            content.text += string.Format("Direction: {0} | Horizontal Input: {1}\n", m_Direction.ToString(), m_HorizontalInput.ToString());
+            content.text += string.Format("Spacing: {0} | Distance: {1}\n", m_Spacing, m_ObjectDetectorHit.distance);
+
+            GUILayout.Label(content);
+		}
 
 
-    }
+	}
 
 }
 
