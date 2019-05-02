@@ -1,117 +1,97 @@
 namespace CharacterController
 {
     using UnityEngine;
-    using System.Collections;
 
 
     public class Fall : CharacterAction
     {
+        protected enum LandingType { 
+            Default, 
+            Hard, 
+            Roll
+        };
+
+        protected LandingType m_LandingType = LandingType.Default;
+
         [SerializeField]
         protected float m_MinFallHeight = 1f;
+        [SerializeField]
+        protected GameObject m_LandSurfaceImpact;
+        [SerializeField]
+        protected float m_MinSurfaceImpactVelocity = 1f;
 
-        private Vector3 startFallPosition;
-        private Vector3 endFallPosition;
-        private float m_Heightfall;
-
-        private RaycastHit groundCheck;
+        private float m_FallVelocity;
+        private bool m_PlaySurfaceLandImpact;
         //
         // Methods
         //
-
-        public LayerMask groundLayer;
-        RaycastHit hit;
-
         public override bool CanStartAction()
         {
-            //if(m_Controller.Moving && m_Controller.Grounded)
-            //{
-            //    if (Physics.Raycast(m_Transform.position + (m_Transform.forward * 0.2f), Vector3.down, out hit, 3, m_Layers.GroundLayer))
-            //    {
-            //        Debug.DrawRay(m_Transform.position + (m_Transform.forward * 0.2f), Vector3.down * 3, Color.green);
-            //    }
-            //    else
-            //    {
-            //        Debug.DrawRay(m_Transform.position + (m_Transform.forward * 0.2f), Vector3.down * 3, Color.white);
-            //        return true;
-            //    }
-            //}
-            if(m_Controller.Grounded == false && Mathf.Abs(m_Rigidbody.velocity.y) > m_MinFallHeight)
-            {
+            if (m_Controller.Grounded == false && 
+                Mathf.Abs(m_Controller.GroundDistance) > (m_MinFallHeight == 0 ? m_MinFallHeight + 0.2f : m_MinFallHeight)){
                 return true;
             }
 
             return false;
         }
 
+        protected override void ActionStarted()
+        {
+            m_Animator.SetInteger(HashID.ActionID, 2);
 
-		public override bool CanStopAction()
-		{
-            if (m_Controller.Grounded)
-                return true;
-            if (m_Rigidbody.velocity.y <= m_MinFallHeight){
-                return true;
+
+            
+
+        }
+
+
+        public override bool CanStopAction()
+        {
+            if (Mathf.Abs(m_Rigidbody.velocity.y) > m_MinSurfaceImpactVelocity){
+                m_FallVelocity = (float)System.Math.Round(m_Rigidbody.velocity.y, 2);
+                m_PlaySurfaceLandImpact = true;
             }
 
+            if (m_Controller.Grounded)
+                return true;
             return false;
-		}
+        }
 
 
-		protected override void ActionStarted()
+        protected override void ActionStopped()
         {
-            m_AnimatorMonitor.SetActionID(2);
-            //startFallPosition = m_Transform.position;
-            //m_Heightfall = 0;
+            if (m_FallVelocity > 10)
+                m_LandingType = LandingType.Hard;
+            else if (m_FallVelocity > 20)
+                m_LandingType = LandingType.Roll;
+            else
+                m_LandingType = LandingType.Default;
+            m_Animator.SetInteger(HashID.ActionIntData, (int)m_LandingType);
+
+            if(m_PlaySurfaceLandImpact){
+                //Debug.LogFormat("Landing Velocity({0}) is greater than m_MinSurfaceImpactVelocity({1})", m_FallVelocity, m_MinSurfaceImpactVelocity);
+            }
+
+
+            m_PlaySurfaceLandImpact = false;
+            m_FallVelocity = 0;
         }
 
 
         //  Returns the state the given layer should be on.
         public override string GetDestinationState(int layer)
         {
-            if(layer == 0){
+            if (layer == 0){
                 //return "JumpingDown.JumpingDown";
-                return "Fall";
+                return "Falling";
             }
             return "";
         }
 
 
 
-        protected override void ActionStopped()
-        {
-            //endFallPosition = m_Transform.position;
-            //m_Heightfall = Vector3.Distance(startFallPosition, endFallPosition);
-
-            //m_Heightfall = Mathf.Abs(m_Rigidbody.velocity.y);
-            m_AnimatorMonitor.SetActionID(0);
-        }
 
 
-        //GUIStyle style = new GUIStyle();
-        //GUIContent content = new GUIContent();
-        //Vector2 size;
-        ////Color debugTextColor = new Color(0, 0.6f, 1f, 1);
-        //GUIStyle textStyle = new GUIStyle();
-        //Rect location = new Rect();
-        //private void OnGUI()
-        //{
-        //    if (Application.isPlaying)
-        //    {
-        //        GUI.color = Color.black;
-        //        textStyle.fontStyle = FontStyle.Bold;
-
-        //        content.text = "";
-        //        //content.text += string.Format("Hit: {0}\n", hit.transform.name);
-
-        //        size = new GUIStyle(GUI.skin.label).CalcSize(content);
-        //        location.Set(5, 15 + size.y * 2, size.x * 2, size.y * 2);
-        //        GUILayout.BeginArea(location, GUI.skin.box);
-        //        GUILayout.Label(content);
-        //        //GUILayout.Label(string.Format("Normalized Time: {0}", normalizedTime.ToString()));
-        //        GUILayout.EndArea();
-        //    }
-
-        //}
-	}
-
+    }
 }
 

@@ -4,6 +4,7 @@ using UnityEditor;
 [CustomPropertyDrawer(typeof(HelpBoxAttribute))]
 public class HelpBoxAttributeDrawer : DecoratorDrawer
 {
+    private GUIContent helpBoxContent = new GUIContent();
 
     public override float GetHeight()
     {
@@ -21,8 +22,11 @@ public class HelpBoxAttributeDrawer : DecoratorDrawer
         var helpBoxAttribute = attribute as HelpBoxAttribute;
         if (helpBoxAttribute == null) return;
 
+
         EditorGUI.HelpBox(position, helpBoxAttribute.text, GetMessageType(helpBoxAttribute.messageType));
 
+        //helpBoxContent.text = helpBoxAttribute.text;
+        //EditorGUILayout.HelpBox(helpBoxAttribute.text, GetMessageType(helpBoxAttribute.messageType));
     }
 
 

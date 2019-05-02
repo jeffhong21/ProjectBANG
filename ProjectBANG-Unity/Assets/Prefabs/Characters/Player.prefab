@@ -406,6 +406,7 @@ GameObject:
   - component: {fileID: 1655704237}
   - component: {fileID: 1005418448}
   - component: {fileID: 3774449784211641878}
+  - component: {fileID: 8553583031029798152}
   m_Layer: 31
   m_Name: Player
   m_TagString: Player
@@ -505,29 +506,28 @@ MonoBehaviour:
   m_SlopeLimit: 45
   m_MaxStepHeight: 0.25
   m_StepOffset: 0.1
-  m_AlignToGroundDepthOffset: 0.5
-  m_AlignToGround: 1
   m_StepSpeed: 4
+  m_AlignToGround: 1
+  m_AlignToGroundDepthOffset: 0.5
   m_Actions:
   - {fileID: 1655704237}
+  - {fileID: 8553583031029798152}
   - {fileID: 114776445558567580}
   - {fileID: 3774449784211641878}
   - {fileID: 114139823554117216}
   - {fileID: 114908900733630684}
   - {fileID: 114329433760099396}
   - {fileID: 2521750178379034832}
-  - {fileID: 114084608887600488}
   - {fileID: 1005418448}
+  - {fileID: 114015622257898310}
+  - {fileID: 114084608887600488}
   - {fileID: 114798496128796052}
   - {fileID: 114031030444924998}
   - {fileID: 114484464717320762}
   - {fileID: 114641910215582532}
-  - {fileID: 114015622257898310}
   m_ActiveAction: {fileID: 0}
   m_DrawDebugLine: 1
   m_Grounded: 1
-  m_InputVector: {x: 0, y: 0, z: 0}
-  m_RelativeInputVector: {x: 0, y: 0, z: 0}
   GroundNormal: {x: 0, y: 0, z: 0}
   m_SlopeAngle: 0
   RIGIDBODY_VELOCITY: {x: 0, y: 0, z: 0}
@@ -714,14 +714,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_IsActive: 0
   m_StateName: Fall
-  m_ActionID: 0
+  m_ActionID: 2
   m_InputNames: []
   m_StartType: 0
   m_StopType: 0
-  m_MinFallHeight: 1
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 134217728
+  m_MinFallHeight: 2
+  m_LandSurfaceImpact: {fileID: 0}
+  m_MinSurfaceImpactVelocity: 1
 --- !u!114 &114908900733630684
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1013,9 +1012,8 @@ MonoBehaviour:
   m_StartType: 2
   m_StopType: 2
   stateNames:
-  - Base Layer.SteppingOnPlatform.SteppingOnPlatform-0
-  - Base Layer.SteppingOnPlatform.SteppingOnPlatform-50
-  - Base Layer.SteppingOnPlatform.SteppingOnPlatform-100
+  - Vault.JumpOverObstacle-2H
+  - Vault.JumpOverObstacle-1H
   currentAnimIndex: 0
 --- !u!114 &1005418448
 MonoBehaviour:
@@ -1063,14 +1061,14 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 83886080
   m_MatchStates:
-  - stateName: Jump
+  - stateName: RunJumpToPlatform_1M
     minHeightStart: 0.5
     horizontalMatchOffset: -0.2
-    verticalMatchOffset: 0.1
+    verticalMatchOffset: 0.2
     startMatchTarget: 0.2
     stopMatchTarget: 0.34
     avatarTarget: 4
-  - stateName: Climb
+  - stateName: RunClimb_2M
     minHeightStart: 1.5
     horizontalMatchOffset: 0.1
     verticalMatchOffset: 0.1
@@ -1078,6 +1076,30 @@ MonoBehaviour:
     stopMatchTarget: 0.52
     avatarTarget: 5
   m_Debug: 0
+--- !u!114 &8553583031029798152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94ec0960e0d9d46e3aaadcdb48fd076e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: Melee
+  m_ActionID: 0
+  m_InputNames:
+  - E
+  m_StartType: 2
+  m_StopType: 2
+  stateNames:
+  - Melee.RightHook
+  - Melee.CrossPunch
+  - Melee.UpperCut
+  currentAnimIndex: 0
 --- !u!1 &1142656612551902
 GameObject:
   m_ObjectHideFlags: 0

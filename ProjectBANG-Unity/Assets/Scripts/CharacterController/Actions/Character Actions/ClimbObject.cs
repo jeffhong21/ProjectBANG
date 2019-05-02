@@ -101,7 +101,7 @@ namespace CharacterController
             for (int i = 0; i < m_MatchStates.Length; i++){
                 if (m_PlatformHeight > m_MatchStates[i].minHeightStart){
                     m_MatchState = m_MatchStates[i];
-                    stateIndex = i + 1;
+                    stateIndex = i;
                 }
             }
             if(m_MatchState == null) m_MatchState = m_MatchStates[0];
@@ -110,10 +110,10 @@ namespace CharacterController
             m_MatchPosition = ObjectHeightHit.point + (Vector3.up * m_MatchState.verticalMatchOffset) + (m_Transform.right * m_MatchState.horizontalMatchOffset);
             m_EndPosition = ObjectHeightHit.point + (Vector3.up * m_MatchState.verticalMatchOffset) + (m_Transform.forward * m_CapsuleCollider.radius);
 
-            m_Animator.SetInteger(HashID.ActionIntData, stateIndex);
-            //m_StateName = "Vault.Head";
             m_ColliderCenter = m_CapsuleCollider.center;
 
+
+            m_Animator.SetInteger(HashID.ActionIntData, stateIndex);
             m_StartTime = Time.time;
             //Debug.LogFormat("Playing:  {0}.  ColliderHeight is : {1}", stateNames[currentAnimIndex], m_PlatformHeight);
         }
@@ -123,7 +123,7 @@ namespace CharacterController
         //  Move over the vault object based off of the root motion forces.
         public override bool UpdateMovement()
         {
-            //m_CapsuleCollider.center = m_ColliderCenter + (m_Transform.forward * m_CapsuleCollider.radius / 1);
+            m_CapsuleCollider.center = m_ColliderCenter + (Vector3.forward * m_CapsuleCollider.radius / 2);
 
             m_HeightDifference = (float)System.Math.Round(m_MatchPosition.y - m_Transform.position.y, 2);
 
@@ -135,6 +135,8 @@ namespace CharacterController
             m_VerticalVelocity = m_VerticalVelocity * m_DeltaTime;
             if (m_HeightDifference >= 0.1f)
                 m_Rigidbody.AddForce(m_VerticalVelocity, ForceMode.VelocityChange);
+            else
+                m_Rigidbody.AddForce((m_Transform.forward * m_CapsuleCollider.radius) * m_DeltaTime, ForceMode.VelocityChange);
 
             return true;
         }
@@ -145,6 +147,10 @@ namespace CharacterController
         {
             m_Animator.ApplyBuiltinRootMotion();
 
+            if(m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(m_MatchState.stateName)){
+                Debug.DrawLine(m_Animator.bodyPosition, m_MatchPosition, Color.blue);
+                //m_Animator.MatchTarget(m_MatchPosition, Quaternion.LookRotation(m_Transform.forward, Vector3.up), m_MatchState.avatarTarget, m_MatchTargetWeightMask, m_MatchState.startMatchTarget, m_MatchState.stopMatchTarget);
+            }
             m_Animator.MatchTarget(m_MatchPosition, Quaternion.LookRotation(m_Transform.forward, Vector3.up), m_MatchState.avatarTarget, m_MatchTargetWeightMask, m_MatchState.startMatchTarget, m_MatchState.stopMatchTarget);
 
             m_Velocity = m_Animator.deltaPosition / m_DeltaTime;
@@ -166,23 +172,23 @@ namespace CharacterController
 
         public override bool CanStopAction()
         {
-            if ((m_EndPosition - m_Transform.position).sqrMagnitude < 0.2f)
+            //if ((m_EndPosition - m_Transform.position).sqrMagnitude < 0.2f)
+            //{
+            //    //Debug.LogFormat("{0} Action has stopped {1}", GetType().Name, Time.time);
+            //    return true;
+            //}
+            if (m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(m_MatchState.stateName))
             {
-                //Debug.LogFormat("{0} Action has stopped {1}", GetType().Name, Time.time);
-                return true;
-            }
-
-            if (m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1)
-                return false;
-            if (m_Animator.GetCurrentAnimatorStateInfo(0).IsName(m_StateName + "." + m_MatchState.stateName))
-            {
-                if (m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1 - m_TransitionDuration)
+                if (m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f - m_TransitionDuration){
+                    //Debug.LogFormat("{0} has stopped by comparing nameHASH", m_StateName);
                     return true;
+                }
+                    
                 return false;
             }
-
-            float clipTime = m_Animator.GetCurrentAnimatorClipInfo(0)[0].clip.length;
-            return m_StartTime + clipTime < Time.time;
+            //float clipTime = m_Animator.GetCurrentAnimatorClipInfo(0)[0].clip.length;
+            return m_StartTime + 2 < Time.time;
+            //return m_StartTime + clipTime < Time.time;
         }
 
 
@@ -204,7 +210,9 @@ namespace CharacterController
         public override string GetDestinationState(int layer)
         {
             if (layer == 0)
-                return m_StateName + "." + m_MatchState.stateName;
+                //return m_StateName + "." + m_MatchState.stateName;
+                return m_MatchState.stateName;
+
             return "";
         }
 
@@ -256,7 +264,11 @@ namespace CharacterController
 
         protected override void DrawOnGUI()
         {
-            content.text = string.Format("Platform Height: {0}\n", m_PlatformHeight);
+            content.text = "";
+            content.text += string.Format("Matching Target: {0}\n", m_Animator.isMatchingTarget);
+            content.text += string.Format("ShortNameHash: {0}\n", m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash);
+            content.text += string.Format("StateName({0}) Hash: {1}\n",m_MatchState.stateName, Animator.StringToHash(m_MatchState.stateName));
+            content.text += string.Format("Platform Height: {0}\n", m_PlatformHeight);
             content.text += string.Format("Height Difference: {0}\n", m_HeightDifference);
             //content.text += string.Format("Clip: {0}\n", (m_StartTime + m_Animator.GetCurrentAnimatorClipInfo(0)[0].clip.length) - Time.time);
 

@@ -49,6 +49,7 @@
         protected GameObject m_GameObject;
         protected Transform m_Transform;
 
+        protected AnimatorStateInfo m_StateInfo;
         protected AnimatorTransitionInfo m_TransitionInfo;
 
 
@@ -206,6 +207,8 @@
         //  Checks if action can be started.
         public virtual bool CanStartAction()
         {
+            if (this.enabled == false) return false;
+
             if (m_IsActive == false)
             {
                 switch (m_StartType)
@@ -250,6 +253,8 @@
 
         public virtual bool CanStopAction()
         {
+            if (this.enabled == false) return false;
+            
             if (m_IsActive == false) return false;
 
             switch (m_StopType)
@@ -314,17 +319,18 @@
 
             ActionStarted();
 
-
-
             //m_AnimatorMonitor.SetActionID(m_ActionID);
             //m_AnimatorMonitor.SetActionTrigger(HashID.ActionChange);
-
+            string destinationState = m_StateName;
             for (int index = 0; index < m_Animator.layerCount; index++)
             {
-                if (string.IsNullOrEmpty(GetDestinationState(index)) == false)
-                {
-                    m_Animator.CrossFade(GetDestinationState(index), m_TransitionDuration, index);
+                if (string.IsNullOrEmpty(GetDestinationState(index)) == false){
+                    destinationState = string.Format("{0}.{1}", m_StateName, GetDestinationState(index));
+                } else{
+                    destinationState = m_StateName;
                 }
+
+                m_Animator.CrossFade(GetDestinationState(index), m_TransitionDuration, index);
             }
 
         }
@@ -495,7 +501,7 @@
                 GUI.color = Color.black;
                 textStyle.fontStyle = FontStyle.Bold;
                 size = new GUIStyle(GUI.skin.label).CalcSize(content);
-                location.Set(5, 15 + size.y * 2, size.x * 2, size.y * 2);
+                location.Set(5, 15, size.x, size.y * 2);
                 GUILayout.BeginArea(location, GUI.skin.box);
 
                 GUILayout.Label(string.Format("Transition Duration: {0}", GetTransitionDuration()));

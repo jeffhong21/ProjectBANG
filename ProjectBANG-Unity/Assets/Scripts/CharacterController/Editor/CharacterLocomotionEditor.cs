@@ -317,12 +317,14 @@ namespace CharacterController
 
 
             serializedList.DeleteArrayElementAtIndex(index);
-            serializedObject.ApplyModifiedProperties();
+
 
 
             DestroyImmediate(characterAction, true);
-            serializedObject.Update();
+            //serializedObject.Update();
             AssetDatabase.Refresh();
+
+            serializedObject.ApplyModifiedProperties();
         }
 
 

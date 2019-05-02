@@ -6,37 +6,48 @@ using System.Collections.Generic;
 [CustomPropertyDrawer(typeof(ReorderableListAttribute))]
 public class ReorderableListDrawer : PropertyDrawer
 {
+    private Dictionary<string, ReorderableList> reorderableListsByPropertyName = new Dictionary<string, ReorderableList>();
 
+    string GetPropertyKeyName(SerializedProperty property)
+    {
+        return property.serializedObject.targetObject.GetInstanceID() + "/" + property.name;
+    }
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
         if (property.isArray)
         {
+            var key = GetPropertyKeyName(property);
 
-
-            ReorderableList reorderableList = new ReorderableList(property.serializedObject, property, true, true, true, true)
+            if (!this.reorderableListsByPropertyName.ContainsKey(key))
             {
-                drawHeaderCallback = (Rect rect) =>
+                ReorderableList reorderableList = new ReorderableList(property.serializedObject, property, true, true, true, true)
                 {
-                    EditorGUI.LabelField(rect, string.Format("{0}: {1}", property.displayName, property.arraySize), EditorStyles.label);
-                },
+                    drawHeaderCallback = (Rect rect) =>
+                    {
+                        EditorGUI.LabelField(rect, string.Format("{0}: {1}", property.displayName, property.arraySize), EditorStyles.label);
+                    },
 
-                drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
-                {
-                    var element = property.GetArrayElementAtIndex(index);
-                    rect.y += 1.0f;
-                    rect.x += 10.0f;
-                    rect.width -= 10.0f;
+                    drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
+                    {
+                        var element = property.GetArrayElementAtIndex(index);
+                        rect.y += 1.0f;
+                        rect.x += 10.0f;
+                        rect.width -= 10.0f;
 
-                    EditorGUI.PropertyField(new Rect(rect.x, rect.y, rect.width, 0.0f), element, true);
-                },
+                        EditorGUI.PropertyField(new Rect(rect.x, rect.y, rect.width, 0.0f), element, true);
+                    },
 
-                elementHeightCallback = (int index) =>
-                {
-                    return EditorGUI.GetPropertyHeight(property.GetArrayElementAtIndex(index)) + 4.0f;
-                }
-            };
-            reorderableList.DoLayoutList();
+                    elementHeightCallback = (int index) =>
+                    {
+                        return EditorGUI.GetPropertyHeight(property.GetArrayElementAtIndex(index)) + 4.0f;
+                    }
+                };
+
+                this.reorderableListsByPropertyName[key] = reorderableList;
+            }
+
+            this.reorderableListsByPropertyName[key].DoLayoutList();
         }
         else
         {
@@ -46,6 +57,8 @@ public class ReorderableListDrawer : PropertyDrawer
             EditorGUILayout.PropertyField(property, true);
         }
     }
+
+
 
 
 }

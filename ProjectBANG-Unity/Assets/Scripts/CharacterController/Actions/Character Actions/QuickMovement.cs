@@ -21,9 +21,10 @@ namespace CharacterController
         {
 
 
-            //var inputDir = m_Controller.RelativeInputVector.x * Mathf.Rad2Deg;
+
             //if(m_Controller.Moving)
             //{
+            //    var inputDir = m_Controller.InputVector.x;
             //    Quaternion referentialShift = Quaternion.FromToRotation(Vector3.forward, Vector3.Normalize(m_Transform.forward));
             //    Vector3 moveDirection = referentialShift * m_Controller.RelativeInputVector;
             //    Vector3 axisSign = Vector3.Cross(moveDirection, m_Transform.forward);

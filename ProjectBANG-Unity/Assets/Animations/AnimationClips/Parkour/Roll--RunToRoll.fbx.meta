@@ -311,7 +311,7 @@ ModelImporter:
     second: roll_to_run
   - first:
       74: 7400004
-    second: Roll--RunToRoll
+    second: RunToRoll
   - first:
       95: 9500000
     second: //RootNode
@@ -344,13 +344,13 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Roll--RunToRoll
+      name: RunToRoll
       takeName: mixamo.com
       internalID: 7400004
       firstFrame: 0
       lastFrame: 42
       wrapMode: 0
-      orientationOffsetY: 0
+      orientationOffsetY: 1.2
       level: 0
       cycleOffset: 0
       loop: 0

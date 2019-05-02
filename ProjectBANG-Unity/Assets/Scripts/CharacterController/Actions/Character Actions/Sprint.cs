@@ -67,18 +67,28 @@ namespace CharacterController
         }
 
 
-        public override bool Move()
-        {
-
+		public override bool UpdateAnimator()
+		{
             m_SpeedInput = m_Controller.InputVector;
             m_SpeedInput.z = Mathf.Clamp(m_Controller.InputVector.z * m_SpeedChangeMultiplier, m_MinSpeedChange, m_MaxSpeedChange);
             m_Controller.InputVector = m_SpeedInput;
+            return true;
+		}
 
+
+		public override bool Move()
+        {
             m_CurrentStanima = Mathf.Clamp(m_CurrentStanima - m_StaminaDecreaseRate, 0, 100);
 
-            //m_Rigidbody.AddForce(m_Transform.forward, ForceMode.VelocityChange);
+            //m_Rigidbody.AddForce(m_Transform.forward * m_SpeedChangeMultiplier * m_DeltaTime, ForceMode.VelocityChange);
 
-            return true;
+            var velocity = (m_Animator.deltaPosition / m_DeltaTime);
+            velocity.y = m_Controller.Grounded ? 0 : m_Rigidbody.velocity.y;
+            //m_Rigidbody.velocity = Vector3.SmoothDamp(m_Rigidbody.velocity, m_Velocity, ref m_velocitySmooth, m_Moving ? m_Acceleration : m_MotorDamping);
+            //m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, m_MovementSpeed);
+            m_Rigidbody.velocity = velocity * 0.75f;
+
+            return false;
         }
 
 
@@ -88,6 +98,15 @@ namespace CharacterController
 		}
 
 
+
+        protected override void DrawOnGUI()
+        {
+            content.text = "";
+            content.text += string.Format("Speed: {0}\n", m_SpeedInput);
+
+
+            GUILayout.Label(content);
+        }
 	}
 
 }

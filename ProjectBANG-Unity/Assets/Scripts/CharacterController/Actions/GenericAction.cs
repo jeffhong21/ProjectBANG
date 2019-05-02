@@ -10,8 +10,7 @@ namespace CharacterController
         private float m_StartTime;
 
         [Header("-----  Debug -----")]
-        [SerializeField]
-        private string[] stateNames = new string[0];
+        public string[] stateNames = new string[0];
         [SerializeField]
         private int currentAnimIndex = 2;
 
@@ -27,6 +26,10 @@ namespace CharacterController
             //currentAnimIndex = 0;
             m_StartTime = Time.time;
             //Debug.LogFormat("Playing:  {0}.", stateNames[currentAnimIndex]);
+            foreach (var clip in m_Animator.runtimeAnimatorController.animationClips)
+            {
+                Debug.LogFormat("ClipName: {0} | Length: {1}", clip.name, clip.length);
+            }
         }
 
 
@@ -67,6 +70,7 @@ namespace CharacterController
 
         public override bool Move()
         {
+            m_Animator.ApplyBuiltinRootMotion();
             var velocity = m_Animator.deltaPosition / m_DeltaTime;
             m_Rigidbody.velocity = velocity;
 
