@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 1751337307}
-  m_IndirectSpecularColor: {r: 0.1741275, g: 0.21774746, b: 0.29994464, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028407, g: 0.22571442, b: 0.3069233, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -51,7 +51,7 @@ LightmapSettings:
     m_IndirectOutputScale: 1
     m_AlbedoBoost: 1
     m_EnvironmentLightingMode: 0
-    m_EnableBakedLightmaps: 1
+    m_EnableBakedLightmaps: 0
     m_EnableRealtimeLightmaps: 1
   m_LightmapEditorSettings:
     serializedVersion: 12
@@ -2537,11 +2537,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Pools:
-  - InstanceID: 17350
+  - InstanceID: 17542
     Prefab: {fileID: 1030604309152162, guid: ed017de91831b481e8c7d14e692443a6, type: 3}
     Count: 10
-  - InstanceID: 15498
-    Prefab: {fileID: 1203368655300024, guid: 4bafa4351c495485790bee98073b5b46, type: 3}
+  - InstanceID: 13970
+    Prefab: {fileID: 6784883267551059862, guid: 13671d90be5e74e6781c058327c266b6,
+      type: 3}
     Count: 20
 --- !u!43 &653626741
 Mesh:
@@ -4371,6 +4372,47 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114139823554117216, guid: f80c1af589fb4412c8617fb38fe4c4f8,
+        type: 3}
+      propertyPath: m_MoveToVaultDistance
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114139823554117216, guid: f80c1af589fb4412c8617fb38fe4c4f8,
+        type: 3}
+      propertyPath: m_MatchTargetStates.Array.data[1].threshold
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114139823554117216, guid: f80c1af589fb4412c8617fb38fe4c4f8,
+        type: 3}
+      propertyPath: m_MatchTargetStates.Array.data[2].threshold
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 114139823554117216, guid: f80c1af589fb4412c8617fb38fe4c4f8,
+        type: 3}
+      propertyPath: m_MatchTargetStates.Array.data[1].matchTargetOffset.x
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114139823554117216, guid: f80c1af589fb4412c8617fb38fe4c4f8,
+        type: 3}
+      propertyPath: m_MatchTargetStates.Array.data[1].stopMatchTarget
+      value: 0.56
+      objectReference: {fileID: 0}
+    - target: {fileID: 114139823554117216, guid: f80c1af589fb4412c8617fb38fe4c4f8,
+        type: 3}
+      propertyPath: m_MatchTargetStates.Array.data[1].matchTargetOffset.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114078442416988612, guid: f80c1af589fb4412c8617fb38fe4c4f8,
+        type: 3}
+      propertyPath: m_SpawnFootprints
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114078442416988612, guid: f80c1af589fb4412c8617fb38fe4c4f8,
+        type: 3}
+      propertyPath: m_Decal
+      value: 
+      objectReference: {fileID: 6784883267551059862, guid: 13671d90be5e74e6781c058327c266b6,
+        type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f80c1af589fb4412c8617fb38fe4c4f8, type: 3}
 --- !u!43 &1423728722

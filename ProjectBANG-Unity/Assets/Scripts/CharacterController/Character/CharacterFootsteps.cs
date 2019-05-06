@@ -66,12 +66,12 @@ namespace CharacterController
                 if (Physics.Raycast(m_currentStep.position, m_currentStep.TransformVector(-m_currentStep.up), out hit, 1f, m_Layers.GroundLayer))
                 {
                     //var footStep = Instantiate(m_Decal, null);
-                    var position = hit.point + Vector3.up * 0.01f;
+                    var position = hit.point + m_Controller.transform.up * 0.02f;
 
-                    var rotation = Quaternion.LookRotation(m_Transform.forward, Vector3.up);
-                    if (m_currentStep.localPosition.x > 0){
-                        rotation = rotation * Quaternion.Euler(0, 0, 180);
-                    }
+                    var rotation = Quaternion.LookRotation(m_Controller.transform.forward, Vector3.up);
+                    //if (m_currentStep.localPosition.x > 0){
+                    //    rotation = rotation * Quaternion.Euler(0, 0, 180);
+                    //}
 
                     //var rotationDirection = Vector3.Cross(hit.point - m_currentStep.transform.position, -m_currentStep.forward);
                     //var newRotation = Quaternion.FromToRotation(m_Transform.forward, rotationDirection);

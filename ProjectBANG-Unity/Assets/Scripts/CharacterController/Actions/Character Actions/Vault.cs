@@ -26,19 +26,20 @@
         [SerializeField]
         protected LayerMask m_VaultLayers;
         [SerializeField, Tooltip("The highest level the character can vault over.")]
-        protected float m_MaxVaultHeight = 2f;
+        protected float m_MaxHeight = 2f;
         [SerializeField, Tooltip("How deep the character can vault over.")]
         protected float m_MaxVaultDepth = 1f;
-        [SerializeField, Tooltip("The offset between the vault point and the point that the character should start to vault at")]
-        protected float m_StartVaultOffset = 0.2f;
-        [SerializeField, Tooltip("The offset between the vault point and the point that the character places their hands")]
-        protected float m_MatchTargetOffset = 0.1f;
+        //[SerializeField, Tooltip("The offset between the vault point and the point that the character should start to vault at")]
+        //protected float m_StartVaultOffset = 0.2f;
+        //[SerializeField, Tooltip("The offset between the vault point and the point that the character places their hands")]
+        //protected float m_MatchTargetOffset = 0.1f;
+        //[SerializeField]
+        //protected float m_StartMatchTarget;
+        //[SerializeField]
+        //protected float m_StopMatchTarget;
         [SerializeField]
-        protected float m_StartMatchTarget;
-        [SerializeField]
-        protected float m_StopMatchTarget;
-        [SerializeField]
-        protected ActionStates[] m_ActionStates = new ActionStates[0];
+        protected AnimatorStateMatchTarget[] m_MatchTargetStates = new AnimatorStateMatchTarget[0];
+        private AnimatorStateMatchTarget m_MatchTargetState;
         //[SerializeField]
         protected float m_JumpForce = 4f;
 
@@ -52,19 +53,20 @@
         //[SerializeField]
         private Vector3 m_Velocity;
         private float m_VaultObjectHeight;
-        private Vector3 m_StartPosition, m_StartDirection;
-        private Vector3 m_EndPosition, m_EndDirection;
-        private Vector3 m_MatchPosition;
         private float m_HeightDifference;
+        private Vector3 m_StartPosition, m_EndPosition, m_MatchPosition;
 
         private Quaternion m_MatchRotation;
         private RaycastHit m_MoveToVaultDistanceHit, m_MatchPositionHit, m_EndPositionHit;
-        private float m_StartTime;
+
 
         private float m_ColliderHeight;
         private Vector3 m_ColliderCenter;
 
         private MatchTargetWeightMask m_MatchTargetWeightMask = new MatchTargetWeightMask(Vector3.one, 0);
+
+        private Vector3 m_HeightCheckStart;
+        private float m_StartTime;
 
         [SerializeField] bool m_Debug;
 
@@ -74,46 +76,40 @@
         //
         public override bool CanStartAction()
         {
-            if(base.CanStartAction())
+            if(base.CanStartAction() && m_MatchTargetStates.Length > 0)
             {
-                if(Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out m_MoveToVaultDistanceHit, m_MoveToVaultDistance + m_StartVaultOffset, m_VaultLayers)){
+                if(Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out m_MoveToVaultDistanceHit, m_MoveToVaultDistance, m_VaultLayers)){
                     if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance, Color.green);
                     return CachePositions();
                 }
-
             }
+
+            if(m_MatchTargetStates.Length == 0)
+                Debug.LogFormat("No AnimatorStateMatchTarget");
             return false;
         }
 
 
         private bool CachePositions()
         {
-            var heightCheckStart = m_MoveToVaultDistanceHit.point;
-            heightCheckStart.y += (m_MaxVaultHeight + m_StartVaultOffset) - m_CheckHeight;
+            m_HeightCheckStart = m_MoveToVaultDistanceHit.point;
+            m_HeightCheckStart.y += (m_MaxHeight + 0.2f) - m_CheckHeight;
 
-
-            if(m_Debug) Debug.DrawRay(heightCheckStart, Vector3.down * m_MaxVaultHeight, Color.cyan, 1f);
-
-            if (Physics.Raycast(heightCheckStart, Vector3.down, out m_MatchPositionHit, m_MaxVaultHeight, m_VaultLayers)){
+            //if(m_Debug) Debug.DrawRay(m_HeightCheckStart, Vector3.down * m_MaxHeight, Color.cyan, 1f);
+            if (Physics.Raycast(m_HeightCheckStart, Vector3.down, out m_MatchPositionHit, m_MaxHeight, m_VaultLayers)){
                 //  cache HeightCheckHit distance.
                 var heightCheckDist = m_MatchPositionHit.distance;
-                if (heightCheckDist < m_MaxVaultHeight){
+                if (heightCheckDist < m_MaxHeight)
+                {
                     //  Get the objet to vault over height.
-                    m_VaultObjectHeight = m_MaxVaultHeight - heightCheckDist;
-                    //  Get the position of when the characters hand is placed on the object.
-                    m_MatchPosition = m_MatchPositionHit.point + (Vector3.up * m_MatchTargetOffset) + (m_Transform.forward * m_MatchTargetOffset);
-
+                    m_VaultObjectHeight = m_MaxHeight - heightCheckDist;
                     //if(m_Debug) Debug.DrawRay(m_MoveToVaultDistanceHit.point, -m_MoveToVaultDistanceHit.normal, Color.yellow, 3f);
-
                     var depthCheck = (-m_MoveToVaultDistanceHit.normal + m_MoveToVaultDistanceHit.point) * m_MaxVaultDepth;
-                    depthCheck.y = heightCheckStart.y;
+                    depthCheck.y = m_HeightCheckStart.y;
 
-                    if (m_Debug) Debug.DrawRay(depthCheck, Vector3.down * heightCheckStart.y, Color.cyan, 1f);
-                    if (Physics.Raycast(depthCheck, Vector3.down, out m_EndPositionHit, m_MaxVaultHeight + m_StartVaultOffset, m_Layers.GroundLayer))
+                    //if (m_Debug) Debug.DrawRay(depthCheck, Vector3.down * m_HeightCheckStart.y, Color.cyan, 1f);
+                    if (Physics.Raycast(depthCheck, Vector3.down, out m_EndPositionHit, (m_MaxHeight + 0.2f), m_Layers.GroundLayer))
                     {
-                        m_EndPosition = m_EndPositionHit.point;
-                        m_StartPosition = m_MoveToVaultDistanceHit.point + (m_Transform.position - m_MoveToVaultDistanceHit.point) * m_StartVaultOffset;
-                        m_StartPosition.y = m_Transform.position.y;
                         return true;
                     }
                 }
@@ -125,37 +121,40 @@
 
         protected override void ActionStarted()
         {
+            var distance = m_MoveToVaultDistanceHit.distance;
+            for (int i = 0; i < m_MatchTargetStates.Length; i++){
+                if (distance > m_MatchTargetStates[i].threshold){
+                    m_MatchTargetState = m_MatchTargetStates[i];
+                }
+            }
+            if (m_MatchTargetState == null)
+                m_MatchTargetState = m_MatchTargetStates[0];
+
+
+            m_EndPosition = m_EndPositionHit.point;
+            m_StartPosition = m_MoveToVaultDistanceHit.point + (m_Transform.position - m_MoveToVaultDistanceHit.point);
+            m_StartPosition.y = m_Transform.position.y;
+            //  Get the position of when the characters hand is placed on the object.
+            m_MatchPosition = m_MatchPositionHit.point + m_MatchTargetState.matchTargetOffset;
+
             m_CharacterIK.disableIK = true;
-
-
             //  Cache variables
             m_ColliderHeight = m_CapsuleCollider.height;
             m_ColliderCenter = m_CapsuleCollider.center;
 
 
-            m_Animator.SetInteger(HashID.ActionIntData, 2);
-            //m_StateName = "Vault.Head";
- 
 
+
+
+
+            //m_Animator.SetInteger(HashID.ActionIntData, 2);
             m_StartTime = Time.time;
             //Debug.LogFormat("Playing:  {0}.  ColliderHeight is : {1}", stateNames[currentAnimIndex], m_VaultObjectHeight);
         }
 
 
 
-        //private void VaultMovement()
-        //{
-        //    var centerPoint = m_MatchPosition;
-        //    //centerPoint -= Vector3.up;
-        //    var startRelCenter = m_StartPosition - centerPoint;
-        //    var endRelCenter = m_EndPosition - centerPoint;
-        //    float startTime = Time.time;
-        //    float journeyTime = 1;
-        //    float speed = 1;
-        //    float fracComplete = (Time.time - startTime) / journeyTime * speed;
-        //    m_Transform.position = Vector3.Slerp(startRelCenter, endRelCenter, fracComplete * speed);
-        //    m_Transform.position += centerPoint;
-        //}
+
 
 
 
@@ -176,7 +175,7 @@
 
             m_VerticalHeight *= m_HeightMultiplier;
             m_VerticalHeight = (float)System.Math.Round(m_VerticalHeight, 2);
-            m_VerticalVelocity = Vector3.up * (m_VerticalHeight * (m_VaultObjectHeight + m_MatchTargetOffset));
+            m_VerticalVelocity = Vector3.up * (m_VerticalHeight * (m_VaultObjectHeight + m_MatchTargetState.matchTargetOffset.y));
 
             m_CapsuleCollider.height = m_ColliderHeight * Mathf.Abs(m_ColliderAnimHeight);
             m_CapsuleCollider.center = Vector3.up * (m_CapsuleCollider.height / 2);
@@ -184,10 +183,10 @@
 
             if (m_HeightDifference >= 0.1f)
             {
-                m_Rigidbody.AddForce(m_VerticalVelocity * m_JumpForce, ForceMode.VelocityChange);
+                m_Rigidbody.AddForce(m_VerticalVelocity * 4, ForceMode.VelocityChange);
             }
             else{
-                m_Rigidbody.AddForce(m_Transform.forward, ForceMode.VelocityChange);
+                m_Rigidbody.AddForce(m_Transform.forward * m_CapsuleCollider.radius, ForceMode.VelocityChange);
             }
 
 
@@ -199,7 +198,7 @@
 		{
             m_Animator.ApplyBuiltinRootMotion();
 
-            m_Animator.MatchTarget(m_MatchPosition, Quaternion.identity, AvatarTarget.LeftHand, m_MatchTargetWeightMask, m_StartMatchTarget, m_StopMatchTarget);
+            m_Animator.MatchTarget(m_MatchPosition, Quaternion.identity, AvatarTarget.LeftHand, m_MatchTargetWeightMask, m_MatchTargetState.startMatchTarget, m_MatchTargetState.stopMatchTarget);
 
             m_Velocity = m_Animator.deltaPosition / m_DeltaTime;
 
@@ -231,33 +230,40 @@
 
         public override bool CanStopAction()
         {
-            if((m_EndPosition - m_Transform.position).sqrMagnitude < 0.5f){
-                //Debug.LogFormat("{0} Action has stopped {1}", GetType().Name, Time.time);
-                return true;
-            }
-
-            if (m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1)
-                return false;
-            if (m_Animator.GetCurrentAnimatorStateInfo(0).IsName(m_StateName)){
-                if (m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1 - m_TransitionDuration)
+            if (m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(m_MatchTargetState.stateName)){
+                if (m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f - m_TransitionDuration)
                     return true;
-                return false;
             }
 
-            return m_StartTime + 3f < Time.time;
+            bool safetyCheck = m_StartTime + 3 < Time.time;
+            if(safetyCheck)
+                Debug.LogFormat("{0} has stopped by safet check.", m_StateName);
+            return safetyCheck;
         }
 
 
         public override string GetDestinationState(int layer)
         {
             if (layer == 0)
-                return m_StateName;
+                return m_MatchTargetState.stateName;
             return "";
         }
 
 
 
-
+        //private void VaultMovement()
+        //{
+        //    var centerPoint = m_MatchPosition;
+        //    //centerPoint -= Vector3.up;
+        //    var startRelCenter = m_StartPosition - centerPoint;
+        //    var endRelCenter = m_EndPosition - centerPoint;
+        //    float startTime = Time.time;
+        //    float journeyTime = 1;
+        //    float speed = 1;
+        //    float fracComplete = (Time.time - startTime) / journeyTime * speed;
+        //    m_Transform.position = Vector3.Slerp(startRelCenter, endRelCenter, fracComplete * speed);
+        //    m_Transform.position += centerPoint;
+        //}
 
 
 

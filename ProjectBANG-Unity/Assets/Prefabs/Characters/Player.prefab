@@ -949,21 +949,27 @@ MonoBehaviour:
   m_VaultLayers:
     serializedVersion: 2
     m_Bits: 33554432
-  m_MaxVaultHeight: 2
+  m_MaxHeight: 2
   m_MaxVaultDepth: 1
-  m_StartVaultOffset: 0.2
-  m_MatchTargetOffset: 0.1
-  m_StartMatchTarget: 0.26
-  m_StopMatchTarget: 0.4
-  m_ActionStates:
-  - stateName: Chest_Level
-    matchTargetOffset: 0.1
+  m_MatchTargetStates:
+  - stateName: Vault-HeadHeight
+    threshold: 0.5
+    matchTargetOffset: {x: 0.1, y: 0.1, z: 0}
     startMatchTarget: 0.26
     stopMatchTarget: 0.4
-  - stateName: Vault_Head_Height
-    matchTargetOffset: 0.1
-    startMatchTarget: 0.26
-    stopMatchTarget: 0.4
+    avatarTarget: 4
+  - stateName: JumpOverObstacle-1H
+    threshold: 1.5
+    matchTargetOffset: {x: 0, y: 0.1, z: 0}
+    startMatchTarget: 0.42
+    stopMatchTarget: 0.54
+    avatarTarget: 4
+  - stateName: JumpOverObstacle-2H
+    threshold: 2
+    matchTargetOffset: {x: 0, y: 0.1, z: 0}
+    startMatchTarget: 0.44
+    stopMatchTarget: 0.55
+    avatarTarget: 4
   m_Debug: 1
 --- !u!114 &2521750178379034832
 MonoBehaviour:
@@ -1060,18 +1066,16 @@ MonoBehaviour:
   m_CheckLayers:
     serializedVersion: 2
     m_Bits: 83886080
-  m_MatchStates:
+  m_MatchTargetStates:
   - stateName: RunJumpToPlatform_1M
-    minHeightStart: 0.5
-    horizontalMatchOffset: -0.2
-    verticalMatchOffset: 0.2
+    threshold: 0.5
+    matchTargetOffset: {x: -0.2, y: 0.1, z: 0}
     startMatchTarget: 0.2
     stopMatchTarget: 0.34
     avatarTarget: 4
   - stateName: RunClimb_2M
-    minHeightStart: 1.5
-    horizontalMatchOffset: 0.1
-    verticalMatchOffset: 0.1
+    threshold: 1.5
+    matchTargetOffset: {x: 0.1, y: 0.1, z: 0}
     startMatchTarget: 0.44
     stopMatchTarget: 0.52
     avatarTarget: 5

@@ -6,17 +6,7 @@ namespace CharacterController
 
     public class ClimbObject : CharacterAction
     {
-        [System.Serializable]
-        public class StateMatchTarget
-        {
-            public string stateName;
-            public float minHeightStart = 0.5f;
-            public float horizontalMatchOffset = 0.1f;
-            public float verticalMatchOffset = 0.1f;
-            public float startMatchTarget = 0.01f;
-            public float stopMatchTarget = 0.1f;
-            public AvatarTarget avatarTarget = AvatarTarget.RightHand;
-        }
+
 
 
         public const int ACTION_ID = 16;
@@ -32,8 +22,8 @@ namespace CharacterController
         [SerializeField]
         protected LayerMask m_CheckLayers;
         [SerializeField]
-        protected StateMatchTarget[] m_MatchStates = new StateMatchTarget[0];
-        private StateMatchTarget m_MatchState;
+        protected AnimatorStateMatchTarget[] m_MatchTargetStates = new AnimatorStateMatchTarget[0];
+        private AnimatorStateMatchTarget m_MatchTargetState;
 
 
 
@@ -61,31 +51,24 @@ namespace CharacterController
         //
         public override bool CanStartAction()
         {
-            if (base.CanStartAction())
+            if (base.CanStartAction() && m_MatchTargetStates.Length > 0)
             {
-                if(m_MatchStates.Length > 0)
+                if (Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out DetectObjectHit, m_MoveToVaultDistance, m_CheckLayers))
                 {
-                    if (Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out DetectObjectHit, m_MoveToVaultDistance, m_CheckLayers))
-                    {
-                        //if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance, Color.green);
-                        m_HeightCheckStart = DetectObjectHit.point;
-                        m_HeightCheckStart.y += (m_MaxHeight + 0.2f) - m_CheckHeight;
+                    //if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance, Color.green);
+                    m_HeightCheckStart = DetectObjectHit.point;
+                    m_HeightCheckStart.y += (m_MaxHeight + 0.2f) - m_CheckHeight;
 
-                        //if (m_Debug) Debug.DrawRay(heightCheckStart, Vector3.down * (m_MaxHeight - m_MinHeight), Color.cyan, 1f);
-                        if (Physics.Raycast(m_HeightCheckStart, Vector3.down, out ObjectHeightHit, (m_MaxHeight - m_MinHeight), m_CheckLayers))
-                        {
-                            if (ObjectHeightHit.distance < m_MaxHeight)
-                            {
-                                return true;
-                            }
+                    //if (m_Debug) Debug.DrawRay(heightCheckStart, Vector3.down * (m_MaxHeight - m_MinHeight), Color.cyan, 1f);
+                    if (Physics.Raycast(m_HeightCheckStart, Vector3.down, out ObjectHeightHit, (m_MaxHeight - m_MinHeight), m_CheckLayers)){
+                        if (ObjectHeightHit.distance < m_MaxHeight){
+                            return true;
                         }
                     }
-                } 
-                else {
-                    Debug.LogFormat("No StateMatchTargets");
                 }
-
             }
+            if (m_MatchTargetStates.Length == 0) Debug.LogFormat("No AnimatorStateMatchTarget");
+
             return false;
         }
 
@@ -98,17 +81,17 @@ namespace CharacterController
             //  Get the objet to vault over height.
             m_PlatformHeight = m_MaxHeight - ObjectHeightHit.distance;
             var stateIndex = 0;
-            for (int i = 0; i < m_MatchStates.Length; i++){
-                if (m_PlatformHeight > m_MatchStates[i].minHeightStart){
-                    m_MatchState = m_MatchStates[i];
+            for (int i = 0; i < m_MatchTargetStates.Length; i++){
+                if (m_PlatformHeight > m_MatchTargetStates[i].threshold){
+                    m_MatchTargetState = m_MatchTargetStates[i];
                     stateIndex = i;
                 }
             }
-            if(m_MatchState == null) m_MatchState = m_MatchStates[0];
+            if(m_MatchTargetState == null) m_MatchTargetState = m_MatchTargetStates[0];
 
             //  Get the position of when the characters hand is placed on the object.
-            m_MatchPosition = ObjectHeightHit.point + (Vector3.up * m_MatchState.verticalMatchOffset) + (m_Transform.right * m_MatchState.horizontalMatchOffset);
-            m_EndPosition = ObjectHeightHit.point + (Vector3.up * m_MatchState.verticalMatchOffset) + (m_Transform.forward * m_CapsuleCollider.radius);
+            m_MatchPosition = ObjectHeightHit.point + (Vector3.up * m_MatchTargetState.matchTargetOffset.y) + (m_Transform.right * m_MatchTargetState.matchTargetOffset.x);
+            m_EndPosition = ObjectHeightHit.point + (Vector3.up * m_MatchTargetState.matchTargetOffset.y) + (m_Transform.forward * m_CapsuleCollider.radius);
 
             m_ColliderCenter = m_CapsuleCollider.center;
 
@@ -129,12 +112,12 @@ namespace CharacterController
 
 
             //m_VerticalVelocity = m_Transform.up * (m_PlatformHeight + m_MatchTargetOffset) * m_DeltaTime;
-            //m_VerticalVelocity =(m_Transform.up * (m_PlatformHeight + m_MatchState.verticalMatchOffset)) + (m_Transform.up * m_CapsuleCollider.height);
+            //m_VerticalVelocity =(m_Transform.up * (m_PlatformHeight + m_MatchTargetState.verticalMatchOffset)) + (m_Transform.up * m_CapsuleCollider.height);
             m_VerticalVelocity = m_Transform.up + (m_Transform.up * m_CapsuleCollider.height);
             //m_VerticalVelocity = m_VerticalVelocity * (m_PlatformHeight * 4);
             m_VerticalVelocity = m_VerticalVelocity * m_DeltaTime;
             if (m_HeightDifference >= 0.1f)
-                m_Rigidbody.AddForce(m_VerticalVelocity, ForceMode.VelocityChange);
+                m_Rigidbody.AddForce(m_VerticalVelocity * (1 * 4), ForceMode.VelocityChange);
             else
                 m_Rigidbody.AddForce((m_Transform.forward * m_CapsuleCollider.radius) * m_DeltaTime, ForceMode.VelocityChange);
 
@@ -147,17 +130,17 @@ namespace CharacterController
         {
             m_Animator.ApplyBuiltinRootMotion();
 
-            if(m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(m_MatchState.stateName)){
+            if(m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(m_MatchTargetState.stateName)){
                 Debug.DrawLine(m_Animator.bodyPosition, m_MatchPosition, Color.blue);
-                //m_Animator.MatchTarget(m_MatchPosition, Quaternion.LookRotation(m_Transform.forward, Vector3.up), m_MatchState.avatarTarget, m_MatchTargetWeightMask, m_MatchState.startMatchTarget, m_MatchState.stopMatchTarget);
+                //m_Animator.MatchTarget(m_MatchPosition, Quaternion.LookRotation(m_Transform.forward, Vector3.up), m_MatchTargetState.avatarTarget, m_MatchTargetWeightMask, m_MatchTargetState.startMatchTarget, m_MatchTargetState.stopMatchTarget);
             }
-            m_Animator.MatchTarget(m_MatchPosition, Quaternion.LookRotation(m_Transform.forward, Vector3.up), m_MatchState.avatarTarget, m_MatchTargetWeightMask, m_MatchState.startMatchTarget, m_MatchState.stopMatchTarget);
+            m_Animator.MatchTarget(m_MatchPosition, Quaternion.LookRotation(m_Transform.forward, Vector3.up), m_MatchTargetState.avatarTarget, m_MatchTargetWeightMask, m_MatchTargetState.startMatchTarget, m_MatchTargetState.stopMatchTarget);
 
             m_Velocity = m_Animator.deltaPosition / m_DeltaTime;
 
-            //m_Velocity += m_VerticalVelocity * (Mathf.Clamp((m_PlatformHeight + m_MatchState.verticalMatchOffset), 1, m_MaxHeight));
-            //m_Velocity += m_VerticalVelocity * ( (m_PlatformHeight + m_MatchState.verticalMatchOffset) * (4 + m_MatchState.verticalMatchOffset) );
-            m_Velocity += m_VerticalVelocity * (m_PlatformHeight * 4);
+            //m_Velocity += m_VerticalVelocity * (Mathf.Clamp((m_PlatformHeight + m_MatchTargetState.verticalMatchOffset), 1, m_MaxHeight));
+            //m_Velocity += m_VerticalVelocity * ( (m_PlatformHeight + m_MatchTargetState.verticalMatchOffset) * (4 + m_MatchTargetState.verticalMatchOffset) );
+            m_Velocity += m_VerticalVelocity;
             //m_Velocity += m_VerticalVelocity;
 
 
@@ -172,18 +155,12 @@ namespace CharacterController
 
         public override bool CanStopAction()
         {
-            //if ((m_EndPosition - m_Transform.position).sqrMagnitude < 0.2f)
-            //{
-            //    //Debug.LogFormat("{0} Action has stopped {1}", GetType().Name, Time.time);
-            //    return true;
-            //}
-            if (m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(m_MatchState.stateName))
+            if (m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(m_MatchTargetState.stateName))
             {
                 if (m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f - m_TransitionDuration){
                     //Debug.LogFormat("{0} has stopped by comparing nameHASH", m_StateName);
                     return true;
                 }
-                    
                 return false;
             }
             //float clipTime = m_Animator.GetCurrentAnimatorClipInfo(0)[0].clip.length;
@@ -210,8 +187,8 @@ namespace CharacterController
         public override string GetDestinationState(int layer)
         {
             if (layer == 0)
-                //return m_StateName + "." + m_MatchState.stateName;
-                return m_MatchState.stateName;
+                //return m_StateName + "." + m_MatchTargetState.stateName;
+                return m_MatchTargetState.stateName;
 
             return "";
         }
@@ -267,7 +244,7 @@ namespace CharacterController
             content.text = "";
             content.text += string.Format("Matching Target: {0}\n", m_Animator.isMatchingTarget);
             content.text += string.Format("ShortNameHash: {0}\n", m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash);
-            content.text += string.Format("StateName({0}) Hash: {1}\n",m_MatchState.stateName, Animator.StringToHash(m_MatchState.stateName));
+            content.text += string.Format("StateName({0}) Hash: {1}\n",m_MatchTargetState.stateName, Animator.StringToHash(m_MatchTargetState.stateName));
             content.text += string.Format("Platform Height: {0}\n", m_PlatformHeight);
             content.text += string.Format("Height Difference: {0}\n", m_HeightDifference);
             //content.text += string.Format("Clip: {0}\n", (m_StartTime + m_Animator.GetCurrentAnimatorClipInfo(0)[0].clip.length) - Time.time);
