@@ -204,6 +204,7 @@
 
             m_Rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
             m_Rigidbody.mass = m_Mass;
+            m_Animator.applyRootMotion = true;
         }
 
 
@@ -808,7 +809,7 @@
                     string.Format("Left: {0} ", m_Animator.leftFeetBottomHeight),
                     string.Format("Right: {0} ", m_Animator.rightFeetBottomHeight),
                     ////string.Format("isHuman: {0} ", m_Animator.isHuman),
-                    //string.Format("Start Angle: {0} ", m_StartAngle)
+                    string.Format("Start Angle: {0} ", m_Animator.isOptimizable)
                 };
 
                 GUI.color = debugTextColor;
