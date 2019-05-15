@@ -5,7 +5,7 @@
     using System.Collections.Generic;
 
 
-
+    [DisallowMultipleComponent]
     public class Inventory : MonoBehaviour
     {
         public delegate void OnInventoryUseItem(ItemType itemType, float remaining);

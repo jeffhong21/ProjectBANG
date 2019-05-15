@@ -12,7 +12,7 @@ public class GameWorld : MonoBehaviour
 
     [SerializeField]
     private GameWorldAssetContainer[] m_AssetContainers = {
-        new GameWorldAssetContainer{ layerName = "Ground" },
+        new GameWorldAssetContainer{ layerName = "Solid" },
         new GameWorldAssetContainer{ layerName = "Cover" },
         new GameWorldAssetContainer{ layerName = "Vault" }
     };

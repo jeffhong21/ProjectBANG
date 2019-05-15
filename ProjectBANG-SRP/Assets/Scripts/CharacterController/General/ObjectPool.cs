@@ -46,7 +46,7 @@ public class ObjectPool : MonoBehaviour
         Instance = this;
 
 
-        Initialize();
+        InitializePools();
     }
 
 
@@ -58,7 +58,7 @@ public class ObjectPool : MonoBehaviour
     }
 
 
-	private void Initialize()
+	private void InitializePools()
     {
         m_GameObjectPool = new Dictionary<GameObject, Queue<GameObject>>();
         m_InstanceIdMap = new Dictionary<int, GameObject>();
@@ -68,75 +68,86 @@ public class ObjectPool : MonoBehaviour
 
         for (int index = 0; index < m_Pools.Count; index++)
         {
-            m_GameObjectPool.Add(m_Pools[index].Prefab, new Queue<GameObject>());
+            var prefab = m_Pools[index].Prefab;
+            m_GameObjectPool.Add(prefab, new Queue<GameObject>());
             for (int i = 0; i < m_Pools[index].Count; i++)
             {
-                GameObject instance = ObjectPool.Instantiate(m_Pools[index].Prefab, Vector3.zero, Quaternion.identity, m_Host);
+                //GameObject instance = ObjectPool.Instantiate(prefab, Vector3.zero, Quaternion.identity, m_Host);
 
-                if(m_InstanceIdMap.ContainsKey(m_Pools[index].Prefab.GetInstanceID()) == false)
-                    m_InstanceIdMap.Add(m_Pools[index].Prefab.GetInstanceID(), m_Pools[index].Prefab);
-                
-                instance.SetActive(false);
+                //  Instantiate a new gameObject.
+                var instance = UnityEngine.Object.Instantiate(prefab, Vector3.zero, Quaternion.identity, m_Host);
+                //  Add to the pool.
+                m_GameObjectPool[prefab].Enqueue(instance);
+                //  Register the new instantiatedObject ID.
+                m_InstanceIdLookup.Add(instance.GetInstanceID(), prefab.GetInstanceID());
+
+
+                //  Register each instance's instanceID to the original prefab it is derived from.
                 if(m_InstanceIdLookup.ContainsKey(instance.GetInstanceID()) == false){
-                    m_InstanceIdLookup.Add(instance.GetInstanceID(), m_Pools[index].Prefab.GetInstanceID());
+                    m_InstanceIdLookup.Add(instance.GetInstanceID(), prefab.GetInstanceID());
                 }
                 else{
-                    
+                    //Debug.LogFormat("Updating {0} instanceID value to {1}", instance.name, prefab.GetInstanceID());
+                    m_InstanceIdLookup[instance.GetInstanceID()] = prefab.GetInstanceID();
                 }
+
+                //  Register the original prefabs instanceID so we know which prefab is which when we return the instanceObject.
+                if (m_InstanceIdMap.ContainsKey(prefab.GetInstanceID()) == false)
+                    m_InstanceIdMap.Add(prefab.GetInstanceID(), prefab);
+
+
+                instance.SetActive(false);
+                //instance.hideFlags = HideFlags.HideInHierarchy;
             }
         }
     }
 
 
 
-    //public static GameObject Instantiate(GameObject original, Vector3 position, Quaternion rotation, Transform parent = null)
-    //{
-    //    //if (!m_GameObjectPool.ContainsKey(original))
-    //    //m_GameObjectPool.Add(original, new Queue<GameObject>());
 
-    //    GameObject instantiatedObject = Instantiate(original);
-    //    m_GameObjectPool[original].Enqueue(instantiatedObject);
-
-
-    //    instantiatedObject.transform.position = position;
-    //    instantiatedObject.transform.rotation = rotation;
-    //    instantiatedObject.transform.SetParent(parent);
-    //    instantiatedObject.SetActive(false);
-
-    //    return instantiatedObject;
-    //}
 
 
     public static GameObject Instantiate(GameObject original, Vector3 position, Quaternion rotation, Transform parent = null)
     {
         GameObject instantiatedObject = null;
         if (m_GameObjectPool.ContainsKey(original)){
-            if (m_GameObjectPool[original].Count > 0){
+            if (m_GameObjectPool[original].Count > 0)
+            {
                 instantiatedObject = m_GameObjectPool[original].Dequeue();
             }
             else{
+                //  Instantiate a new gameObject.
                 instantiatedObject = Instantiate(original);
-                //  Add to the pool count.
+                //  Add to the pool.
                 m_GameObjectPool[original].Enqueue(instantiatedObject);
-                //  register the new objects ID.
+                //  Register the new instantiatedObject ID.
                 m_InstanceIdLookup.Add(instantiatedObject.GetInstanceID(), original.GetInstanceID());
             }
-            instantiatedObject.transform.position = position;
-            instantiatedObject.transform.rotation = rotation;
-            instantiatedObject.transform.SetParent(parent);
-            instantiatedObject.SetActive(true);
+            //Debug.LogFormat("Total instances of {0} remaining: {1}", original.name, m_GameObjectPool[original].Count);
         }
-        //else{
-        //    m_GameObjectPool.Add(original, new Queue<GameObject>());
-        //    instantiatedObject = Instantiate(original, Vector3.zero, Quaternion.identity, parent);
-        //}
+        else{
+            //  Instantiate a new gameObject.
+            instantiatedObject = Instantiate(original);
+            //  Create a new ObjectPool and add the new instance to the pool.
+            m_GameObjectPool.Add(original, new Queue<GameObject>());
+            m_GameObjectPool[original].Enqueue(instantiatedObject);
+            //  Register the new instantiatedObject ID.
+            m_InstanceIdLookup.Add(instantiatedObject.GetInstanceID(), original.GetInstanceID());
+            Debug.LogFormat("Creating a new object pool for {0} (InstanceID: {1})", original.name, original.GetInstanceID());
+        }
 
-        //Debug.LogFormat("Original InstanceID: {0} | Instance InstanceID {1}",OriginalInstanceID(instantiatedObject), instantiatedObject.GetInstanceID());
+        instantiatedObject.transform.position = position;
+        instantiatedObject.transform.rotation = rotation;
+        instantiatedObject.transform.SetParent(parent);
+        instantiatedObject.SetActive(true);
+
+
+        //Debug.LogFormat("Original InstanceID: {0} | Instance InstanceID {1}",GetOriginalInstanceID(instantiatedObject), instantiatedObject.GetInstanceID());
         return instantiatedObject;
     }
 
 
-    public static int OriginalInstanceID(GameObject instantiatedObject)
+    public static int GetOriginalInstanceID(GameObject instantiatedObject)
     {
         if(m_InstanceIdLookup.ContainsKey(instantiatedObject.GetInstanceID())){
             return m_InstanceIdLookup[instantiatedObject.GetInstanceID()];
@@ -145,9 +156,9 @@ public class ObjectPool : MonoBehaviour
     }
 
 
-    public static void Return(GameObject instantiatedObject)
+    public static void Destroy(GameObject instantiatedObject)
     {
-        var originalInstanceID = OriginalInstanceID(instantiatedObject);
+        var originalInstanceID = GetOriginalInstanceID(instantiatedObject);
         var originalPrefab = m_InstanceIdMap[originalInstanceID];
         if(originalInstanceID == -1){
             originalPrefab = null;
@@ -203,7 +214,7 @@ public class ObjectPool : MonoBehaviour
 
 //    protected Stack<int> m_FreeIdx;
 
-//    public void Initialize(int count, T prefab)
+//    public void InitializePools(int count, T prefab)
 //    {
 //        instances = new T[count];
 //        m_FreeIdx = new Stack<int>(count);

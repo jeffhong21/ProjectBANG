@@ -134,10 +134,10 @@ namespace CharacterController
         {
             m_Animator.ApplyBuiltinRootMotion();
 
-            if(m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(m_MatchTargetState.stateName)){
-                Debug.DrawLine(m_Animator.bodyPosition, m_MatchPosition, Color.blue);
-                //m_Animator.MatchTarget(m_MatchPosition, Quaternion.LookRotation(m_Transform.forward, Vector3.up), m_MatchTargetState.avatarTarget, m_MatchTargetWeightMask, m_MatchTargetState.startMatchTarget, m_MatchTargetState.stopMatchTarget);
-            }
+            //if(m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(m_MatchTargetState.stateName)){
+            //    Debug.DrawLine(m_Animator.bodyPosition, m_MatchPosition, Color.blue);
+            //    //m_Animator.MatchTarget(m_MatchPosition, Quaternion.LookRotation(m_Transform.forward, Vector3.up), m_MatchTargetState.avatarTarget, m_MatchTargetWeightMask, m_MatchTargetState.startMatchTarget, m_MatchTargetState.stopMatchTarget);
+            //}
             //m_Animator.MatchTarget(m_MatchPosition, Quaternion.LookRotation(m_Transform.forward, Vector3.up) , m_MatchTargetState.avatarTarget, m_MatchTargetWeightMask, m_MatchTargetState.startMatchTarget, m_MatchTargetState.stopMatchTarget);
             m_Animator.MatchTarget(m_MatchPosition, Quaternion.identity, m_MatchTargetState.avatarTarget, m_MatchTargetWeightMask, m_MatchTargetState.startMatchTarget, m_MatchTargetState.stopMatchTarget);
 
@@ -161,7 +161,7 @@ namespace CharacterController
             if (m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(m_MatchTargetState.stateName))
             {
                 if (m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f - m_TransitionDuration){
-                    Debug.LogFormat("{0} has stopped by comparing nameHASH", m_MatchTargetState.stateName);
+                    //Debug.LogFormat("{0} has stopped by comparing nameHASH", m_MatchTargetState.stateName);
                     return true;
                 }
                 return false;

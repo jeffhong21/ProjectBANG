@@ -2,7 +2,7 @@ namespace CharacterController
 {
     using UnityEngine;
 
-
+    [DisallowMultipleComponent]
     public class PlayerInput : MonoBehaviour
     {
         private string m_HorizontalInputName = "Horizontal";
@@ -109,13 +109,14 @@ namespace CharacterController
 
 
 
-        private void Update()
+        private void FixedUpdate()
 		{
             //  LOCK CAMERA
             if (LockCameraRotation() == true) return;
+
+
             //  -----------
-
-
+            //  Character Input
             m_Horizontal = GetAxis(m_HorizontalInputName, m_AxisRaw);
             m_Forward = GetAxis(m_VerticalInputName, m_AxisRaw);
 
@@ -126,17 +127,19 @@ namespace CharacterController
             m_Controller.LookDirection = m_LookDirection;
 
 
+            //  -----------
+            //  Camera Input
+            if (m_CameraController != null)
+            {
+                m_MouseHorizontal = Input.GetAxis(m_RotateCameraXInput);
+                m_MouseVertical = Input.GetAxis(m_RotateCameraYInput);
 
+                m_CameraController.RotateCamera(m_MouseHorizontal, m_MouseVertical);
+                m_CameraController.ZoomCamera(Input.GetAxisRaw(m_MouseScrollInput));
+            }
 
-
-            CameraInput();
 
             DebugButtonPress();
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                var health = GetComponent<CharacterHealth>();
-                health.TakeDamage(10, m_Transform.position + Vector3.up, -m_Transform.right, m_GameObject);
-            }
 		}
 
 
@@ -154,11 +157,6 @@ namespace CharacterController
 
             m_CameraController.RotateCamera(m_MouseHorizontal, m_MouseVertical);
             m_CameraController.ZoomCamera(Input.GetAxisRaw(m_MouseScrollInput));
-
-            if (Input.GetKeyDown(KeyCode.M))
-            {
-                m_CameraController.Camera.GetComponentInParent<CameraShake>().AddShakeEvent(data);
-            }
         }
 
 
@@ -170,7 +168,6 @@ namespace CharacterController
                     CameraController.LockRotation = !CameraController.LockRotation;
                 }
 
-
                 return true;
             }
             return false;
@@ -178,6 +175,31 @@ namespace CharacterController
 
 
 
+        private void DebugButtonPress()
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                var health = GetComponent<CharacterHealth>();
+                health.TakeDamage(10, m_Transform.position + Vector3.up, -m_Transform.right, m_GameObject);
+            }
+
+            if (Input.GetKeyDown(KeyCode.M))
+            {
+                m_CameraController.Camera.GetComponentInParent<CameraShake>().AddShakeEvent(data);
+            }
+
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                //EventHandler.LogAllRegistered();
+                UnityEditor.Selection.activeGameObject = gameObject;
+            }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                //UnityEditor.EditorApplication.isPaused = !UnityEditor.EditorApplication.isPlaying;
+                Debug.Break();
+            }
+        }
 
 
 
@@ -197,19 +219,7 @@ namespace CharacterController
 
 
 
-        private void DebugButtonPress()
-        {
-            if (Input.GetKeyDown(KeyCode.P)){
-                //EventHandler.LogAllRegistered();
-                UnityEditor.Selection.activeGameObject = gameObject;
-            }
 
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                //UnityEditor.EditorApplication.isPaused = !UnityEditor.EditorApplication.isPlaying;
-                Debug.Break();
-            }
-        }
 
 
 

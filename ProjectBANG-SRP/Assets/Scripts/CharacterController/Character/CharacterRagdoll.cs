@@ -5,7 +5,7 @@
     using System.Collections;
     using System.Collections.Generic;
 
-
+    [DisallowMultipleComponent]
     public class CharacterRagdoll : MonoBehaviour
     {
         private const string m_RagdollLayerName = "CharacterCollider";

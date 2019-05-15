@@ -6,29 +6,27 @@ public class SpawnPoints : MonoBehaviour
 {
     public enum SpawnType {Default, SpawnOnly, RespawnOnly}
 
+    public static bool useDrawGizmos;
+
     [Serializable]
     public class SpawPointDebugSettings
     {
         [Range(0, 1)]
         public float gizmoSize = 0.25f;
-        public Color defaultColor = new Color(0, 1, 1, 0.5f);
+        public Color defaultColor = new Color(0, 0.64f, 1, 0.5f);
         public Color spawnColor = new Color(1, 0, 1, 0.5f);
         public Color respawnColor = new Color(0, 1, 0, 0.5f);
         public Color textColor = new Color(1, 1, 1, 1);
     }
 
 
-    public SpawnType m_SpawnType = SpawnType.Default;
-    public float m_Radius = 1;
-    public float m_DelayBetweenSpawns = 3;
+    public SpawnType spawnType = SpawnType.Default;
+    public float radius = 1;
+    public float delayBetweenSpawns = 3;
 
 
     [Space]
-    public SpawPointDebugSettings m_DebugSettings = new SpawPointDebugSettings();
-
-
-    private GameObject m_GameObject;
-    private Transform m_Transform;
+    public SpawPointDebugSettings debugSettings = new SpawPointDebugSettings();
 
 
 
@@ -48,20 +46,16 @@ public class SpawnPoints : MonoBehaviour
 	//
     //  Methods
     //
-    private void Awake()
-	{
-        m_GameObject = gameObject;
-        m_Transform = transform;
-	}
 
 
     public Vector3 GetSpawnPosition()
     {
-        Vector3 spawnPoint = m_Transform.position;
-        spawnPoint = m_Transform.position + (UnityEngine.Random.insideUnitSphere * m_Radius);
+        Vector3 spawnPoint = transform.position;
+        spawnPoint = transform.position + (UnityEngine.Random.insideUnitSphere * radius);
         spawnPoint.y = 0;
         return spawnPoint;
     }
+
 
 
 
@@ -71,35 +65,71 @@ public class SpawnPoints : MonoBehaviour
     //    DrawGizmos();
     //}
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
 
-	private void OnDrawGizmosSelected()
+    private void OnDrawGizmos() => DrawGizmos(false);
+
+    private void OnDrawGizmosSelected() => DrawGizmos(true);
+
+
+	public void DrawGizmos(bool selected)
 	{
-        DrawGizmos();
-	}
+        if (debugSettings == null) return;
 
-
-	public void DrawGizmos()
-	{
-        if (m_DebugSettings == null) return;
-
-        switch (m_SpawnType)
+        Color color = debugSettings.defaultColor;
+        switch (spawnType)
         {
             case SpawnType.SpawnOnly:
-                Gizmos.color = m_DebugSettings.spawnColor;
+                color = debugSettings.spawnColor;
                 break;
             case SpawnType.RespawnOnly:
-                Gizmos.color = m_DebugSettings.respawnColor;
+                color = debugSettings.respawnColor;
                 break;
             default:
-                Gizmos.color = m_DebugSettings.defaultColor;
+                color = debugSettings.defaultColor;
                 break;
         }
 
-        Gizmos.DrawSphere(transform.position, m_Radius);
-        Gizmos.DrawRay(transform.position + transform.up * 1.5f, transform.forward);
+        if (!selected)
+            //color.a = color.a * 0.25f;
+            color = Color.gray;
 
-        GizmosUtils.DrawString(gameObject.name, transform.position + Vector3.up, m_DebugSettings.textColor);
+
+        if(Event.current.type == EventType.Repaint)
+        {
+            Gizmos.color = color;
+            if (selected)
+                Gizmos.DrawSphere(transform.position, debugSettings.gizmoSize);
+
+            Gizmos.DrawWireSphere(transform.position, radius);
+
+
+
+            if (selected){
+                Color diskColor = color;
+                diskColor.a = color.a * 0.2f;
+                UnityEditor.Handles.color = diskColor;
+                UnityEditor.Handles.DrawSolidDisc(transform.position, transform.up, radius);
+            }
+
+
+            UnityEditor.Handles.color = color;
+
+            UnityEditor.Handles.ArrowHandleCap(
+                0,
+                transform.position + transform.up * radius,
+                Quaternion.LookRotation(transform.forward),
+                radius,
+                EventType.Repaint );
+
+
+                
+
+            var displayText = gameObject.name + "\n" + transform.position.ToString();
+            GizmosUtils.DrawString(displayText, transform.position + Vector3.up, debugSettings.textColor);
+        }
+
+
 
 	}
 

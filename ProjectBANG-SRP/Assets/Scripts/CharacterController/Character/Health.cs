@@ -4,7 +4,7 @@
     using System;
     using System.Collections;
 
-
+    [DisallowMultipleComponent]
     public class Health : MonoBehaviour
     {
         public delegate void OnTakeDamage(float amount, Vector3 position, Vector3 force, GameObject attacker, Collider hitCollider);

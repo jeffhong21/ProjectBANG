@@ -3,7 +3,7 @@ namespace CharacterController
     using UnityEngine;
 
 
-
+    [DisallowMultipleComponent]
     public class LayerManager : MonoBehaviour
     {
         //

@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8798b8e1d01a64f829f33f1e83237db4, type: 3}
+  m_Name: ExplorerFemale (SkinData)
+  m_EditorClassIdentifier: 
+  setId: ExplorerFemale
+  _characterMesh: {fileID: 6909915741132329524, guid: 0aa002b2664e74bf0af5e8f93b9b72a2,
+    type: 3}
+  _hairMesh: {fileID: 5923527839623921657, guid: 0aa002b2664e74bf0af5e8f93b9b72a2,
+    type: 3}
+  _hatMesh: {fileID: -1331703381080857889, guid: 0aa002b2664e74bf0af5e8f93b9b72a2,
+    type: 3}
+  _hatHairMesh: {fileID: -7036248200396244026, guid: 0aa002b2664e74bf0af5e8f93b9b72a2,
+    type: 3}
+  _facialHairMesh: {fileID: 0}

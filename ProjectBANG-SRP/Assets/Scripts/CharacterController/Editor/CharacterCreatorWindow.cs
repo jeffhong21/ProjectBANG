@@ -102,6 +102,17 @@ namespace CharacterController.CharacterCreator
                         //GUILayout.FlexibleSpace();
                     }
                 }
+                else{
+                    string helpboxMsg = "Something is missing.\n";
+                    if (m_animator == false)
+                        helpboxMsg += "• Animator is missing. \n";
+                    if (m_isHuman == false)
+                        helpboxMsg += "• Rig is not set to human. \n";
+                    if (m_isValidAvatar == false)
+                        helpboxMsg += "• Animator does not have a valid Avatar.";
+                    
+                    EditorGUILayout.HelpBox(helpboxMsg, MessageType.Error);
+                }
             }
 
 
@@ -211,7 +222,7 @@ namespace CharacterController.CharacterCreator
             // capsule collider 
             collider.height = ColliderHeight(_CharacterObject.GetComponent<Animator>());
             collider.center = new Vector3(0, (float)System.Math.Round(collider.height * 0.5f, 2), 0);
-            collider.radius = (float)System.Math.Round(collider.height * 0.15f, 2);
+            collider.radius = (float)System.Math.Round(collider.height * 0.2f, 2);
 
             ComponentUtility.MoveComponentDown(collider);
         }
@@ -222,6 +233,7 @@ namespace CharacterController.CharacterCreator
             var rigidbody = _CharacterObject.GetComponent<Rigidbody>();
             if (rigidbody == null) rigidbody = _CharacterObject.AddComponent<Rigidbody>();
 
+            //rigidbody.mass = _CharacterObject.M
             rigidbody.useGravity = true;
             rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
             rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;

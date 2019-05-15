@@ -39,7 +39,7 @@
     }
 
 
-
+    [DisallowMultipleComponent]
     public class AnimatorMonitor : MonoBehaviour
     {
         public readonly string BaseLayerName = "Base Layer";

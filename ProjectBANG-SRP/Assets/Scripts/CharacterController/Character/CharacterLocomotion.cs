@@ -4,7 +4,7 @@
     using System;
     using System.Collections;
 
-
+    [DisallowMultipleComponent]
     [RequireComponent(typeof(CapsuleCollider), typeof(Rigidbody), typeof(LayerManager))]
     public class CharacterLocomotion : MonoBehaviour
     {
@@ -49,7 +49,7 @@
 
 
         //[SerializeField, HideInInspector]
-        protected float m_GravityModifier = 0.4f;           //  TODO:  Need to add to editor
+        protected float m_GravityModifier = 2f;           //  TODO:  Need to add to editor
 
         [SerializeField, HideInInspector]
         protected bool m_AlignToGround = true;
@@ -96,7 +96,7 @@
 
 
 
-
+        [SerializeField]
         private bool m_CheckGround = true, m_UpdateRotation = true, m_UpdateMovement = true, m_UpdateAnimator = true, m_Move = true, m_CheckMovement = true;
 
         private CapsuleCollider m_CapsuleCollider;
@@ -162,6 +162,10 @@
 
 
 
+        public RaycastHit GroundHit{
+            get { return m_GroundHit; }
+        }
+
         public float GroundDistance{
             get { return m_GroundDistance; }
         }
@@ -215,38 +219,60 @@
 
         private void Update()
 		{
-            m_InputMagnitude = Mathf.SmoothDamp(m_InputMagnitude, m_InputVector.magnitude, ref m_InputMagSmooth, 0.1f);
-            if(m_InputMagnitude < 0.01f || m_InputMagnitude > 0.99f)
-                m_InputMagnitude = Mathf.Round(m_InputMagnitude);
-            if (m_InputMagnitude > 1)
-                m_InputVector.Normalize();
-            m_RelativeInputVector = m_InputVector;
+            m_Animator.applyRootMotion = m_UseRootMotion;
+            ////  Start Stop Actions.
+            //StartStopActions();
 
-            //m_Moving = m_InputMagnitude > m_StopMovementThreshold;
-            m_Moving = m_InputMagnitude > 0.2f;
+            m_CheckGround = true;
+            m_UpdateAnimator = true;
+            for (int i = 0; i < m_Actions.Length; i++)
+            {
+                if (m_Actions[i].enabled == false)
+                    continue;
+                CharacterAction charAction = m_Actions[i];
+                StopStartAction(charAction);
 
 
+                m_UpdateRotation = true;
+                m_UpdateAnimator = true;
+                if(charAction.IsActive)
+                {
+                    if (m_CheckGround) m_UpdateMovement = charAction.CheckGround();
+                    if (m_UpdateAnimator) m_UpdateAnimator = charAction.UpdateAnimator();
+                }
 
-
-            //  Start Stop Actions.
-            StartStopActions();
+                //  Call Action Update.
+                charAction.UpdateAction();
+            }
 
             CheckGround();
-
-            CheckMovement();
-
-            UpdateRotation();
-
-            UpdateMovement();
-
             UpdateAnimator();
-
 		}
 
 
 		private void FixedUpdate()
 		{
-			
+            m_CheckMovement = true;
+            m_UpdateRotation = true;
+            m_UpdateMovement = true;
+            for (int i = 0; i < m_Actions.Length; i++)
+            {
+                if (m_Actions[i].enabled == false)
+                    continue;
+                CharacterAction charAction = m_Actions[i];
+
+                if (charAction.IsActive)
+                {
+                    if (m_CheckMovement) m_CheckMovement = charAction.CheckMovement();
+                    if (m_UpdateRotation) m_UpdateRotation = charAction.UpdateRotation();
+                    if (m_UpdateMovement) m_UpdateMovement = charAction.UpdateMovement();
+                }
+            }  //  end of for loop
+
+
+            CheckMovement();
+            UpdateRotation();
+            UpdateMovement();
 		}
 
 
@@ -296,7 +322,7 @@
                     if (Physics.Raycast(m_StepRayStart, Vector3.down, out m_StepHit, m_MaxStepHeight - m_SkinWidth, m_Layers.GroundLayer) && !m_StepHit.collider.isTrigger){
                         if (m_StepHit.normal == Vector3.up){
                             if (m_StepHit.point.y >= (m_Transform.position.y) && m_StepHit.point.y <= (m_Transform.position.y + m_MaxStepHeight + m_SkinWidth)){
-                                m_Transform.position += (Vector3.up * m_StepOffset * m_InputMagnitude) + ((m_StepHit.point - m_Transform.position) * m_StepSpeed * m_DeltaTime);
+                                //m_Transform.position += (Vector3.up * m_StepOffset * m_InputMagnitude) + ((m_StepHit.point - m_Transform.position) * m_StepSpeed * m_DeltaTime);
                                 m_OnStep = true;
                             }
                         }
@@ -335,11 +361,25 @@
         private void CheckMovement()
         {
             //  First, do anything that is independent of a character action.
+            //  -----------
+            m_InputMagnitude = Mathf.SmoothDamp(m_InputMagnitude, m_InputVector.magnitude, ref m_InputMagSmooth, 0.1f);
+            if (m_InputMagnitude < 0.01f || m_InputMagnitude > 0.99f)
+                m_InputMagnitude = Mathf.Round(m_InputMagnitude);
+            if (m_InputMagnitude > 1)
+                m_InputVector.Normalize();
+            m_RelativeInputVector = m_InputVector;
+
+            //m_Moving = m_InputMagnitude > m_StopMovementThreshold;
+            m_Moving = m_InputMagnitude > 0.2f;
+
+
             m_RelativeInputVector = m_Transform.InverseTransformDirection(m_InputVector);
             m_RelativeInputVector = m_Transform.rotation * m_RelativeInputVector;
             m_RelativeInputVector = Vector3.ProjectOnPlane(m_RelativeInputVector, m_GroundNormal);
 
+            //  -----------
             //  Does the current active character action override this method.
+            //  -----------
             if (m_CheckMovement == true)
             {
                 Vector3 axisSign = Vector3.Cross(m_LookDirection, m_Transform.forward);
@@ -380,10 +420,11 @@
         private void UpdateRotation()
         {
             //  First, do anything that is independent of a character action.
+            //  -----------
 
-
-
+            //  -----------
             //  Does the current active character action override this method.
+            //  -----------
             if (m_UpdateRotation == true)
             {
                 if (m_LookDirection == Vector3.zero)
@@ -412,8 +453,12 @@
         private void UpdateMovement()
         {
             //  First, do anything that is independent of a character action.
+            //  -----------
 
+
+            //  -----------
             //  Does the current active character action override this method.
+            //  -----------
             if (m_UpdateMovement == true)
             {
                 m_Velocity = Vector3.SmoothDamp(m_Velocity, m_MoveDirection, ref m_VelocitySmooth, m_Acceleration);
@@ -425,41 +470,48 @@
         }
 
 
-
 		private void Move()
 		{
-            m_Animator.applyRootMotion = m_UseRootMotion;
+            //  First, do anything that is independent of a character action.
+            //  -----------
 
-            if(m_UseRootMotion)
+
+            //  -----------
+            //  Does the current active character action override this method.
+            //  -----------
+            if(m_Move == true)
             {
-                float angleInDegrees;
-                Vector3 rotationAxis;
-                m_Animator.deltaRotation.ToAngleAxis(out angleInDegrees, out rotationAxis);
-                Vector3 angularDisplacement = rotationAxis * angleInDegrees * Mathf.Deg2Rad * m_RotationSpeed;
-                m_Rigidbody.angularVelocity = angularDisplacement;
+                if (m_UseRootMotion)
+                {
+                    float angleInDegrees;
+                    Vector3 rotationAxis;
+                    m_Animator.deltaRotation.ToAngleAxis(out angleInDegrees, out rotationAxis);
+                    Vector3 angularDisplacement = rotationAxis * angleInDegrees * Mathf.Deg2Rad * m_RotationSpeed;
+                    m_Rigidbody.angularVelocity = angularDisplacement;
 
 
-                Vector3 velocity = (m_Animator.deltaPosition / m_DeltaTime) ;
-                velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
-                //m_Rigidbody.velocity = Vector3.SmoothDamp(m_Rigidbody.velocity, m_Velocity, ref m_VelocitySmooth, m_Moving ? m_Acceleration : m_MotorDamping);
-                //m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, m_MovementSpeed);
-                m_Rigidbody.velocity = velocity;
+                    Vector3 velocity = (m_Animator.deltaPosition / m_DeltaTime);
+                    velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
+                    //m_Rigidbody.velocity = Vector3.SmoothDamp(m_Rigidbody.velocity, m_Velocity, ref m_VelocitySmooth, m_Moving ? m_Acceleration : m_MotorDamping);
+                    //m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, m_MovementSpeed);
+                    m_Rigidbody.velocity = velocity;
+                }
             }
+
 		}
 
 
         private void OnAnimatorMove()
         {
-            // The anim speed multiplier allows the overall speed of walking/running to be tweaked in the inspector,
-            // which affects the movement speed because of the root motion.
-            m_Animator.speed = m_RootMotionSpeedMultiplier;
-
+            m_Move = true;
             for (int i = 0; i < m_Actions.Length; i++){
                 if (m_Actions[i].IsActive){
                     if (m_Move) m_Move = m_Actions[i].Move();
                 }
             }
-            if (m_Move) Move();
+
+
+            Move();
         }
 
 
@@ -467,6 +519,11 @@
 		private void UpdateAnimator()
         {
             //  First, do anything that is independent of a character action.
+            //  -----------
+
+            // The anim speed multiplier allows the overall speed of walking/running to be tweaked in the inspector,
+            // which affects the movement speed because of the root motion.
+            m_Animator.speed = m_RootMotionSpeedMultiplier;
 
             m_Animator.SetFloat(Animator.StringToHash("StartAngle"), m_StartAngle);
             m_Animator.SetBool(HashID.Moving, m_Moving);
@@ -486,7 +543,10 @@
             m_Animator.SetFloat(Animator.StringToHash("RightFootUp"), m_Animator.pivotWeight);
 
 
+
+            //  -----------
             //  Does a character action override the controllers update animator.
+            //  -----------
             if (m_UpdateAnimator == true)
             {
                 //  Movement Input
@@ -499,7 +559,7 @@
 
 
 
-
+        #region Public Functions
 
         public void SetPosition(Vector3 position){
             m_Rigidbody.MovePosition(position);
@@ -524,45 +584,15 @@
         }
 
 
-        int contactCount;
-		private void OnCollisionEnter(Collision collision)
-		{
-            OnCollision(collision);
-		}
-
-
-		private void OnCollisionStay(Collision collision)
-		{
-            OnCollision(collision);
-		}
-
-        private void OnCollisionExit(Collision collision)
-        {
-            contactCount = 0;
-        }
-
-        private void OnCollision(Collision collision)
-        {
-            contactCount = collision.contactCount;
-            for (int i = 0; i < collision.contactCount; i++)
-            {
-                var start = m_Animator.bodyPosition;
-                var contactDir = collision.GetContact(i).point - start;
-                Debug.DrawLine(start, collision.GetContact(i).point, Color.yellow);
-                //Debug.DrawRay(start, contactDir, Color.yellow);
-            }
-        }
+        #endregion
 
 
 
 
 
+        #region Actions
 
-
-
-		#region Actions
-
-		private void StartStopActions()
+        private void StartStopActions()
         {
             for (int i = 0; i < m_Actions.Length; i++)
             {
@@ -599,7 +629,7 @@
                             {
                                 //  Start the Action and update the animator.
                                 m_Actions[i].StartAction();
-                                m_Actions[i].UpdateAnimator();
+                                //m_Actions[i].UpdateAnimator();
                                 //  Set active Action if not concurrent.
                                 if (m_Actions[i].IsConcurrentAction() == false)
                                     m_ActiveAction = m_Actions[i];
@@ -626,34 +656,77 @@
                 }
 
 
-                //  Next, if current Action is active, update overrides.
-                m_CheckMovement = m_UpdateRotation = m_UpdateMovement = m_UpdateAnimator = m_Move = true;
                 //  Call Action Update.
                 m_Actions[i].UpdateAction();
 
-                if (m_Actions[i].IsActive)
-                {
-                    if (m_CheckMovement)
-                    {
-                        m_CheckMovement = m_Actions[i].CheckMovement();
-                    }
-                    if (m_UpdateRotation)
-                    {
-                        m_UpdateRotation = m_Actions[i].UpdateRotation();
-                    }
-                    if (m_UpdateMovement)
-                    {
-                        m_UpdateMovement = m_Actions[i].UpdateMovement();
-                    }
-                    if (m_UpdateAnimator)
-                    {
-                        m_UpdateAnimator = m_Actions[i].UpdateAnimator();
-                    }
-                }
-
-
             }  //  end of for loop
             //  end of
+        }
+
+
+
+
+        private void StopStartAction(CharacterAction charAction)
+        {
+            //  First, check if current Action can Start or Stop.
+
+            //  Current Action is Active.
+            if (charAction.enabled && charAction.IsActive)
+            {
+                //  Check if can stop Action is StopType is NOT Manual.
+                if (charAction.StopType != ActionStopType.Manual)
+                {
+                    if (charAction.CanStopAction())
+                    {
+                        //  Start the Action and update the animator.
+                        charAction.StopAction();
+                        //  Reset Active Action.
+                        if (m_ActiveAction = charAction)
+                            m_ActiveAction = null;
+                        //  Move on to the next Action.
+                        return;
+                    }
+                }
+            }
+            //  Current Action is NOT Active.
+            else
+            {
+                //  Check if can start Action is StartType is NOT Manual.
+                if (charAction.enabled && charAction.StartType != ActionStartType.Manual)
+                {
+                    if (m_ActiveAction == null)
+                    {
+                        if (charAction.CanStartAction())
+                        {
+                            //  Start the Action and update the animator.
+                            charAction.StartAction();
+                            //charAction.UpdateAnimator();
+                            //  Set active Action if not concurrent.
+                            if (charAction.IsConcurrentAction() == false)
+                                m_ActiveAction = charAction;
+                            //  Move onto the next Action.
+                            return;
+                        }
+                    }
+                    else if (charAction.IsConcurrentAction())
+                    {
+                        if (charAction.CanStartAction())
+                        {
+                            //  Start the Action and update the animator.
+                            charAction.StartAction();
+                            //charAction.UpdateAnimator();
+                            //  Move onto the next Action.
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+            }
+
+
         }
 
 
@@ -851,59 +924,60 @@
         }
 
 
-        private void DebugMessages()
-        {
-            debugMsgs = new string[]
-            {
-                //string.Format("Input Mag: {0}", m_InputMagnitude),
-                //string.Format("Input Angle: {0}", m_InputAngle),
-                //string.Format("Start Angle Vector: {0}", m_StartAngle),
-                //string.Format("Relative Input: {0}", m_RelativeInputVector),
-                //string.Format("Pivot Position: {0}", m_Animator.pivotPosition),
-                //string.Format("Pivot Weight: {0}", m_Animator.pivotWeight),
-                //string.Format("Center of Mass: {0}", m_Animator.bodyPosition),
-                //string.Format("Feet Pivot Action: {0}", m_Animator.feetPivotActive),
+        //private void DebugMessages()
+        //{
+        //    debugMsgs = new string[]
+        //    {
+        //        string.Format("Input Mag: {0}", m_InputMagnitude),
+        //        string.Format("Input Angle: {0}", m_InputAngle),
+        //        string.Format("Start Angle Vector: {0}", m_StartAngle),
+        //        string.Format("Relative Input: {0}", m_RelativeInputVector),
+        //        string.Format("Pivot Position: {0}", m_Animator.pivotPosition),
+        //        string.Format("Pivot Weight: {0}", m_Animator.pivotWeight),
+        //        string.Format("Center of Mass: {0}", m_Animator.bodyPosition),
+        //        string.Format("Feet Pivot Action: {0}", m_Animator.feetPivotActive),
 
 
-                string.Format("Next State (short): {0}\n", m_Animator.GetNextAnimatorStateInfo(0).shortNameHash),
-                string.Format("Current State (short): {0}\n", m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash),
-                string.Format("Next State (full): {0}\n", m_Animator.GetNextAnimatorStateInfo(0).fullPathHash),
-                string.Format("Current State (full): {0}\n", m_Animator.GetCurrentAnimatorStateInfo(0).fullPathHash),
-                string.Format("In Transition?: {0}\n", m_Animator.IsInTransition(0)),
-                string.Format("Transition Norm Time: {0}\n", m_Animator.GetAnimatorTransitionInfo(0).normalizedTime),
-                string.Format("Transition Duration: {0}\n", m_Animator.GetAnimatorTransitionInfo(0).duration),
-            };
-        }
+        //        string.Format("Next State (short): {0}\n", m_Animator.GetNextAnimatorStateInfo(0).shortNameHash),
+        //        string.Format("Current State (short): {0}\n", m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash),
+        //        string.Format("Next State (full): {0}\n", m_Animator.GetNextAnimatorStateInfo(0).fullPathHash),
+        //        string.Format("Current State (full): {0}\n", m_Animator.GetCurrentAnimatorStateInfo(0).fullPathHash),
+        //        string.Format("In Transition?: {0}\n", m_Animator.IsInTransition(0)),
+        //        string.Format("Transition Norm Time: {0}\n", m_Animator.GetAnimatorTransitionInfo(0).normalizedTime),
+        //        string.Format("Transition Duration: {0}\n", m_Animator.GetAnimatorTransitionInfo(0).duration),
+        //    };
+        //}
 
 
-        //Color debugTextColor = new Color(0, 1f, 1f, 1);
-        Color debugTextColor = Color.black;
-        string[] debugMsgs;
-        Rect groupRect = new Rect(10, 50, 200, 20);
-        Rect rect = new Rect(10, 50, 200, 20);
-        float rectStartHeight = 50;
-        float labelHeight = 16;
-        private void OnGUI()
-        {
-            if (Application.isPlaying)
-            {
-                GUI.color = debugTextColor;
-                DebugMessages();
+        ////Color debugTextColor = new Color(0, 1f, 1f, 1);
+        //Color debugTextColor = Color.black;
+        //string[] debugMsgs;
+        //Rect groupRect = new Rect(10, 50, 200, 20);
+        //Rect rect = new Rect(10, 50, 200, 20);
+        //float rectStartHeight = 50;
+        //float labelHeight = 16;
+        //private void OnGUI()
+        //{
+        //    if (Application.isPlaying)
+        //    {
+        //        GUI.color = debugTextColor;
+        //        DebugMessages();
 
-                rect.y = rectStartHeight;
-                //groupRect.y = rect.y + rectStartHeight * 2;
-                groupRect.height = labelHeight * debugMsgs.Length + rectStartHeight;
+        //        rect.y = rectStartHeight;
+        //        //groupRect.y = rect.y + rectStartHeight * 2;
+        //        groupRect = rect;
+        //        groupRect.height = labelHeight * debugMsgs.Length + rectStartHeight;
 
-                GUI.BeginGroup(groupRect, GUI.skin.box);
-                for (int i = 0; i < debugMsgs.Length; i++)
-                {
-                    rect.y = rectStartHeight + labelHeight * i;
-                    GUI.Label(rect, debugMsgs[i]);
-                }
-                GUI.EndGroup();
-            }
+        //        GUI.BeginGroup(groupRect, GUI.skin.box);
+        //        for (int i = 0; i < debugMsgs.Length; i++)
+        //        {
+        //            rect.y = rectStartHeight + labelHeight * i;
+        //            GUI.Label(rect, debugMsgs[i]);
+        //        }
+        //        GUI.EndGroup();
+        //    }
 
-        }
+        //}
 
 
 

@@ -16,7 +16,7 @@ TagManager:
   - 
   - PostProcessing
   - Entities
-  - 
+  - Ragdoll
   - 
   - 
   - 
@@ -31,9 +31,9 @@ TagManager:
   - 
   - 
   - Climbable
-  - Vault
+  - Vaultable
   - Cover
-  - Ground
+  - Solid
   - VisualEffects
   - CharacterCollider
   - Agent

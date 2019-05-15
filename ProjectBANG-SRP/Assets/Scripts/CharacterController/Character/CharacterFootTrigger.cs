@@ -7,7 +7,7 @@ namespace CharacterController
     [RequireComponent(typeof(SphereCollider), typeof(AudioSource))]
     public class CharacterFootTrigger : MonoBehaviour
     {
-        private string[] m_GroundTags = { "Ground" };
+
 
         [SerializeField]
         protected float radius = 0.1f;
@@ -53,7 +53,8 @@ namespace CharacterController
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.gameObject.layer == LayerMask.NameToLayer("Ground")) ;
+            //if (other.gameObject.layer == LayerMask.NameToLayer("Solid")) ;
+            if (other.gameObject.layer == layerManager.GroundLayer) ;
             {
                 if (m_Footsteps != null)
                 {
@@ -62,57 +63,6 @@ namespace CharacterController
                     m_Footsteps.PlayFootFallSound(this);
                 }
             }
-            //if (other.CompareTag(m_GroundTags[0]))
-            //{
-            //    if (m_Footsteps != null)
-            //    {
-            //        m_Footsteps.StepOnMesh(this);
-            //        m_Footsteps.PlayFootFallSound(this);
-            //    }
-            //}
-
-
-            //if(Time.timeSinceLevelLoad > timeDelay){
-            //    for (int i = 0; i < m_GroundTags.Length; i++)
-            //    {
-                    
-            //        if(other.gameObject.layer == layerManager.GroundLayer){
-            //            if (m_Footsteps != null)
-            //            {
-            //                Debug.Log(other.gameObject.name + " | " + other.gameObject.layer);
-            //            }
-            //        }
-            //        if (other.CompareTag(m_GroundTags[i]))
-            //        {
-            //            if (m_Footsteps != null)
-            //            {
-            //                m_Footsteps.StepOnMesh(this);
-            //                m_Footsteps.PlayFootFallSound(this);
-            //            }
-            //        }
-            //    }
-            //    ////  Compare Layers.
-            //    //if(other.gameObject.layer == LayerMask.NameToLayer("Solid")){
-            //    //    if (m_Footsteps != null){
-            //    //        m_Footsteps.StepOnMesh(this);
-            //    //        m_Footsteps.PlayFootFallSound(this);
-            //    //    }
-            //    //}
-            //    ////  Compare Tags.
-            //    //else{
-            //    //    for (int i = 0; i < m_GroundTags.Length; i++){
-            //    //        if (other.CompareTag(m_GroundTags[i])){
-            //    //            if (m_Footsteps != null){
-            //    //                m_Footsteps.StepOnMesh(this);
-            //    //                m_Footsteps.PlayFootFallSound(this);
-            //    //            }
-            //    //        }
-            //    //    }
-            //    //}
-
-
-            //}
-
 
 
 

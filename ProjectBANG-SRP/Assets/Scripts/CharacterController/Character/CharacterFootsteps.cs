@@ -62,11 +62,13 @@ namespace CharacterController
         {
             if (m_Controller.Grounded && Time.timeSinceLevelLoad > m_FootstepThreshold && m_SpawnFootprints)
             {
-                var position = sender.transform.position + m_Controller.transform.up * 0.02f;
-                var rotation = Quaternion.LookRotation(m_Controller.transform.forward, Vector3.up);
-                var footStep = ObjectPool.Instantiate(m_Decal, position, rotation);
+                if(sender.transform.position.y < m_Controller.transform.position.y + 0.1f){
+                    var position = sender.transform.position + m_Controller.transform.up * 0.02f;
+                    var fwdDirection = Vector3.Cross(m_Transform.right, m_Controller.GroundHit.normal);
+                    var rotation = Quaternion.LookRotation(fwdDirection, m_Controller.GroundHit.normal);
+                    var footStep = ObjectPool.Instantiate(m_Decal, position, rotation);
+                }
                 m_FootstepThreshold = Time.timeSinceLevelLoad + m_FootstepTimer;
-
                 m_currentStep = sender.transform;
             }
 

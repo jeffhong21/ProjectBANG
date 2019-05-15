@@ -2,6 +2,7 @@
 {
     using UnityEngine;
 
+    [DisallowMultipleComponent]
     public class CharacterIK : MonoBehaviour
     {
         private readonly float m_LookAtRayLength = 10;
