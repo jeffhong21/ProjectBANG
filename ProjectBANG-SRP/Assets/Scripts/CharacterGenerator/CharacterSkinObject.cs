@@ -8,10 +8,17 @@ namespace CharacterSkins
     public class CharacterSkinObject : MonoBehaviour
     {
         [DisplayOnly]
-        public string id;
+        protected string _skinId;
+        public string skinId{
+            get{
+                if(_skinId == string.IsNullOrWhiteSpace)
+                    _skinId = gameObject.name;
+                return skinId;
+            }
+            set{_skinId = value; }
+        }
 
-        public HumanBodyBones bodyBone;
-
+        protected HumanBodyBones bodyBone;
 
 
 

@@ -16,50 +16,43 @@ namespace CharacterSkins
     {
         [SerializeField]
         protected string setId;
-        [Header("-- Mesh --")]
+        [Header("-- Mesh Data --")]
         [SerializeField]
-        protected Mesh _characterMesh;
-        [Header("-- Hair --")]
+        protected Mesh characterMesh;
         [SerializeField]
-        protected Mesh _hairMesh;
-        [Header("-- Hat --")]
+        protected Mesh hairMesh;
         [SerializeField]
-        protected Mesh _hatMesh;
+        protected Mesh hatHairMesh;
+        [Header("-- Texture Data --")]
         [SerializeField]
-        protected Mesh _hatHairMesh;
-        [Header("-- Facial Hair --")]
+        protected TextureSetData textureSetData;
         [SerializeField]
-        protected Mesh _facialHairMesh;
-
-
+        protected Material skinMaterial;
 
 
         public string SetId{
             get { return setId; }
         }
 
-        public Mesh characterMesh{
-            get { return _characterMesh; }
+        public Mesh CharacterMesh{
+            get { return characterMesh; }
         }
 
-        public Mesh hairMesh{
-            get { return _hairMesh; }
+        public Mesh HairMesh{
+            get { return hairMesh; }
         }
 
-        public Mesh hatMesh{
-            get { return _hatMesh; }
+        public Mesh HatHairMesh{
+            get { return hatHairMesh; }
         }
 
-        public Mesh hatHairMesh{
-            get { return _hatHairMesh; }
+        public TextureSetData SkinTextureSet{
+            get { return textureSetData; }
         }
 
-        public Mesh facialHairMesh{
-            get { return _facialHairMesh; }
+        public Material SkinMaterial{
+            get { return skinMaterial; }
         }
-
-
-
 
     }
 
