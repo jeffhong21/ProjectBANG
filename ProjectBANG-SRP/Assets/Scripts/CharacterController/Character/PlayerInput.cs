@@ -177,7 +177,7 @@ namespace CharacterController
 
         private void DebugButtonPress()
         {
-            if (Input.GetKeyDown(KeyCode.E))
+            if (Input.GetKeyDown(KeyCode.O))
             {
                 var health = GetComponent<CharacterHealth>();
                 health.TakeDamage(10, m_Transform.position + Vector3.up, -m_Transform.right, m_GameObject);

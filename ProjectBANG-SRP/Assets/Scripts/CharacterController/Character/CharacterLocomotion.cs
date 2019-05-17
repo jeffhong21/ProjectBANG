@@ -3,6 +3,7 @@
     using UnityEngine;
     using System;
     using System.Collections;
+    using System.Text;
 
     [DisallowMultipleComponent]
     [RequireComponent(typeof(CapsuleCollider), typeof(Rigidbody), typeof(LayerManager))]
@@ -39,7 +40,7 @@
         protected float m_SlopeLimit = 45f;
         [SerializeField, HideInInspector]
         protected float m_MaxStepHeight = 0.25f;
-
+        protected float m_GroundStickiness = 6f;             //  TODO:  Need to add to editor
         protected float m_ExternalForceDamping = 0.1f;      //  TODO:  Need to add to editor
         [SerializeField, HideInInspector, Range(0, 0.3f), Tooltip("Minimum height to consider a step.")]
         protected float m_StepOffset = 0.15f;
@@ -70,20 +71,21 @@
         [Header("-- Debug --")]
         [SerializeField] bool m_DrawDebugLine;
         private MovementType m_MovementType = MovementType.Adventure;
-        private bool m_Grounded = true;
-        private bool m_Aiming, m_Moving;
+        [SerializeField, DisplayOnly]
+        private bool m_Grounded = true, m_Moving;
+        private bool m_Aiming;
         private float m_InputMagnitude, m_InputMagSmooth;
         private float m_InputAngle, m_InputAngleSmooth, m_InputAngleDamp = 0.18f;
-        private Vector3 m_Velocity;
+        private Vector3 m_Velocity, m_VerticalVelocity;
         private Vector3 m_InputVector, m_RelativeInputVector;
         private Vector3 m_LookDirection;
         private Quaternion m_LookRotation;
         private Vector3 m_MoveDirection;
         private Vector3 m_ExternalForce;
         private Vector3 m_GroundNormal;
-
-
-
+        private Vector3 m_Gravity;
+        private float m_VelocityY;
+        private float m_Stickiness;
 
         private float m_StartAngle, m_StartAngleSmooth;
         private RaycastHit m_GroundHit, m_StepHit;
@@ -96,7 +98,7 @@
 
 
 
-        [SerializeField]
+        //[SerializeField]
         private bool m_CheckGround = true, m_UpdateRotation = true, m_UpdateMovement = true, m_UpdateAnimator = true, m_Move = true, m_CheckMovement = true;
 
         private CapsuleCollider m_CapsuleCollider;
@@ -223,7 +225,7 @@
             ////  Start Stop Actions.
             //StartStopActions();
 
-            m_CheckGround = true;
+
             m_UpdateAnimator = true;
             for (int i = 0; i < m_Actions.Length; i++)
             {
@@ -233,11 +235,7 @@
                 StopStartAction(charAction);
 
 
-                m_UpdateRotation = true;
-                m_UpdateAnimator = true;
-                if(charAction.IsActive)
-                {
-                    if (m_CheckGround) m_UpdateMovement = charAction.CheckGround();
+                if(charAction.IsActive){
                     if (m_UpdateAnimator) m_UpdateAnimator = charAction.UpdateAnimator();
                 }
 
@@ -245,14 +243,17 @@
                 charAction.UpdateAction();
             }
 
-            CheckGround();
+            deltaAngle = 0;
             UpdateAnimator();
 		}
 
 
 		private void FixedUpdate()
 		{
+            m_Gravity = Physics.gravity;
+
             m_CheckMovement = true;
+            m_CheckGround = true;
             m_UpdateRotation = true;
             m_UpdateMovement = true;
             for (int i = 0; i < m_Actions.Length; i++)
@@ -264,6 +265,7 @@
                 if (charAction.IsActive)
                 {
                     if (m_CheckMovement) m_CheckMovement = charAction.CheckMovement();
+                    if (m_CheckGround) m_CheckGround = charAction.CheckGround();
                     if (m_UpdateRotation) m_UpdateRotation = charAction.UpdateRotation();
                     if (m_UpdateMovement) m_UpdateMovement = charAction.UpdateMovement();
                 }
@@ -271,6 +273,7 @@
 
 
             CheckMovement();
+            CheckGround();
             UpdateRotation();
             UpdateMovement();
 		}
@@ -295,60 +298,21 @@
             //  Does the current active character action override this method.
             if (m_CheckGround == true)
             {
-                if (m_CapsuleCollider != null)
-                {
-                    float distance = 10f;
-                    //  Position of the SphereCast origin starting at the base of the capsule.
-                    Vector3 pos = m_Transform.position + Vector3.up * (m_CapsuleCollider.radius);
+                m_Grounded = false;
 
-                    if (Physics.Raycast(m_Transform.position + Vector3.up * (m_CapsuleCollider.height / 2), Vector3.down,
-                                        out m_GroundHit, m_CapsuleCollider.height / 2 + 2 + m_SkinWidth, m_Layers.GroundLayer))
-                    {
-                        distance = m_Transform.position.y - m_GroundHit.point.y;
-                    }
-                    if (Physics.SphereCast(m_Transform.position + Vector3.up * (m_CapsuleCollider.radius), m_CapsuleCollider.radius * 0.9f,
-                                           -Vector3.up, out m_GroundHit, m_CapsuleCollider.radius * 1 + 2, m_Layers.GroundLayer))
-                    {
-                        // check if sphereCast distance is small than the ray cast distance
-                        if (distance > (m_GroundHit.distance - m_CapsuleCollider.radius * 0.1f))
-                            distance = (m_GroundHit.distance - m_CapsuleCollider.radius * 0.1f);
-                    }
+                Physics.SphereCast(m_Transform.position + Vector3.up * (m_CapsuleCollider.radius), m_CapsuleCollider.radius * 0.9f,
+                   -Vector3.up, out m_GroundHit, m_CapsuleCollider.radius * 2, m_Layers.GroundLayer);
+                m_GroundDistance = Vector3.Project(m_Rigidbody.position - m_GroundHit.point, m_Transform.up).magnitude;
+                m_GroundDistance = (float)Math.Round(m_GroundDistance, 2);
+                float airbornThreshold = 0.1f;
 
-                    m_GroundDistance = (float)Math.Round(distance, 2);
-
-                    //  Check if on step.
-                    m_OnStep = false;
-                    m_StepRayStart = (m_Transform.position + Vector3.up * m_MaxStepHeight) + m_Transform.forward * (m_CapsuleCollider.radius * 2);  //+ m_SkinWidth);
-                    if (Physics.Raycast(m_StepRayStart, Vector3.down, out m_StepHit, m_MaxStepHeight - m_SkinWidth, m_Layers.GroundLayer) && !m_StepHit.collider.isTrigger){
-                        if (m_StepHit.normal == Vector3.up){
-                            if (m_StepHit.point.y >= (m_Transform.position.y) && m_StepHit.point.y <= (m_Transform.position.y + m_MaxStepHeight + m_SkinWidth)){
-                                //m_Transform.position += (Vector3.up * m_StepOffset * m_InputMagnitude) + ((m_StepHit.point - m_Transform.position) * m_StepSpeed * m_DeltaTime);
-                                m_OnStep = true;
-                            }
-                        }
-                    }
+                if(m_GroundDistance < airbornThreshold){
+                    Vector3 horizontalVelocity = Vector3.Project(m_Rigidbody.velocity, m_Gravity);
+                    m_Stickiness = m_GroundStickiness * horizontalVelocity.magnitude * airbornThreshold;
+                    m_Grounded = true;
+                } 
 
 
-                    if (m_GroundDistance <= 0.05f)
-                    {
-                        m_SlopeAngle = (float)Math.Round(Vector3.Angle(m_Transform.forward, m_GroundHit.normal) - 90, 2);
-                        m_Grounded = true;
-                    }
-                    else
-                    {
-                        if (m_GroundDistance >= 0.5f)
-                        {
-                            m_SlopeAngle = 0;
-                            m_Grounded = false;
-                            m_Rigidbody.AddForce(Physics.gravity * m_DeltaTime, ForceMode.VelocityChange);
-                        }
-                        else if (m_OnStep == false)
-                        {
-                            m_Rigidbody.AddForce(Physics.gravity * 2 * m_DeltaTime, ForceMode.VelocityChange);
-                        }
-
-                    }
-                }
                 m_GroundNormal = m_GroundHit.normal;
             }
 
@@ -362,32 +326,28 @@
         {
             //  First, do anything that is independent of a character action.
             //  -----------
-            m_InputMagnitude = Mathf.SmoothDamp(m_InputMagnitude, m_InputVector.magnitude, ref m_InputMagSmooth, 0.1f);
+            //m_InputMagnitude = Mathf.SmoothDamp(m_InputMagnitude, m_InputVector.magnitude, ref m_InputMagSmooth, 0.1f);
+            m_InputMagnitude = m_InputVector.magnitude;
             if (m_InputMagnitude < 0.01f || m_InputMagnitude > 0.99f)
                 m_InputMagnitude = Mathf.Round(m_InputMagnitude);
             if (m_InputMagnitude > 1)
                 m_InputVector.Normalize();
-            m_RelativeInputVector = m_InputVector;
+            
+            m_Moving = m_InputMagnitude > m_StopMovementThreshold;
+            //m_Moving = m_InputMagnitude > 0.2f;
 
-            //m_Moving = m_InputMagnitude > m_StopMovementThreshold;
-            m_Moving = m_InputMagnitude > 0.2f;
 
 
-            m_RelativeInputVector = m_Transform.InverseTransformDirection(m_InputVector);
-            m_RelativeInputVector = m_Transform.rotation * m_RelativeInputVector;
-            m_RelativeInputVector = Vector3.ProjectOnPlane(m_RelativeInputVector, m_GroundNormal);
 
             //  -----------
             //  Does the current active character action override this method.
             //  -----------
             if (m_CheckMovement == true)
             {
+                //  Start walk angle
                 Vector3 axisSign = Vector3.Cross(m_LookDirection, m_Transform.forward);
-
-
                 m_InputAngle = Vector3.Angle(m_Transform.forward, m_LookDirection) * (axisSign.y >= 0 ? -1f : 1f);
                 m_InputAngle = (float)Math.Round(m_InputAngle, 2);
-
                 //m_StartAngle = m_InputAngle;
                 if (m_InputMagnitude <= 0.2f)
                     m_StartAngle = m_InputAngle;
@@ -398,15 +358,24 @@
 
 
 
+                m_VerticalVelocity = Vector3.Project(m_Rigidbody.velocity, m_Gravity);
+                m_VelocityY = m_VerticalVelocity.magnitude;
+                if (Vector3.Dot(m_VerticalVelocity, m_Gravity) > 0)
+                    m_VelocityY = -m_VelocityY;
+
+
+
                 m_MoveDirection = Vector3.Cross(m_Transform.right, m_GroundHit.normal) * m_InputMagnitude;
 
                 if (m_Grounded)
                 {
-
+                    m_Rigidbody.velocity = m_Rigidbody.velocity - m_Transform.up * m_Stickiness * m_DeltaTime;
                 }
                 if (m_SlopeAngle > m_SlopeLimit)
                 {
-
+                    if(m_InputVector == Vector3.zero && m_Rigidbody.velocity.sqrMagnitude < (0.5f * 0.5f)){
+                        m_Rigidbody.velocity = Vector3.zero;
+                    }
                 }
                 if (m_OnStep)
                 {
@@ -432,21 +401,23 @@
 
                 if (m_InputMagnitude > 0.2f && m_LookDirection.sqrMagnitude > 0.2f)
                 {
-                    var lookDirection = m_LookDirection.normalized;
-                    m_LookRotation = Quaternion.LookRotation(lookDirection, m_Transform.up);
+                    Vector3 local = m_Transform.InverseTransformDirection(m_LookDirection);
+                    float angle = Mathf.Atan2(local.x, local.z) * Mathf.Rad2Deg;
+                    if (m_InputVector == Vector3.zero)
+                        angle *= (1.01f - (Mathf.Abs(angle) / 180)) * 1;
 
-                    if (m_Grounded)
-                    {
-                        m_LookRotation = Quaternion.Slerp(m_Transform.rotation, m_LookRotation, m_RotationSpeed * m_DeltaTime);
+                    //m_Rigidbody.MoveRotation(Quaternion.AngleAxis(angle * m_DeltaTime * m_RotationSpeed, m_Transform.up) * m_Rigidbody.rotation);
+                
 
-                        m_Rigidbody.MoveRotation(m_LookRotation.normalized);
-                    }
+                    Quaternion rotation = Quaternion.AngleAxis(angle * m_DeltaTime * m_RotationSpeed, m_Transform.up);
+                    Vector3 d = transform.position - m_Animator.pivotPosition;
+                    m_Rigidbody.MovePosition(m_Animator.pivotPosition + rotation * d);
+                    m_Rigidbody.MoveRotation(rotation * transform.rotation);
                 }
-
-
             }
-
         }
+
+
 
 
         //  Apply any movement.
@@ -461,15 +432,30 @@
             //  -----------
             if (m_UpdateMovement == true)
             {
-                m_Velocity = Vector3.SmoothDamp(m_Velocity, m_MoveDirection, ref m_VelocitySmooth, m_Acceleration);
-                m_Velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
-                if (m_SlopeAngle < -10)
-                    m_Velocity += Vector3.down * m_SlopeForceDown;
-                m_Rigidbody.AddForce(m_Velocity * m_DeltaTime, ForceMode.VelocityChange);
+                if (Vector3.Dot(m_VerticalVelocity, m_Gravity) < 0f){
+                    float maxVerticalVelocityOnGround = 3;
+                    m_VerticalVelocity = Vector3.ClampMagnitude(m_VerticalVelocity, maxVerticalVelocityOnGround);
+                }
+                //m_Velocity + m_VerticalVelocity;
+                m_Velocity = m_MoveDirection * m_InputMagnitude + (m_DeltaTime * (Physics.gravity * m_GravityModifier));
+                if(m_Grounded)
+                {
+                    //m_Velocity = Vector3.SmoothDamp(m_Velocity, m_MoveDirection, ref m_VelocitySmooth, m_Acceleration);
+                    m_Velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
+                    if (m_SlopeAngle < 0)
+                        m_Velocity += Vector3.down * m_SlopeForceDown;
+                    //m_Rigidbody.AddForce(m_Velocity * m_DeltaTime, ForceMode.VelocityChange);
+                    m_Rigidbody.velocity = m_Velocity * m_DeltaTime + m_VerticalVelocity;
+                }
+                else{
+                    m_Rigidbody.AddForce(m_Gravity * m_GravityModifier);
+                }
+
             }
         }
 
 
+        float deltaAngle;
 		private void Move()
 		{
             //  First, do anything that is independent of a character action.
@@ -489,6 +475,8 @@
                     Vector3 angularDisplacement = rotationAxis * angleInDegrees * Mathf.Deg2Rad * m_RotationSpeed;
                     m_Rigidbody.angularVelocity = angularDisplacement;
 
+                    Vector3 f = m_Animator.deltaRotation * Vector3.forward;
+                    deltaAngle += Mathf.Atan2(f.x, f.z) * Mathf.Rad2Deg;
 
                     Vector3 velocity = (m_Animator.deltaPosition / m_DeltaTime);
                     velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
@@ -911,12 +899,12 @@
                 //GizmosUtils.DrawString("m_Velocity", m_Transform.position + m_Velocity, Color.white);
 
                 Gizmos.color = Color.blue;
-                Gizmos.DrawRay(m_Transform.position + m_DebugHeightOffset, m_LookDirection);
-                GizmosUtils.DrawString("m_LookDirection", m_Transform.position + m_LookDirection, Color.white);
+                Gizmos.DrawRay(m_Transform.position + m_DebugHeightOffset, m_MoveDirection);
+                //GizmosUtils.DrawString("m_LookDirection", m_Transform.position + m_MoveDirection, Color.white);
 
                 Gizmos.color = m_OnStep ? Color.yellow : Color.white;
                 Gizmos.DrawRay(m_StepRayStart, Vector3.down * (m_MaxStepHeight - m_SkinWidth));
-                GizmosUtils.DrawString("Step", m_StepRayStart + Vector3.up * m_MaxStepHeight, Color.white);
+                //GizmosUtils.DrawString("Step", m_StepRayStart + Vector3.up * m_MaxStepHeight, Color.white);
 
 
 
@@ -924,60 +912,67 @@
         }
 
 
-        //private void DebugMessages()
-        //{
-        //    debugMsgs = new string[]
-        //    {
-        //        string.Format("Input Mag: {0}", m_InputMagnitude),
-        //        string.Format("Input Angle: {0}", m_InputAngle),
-        //        string.Format("Start Angle Vector: {0}", m_StartAngle),
-        //        string.Format("Relative Input: {0}", m_RelativeInputVector),
-        //        string.Format("Pivot Position: {0}", m_Animator.pivotPosition),
-        //        string.Format("Pivot Weight: {0}", m_Animator.pivotWeight),
-        //        string.Format("Center of Mass: {0}", m_Animator.bodyPosition),
-        //        string.Format("Feet Pivot Action: {0}", m_Animator.feetPivotActive),
+        private void DebugMessages()
+        {
+            //debugMessages.AppendFormat("Ground Distance: {0} \n", m_GroundDistance);
+            //debugMessages.AppendFormat("VelocityY: {0} \n", (float)Math.Round(m_VelocityY, 2));
+            //debugMessages.AppendFormat("Grounded: {0} \n", m_Grounded);
+            //debugMessages.AppendFormat("deltaAngle: {0} \n", deltaAngle);
+            debugMsgs = new string[]
+            {
+                string.Format("Ground Distance: {0}", m_GroundDistance),
+                string.Format("VelocityY: {0}", (float)Math.Round(m_VelocityY, 2)),
+                string.Format("Grounded: {0}", m_Grounded),
+                string.Format("deltaAngle: {0}", deltaAngle),
+                string.Format("RigidbodyVelY: {0}", (float)Math.Round(m_Rigidbody.velocity.y, 2)),
 
 
-        //        string.Format("Next State (short): {0}\n", m_Animator.GetNextAnimatorStateInfo(0).shortNameHash),
-        //        string.Format("Current State (short): {0}\n", m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash),
-        //        string.Format("Next State (full): {0}\n", m_Animator.GetNextAnimatorStateInfo(0).fullPathHash),
-        //        string.Format("Current State (full): {0}\n", m_Animator.GetCurrentAnimatorStateInfo(0).fullPathHash),
-        //        string.Format("In Transition?: {0}\n", m_Animator.IsInTransition(0)),
-        //        string.Format("Transition Norm Time: {0}\n", m_Animator.GetAnimatorTransitionInfo(0).normalizedTime),
-        //        string.Format("Transition Duration: {0}\n", m_Animator.GetAnimatorTransitionInfo(0).duration),
-        //    };
-        //}
+
+                //string.Format("Next State (short): {0}\n", m_Animator.GetNextAnimatorStateInfo(0).shortNameHash),
+                //string.Format("Current State (short): {0}\n", m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash),
+                //string.Format("Next State (full): {0}\n", m_Animator.GetNextAnimatorStateInfo(0).fullPathHash),
+                //string.Format("Current State (full): {0}\n", m_Animator.GetCurrentAnimatorStateInfo(0).fullPathHash),
+                //string.Format("In Transition?: {0}\n", m_Animator.IsInTransition(0)),
+                //string.Format("Transition Norm Time: {0}\n", m_Animator.GetAnimatorTransitionInfo(0).normalizedTime),
+                //string.Format("Transition Duration: {0}\n", m_Animator.GetAnimatorTransitionInfo(0).duration),
+            };
+        }
+
+        StringBuilder debugMessages = new StringBuilder();
+        //Color debugTextColor = new Color(0, 1f, 1f, 1);
+        Color debugTextColor = Color.black;
+        string[] debugMsgs;
+        Rect groupRect = new Rect(10, 50, 200, 20);
+        Rect rect = new Rect(10, 50, 200, 20);
+        float rectStartHeight = 50;
+        float labelHeight = 16;
+        private void OnGUI()
+        {
+            if (Application.isPlaying)
+            {
+                GUI.color = debugTextColor;
+                DebugMessages();
+
+                //rect.y = rectStartHeight;
+                //groupRect.y = rect.y + rectStartHeight * 2;
+                groupRect = rect;
+                //groupRect.height = labelHeight * debugMsgs.Length + rectStartHeight;
+                groupRect.height = Screen.height * 0.75f;
 
 
-        ////Color debugTextColor = new Color(0, 1f, 1f, 1);
-        //Color debugTextColor = Color.black;
-        //string[] debugMsgs;
-        //Rect groupRect = new Rect(10, 50, 200, 20);
-        //Rect rect = new Rect(10, 50, 200, 20);
-        //float rectStartHeight = 50;
-        //float labelHeight = 16;
-        //private void OnGUI()
-        //{
-        //    if (Application.isPlaying)
-        //    {
-        //        GUI.color = debugTextColor;
-        //        DebugMessages();
+                GUI.BeginGroup(groupRect, GUI.skin.box);
 
-        //        rect.y = rectStartHeight;
-        //        //groupRect.y = rect.y + rectStartHeight * 2;
-        //        groupRect = rect;
-        //        groupRect.height = labelHeight * debugMsgs.Length + rectStartHeight;
+                //GUI.Label(rect, debugMessages.ToString(0, debugMessages.Length));
 
-        //        GUI.BeginGroup(groupRect, GUI.skin.box);
-        //        for (int i = 0; i < debugMsgs.Length; i++)
-        //        {
-        //            rect.y = rectStartHeight + labelHeight * i;
-        //            GUI.Label(rect, debugMsgs[i]);
-        //        }
-        //        GUI.EndGroup();
-        //    }
+                for (int i = 0; i < debugMsgs.Length; i++)
+                {
+                    rect.y = labelHeight * i;
+                    GUI.Label(rect, debugMsgs[i]);
+                }
+                GUI.EndGroup();
+            }
 
-        //}
+        }
 
 
 

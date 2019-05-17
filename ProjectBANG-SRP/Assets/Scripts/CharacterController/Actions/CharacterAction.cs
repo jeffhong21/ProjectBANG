@@ -29,6 +29,9 @@
         [SerializeField]
         protected ActionStopType m_StopType = ActionStopType.Manual;
 
+        protected AudioClip[] m_StartAudioClips;
+        protected AudioClip[] m_StopAudioClips;
+        protected GameObject m_Effect;
 
         [Space(12)]
 
@@ -507,7 +510,7 @@
 
         private Rect location = new Rect();
         protected GUIContent content = new GUIContent();
-
+        protected string debugMsg;
 
         private void OnGUI()
         {
@@ -519,10 +522,10 @@
                 location.Set(Screen.width - size.x - 10, 15, size.x, size.y * 2);
                 GUILayout.BeginArea(location, GUI.skin.box);
 
-                GUILayout.Label(string.Format("Transition Duration: {0}", GetTransitionDuration()));
+                //GUILayout.Label(string.Format("Transition Duration: {0}", GetTransitionDuration()));
                 DrawOnGUI();
 
-                //GUILayout.Label(string.Format("Normalized Time: {0}", normalizedTime.ToString()));
+                GUILayout.Label(content);
 
                 GUILayout.EndArea();
             }
@@ -531,7 +534,7 @@
 
         protected virtual void DrawOnGUI()
         {
-            content.text = string.Format("-- {0} --", GetType());
+            //content.text = string.Format("-- {0} --", GetType());
         }
 
 

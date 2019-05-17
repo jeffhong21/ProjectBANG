@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c108f202f9f7e4665b0b40e7019fd84e, type: 3}
+  m_Name: Western_SetB
+  m_EditorClassIdentifier: 
+  setId: Western
+  textures:
+  - {fileID: 2800000, guid: a70ee0408280c0540834992618cd9948, type: 3}
+  - {fileID: 2800000, guid: 1b70ea072930be048a51e32bc50964a1, type: 3}
+  - {fileID: 2800000, guid: 935759cd778991a459f94dcf89141ed9, type: 3}
+  - {fileID: 2800000, guid: 6bd8f41e055ee30468703cc63498337a, type: 3}

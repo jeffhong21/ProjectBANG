@@ -48,7 +48,7 @@ MonoBehaviour:
   IsMoving: 0
   m_ActiveCameraState: 
   m_CameraStates:
-  - {fileID: 11400000, guid: 7e6f7bf8d3f914d2c8b9d8f007b3c2a2, type: 2}
+  - {fileID: 11400000, guid: ffcdaefce09cc4263a0195a50b35db76, type: 2}
   - {fileID: 11400000, guid: 25f2bdf1c47504e2bbba5a6aa6e4abbf, type: 2}
   m_Character: {fileID: 0}
   m_Anchor: {fileID: 0}

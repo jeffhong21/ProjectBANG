@@ -265,24 +265,8 @@
 
 		private void FixedUpdate()
 		{
-            m_PitchPivotPosition = m_PitchPivot.localPosition;
-            //m_PitchPivotPosition.z = -m_CameraState.ViewDistance;
-            //m_PitchPivotPosition.y = m_CameraState.VerticalOffset;
-
-            m_CameraPosition = m_Camera.transform.localPosition;
-            if (m_CameraState.ApplyCameraOffset)
-                m_CameraPosition = m_CameraState.CameraOffset;
-            m_CameraPosition.z = m_CameraPosition.z + (-m_CameraState.ViewDistance);
-                
-
-            //m_PitchPivot.localPosition = Vector3.Lerp(m_PitchPivot.localPosition, m_PitchPivotPosition, 12 * m_DeltaTime);
-            m_Camera.transform.localPosition = Vector3.Lerp(m_Camera.transform.localPosition, m_CameraPosition, 12 * m_DeltaTime);
-
-            //m_TargetPosition = Vector3.Lerp(m_Transform.position, m_Anchor.position, 12 * m_DeltaTime);
-            m_TargetPosition = Vector3.SmoothDamp(m_Transform.position, m_Anchor.position, ref m_CameraVelocitySmooth, 0.18f);
-            m_TargetPosition.y = m_Anchor.position.y + m_CameraState.VerticalOffset;
-            //m_Transform.position = m_TargetPosition;
-            m_Transform.position = Vector3.Slerp(m_Transform.position ,m_TargetPosition, m_CameraState.MoveSpeed * m_DeltaTime);
+            UpdatePosition();
+            UpdateRotation();
 		}
 
 
@@ -293,16 +277,42 @@
                 return;
 
             //UpdateCameraMovement();
-            HandleRotationMovement();
+
 
             if(m_Camera.fieldOfView != m_CameraState.FieldOfView)
                 m_Camera.fieldOfView = Mathf.Lerp(m_Camera.fieldOfView, m_CameraState.FieldOfView, m_DeltaTime * m_CameraState.FieldOfViewSpeed);
+
+
+            //OcclusionDetection();
+        }
+
+
+        private void UpdatePosition()
+        {
+            m_PitchPivotPosition = m_PitchPivot.localPosition;
+            //m_PitchPivotPosition.z = -m_CameraState.ViewDistance;
+            //m_PitchPivotPosition.y = m_CameraState.VerticalOffset;
+
+            m_CameraPosition = m_Camera.transform.localPosition;
+            if (m_CameraState.ApplyCameraOffset)
+                m_CameraPosition = m_CameraState.CameraOffset;
+            m_CameraPosition.z = m_CameraPosition.z + (-m_CameraState.ViewDistance);
+
+
+            //m_PitchPivot.localPosition = Vector3.Lerp(m_PitchPivot.localPosition, m_PitchPivotPosition, 12 * m_DeltaTime);
+            m_Camera.transform.localPosition = Vector3.Lerp(m_Camera.transform.localPosition, m_CameraPosition, 12 * m_DeltaTime);
+
+            //m_TargetPosition = Vector3.Lerp(m_Transform.position, m_Anchor.position, 12 * m_DeltaTime);
+            m_TargetPosition = Vector3.SmoothDamp(m_Transform.position, m_Anchor.position, ref m_CameraVelocitySmooth, 0.18f);
+            m_TargetPosition.y = m_Anchor.position.y + m_CameraState.VerticalOffset;
+            //m_Transform.position = m_TargetPosition;
+            m_Transform.position = Vector3.Slerp(m_Transform.position, m_TargetPosition, m_CameraState.MoveSpeed * m_DeltaTime);
         }
 
 
         [SerializeField]
         float angle;
-        private void HandleRotationMovement()
+        private void UpdateRotation()
         {
             //  Main controller
             if (m_CameraState.ApplyRotation){
@@ -358,95 +368,58 @@
 
 
 
-
-        //private void UpdateCameraMovement()
-        //{
-        //    if (m_LockRotation) return;
-
-        //    //  Yaw
-        //    m_Yaw = m_MouseInput.x; // * m_CameraState.TurnSpeed;
-
-        //    m_SmoothYaw = Mathf.SmoothDamp(m_SmoothYaw, m_Yaw, ref m_SmoothYawVelocity, m_CameraState.TurnSmooth);
-        //    m_TargetYawAngle += m_SmoothYaw * m_CameraState.TurnSpeed;
-        //    if (m_CameraState.ApplyYawLimit)
-        //        m_TargetYawAngle = Mathf.Clamp(m_TargetYawAngle, m_CameraState.MinYaw, m_CameraState.MaxYaw);
-            
-        //    if (m_CameraState.ApplyTurn)
-        //    {
-        //        //m_TargetRotation = Quaternion.Euler(0, m_TargetYawAngle, 0);//* m_YawPivotRotation;
-        //        //m_Transform.rotation = Quaternion.Lerp(m_Transform.rotation, m_TargetRotation, m_CameraState.TurnSpeed * m_DeltaTime);
-        //        m_YawPivotRotation = Quaternion.Euler(0, m_TargetYawAngle, 0);//* m_YawPivotRotation;
-        //        m_YawPivot.localRotation = Quaternion.Slerp(m_YawPivot.localRotation, m_YawPivotRotation, m_CameraState.TurnSpeed * m_DeltaTime);
-        //    }
-
-
-        //    //  Pitch
-        //    m_Pitch = m_MouseInput.y; // * m_CameraState.TurnSpeed;
-
-        //    m_SmoothPitch = Mathf.SmoothDamp(m_SmoothPitch, m_Pitch, ref m_SmoothPitchVelocity, m_CameraState.TurnSmooth);
-        //    m_TargetPitchAngle -= m_SmoothPitch * m_CameraState.TurnSpeed;
-
-        //    if (m_CameraState.ApplyPitchLimit)
-        //        m_TargetPitchAngle = Mathf.Clamp(m_TargetPitchAngle, m_CameraState.MinPitch, m_CameraState.MaxPitch);
-
-        //    if (m_CameraState.ApplyTurn)
-        //    {
-        //        m_PitchPivotRotation = Quaternion.Euler(m_TargetPitchAngle, 0, 0);
-        //        m_PitchPivot.localRotation = Quaternion.Slerp(m_PitchPivot.localRotation, Quaternion.Euler(m_TargetPitchAngle, 0, 0), m_CameraState.TurnSpeed * m_DeltaTime); ;
-        //    }
-
-        //    //m_Camera.transform.LookAt(m_Character.transform);
-        //    var lookDirection = m_Character.transform.position + (Vector3.up * m_CameraState.VerticalOffset) - m_Camera.transform.position;
-        //    m_Camera.transform.rotation = Quaternion.LookRotation(lookDirection, Vector3.up);
-
-        //    //  Main controller
-        //    if (m_CameraState.ApplyRotation){
-        //        if (Quaternion.Angle(m_Transform.rotation, m_Character.transform.rotation) != 0){
-        //            m_TargetRotation = Quaternion.FromToRotation(m_Transform.forward, m_Character.transform.forward);
-        //            m_Transform.rotation = Quaternion.Slerp(m_Transform.rotation, m_TargetRotation * m_Transform.rotation, m_CameraState.RotationSpeed * m_DeltaTime);
-        //        }
-        //    }
-        //}
-
-
-        //private void HandlePosition()
-        //{
-        //    if (m_CameraState.ApplyCameraOffset)
-        //        m_YawPivot.localPosition = m_CameraState.CameraOffset;
-        //    m_YawPivotPosition = m_YawPivot.localPosition;
-        //    //m_YawPivotPosition.y = m_CameraState.VerticalOffset;
-
-        //    m_CameraPosition = m_Camera.transform.localPosition;
-        //    m_CameraPosition.z = -m_CameraState.ViewDistance;
-
-
-        //    m_YawPivot.localPosition = Vector3.Lerp(m_YawPivot.localPosition, m_YawPivotPosition, 4 * m_DeltaTime);
-        //    m_Camera.transform.localPosition = Vector3.Lerp(m_Camera.transform.localPosition, m_CameraPosition, 4 * m_DeltaTime);
-
-        //    //m_TargetPosition = Vector3.Lerp(m_Transform.position, m_Anchor.position, time);
-        //    m_TargetPosition = Vector3.SmoothDamp(m_Transform.position, m_Anchor.position, ref m_CameraVelocitySmooth, 0.12f);
-        //    m_TargetPosition.y = m_Transform.position.y;
-        //    m_Transform.position = m_TargetPosition;
-
-        //    //m_Transform.LookAt(m_Anchor, Vector3.up);
-        //}
+        RaycastHit[] hits;
+        private void OcclusionDetection()
+        {
+            float distance = Vector3.Distance(m_Camera.transform.position, m_Character.transform.position);
+            hits = Physics.RaycastAll(m_Camera.transform.position, m_Camera.transform.forward, distance);
+            for (int i = 0; i < hits.Length; i++)
+            {
+                RaycastHit hit = hits[i];
+                Renderer rend = hit.transform.GetComponent<Renderer>();
+                if(rend){
+                    // Change the material of all hit colliders
+                    // to use a transparent shader.
+                    rend.material.shader = Shader.Find("Transparent/Diffuse");
+                    Color tempColor = rend.material.color;
+                    tempColor.a = 0.3F;
+                    rend.material.color = tempColor;
+                }
+            }
+        }
 
 
 
+        bool CullingRayCast(Vector3 from, ClipPlanePoints _to, out RaycastHit hitInfo, float distance, LayerMask cullingLayer, Color color)
+        {
+            bool value = false;
 
+            if (Physics.Raycast(from, _to.LowerLeft - from, out hitInfo, distance, cullingLayer))
+            {
+                value = true;
+                //cullingDistance = hitInfo.distance;
+            }
 
+            if (Physics.Raycast(from, _to.LowerRight - from, out hitInfo, distance, cullingLayer))
+            {
+                value = true;
+                //if (cullingDistance > hitInfo.distance) cullingDistance = hitInfo.distance;
+            }
 
+            if (Physics.Raycast(from, _to.UpperLeft - from, out hitInfo, distance, cullingLayer))
+            {
+                value = true;
+                //if (cullingDistance > hitInfo.distance) cullingDistance = hitInfo.distance;
+            }
 
+            if (Physics.Raycast(from, _to.UpperRight - from, out hitInfo, distance, cullingLayer))
+            {
+                value = true;
+                //if (cullingDistance > hitInfo.distance) cullingDistance = hitInfo.distance;
+            }
 
-
-
-
-
-
-
-
-
-
+            return value;
+        }
 
 
 
@@ -476,6 +449,49 @@
             if(zoomInput != 0) Debug.LogFormat("Zoom Input {0}", zoomInput);
         }
 
+
+
+
+        public struct ClipPlanePoints
+        {
+            public Vector3 UpperLeft;
+            public Vector3 UpperRight;
+            public Vector3 LowerLeft;
+            public Vector3 LowerRight;
+        }
+
+
+
+        public ClipPlanePoints NearClipPlanePoints(Camera camera, Vector3 pos, float clipPlaneMargin)
+        {
+            var clipPlanePoints = new ClipPlanePoints();
+
+            var transform = camera.transform;
+            var halfFOV = (camera.fieldOfView / 2) * Mathf.Deg2Rad;
+            var aspect = camera.aspect;
+            var distance = camera.nearClipPlane;
+            var height = distance * Mathf.Tan(halfFOV);
+            var width = height * aspect;
+            height *= 1 + clipPlaneMargin;
+            width *= 1 + clipPlaneMargin;
+            clipPlanePoints.LowerRight = pos + transform.right * width;
+            clipPlanePoints.LowerRight -= transform.up * height;
+            clipPlanePoints.LowerRight += transform.forward * distance;
+
+            clipPlanePoints.LowerLeft = pos - transform.right * width;
+            clipPlanePoints.LowerLeft -= transform.up * height;
+            clipPlanePoints.LowerLeft += transform.forward * distance;
+
+            clipPlanePoints.UpperRight = pos + transform.right * width;
+            clipPlanePoints.UpperRight += transform.up * height;
+            clipPlanePoints.UpperRight += transform.forward * distance;
+
+            clipPlanePoints.UpperLeft = pos - transform.right * width;
+            clipPlanePoints.UpperLeft += transform.up * height;
+            clipPlanePoints.UpperLeft += transform.forward * distance;
+
+            return clipPlanePoints;
+        }
 
 
 

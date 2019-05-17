@@ -18,7 +18,8 @@ namespace CharacterController
         {
             if (base.CanStartAction())
             {
-                return true;
+                if(m_Controller.Moving)
+                    return true;
             }
             return false;
         }

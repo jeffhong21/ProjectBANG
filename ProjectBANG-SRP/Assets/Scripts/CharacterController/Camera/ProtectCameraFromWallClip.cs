@@ -60,6 +60,7 @@ namespace CharacterController
                     initialIntersect = true;
                     break;
                 }
+
             }
 
             // if there is a collision
