@@ -5,6 +5,10 @@ namespace CharacterController
 
     public static class EventIDs
     {
+        public static readonly string OnAnimatorStartJump = "OnAnimatorStartJump";
+        public static readonly string OnAnimatorEndJump = "OnAnimatorEndJump";
+
+
 
         public static readonly string OnTakeDamage = "OnTakeDamage";
 

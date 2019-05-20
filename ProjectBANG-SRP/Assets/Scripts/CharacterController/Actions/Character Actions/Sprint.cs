@@ -85,7 +85,7 @@ namespace CharacterController
             velocity.y = m_Controller.Grounded ? 0 : m_Rigidbody.velocity.y;
             //m_Rigidbody.velocity = Vector3.SmoothDamp(m_Rigidbody.velocity, m_Velocity, ref m_velocitySmooth, m_Moving ? m_Acceleration : m_MotorDamping);
             //m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, m_MovementSpeed);
-            m_Rigidbody.velocity = velocity * 0.75f;
+            m_Rigidbody.velocity = velocity;
 
             return false;
         }

@@ -40,20 +40,17 @@
         //[SerializeField]
         private Vector3 m_Velocity;
         private float m_VaultObjectHeight;
-        private float m_HeightDifference;
         private Vector3 m_StartPosition, m_EndPosition, m_MatchPosition;
 
         private Quaternion m_MatchRotation;
         private RaycastHit m_MoveToVaultDistanceHit, m_MatchPositionHit, m_EndPositionHit;
 
 
-        private float m_ColliderHeight;
-        private Vector3 m_ColliderCenter;
 
         private MatchTargetWeightMask m_MatchTargetWeightMask = new MatchTargetWeightMask(Vector3.one, 0);
 
         private Vector3 m_HeightCheckStart;
-        private float m_StartTime;
+
 
         [SerializeField] bool m_Debug;
 
@@ -98,7 +95,7 @@
                     if (m_Debug) Debug.DrawRay(depthCheck, Vector3.down * (m_MaxHeight + 0.2f), Color.yellow, 3f);
                     if (Physics.Raycast(depthCheck, Vector3.down, out m_EndPositionHit, (m_MaxHeight + 0.2f), m_Layers.GroundLayer))
                     {
-                        Debug.LogFormat("Distance {0}", Vector3.Distance(m_MoveToVaultDistanceHit.point, m_EndPositionHit.point));
+                        //Debug.LogFormat("Distance {0}", Vector3.Distance(m_MoveToVaultDistanceHit.point, m_EndPositionHit.point));
                         return true;
                     }
                 }
@@ -127,14 +124,11 @@
             m_ColliderHeight = m_CapsuleCollider.height;
             m_ColliderCenter = m_CapsuleCollider.center;
 
-
-
             m_Rigidbody.isKinematic = !m_Rigidbody.isKinematic;
 
 
-
-             
-            m_StartTime = Time.time;
+            Vector3 verticalVelocity = Vector3.up * (Mathf.Sqrt(m_VaultObjectHeight * -2 * Physics.gravity.y));
+            m_Rigidbody.velocity = verticalVelocity;
         }
 
 
@@ -149,8 +143,12 @@
             //  Rigidbody IsKinamatic is currently on, so physics movement will do nothing.
             //  
             //  
+            float heightDifference = (float)System.Math.Round(m_MatchPosition.y - m_Transform.position.y, 2);
 
-            m_HeightDifference =  (float)System.Math.Round(m_MatchPosition.y - m_Transform.position.y, 2);
+            float colliderScale = 1 / (m_VaultObjectHeight - heightDifference);
+            colliderScale = Mathf.Clamp(colliderScale - 0.5f, 0.5f, 1);
+            m_CapsuleCollider.height = Mathf.MoveTowards(m_CapsuleCollider.height, m_ColliderHeight * colliderScale, Time.deltaTime * 4);
+            m_CapsuleCollider.center = Vector3.MoveTowards(m_CapsuleCollider.center, m_ColliderCenter * colliderScale, Time.deltaTime * 2);
 
             //var velocity = Vector3.Project(m_Rigidbody.velocity, Physics.gravity * 2);
             //var velocityY = Mathf.Sin()
@@ -159,8 +157,7 @@
 
             m_VerticalVelocity = Vector3.up * (m_VaultObjectHeight + m_VerticalOffset) ;
             m_VerticalVelocity = m_VerticalVelocity * m_DeltaTime;
-
-            if (m_HeightDifference >= 0.0f)
+            if (heightDifference >= 0.0f)
             {
                 m_Rigidbody.AddForce(m_VerticalVelocity * 10, ForceMode.VelocityChange);
                 //m_Rigidbody.AddForce(m_VerticalVelocity, ForceMode.VelocityChange);
@@ -178,7 +175,7 @@
 
 		public override bool Move()
 		{
-            m_Animator.ApplyBuiltinRootMotion();
+            //m_Animator.MatchTarget(m_MatchPosition, Quaternion.Euler(0, m_Transform.eulerAngles.y, 0), AvatarTarget.LeftHand, m_MatchTargetWeightMask, m_StartMatchTarget, m_StopMatchTarget);
             m_Animator.MatchTarget(m_MatchPosition, Quaternion.identity, AvatarTarget.LeftHand, m_MatchTargetWeightMask, m_StartMatchTarget, m_StopMatchTarget);
 
             m_Velocity = m_Animator.deltaPosition / m_DeltaTime;
@@ -225,9 +222,9 @@
                 }
             }
 
-            //bool safetyCheck = m_StartTime + 3 < Time.time;
-            //if(safetyCheck) Debug.LogFormat("{0} has stopped by safet check. | {1} : {2}", m_StateName, m_StartTime, Time.time);
-            return m_StartTime + 1 < Time.time;
+            //bool safetyCheck = m_ActionStartTime + 3 < Time.time;
+            //if(safetyCheck) Debug.LogFormat("{0} has stopped by safet check. | {1} : {2}", m_StateName, m_ActionStartTime, Time.time);
+            return Time.time > m_ActionStartTime + 1;;
         }
 
 

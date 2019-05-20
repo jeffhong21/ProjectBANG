@@ -201,7 +201,8 @@
             alignmentAngle = Quaternion.Angle(m_Transform.rotation, m_TargetRotation);
 
             //m_Transform.rotation = m_TargetRotation;
-            m_Transform.rotation = Quaternion.Lerp(m_TargetRotation, m_Transform.rotation, m_DeltaTime);
+            //m_Transform.rotation = Quaternion.Lerp(m_TargetRotation, m_Transform.rotation, m_DeltaTime);
+            m_Rigidbody.MoveRotation(Quaternion.Slerp(m_TargetRotation, m_Rigidbody.rotation, m_DeltaTime).normalized);
             //m_Transform.rotation = Quaternion.RotateTowards(m_Transform.rotation, m_TargetRotation,  m_DeltaTime);
 
 

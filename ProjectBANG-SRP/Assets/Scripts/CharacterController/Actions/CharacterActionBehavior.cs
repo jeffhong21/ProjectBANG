@@ -1,10 +1,21 @@
 ﻿namespace CharacterController
 {
     using UnityEngine;
-
+    using System;
 
     public class CharacterActionBehavior : StateMachineBehaviour
     {
+        [Serializable]
+        public class CharacterAnimationEvent
+        {
+            public string eventID;
+            [Range(0,0.99f)]
+            public float time;
+        }
+
+        public CharacterAnimationEvent[] animEvent = new CharacterAnimationEvent[0];
+
+
 
         protected AnimatorMonitor m_AnimatorMonitor;
         [SerializeField]
@@ -27,7 +38,13 @@
         }
 
 
-        public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+		public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+		{
+            base.OnStateUpdate(animator, stateInfo, layerIndex);
+		}
+
+
+		public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
             base.OnStateExit(animator, stateInfo, layerIndex);
             //Debug.LogFormat("{0}", stateInfo.);
@@ -37,19 +54,19 @@
         }
 
 
-        public override void OnStateMachineEnter(Animator animator, int stateMachinePathHash)
-        {
-            base.OnStateMachineEnter(animator, stateMachinePathHash);
-            Debug.LogFormat("On StateMachine <color=cyan> {0} </color> | FullHashPath: {1}", "Enter", stateMachinePathHash);
+        //public override void OnStateMachineEnter(Animator animator, int stateMachinePathHash)
+        //{
+        //    base.OnStateMachineEnter(animator, stateMachinePathHash);
+        //    Debug.LogFormat("On StateMachine <color=cyan> {0} </color> | FullHashPath: {1}", "Enter", stateMachinePathHash);
 
-        }
+        //}
 
-        public override void OnStateMachineExit(Animator animator, int stateMachinePathHash)
-        {
-            base.OnStateMachineExit(animator, stateMachinePathHash);
-            Debug.LogFormat("On StateMachine <color=blue> {0} </color> | FullHashPath: {1}", "Exit", stateMachinePathHash);
+        //public override void OnStateMachineExit(Animator animator, int stateMachinePathHash)
+        //{
+        //    base.OnStateMachineExit(animator, stateMachinePathHash);
+        //    Debug.LogFormat("On StateMachine <color=blue> {0} </color> | FullHashPath: {1}", "Exit", stateMachinePathHash);
 
-        }
+        //}
     }
 
 }

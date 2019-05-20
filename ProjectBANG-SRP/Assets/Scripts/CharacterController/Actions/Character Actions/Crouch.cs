@@ -16,16 +16,14 @@
 
         protected override void ActionStarted()
         {
-            //m_IsCrouching = true;
-            m_AnimatorMonitor.SetHeightValue(m_Height);
+
         }
 
 
 
         protected override void ActionStopped()
         {
-            //m_IsCrouching = false;
-            m_AnimatorMonitor.SetHeightValue(m_DefaultHeight);
+
         }
 
 

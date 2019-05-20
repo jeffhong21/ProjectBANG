@@ -7,13 +7,12 @@ namespace CharacterController
     public class Roll : CharacterAction
     {
         //public const int ACTION_ID = 15;
-        //protected readonly float m_MaxRollDistance = 4f;
+        protected readonly float m_RollDistance = 3f;
         //protected readonly float m_CheckHeight = 0.35f;
 
         protected float m_RollRecurrenceDelay = 0.2f;
         protected float m_NextRollAllowed;
-        protected float m_ColliderHeight;
-        protected Vector3 m_ColliderCenter;
+
         //
         // Methods
         //
@@ -32,6 +31,9 @@ namespace CharacterController
             //  Cache variables
             m_ColliderHeight = m_CapsuleCollider.height;
             m_ColliderCenter = m_CapsuleCollider.center;
+
+            Vector3 velocity = Vector3.Scale(transform.forward, m_RollDistance * new Vector3((Mathf.Log(1f / (m_DeltaTime * m_Rigidbody.drag + 1)) / -m_DeltaTime), 0, (Mathf.Log(1f / (m_DeltaTime * m_Rigidbody.drag + 1)) / -m_DeltaTime)));
+            m_Rigidbody.velocity = velocity;
         }
 
 

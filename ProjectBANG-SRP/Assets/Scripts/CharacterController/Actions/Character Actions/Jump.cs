@@ -6,23 +6,16 @@ namespace CharacterController
 
     public class Jump : CharacterAction
     {
+        [Header("-- Jump Parameters --")]
         [SerializeField]
-        protected float m_Force = 12;
-        [SerializeField]
-        protected float m_Distance = 4;
+        protected float m_Force = 1;
         [SerializeField]
         protected float m_RecurrenceDelay = 0.1f;
 
-        private Vector3 velocity;
-        private Vector3 verticalVelocity;
-        private Vector3 forwardVelocity;
-        private float gravity;
-        private float velocityY;
-        private float startTime;
 
 
-
-
+        private float m_AirborneHeight = 0.6f;
+        private float m_NextJump;
 
 		//
 		// Methods
@@ -31,7 +24,10 @@ namespace CharacterController
         {
             if (base.CanStartAction())
             {
-                return true;
+                if(m_Controller.Grounded && Time.time > m_NextJump){
+                    return true;
+                }
+
             }
             return false;
 		}
@@ -40,54 +36,76 @@ namespace CharacterController
         {
             m_Animator.SetInteger(HashID.ActionID, (int)ActionTypeDefinition.Jump);
 
-            gravity = Physics.gravity.y;
-            velocityY = Mathf.Sqrt(-2 * gravity * m_Force);
-            forwardVelocity = m_Controller.Moving ? transform.forward : Vector3.zero;
-            verticalVelocity = Vector3.zero;
-            m_Rigidbody.AddForce(Vector3.up * m_Force + transform.forward * m_Distance, ForceMode.VelocityChange);
-            //m_Rigidbody.velocity = forwardVelocity + verticalVelocity;
-            startTime = Time.time;
+            if(m_Controller.Moving){
+                Vector3 verticalVelocity = Vector3.up * (Mathf.Sqrt(m_Force * -2 * Physics.gravity.y));
+                Vector3 fwdVelocity = m_Transform.forward * m_Force;
+
+                m_Rigidbody.velocity += fwdVelocity + verticalVelocity;
+            }
         }
 
 
         public override bool CanStopAction()
         {
-            return m_Controller.Grounded;
+            //if(Time.time > m_ActionStartTime + 0.1f){
+            //    return m_Controller.Grounded;
+            //}
+            //return false;
+
+            return Time.time > m_ActionStartTime + 0.9f;
         }
 
 
         protected override void ActionStopped()
         {
-
-
+            m_NextJump = Time.time + m_RecurrenceDelay;
 
         }
 
 
-		public override bool UpdateMovement()
+		public override bool CheckGround()
 		{
-            velocityY += gravity * m_DeltaTime;
-            velocity = forwardVelocity * m_Distance + Vector3.up * velocityY;
+            //RaycastHit hit = m_Controller.GetRaycastHit();
+            //m_Controller.Grounded = hit.distance < m_AirborneHeight;
 
-            //Vector3 verticalVelocity = Vector3.Project(m_Rigidbody.velocity * m_Force, Physics.gravity);
-            //Vector3 velocity = Vector3.Project(m_Transform.forward * m_Distance, Physics.gravity);
-
-            velocity = (velocity + verticalVelocity) * m_DeltaTime;
-            m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, velocity, (startTime - Time.time) / 1);  
+            m_Controller.Grounded = false;
 
             return false;
 		}
 
 
 
+
+		public override bool UpdateAnimator()
+		{
+            return base.UpdateAnimator();
+		}
+
+
 		//  Returns the state the given layer should be on.
 		public override string GetDestinationState(int layer)
         {
             if (layer == 0){
-                return "JumpRunStart_LU";
+                if(m_Controller.Moving){
+                    if (m_Animator.pivotWeight >= 0.5f)
+                        m_DestinationStateName = "RunStart_LeftUp";
+                    else if (m_Animator.pivotWeight < 0.5f)
+                        m_DestinationStateName = "RunStart_RightUp";
+                }
+                else{
+                    m_DestinationStateName = "IdleStart";
+                }
+
+                return m_DestinationStateName;
             }
             return "";
         }
+
+
+
+
+
+
 
 
 

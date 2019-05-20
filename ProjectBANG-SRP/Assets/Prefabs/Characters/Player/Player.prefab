@@ -327,6 +327,8 @@ GameObject:
   - component: {fileID: 1784387541}
   - component: {fileID: 5595395500200508759}
   - component: {fileID: 2432881533187493989}
+  - component: {fileID: 5598002005745188121}
+  - component: {fileID: -8503966014793524050}
   m_Layer: 31
   m_Name: Player
   m_TagString: Player
@@ -385,7 +387,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.35
+  m_Radius: 0.3
   m_Height: 1.8
   m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0}
@@ -403,7 +405,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 1
-  m_Constraints: 112
+  m_Constraints: 80
   m_CollisionDetection: 0
 --- !u!114 &114933608758217926
 MonoBehaviour:
@@ -417,13 +419,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e78c0408c7564ed789d7937cadd7677, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UseRootMotion: 1
-  m_RootMotionSpeedMultiplier: 1
-  m_Acceleration: 0.18
-  m_MotorDamping: 0.2
-  m_MovementSpeed: 1
-  m_RotationSpeed: 10
-  m_SlopeForceDown: 1.25
   m_Mass: 100
   m_SkinWidth: 0.08
   m_SlopeLimit: 45
@@ -432,6 +427,15 @@ MonoBehaviour:
   m_StepSpeed: 4
   m_AlignToGround: 1
   m_AlignToGroundDepthOffset: 0.5
+  m_Grounded: 1
+  m_DrawDebugLine: 1
+  m_UseRootMotion: 1
+  m_RootMotionSpeedMultiplier: 1
+  m_Acceleration: 0.18
+  m_MotorDamping: 0.2
+  m_MovementSpeed: 1
+  m_RotationSpeed: 10
+  m_SlopeForceDown: 1.25
   m_Actions:
   - {fileID: 114776445558567580}
   - {fileID: 3774449784211641878}
@@ -441,12 +445,12 @@ MonoBehaviour:
   - {fileID: 114329433760099396}
   - {fileID: 647976094}
   - {fileID: 1872464415}
-  - {fileID: 2521750178379034832}
+  - {fileID: 5598002005745188121}
   - {fileID: 1784387541}
   - {fileID: 23525450}
+  - {fileID: 2521750178379034832}
+  - {fileID: -8503966014793524050}
   m_ActiveAction: {fileID: 0}
-  m_DrawDebugLine: 1
-  m_Grounded: 1
   m_Moving: 0
 --- !u!114 &114311917172092944
 MonoBehaviour:
@@ -593,7 +597,7 @@ MonoBehaviour:
     m_Bits: 50
   m_GroundLayer:
     serializedVersion: 2
-    m_Bits: 201326592
+    m_Bits: 201326593
 --- !u!114 &114921923587186984
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -654,7 +658,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a70e525c82ce9413fa4d940ad7fcf1db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fixTransforms: 1
+  fixTransforms: 0
   references:
     root: {fileID: 4800368842353962}
     pelvis: {fileID: 4062153608772630}
@@ -1119,6 +1123,7 @@ MonoBehaviour:
   m_InputNames: []
   m_StartType: 0
   m_StopType: 0
+  m_ApplyBuiltinRootMotion: 0
   m_MinFallHeight: 2
   m_LandSurfaceImpact: {fileID: 0}
   m_MinSurfaceImpactVelocity: 1
@@ -1129,7 +1134,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d3005a58794a74e28bd4e9600cba665f, type: 3}
   m_Name: 
@@ -1142,6 +1147,7 @@ MonoBehaviour:
   - Space
   m_StartType: 2
   m_StopType: 3
+  m_ApplyBuiltinRootMotion: 0
   m_TakeCoverDistance: 3
   m_CoverLayer:
     serializedVersion: 2
@@ -1168,7 +1174,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bb16de68a3c6f4c2c99766840b8420c9, type: 3}
   m_Name: 
@@ -1181,6 +1187,7 @@ MonoBehaviour:
   - Space
   m_StartType: 3
   m_StopType: 2
+  m_ApplyBuiltinRootMotion: 0
 --- !u!114 &114139823554117216
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1201,6 +1208,7 @@ MonoBehaviour:
   - LeftControl
   m_StartType: 2
   m_StopType: 2
+  m_ApplyBuiltinRootMotion: 1
   m_MoveToVaultDistance: 2
   m_VaultLayers:
     serializedVersion: 2
@@ -1232,10 +1240,11 @@ MonoBehaviour:
   - LeftShift
   m_StartType: 2
   m_StopType: 2
+  m_ApplyBuiltinRootMotion: 0
   m_SpeedChangeMultiplier: 2
   m_MinSpeedChange: -2
   m_MaxSpeedChange: 2
-  m_StaminaDecreaseRate: 0.5
+  m_StaminaDecreaseRate: 0.1
   m_StaminaIncreaseRate: 0.1
   m_MaxStanima: 100
   m_CurrentStanima: 100
@@ -1260,7 +1269,8 @@ MonoBehaviour:
   - LeftControl
   m_StartType: 2
   m_StopType: 2
-  m_MoveToVaultDistance: 3
+  m_ApplyBuiltinRootMotion: 0
+  m_MoveToClimbDistance: 1
   m_MaxHeight: 2.5
   m_MinHeight: 0.5
   m_CheckLayers:
@@ -1269,13 +1279,13 @@ MonoBehaviour:
   m_MatchTargetStates:
   - stateName: Climb-1M
     threshold: 0.5
-    matchTargetOffset: {x: -0.2, y: 0.1, z: 0}
+    matchTargetOffset: {x: -0.2, y: 0, z: 0}
     startMatchTarget: 0.2
     stopMatchTarget: 0.28
     avatarTarget: 4
   - stateName: Climb-2M
     threshold: 1.5
-    matchTargetOffset: {x: -0.1, y: 0.1, z: 0}
+    matchTargetOffset: {x: -0.1, y: 0, z: 0}
     startMatchTarget: 0.1
     stopMatchTarget: 0.45
     avatarTarget: 4
@@ -1300,8 +1310,8 @@ MonoBehaviour:
   - Space
   m_StartType: 2
   m_StopType: 2
-  m_Force: 2
-  m_Distance: 4
+  m_ApplyBuiltinRootMotion: 1
+  m_Force: 2.5
   m_RecurrenceDelay: 0.1
 --- !u!114 &1872464415
 MonoBehaviour:
@@ -1323,6 +1333,7 @@ MonoBehaviour:
   - Mouse1
   m_StartType: 2
   m_StopType: 2
+  m_ApplyBuiltinRootMotion: 0
   m_Hitboxes: []
   m_ExitStateName: Exit
 --- !u!114 &23525450
@@ -1344,6 +1355,7 @@ MonoBehaviour:
   m_InputNames: []
   m_StartType: 2
   m_StopType: 2
+  m_ApplyBuiltinRootMotion: 1
   stateNames: []
   currentAnimIndex: 1
 --- !u!114 &1784387540
@@ -1366,6 +1378,7 @@ MonoBehaviour:
   - Space
   m_StartType: 3
   m_StopType: 2
+  m_ApplyBuiltinRootMotion: 0
 --- !u!114 &1784387541
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1373,7 +1386,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5c6b69abf52d14e8186e8a930c05af45, type: 3}
   m_Name: 
@@ -1385,6 +1398,7 @@ MonoBehaviour:
   m_InputNames: []
   m_StartType: 1
   m_StopType: 1
+  m_ApplyBuiltinRootMotion: 0
   m_DamageTypeIndex: 0
   m_IsDamaged: 0
   m_MinDamageAmount: 0
@@ -1441,6 +1455,47 @@ MonoBehaviour:
   weight: 1
   ik: {fileID: 3255776655029733184}
   bodies: []
+--- !u!114 &5598002005745188121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb969d52822a24d8dbd0b8c198a14803, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: StartMovement
+  m_ActionID: 0
+  m_TransitionDuration: 0
+  m_InputNames: []
+  m_StartType: 0
+  m_StopType: 0
+  m_ApplyBuiltinRootMotion: 0
+--- !u!114 &-8503966014793524050
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6154c3fa2c49643758284fb02e121cd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: Crouch
+  m_ActionID: 0
+  m_TransitionDuration: 0.2
+  m_InputNames:
+  - C
+  m_StartType: 2
+  m_StopType: 3
+  m_ApplyBuiltinRootMotion: 0
 --- !u!1 &1142656612551902
 GameObject:
   m_ObjectHideFlags: 0
@@ -4109,6 +4164,10 @@ PrefabInstance:
     - target: {fileID: 1252006954579170, guid: 49ca4dd25f534bf4b9e1aed8500990ac, type: 3}
       propertyPath: m_Name
       value: SM_Chr_Attach_Backpack_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 1252006954579170, guid: 49ca4dd25f534bf4b9e1aed8500990ac, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4985778594100514, guid: 49ca4dd25f534bf4b9e1aed8500990ac, type: 3}
       propertyPath: m_LocalPosition.x

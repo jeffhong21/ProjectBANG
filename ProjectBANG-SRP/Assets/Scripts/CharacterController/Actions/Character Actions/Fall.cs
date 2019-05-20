@@ -24,16 +24,22 @@ namespace CharacterController
         private float m_FallVelocity;
         private bool m_PlaySurfaceLandImpact;
 
+        private float m_StartHeight;
+        private float m_FallHeight;
+
         //
         // Methods
         //
         public override bool CanStartAction()
         {
+            if(m_Controller.Grounded){
+                m_StartHeight = m_Rigidbody.position.y;
+            }
             if (m_Controller.Grounded == false  &&
-                Mathf.Abs(m_Rigidbody.velocity.y) > m_MinFallHeight      &&
-                Mathf.Abs(m_Controller.GroundDistance) > (m_MinFallHeight == 0 ? m_MinFallHeight + 0.2f : m_MinFallHeight))
+                m_Rigidbody.velocity.y < 0 )
             {
-                return true;
+                if(m_StartHeight - m_Rigidbody.position.y > m_MinFallHeight)
+                    return true;
             }
 
             return false;
@@ -53,7 +59,7 @@ namespace CharacterController
 		public override bool UpdateMovement()
 		{
             m_Airtime += m_DeltaTime;
-
+            m_Rigidbody.velocity += m_Transform.forward * m_DeltaTime;
             return base.UpdateMovement();
 		}
 

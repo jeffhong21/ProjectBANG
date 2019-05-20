@@ -8,6 +8,11 @@
     {
         public static readonly int InputMagnitude = Animator.StringToHash("InputMagnitude");
         public static readonly int InputAngle = Animator.StringToHash("InputAngle");
+        public static readonly int StartAngle = Animator.StringToHash("StartAngle");
+        public static readonly int StopLeftUp = Animator.StringToHash("StopLeftUp");
+        public static readonly int StopRightUp = Animator.StringToHash("StopRightUp");
+        public static readonly int LegUpIndex = Animator.StringToHash("LegUpIndex");
+        //public static readonly int Grounded = Animator.StringToHash("Grounded");
 
 
         public static readonly int HorizontalInput = Animator.StringToHash("HorizontalInput");

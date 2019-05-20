@@ -28,22 +28,32 @@
         protected ActionStartType m_StartType = ActionStartType.Manual;
         [SerializeField]
         protected ActionStopType m_StopType = ActionStopType.Manual;
-
-        protected AudioClip[] m_StartAudioClips;
-        protected AudioClip[] m_StopAudioClips;
-        protected GameObject m_Effect;
+        [SerializeField]
+        protected bool m_ApplyBuiltinRootMotion;
+        //[SerializeField]
+        protected AudioClip[] m_StartAudioClips = new AudioClip[0];
+        //[SerializeField]
+        protected AudioClip[] m_StopAudioClips = new AudioClip[0];
+        //[SerializeField]
+        protected GameObject m_StartEffect;
+        //[SerializeField]
+        protected GameObject m_EndEffect;
 
         [Space(12)]
 
-
+        [Header("-- Action Parameters --")]
         //  InputNames to KeyCodes
         protected KeyCode[] m_KeyCodes = new KeyCode[0];
         protected int m_InputIndex = -1;
         //  Check double press variables.
         private KeyCode m_FirstButtonPressed;
         private float m_TimeOfFirstButtoonPressed;
-        private float m_DoublePressInputTime = 0.25f;
+        private float m_DoublePressInputTime = 0.1f;
 
+        protected float m_ColliderHeight;
+        protected Vector3 m_ColliderCenter;
+        protected float m_ActionStartTime;
+        private float m_DefaultActionStopTime = 0.25f;
         protected float m_DeltaTime;
         protected CharacterLocomotion m_Controller;
         protected Rigidbody m_Rigidbody;
@@ -100,6 +110,9 @@
         }
 
 
+        public float ActionStartTime{
+            get { return m_ActionStartTime; }
+        }
 
 
         //
@@ -148,7 +161,8 @@
 
         protected void OnEnable()
         {
-
+            m_ColliderHeight = m_CapsuleCollider.height;
+            m_ColliderCenter = m_CapsuleCollider.center;
         }
 
         protected void OnDisable()
@@ -157,15 +171,6 @@
         }
 
 
-		//private void Update()
-		//{
-  //          if(m_IsActive){
-  //              if (m_Animator.IsInTransition(0)){
-  //                  m_Animator.ResetTrigger(HashID.ActionChange);
-  //              }
-  //          }
-
-		//}
 
 
 		protected virtual void OnValidate()
@@ -248,9 +253,15 @@
                                 if (m_StopType == ActionStopType.ButtonToggle)
                                     m_ActionStopToggle = true;
                                 m_InputIndex = i;
-
                                 return true;
                             }
+                            //if (m_FirstButtonPressed == m_KeyCodes[m_InputIndex] && Time.time - m_TimeOfFirstButtoonPressed < 0.25f)
+                            //{
+                            //    if (m_StopType == ActionStopType.ButtonToggle)
+                            //        m_ActionStopToggle = true;
+                                
+                            //    return true;
+                            //}
                         }
                         break;
                     case ActionStartType.DoublePress:
@@ -277,7 +288,7 @@
             switch (m_StopType)
             {
                 case ActionStopType.Automatic:
-
+                    //if(m_ActionStartTime != -1 && Time.time >= m_ActionStartTime + m_DefaultActionStopTime)
                     for (int index = 0; index < m_Animator.layerCount; index++)
                     {
                         if (m_Animator.GetCurrentAnimatorStateInfo(index).IsName(m_StateName))
@@ -329,10 +340,12 @@
         public void StartAction()
         {
             m_IsActive = true;
-            EventHandler.ExecuteEvent(m_GameObject, "OnCharacterActionActive", this, m_IsActive);
+            EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnCharacterActionActive, this, m_IsActive);
 
             m_Animator.SetInteger(HashID.ActionID, m_ActionID);
             m_Animator.SetTrigger(HashID.ActionChange);
+
+            m_ActionStartTime = Time.time;
 
             ActionStarted();
 
@@ -362,10 +375,13 @@
             m_Animator.ResetTrigger(HashID.ActionChange);
             //m_AnimatorMonitor.SetActionID(0);
 
+            m_ActionStartTime = -1;
+
+
             ActionStopped();
 
             m_IsActive = false;
-            EventHandler.ExecuteEvent(m_GameObject, "OnCharacterActionActive", this, m_IsActive);
+            EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnCharacterActionActive, this, m_IsActive);
         }
 
 
@@ -464,8 +480,7 @@
 
         public virtual float GetColliderHeightAdjustment()
         {
-
-            return m_CapsuleCollider.height;
+            return m_CapsuleCollider.height - m_ColliderHeight;
         }
 
 
@@ -497,13 +512,29 @@
 
 
 
-        #region Debug
+		private void OnAnimatorMove()
+		{
+
+            if(m_IsActive && m_ApplyBuiltinRootMotion)
+                m_Animator.ApplyBuiltinRootMotion();
+		}
 
 
 
 
-        //Color debugTextColor = new Color(0, 0.6f, 1f, 1);
-        private GUIStyle textStyle = new GUIStyle();
+
+
+
+
+
+
+		#region Debug
+
+
+
+
+		//Color debugTextColor = new Color(0, 0.6f, 1f, 1);
+		private GUIStyle textStyle = new GUIStyle();
         private GUIStyle style = new GUIStyle();
 
         private Vector2 size;
