@@ -6,13 +6,15 @@ namespace CharacterController
 
     public class Roll : CharacterAction
     {
+        protected float m_CheckHeight = 0.4f;
         //public const int ACTION_ID = 15;
-        protected readonly float m_RollDistance = 3f;
+        protected readonly float m_MaxDistance = 3f;
         //protected readonly float m_CheckHeight = 0.35f;
 
         protected float m_RollRecurrenceDelay = 0.2f;
         protected float m_NextRollAllowed;
 
+        protected RaycastHit m_CheckDistanceHit;
         //
         // Methods
         //
@@ -21,6 +23,9 @@ namespace CharacterController
         {
             if (base.CanStartAction() && Time.time > m_NextRollAllowed)
             {
+                if(Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out m_CheckDistanceHit, m_MaxDistance, m_VaultLayers)){
+
+                }
                 return true;
             }
             return false;
@@ -32,7 +37,7 @@ namespace CharacterController
             m_ColliderHeight = m_CapsuleCollider.height;
             m_ColliderCenter = m_CapsuleCollider.center;
 
-            Vector3 velocity = Vector3.Scale(transform.forward, m_RollDistance * new Vector3((Mathf.Log(1f / (m_DeltaTime * m_Rigidbody.drag + 1)) / -m_DeltaTime), 0, (Mathf.Log(1f / (m_DeltaTime * m_Rigidbody.drag + 1)) / -m_DeltaTime)));
+            Vector3 velocity = Vector3.Scale(transform.forward, m_MaxDistance * new Vector3((Mathf.Log(1f / (m_DeltaTime * m_Rigidbody.drag + 1)) / -m_DeltaTime), 0, (Mathf.Log(1f / (m_DeltaTime * m_Rigidbody.drag + 1)) / -m_DeltaTime)));
             m_Rigidbody.velocity = velocity;
         }
 

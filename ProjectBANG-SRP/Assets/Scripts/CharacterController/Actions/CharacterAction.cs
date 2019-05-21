@@ -255,13 +255,23 @@
                                 m_InputIndex = i;
                                 return true;
                             }
-                            //if (m_FirstButtonPressed == m_KeyCodes[m_InputIndex] && Time.time - m_TimeOfFirstButtoonPressed < 0.25f)
-                            //{
-                            //    if (m_StopType == ActionStopType.ButtonToggle)
-                            //        m_ActionStopToggle = true;
-                                
-                            //    return true;
-                            //}
+                            // if (Input.GetKeyDown(m_KeyCodes[i]) && m_FirstButtonPressed == m_KeyCodes[i])
+                            // {
+                            //     m_FirstButtonPressed = KeyCode.F12;
+                            //     if (Time.time - m_TimeOfFirstButtoonPressed < 0.25f){
+                            //         if (m_StopType == ActionStopType.ButtonToggle)
+                            //             m_ActionStopToggle = true;
+                            //         m_InputIndex = i;
+                            //         return true;
+                            //     }
+                            // }
+                            // if (Input.GetKeyDown(m_KeyCodes[i]) && m_FirstButtonPressed != m_KeyCodes[i])
+                            // {
+                            //     m_FirstButtonPressed = m_KeyCodes[i];
+                            //     m_TimeOfFirstButtoonPressed = Time.time;
+                            //     return false;
+                            // }
+
                         }
                         break;
                     case ActionStartType.DoublePress:
@@ -272,6 +282,22 @@
                             {
                                 return true;
                             }
+                            
+                            // if (Input.GetKeyDown(m_KeyCodes[i]) && m_FirstButtonPressed == m_KeyCodes[i])
+                            // {
+                            //     m_FirstButtonPressed = KeyCode.F12;
+                            //     if (Time.time - m_TimeOfFirstButtoonPressed < m_DoublePressInputTime)
+                            //     {
+                            //         return true;
+                            //     }
+                            // }
+                            // if (Input.GetKeyDown(m_KeyCodes[i]) && m_FirstButtonPressed != m_KeyCodes[i])
+                            // {
+                            //     m_FirstButtonPressed = m_KeyCodes[i];
+                            //     m_TimeOfFirstButtoonPressed = Time.time;
+                            //     return false;
+                            // }
+
                         }
                         break;
                 }
