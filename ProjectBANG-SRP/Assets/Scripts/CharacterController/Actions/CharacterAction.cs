@@ -18,37 +18,41 @@
         protected string m_DestinationStateName;
         [SerializeField, HideInInspector]
         protected int m_ActionID;
-        [SerializeField]
+
+        [SerializeField, HideInInspector]
         protected float m_TransitionDuration = 0.2f;
-        //[SerializeField]
-        protected float m_SpeedMultiplier = 1;
-        [SerializeField]
-        protected string[] m_InputNames = new string[0];
-        [SerializeField]
+        [SerializeField, HideInInspector]
         protected ActionStartType m_StartType = ActionStartType.Manual;
-        [SerializeField]
+        [SerializeField, HideInInspector]
         protected ActionStopType m_StopType = ActionStopType.Manual;
-        [SerializeField]
+        [SerializeField, HideInInspector]
+        protected string[] m_InputNames = new string[0];
+        [SerializeField, HideInInspector]
+        protected float m_SpeedMultiplier = 1;
+        [SerializeField, HideInInspector]
         protected bool m_ApplyBuiltinRootMotion;
-        //[SerializeField]
+        [SerializeField, HideInInspector]
         protected AudioClip[] m_StartAudioClips = new AudioClip[0];
-        //[SerializeField]
+        [SerializeField, HideInInspector]
         protected AudioClip[] m_StopAudioClips = new AudioClip[0];
-        //[SerializeField]
+        [SerializeField, HideInInspector]
         protected GameObject m_StartEffect;
-        //[SerializeField]
+        [SerializeField, HideInInspector]
         protected GameObject m_EndEffect;
 
-        [Space(12)]
 
-        [Header("-- Action Parameters --")]
+        [Space(12)]
+        [Header("-- Action Debug Parameters --")]
         //  InputNames to KeyCodes
         protected KeyCode[] m_KeyCodes = new KeyCode[0];
         protected int m_InputIndex = -1;
+        private KeyCode m_ButtonDownPressed = KeyCode.F12;
+        private float m_ButtonDownPressedTime;
+
         //  Check double press variables.
-        private KeyCode m_FirstButtonPressed;
+        private KeyCode m_FirstButtonPressed = KeyCode.F12;
         private float m_TimeOfFirstButtoonPressed;
-        private float m_DoublePressInputTime = 0.1f;
+        //private float m_DoublePressInputTime = 0.1f;
 
         protected float m_ColliderHeight;
         protected Vector3 m_ColliderCenter;
@@ -152,6 +156,8 @@
                 m_KeyCodes = new KeyCode[m_InputNames.Length];
                 for (int i = 0; i < m_InputNames.Length; i++)
                 {
+                    if (string.IsNullOrWhiteSpace(m_InputNames[i]))
+                        continue;
                     m_KeyCodes[i] = (KeyCode)Enum.Parse(typeof(KeyCode), m_InputNames[i]);
                 }
             }
@@ -209,7 +215,7 @@
             if (Input.GetKeyDown(key) && m_FirstButtonPressed == key)
             {
                 m_FirstButtonPressed = KeyCode.F12;
-                if (Time.time - m_TimeOfFirstButtoonPressed < m_DoublePressInputTime)
+                if (Time.time - m_TimeOfFirstButtoonPressed < 0.25f)
                 {
                     return true;
                 }
@@ -255,48 +261,57 @@
                                 m_InputIndex = i;
                                 return true;
                             }
-                            // if (Input.GetKeyDown(m_KeyCodes[i]) && m_FirstButtonPressed == m_KeyCodes[i])
-                            // {
-                            //     m_FirstButtonPressed = KeyCode.F12;
-                            //     if (Time.time - m_TimeOfFirstButtoonPressed < 0.25f){
-                            //         if (m_StopType == ActionStopType.ButtonToggle)
-                            //             m_ActionStopToggle = true;
-                            //         m_InputIndex = i;
-                            //         return true;
-                            //     }
-                            // }
-                            // if (Input.GetKeyDown(m_KeyCodes[i]) && m_FirstButtonPressed != m_KeyCodes[i])
-                            // {
-                            //     m_FirstButtonPressed = m_KeyCodes[i];
-                            //     m_TimeOfFirstButtoonPressed = Time.time;
-                            //     return false;
-                            // }
 
+                            ////if (Input.GetKeyDown(m_KeyCodes[i]) && m_ButtonDownPressed == m_KeyCodes[i])
+                            ////{
+                            ////    if (Time.time - m_ButtonDownPressedTime < 0.25f)
+                            ////    {
+                            ////        m_ButtonDownPressed = KeyCode.F12;
+                            ////        if (m_StopType == ActionStopType.ButtonToggle)
+                            ////            m_ActionStopToggle = true;
+                            ////        m_InputIndex = i;
+                            ////        return true;
+                            ////    }
+                            ////}
+                            //if (Time.time - m_ButtonDownPressedTime < 0.25f && m_ButtonDownPressed == m_KeyCodes[i])
+                            //{
+                            //    m_ButtonDownPressed = KeyCode.F12;
+                            //    if (m_StopType == ActionStopType.ButtonToggle)
+                            //        m_ActionStopToggle = true;
+                            //    m_InputIndex = i;
+                            //    return true;
+                            //}
+                            //if (Input.GetKeyDown(m_KeyCodes[i]) && m_ButtonDownPressed != m_KeyCodes[i])
+                            //{
+                            //    m_ButtonDownPressed = m_KeyCodes[i];
+                            //    m_ButtonDownPressedTime = Time.time;
+                            //    return false;
+                            //}
                         }
                         break;
                     case ActionStartType.DoublePress:
 
                         for (int i = 0; i < m_KeyCodes.Length; i++)
                         {
-                            if (CheckDoubleTap(m_KeyCodes[i]))
-                            {
-                                return true;
-                            }
+                            //if (CheckDoubleTap(m_KeyCodes[i]))
+                            //{
+                            //    return true;
+                            //}
                             
-                            // if (Input.GetKeyDown(m_KeyCodes[i]) && m_FirstButtonPressed == m_KeyCodes[i])
-                            // {
-                            //     m_FirstButtonPressed = KeyCode.F12;
-                            //     if (Time.time - m_TimeOfFirstButtoonPressed < m_DoublePressInputTime)
-                            //     {
-                            //         return true;
-                            //     }
-                            // }
-                            // if (Input.GetKeyDown(m_KeyCodes[i]) && m_FirstButtonPressed != m_KeyCodes[i])
-                            // {
-                            //     m_FirstButtonPressed = m_KeyCodes[i];
-                            //     m_TimeOfFirstButtoonPressed = Time.time;
-                            //     return false;
-                            // }
+                             if (Input.GetKeyDown(m_KeyCodes[i]) && m_FirstButtonPressed == m_KeyCodes[i])
+                             {
+                                 m_FirstButtonPressed = KeyCode.F12;
+                                 if (Time.time - m_TimeOfFirstButtoonPressed < 0.18f)
+                                 {
+                                     return true;
+                                 }
+                             }
+                             if (Input.GetKeyDown(m_KeyCodes[i]) && m_FirstButtonPressed != m_KeyCodes[i])
+                             {
+                                 m_FirstButtonPressed = m_KeyCodes[i];
+                                 m_TimeOfFirstButtoonPressed = Time.time;
+                                 return false;
+                             }
 
                         }
                         break;
@@ -391,11 +406,26 @@
                     m_Animator.Play(GetDestinationState(index), index);
             }
 
+
+            if(m_StartEffect != null){
+                if (ObjectPool.Instance != null)
+                    ObjectPool.Instantiate(m_StartEffect, m_Transform.position, m_Transform.rotation);
+                else
+                    Instantiate(m_StartEffect, m_Transform.position, m_Transform.rotation);
+            }
         }
 
 
         public void StopAction()
         {
+            if (m_EndEffect != null){
+                if (ObjectPool.Instance != null)
+                    ObjectPool.Instantiate(m_EndEffect, m_Transform.position, m_Transform.rotation);
+                else
+                    Instantiate(m_EndEffect, m_Transform.position, m_Transform.rotation);
+            }
+
+
             m_Animator.SetInteger(HashID.ActionID, 0);
             m_Animator.SetInteger(HashID.ActionIntData, 0);
             m_Animator.ResetTrigger(HashID.ActionChange);

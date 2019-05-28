@@ -6,7 +6,6 @@ namespace CharacterController
 
     public class Jump : CharacterAction
     {
-        [Header("-- Jump Parameters --")]
         [SerializeField]
         protected float m_Force = 1;
         [SerializeField]

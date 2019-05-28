@@ -26,15 +26,17 @@
         [SerializeField, HideInInspector]
         protected float m_RotationSpeed = 10f;
         [SerializeField, HideInInspector]
+        protected float m_SlopeForceUp = 1f;
+        [SerializeField, HideInInspector]
         protected float m_SlopeForceDown = 1.25f;
-
-        protected float m_StopMovementThreshold = 0.2f;     //  TODO:  Need to add to editor
+        [SerializeField, HideInInspector]
+        protected float m_StopMovementThreshold = 0.2f;  
 
 
         [SerializeField, HideInInspector]
         protected CharacterAction[] m_Actions;
-        [SerializeField]
-        private CharacterAction m_ActiveAction;
+        [SerializeField, HideInInspector]
+        protected CharacterAction m_ActiveAction;
 
 
 
@@ -58,22 +60,25 @@
         private float m_Stickiness;
 
         private float m_StartAngle, m_StartAngleSmooth;
-        //private RaycastHit m_GroundHit, m_StepHit;
-        //private float m_GroundDistance;
         private bool m_OnStep;
-        private float m_SlopeAngle;
+
         private Vector3 m_StepRayStart, m_StepRayDirection;
 
         private Vector3 m_VelocitySmooth;
 
 
 
-        //[SerializeField]
         private bool m_CheckGround = true, m_UpdateRotation = true, m_UpdateMovement = true, m_UpdateAnimator = true, m_Move = true, m_CheckMovement = true;
 
 
         private Animator m_Animator;
         private AnimatorMonitor m_AnimationMonitor;
+
+        //  For Editor.
+        [SerializeField, HideInInspector]
+        private bool displayMovement = true, displayPhysics = true, displayActions = true;
+
+
 
 
 
@@ -337,7 +342,7 @@
 
                     m_Rigidbody.velocity = m_Rigidbody.velocity - m_Transform.up * m_Stickiness * m_DeltaTime;
 
-                    if (m_SlopeAngle > m_SlopeLimit)
+                    if (m_GroundSlopeAngle > m_SlopeLimit)
                     {
                         if (m_InputVector == Vector3.zero && m_Rigidbody.velocity.sqrMagnitude < (0.5f * 0.5f))
                         {
@@ -416,7 +421,7 @@
                 {
                     //m_Velocity = Vector3.SmoothDamp(m_Velocity, m_MoveDirection, ref m_VelocitySmooth, m_Acceleration);
                     m_Velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
-                    if (m_SlopeAngle < 0)
+                    if (m_GroundSlopeAngle < 0)
                         m_Velocity += Vector3.down * m_SlopeForceDown;
                     m_Rigidbody.AddForce(m_Velocity * m_DeltaTime, ForceMode.VelocityChange);
                     //m_Rigidbody.velocity = m_Velocity * m_DeltaTime + m_VerticalVelocity;
@@ -512,9 +517,19 @@
             //  -----------
             if (m_UpdateAnimator == true)
             {
-                //  Movement Input
-                m_AnimationMonitor.SetForwardInputValue(m_InputVector.z);
-                m_AnimationMonitor.SetHorizontalInputValue(m_InputVector.x);
+                if(m_Grounded){
+                    //  Movement Input
+                    m_Animator.applyRootMotion = true;
+                    m_AnimationMonitor.SetForwardInputValue(m_InputVector.z);
+                    m_AnimationMonitor.SetHorizontalInputValue(m_InputVector.x);
+                }
+                else{
+                    //m_AnimationMonitor.SetForwardInputValue(0);
+                    //m_AnimationMonitor.SetHorizontalInputValue(0);
+                    m_Animator.applyRootMotion = false;
+                    m_Animator.SetFloat(HashID.ForwardInput, 0);
+                    m_Animator.SetFloat(HashID.HorizontalInput, 0);
+                }
             }
         }
 

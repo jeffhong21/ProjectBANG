@@ -4,10 +4,135 @@ using UnityEditorInternal;
 
 public static class InspectorUtility
 {
+    private static GUIStyle labelFieldStyle;
+    private static GUIStyle foldoutStyle;
+
+
+    static InspectorUtility()
+    {
+        labelFieldStyle = new GUIStyle()
+        {
+            font = new GUIStyle(EditorStyles.label).font,
+            fontStyle = FontStyle.Bold,
+            fontSize = 11,
+        };
+
+
+        foldoutStyle = new GUIStyle("ShurikenModuleTitle")
+        {
+            font = new GUIStyle(EditorStyles.label).font,
+            fontStyle = FontStyle.Bold,
+            fontSize = 11,
+            border = new RectOffset(15, 7, 4, 4),
+            fixedHeight = 22,
+            contentOffset = new Vector2(20f, -2f),
+        };
+
+    }
+
+
+    public static void LabelField(string text, int fontSize = 11, FontStyle fontStyle = FontStyle.Bold){
+        labelFieldStyle.fontSize = fontSize;
+        labelFieldStyle.fontStyle = fontStyle;
+        EditorGUILayout.LabelField(text, labelFieldStyle);
+    }
+
+    public static void LabelField(GUIContent content, int fontSize = 11, FontStyle fontStyle = FontStyle.Bold)
+    {
+        labelFieldStyle.fontSize = fontSize;
+        labelFieldStyle.fontStyle = fontStyle;
+        EditorGUILayout.LabelField(content, labelFieldStyle);
+    }
+
+    public static void PropertyField(SerializedProperty property, bool includeChildren = false)
+    {
+        if(property == null){
+            EditorGUILayout.HelpBox("Property " + property.name + " does not exist", MessageType.Error);
+            return;
+        }
+        if(property.isArray && includeChildren){
+            property.isExpanded = EditorGUILayout.Foldout(property.isExpanded, property.displayName);
+            if (property.isExpanded)
+            {
+                EditorGUI.indentLevel++;
+                EditorGUILayout.PropertyField(property.FindPropertyRelative("Array.size"));
+                for (int index = 0; index < property.arraySize; index++)
+                {
+                    EditorGUILayout.PropertyField(property.GetArrayElementAtIndex(index));
+                }
+                EditorGUI.indentLevel--;
+                EditorGUILayout.Space();
+            }
+        }
+        else{
+            EditorGUILayout.PropertyField(property, includeChildren);
+        }
+    }
 
 
 
-    public static void DrawReorderableList(SerializedObject serializedObject, SerializedProperty property)
+    public static bool Foldout(bool display, string title, int fontSize, FontStyle fontStyle = FontStyle.Normal)
+    {
+        foldoutStyle.fontSize = Mathf.Clamp(fontSize, 8, 24);
+        foldoutStyle.fontStyle = fontStyle;
+
+        var rect = GUILayoutUtility.GetRect(16f, 22f, foldoutStyle);
+        GUI.Box(rect, title, foldoutStyle);
+
+        var e = Event.current;
+
+        var toggleRect = new Rect(rect.x + 4f, rect.y + 2f, 13f, 13f);
+        if (e.type == EventType.Repaint)
+        {
+            EditorStyles.foldout.Draw(toggleRect, false, false, display, false);
+        }
+
+        if (e.type == EventType.MouseDown && rect.Contains(e.mousePosition))
+        {
+            display = !display;
+            e.Use();
+        }
+        EditorGUILayout.Space();
+        return display;
+    }
+
+
+    public static bool Foldout(bool display, string title)
+    {
+        var rect = GUILayoutUtility.GetRect(16f, 22f, foldoutStyle);
+        GUI.Box(rect, title, foldoutStyle);
+
+        var e = Event.current;
+
+        var toggleRect = new Rect(rect.x + 4f, rect.y + 2f, 13f, 13f);
+        if (e.type == EventType.Repaint)
+        {
+            EditorStyles.foldout.Draw(toggleRect, false, false, display, false);
+        }
+
+        if (e.type == EventType.MouseDown && rect.Contains(e.mousePosition))
+        {
+            display = !display;
+            e.Use();
+        }
+        EditorGUILayout.Space();
+        return display;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private static void DrawReorderableList(SerializedObject serializedObject, SerializedProperty property)
     {
         ReorderableList list = new ReorderableList(serializedObject, property, true, true, true, true)
         {
@@ -47,7 +172,7 @@ public static class InspectorUtility
 
     }
 
-    public static void DrawReorderableList(ReorderableList list)
+    private static void DrawReorderableList(ReorderableList list)
     {
         list.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
         {

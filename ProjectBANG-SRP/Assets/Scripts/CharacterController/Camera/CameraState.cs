@@ -54,6 +54,8 @@ namespace CharacterController
         [Header("--  Zoom Settings  --")]
         public bool ApplyStepZoom;
         public float StepZoomSensitivity = 1;
+        [Range(0, 1)]
+        public float StepZoomSmooth = 0.15f;
         public float MinStepZooom = -1;
         public float MaxStepZoom = 10;
 

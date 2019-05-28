@@ -297,7 +297,7 @@
             if (m_CameraState.ApplyCameraOffset)
                 m_CameraPosition = m_CameraState.CameraOffset;
             m_CameraPosition.z = m_CameraPosition.z + (-m_CameraState.ViewDistance);
-
+            //m_CameraPosition.z = m_CameraPosition.z + m_ZoomAmount;
 
             //m_PitchPivot.localPosition = Vector3.Lerp(m_PitchPivot.localPosition, m_PitchPivotPosition, 12 * m_DeltaTime);
             m_Camera.transform.localPosition = Vector3.Lerp(m_Camera.transform.localPosition, m_CameraPosition, 12 * m_DeltaTime);
@@ -433,20 +433,22 @@
 
         public void ZoomCamera(float zoomInput)
         {
-            //var direction = m_Character.transform.position - m_PitchPivot.position;
-            //float distance = direction.magnitude;
-            //var newDistance = distance + m_CameraState.ZoomStep * zoomInput;
 
-            //m_ZoomAmount = Mathf.Lerp(distance, newDistance, m_CameraState.ZoomSmooth * m_DeltaTime);
-            //if(m_ZoomAmount > m_CameraState.MaxZoom){
-            //    m_ZoomAmount = m_CameraState.MaxZoom;
-            //}
-            //if (m_ZoomAmount > m_CameraState.MinZooom)
-            //{
-            //    m_ZoomAmount = m_CameraState.MinZooom;
-            //}
+            m_ZoomAmount = m_CameraState.StepZoomSensitivity * zoomInput;
 
-            if(zoomInput != 0) Debug.LogFormat("Zoom Input {0}", zoomInput);
+            var direction = m_Character.transform.position - m_Camera.transform.position;
+            var distance = direction.magnitude + m_ZoomAmount;
+
+            //m_ZoomAmount = Mathf.Lerp(distance, newDistance, m_CameraState.StepZoomSmooth * m_DeltaTime);
+            if(distance > m_CameraState.MaxStepZoom){
+                m_ZoomAmount = m_CameraState.MaxStepZoom;
+            }
+            if (distance < m_CameraState.MinStepZooom)
+            {
+                m_ZoomAmount = m_CameraState.MinStepZooom;
+            }
+
+            if(zoomInput != 0) Debug.LogFormat("m_ZoomAmount {0} | distance {1}", m_ZoomAmount, distance);
         }
 
 

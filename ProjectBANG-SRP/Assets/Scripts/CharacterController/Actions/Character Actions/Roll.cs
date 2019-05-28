@@ -11,8 +11,10 @@ namespace CharacterController
         protected readonly float m_MaxDistance = 3f;
         //protected readonly float m_CheckHeight = 0.35f;
 
+
         protected float m_RollRecurrenceDelay = 0.2f;
         protected float m_NextRollAllowed;
+
 
         protected RaycastHit m_CheckDistanceHit;
         //
@@ -23,9 +25,9 @@ namespace CharacterController
         {
             if (base.CanStartAction() && Time.time > m_NextRollAllowed)
             {
-                if(Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out m_CheckDistanceHit, m_MaxDistance, m_VaultLayers)){
+                //if(Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out m_CheckDistanceHit, m_MaxDistance, m_VaultLayers)){
 
-                }
+                //}
                 return true;
             }
             return false;

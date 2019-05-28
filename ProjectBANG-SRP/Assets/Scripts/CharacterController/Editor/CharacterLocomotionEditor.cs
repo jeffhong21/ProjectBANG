@@ -15,9 +15,15 @@ namespace CharacterController
         //private static readonly string[] m_DontIncude = new string[] { "m_Script" };
         //private static readonly string[] m_DontIncude = new string[] { "m_Actions" };
 
-        private const string MotorFoldoutHeader = "Character Motor";
+        private readonly bool m_UseDefaultFoldout = false;
+
+
+        private const string MotorFoldoutHeader = "Character Movement";
         private const string PhysicsFoldoutHeader = "Character Physics";
         private const string ActionsFoldoutHeader = "Actions List";
+        private const string DebugHeader = "-- Debug --";
+
+
 
         CharacterLocomotion m_Controller;
 
@@ -29,6 +35,7 @@ namespace CharacterController
         private bool m_ShowCharMotorFoldout = true;
         private bool m_ShowCharPhysicsFoldout;
         private bool m_ShowActionListFoldout = true;
+        private bool m_DebugFoldout = true;
 
         private GUIStyle m_DefaultActionTextStyle = new GUIStyle();
         private GUIStyle m_ActiveActionTextStyle = new GUIStyle();
@@ -38,6 +45,8 @@ namespace CharacterController
         private float m_LineHeight;
 
         private SerializedProperty m_Script;
+        private SerializedProperty m_Debug;
+
         private SerializedProperty m_Actions;
         private SerializedProperty m_UseRootMotion;
         private SerializedProperty m_RootMotionSpeedMultiplier;
@@ -51,11 +60,14 @@ namespace CharacterController
         private SerializedProperty m_SlopeLimit;
         private SerializedProperty m_MaxStepHeight;
 
-        private SerializedProperty m_AlignToGround;
-        private SerializedProperty m_AlignToGroundDepthOffset;
+
         private SerializedProperty m_StepOffset;
         private SerializedProperty m_StepSpeed;
 
+
+        private SerializedProperty displayMovement;
+        private SerializedProperty displayPhysics;
+        private SerializedProperty displayActions;
 
 
 
@@ -68,9 +80,12 @@ namespace CharacterController
             m_DefaultActionTextStyle.fontStyle = FontStyle.Normal;
             m_ActiveActionTextStyle.fontStyle = FontStyle.Bold;
 
-
+            displayMovement = serializedObject.FindProperty("displayMovement");
+            displayPhysics = serializedObject.FindProperty("displayPhysics");
+            displayActions = serializedObject.FindProperty("displayActions");
 
             m_Script = serializedObject.FindProperty("m_Script");
+            m_Debug = serializedObject.FindProperty("m_Debug");
             m_Actions = serializedObject.FindProperty("m_Actions");
             m_UseRootMotion = serializedObject.FindProperty("m_UseRootMotion");
             m_RootMotionSpeedMultiplier = serializedObject.FindProperty("m_RootMotionSpeedMultiplier");
@@ -85,8 +100,7 @@ namespace CharacterController
             m_SkinWidth = serializedObject.FindProperty("m_SkinWidth");
             m_SlopeLimit = serializedObject.FindProperty("m_SlopeLimit");
 
-            m_AlignToGround = serializedObject.FindProperty("m_AlignToGround");
-            m_AlignToGroundDepthOffset = serializedObject.FindProperty("m_AlignToGroundDepthOffset");
+
             m_StepOffset = serializedObject.FindProperty("m_StepOffset");
             m_StepSpeed = serializedObject.FindProperty("m_StepSpeed");
 
@@ -102,9 +116,16 @@ namespace CharacterController
             GUI.enabled = false;
             EditorGUILayout.PropertyField(m_Script);
             GUI.enabled = true;
-            //m_ShowCharPhysicsFoldout = Foldout("Character Locomtion", m_ShowCharPhysicsFoldout);
-            m_ShowCharMotorFoldout = EditorGUILayout.Foldout(m_ShowCharMotorFoldout, MotorFoldoutHeader);
-            if(m_ShowCharMotorFoldout)
+
+
+            EditorGUILayout.PropertyField(m_Debug);
+
+            //  -----
+            //  Character Movement
+            //  -----
+            EditorGUILayout.Space();
+            displayMovement.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayMovement.boolValue, MotorFoldoutHeader) : InspectorUtility.Foldout(displayMovement.boolValue, MotorFoldoutHeader);
+            if(displayMovement.boolValue)
             {
                 EditorGUILayout.PropertyField(m_UseRootMotion);
                 //  Root motion related variables.
@@ -115,40 +136,100 @@ namespace CharacterController
                 EditorGUILayout.PropertyField(m_MovementSpeed);
                 EditorGUILayout.PropertyField(m_Acceleration);
                 EditorGUILayout.PropertyField(m_RotationSpeed);
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_SlopeForceUp"));
                 EditorGUILayout.PropertyField(m_SlopeForceDown);
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_StopMovementThreshold"));
+
             }
 
+            //  -----
+            //  Character Physics
+            //  -----
             EditorGUILayout.Space();
-
-            m_ShowCharPhysicsFoldout  = EditorGUILayout.Foldout(m_ShowCharPhysicsFoldout, PhysicsFoldoutHeader);
-            if(m_ShowCharPhysicsFoldout)
+            displayPhysics.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayPhysics.boolValue, PhysicsFoldoutHeader) : InspectorUtility.Foldout(displayPhysics.boolValue, PhysicsFoldoutHeader);
+            if(displayPhysics.boolValue)
             {
                 EditorGUILayout.PropertyField(m_Mass);
                 EditorGUILayout.PropertyField(m_SkinWidth);
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_GroundStickiness"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_ExternalForceDamping"));
                 EditorGUILayout.PropertyField(m_SlopeLimit);
                 EditorGUILayout.PropertyField(m_MaxStepHeight);
                 EditorGUILayout.PropertyField(m_StepOffset);
                 EditorGUILayout.PropertyField(m_StepSpeed);
-                EditorGUILayout.PropertyField(m_AlignToGround);
-                EditorGUILayout.PropertyField(m_AlignToGroundDepthOffset);
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_GravityModifier"));
+
+
             }
 
+            //  -----
+            //  Character Actions
+            //  -----
             EditorGUILayout.Space();
+            displayActions.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayActions.boolValue, ActionsFoldoutHeader) : InspectorUtility.Foldout(displayActions.boolValue, ActionsFoldoutHeader);
+            if(displayActions.boolValue)
+            {
+                EditorGUILayout.Space();
+                //  Active Action.
+                EditorGUILayout.BeginHorizontal();
+                InspectorUtility.LabelField(serializedObject.FindProperty("m_ActiveAction").displayName, 11, FontStyle.Normal);
+                GUI.enabled = false;
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_ActiveAction"), GUIContent.none);
+                GUI.enabled = true;
+                EditorGUILayout.EndHorizontal();
 
-            //  Draw Action List.
-            m_ShowActionListFoldout = EditorGUILayout.Foldout(m_ShowActionListFoldout, ActionsFoldoutHeader);
-            if(m_ShowActionListFoldout){
 
-                DrawReorderableList(m_ActionsList);
                 //  Draw Action Inspector.
+                //EditorGUI.indentLevel++;
+                EditorGUILayout.Space();
+
+                //GUILayout.BeginVertical("box");
+                DrawReorderableList(m_ActionsList);
+                //GUILayout.EndVertical();
+
+                //  Draw Selected Action Inspector.
                 EditorGUI.indentLevel++;
-                DrawActionInspector(m_SelectedAction);
+                if (m_SelectedAction != null)
+                {
+                    GUILayout.BeginVertical("box");
+
+                    GUILayout.Space(12);
+                    m_ActionEditor = CreateEditor(m_SelectedAction);
+                    //m_ActionEditor.DrawDefaultInspector();
+                    m_ActionEditor.OnInspectorGUI();
+
+                    GUILayout.Space(12);
+
+                    GUILayout.EndVertical();
+                }
+                //EditorGUI.indentLevel--;
                 EditorGUI.indentLevel--;
             }
 
 
-            GUILayout.Space(12);
-            DrawPropertiesExcluding(serializedObject, m_DontIncude);
+
+            //  -----
+            //  Debugging
+            //  -----
+            if(m_Debug.boolValue){
+                EditorGUILayout.Space();
+                m_DebugFoldout = m_UseDefaultFoldout ? EditorGUILayout.Foldout(m_DebugFoldout, DebugHeader) : InspectorUtility.Foldout(m_DebugFoldout, DebugHeader);
+                if (m_DebugFoldout)
+                {
+                    DrawPropertiesExcluding(serializedObject, m_DontIncude);
+
+
+                    EditorGUILayout.Space();
+                    InspectorUtility.LabelField("-- Debug Settings--");
+                    EditorGUI.indentLevel++;
+
+                    InspectorUtility.PropertyField(serializedObject.FindProperty("m_DrawDebugLine"));
+
+                    EditorGUI.indentLevel--;
+                }
+            }
+
+            EditorGUILayout.Space();
             serializedObject.ApplyModifiedProperties();
         }
 
@@ -156,16 +237,31 @@ namespace CharacterController
 
         private void DrawReorderableList(ReorderableList list)
         {
-            GUILayout.Space(12);
+            //GUILayout.Space(12);
             //GUILayout.BeginVertical("box");
             list.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
             {
                 SerializedProperty element = list.serializedProperty.GetArrayElementAtIndex(index);
                 DrawListElement(rect, element, isActive);
+
+
             };
 
-            list.drawHeaderCallback = (Rect rect) => {
-                DrawListHeader(rect);
+            list.drawHeaderCallback = (Rect rect) => 
+            {
+                Rect headerRect = rect;
+                headerRect.x += 12;
+                EditorGUI.LabelField(headerRect, m_Actions.displayName);
+
+                //  Action state name.
+                //headerRect.x = rect.width * 0.465f;
+                headerRect.x += rect.width * 0.40f;
+                headerRect.width = rect.width * 0.36f;
+                EditorGUI.LabelField(headerRect, "State Name");
+
+                //  Action state name.
+                headerRect.x = rect.width - 50f;
+                EditorGUI.LabelField(headerRect, "ID");
             };
 
             list.onSelectCallback = (ReorderableList l) => {
@@ -189,31 +285,18 @@ namespace CharacterController
                 RemoveCharacterAction(l.index);
             };
 
+            //Event evt = Event.current;
+            //if (rect.Contains(evt.mousePosition))
+            //{
+            //    if (evt.button == 0 && evt.isMouse && evt.type == EventType.MouseDown)
+            //    {
+                    
+            //    }
+            //}
 
             list.DoLayoutList();
             //GUILayout.EndVertical();
             GUILayout.Space(12);
-        }
-
-
-
-
-
-
-
-        private void DrawListHeader(Rect rect)
-        {
-            Rect headerRect = rect;
-            headerRect.x += 12;
-            EditorGUI.LabelField(headerRect, m_Actions.displayName);
-
-            //  Action state name.
-            headerRect.x = rect.width * 0.48f;
-            EditorGUI.LabelField(headerRect, "State Name");
-
-            //  Action state name.
-            headerRect.x = rect.width - 50f;
-            EditorGUI.LabelField(headerRect, "ID");
         }
 
 
@@ -264,13 +347,20 @@ namespace CharacterController
 
 
                 Event evt = Event.current;
-                if(elementRect.Contains(evt.mousePosition)){
-                    if(evt.button == 1 && evt.isMouse && evt.type == EventType.MouseUp)
+                if (elementRect.Contains(evt.mousePosition))
+                {
+                    if (evt.button == 1 && evt.isMouse && evt.type == EventType.MouseUp)
                     {
                         var menu = new GenericMenu();
                         menu.AddItem(new GUIContent("Add"), false, () => TestContextMenu(action.GetType().Name));
                         menu.AddItem(new GUIContent("Remove"), false, () => TestContextMenu(action.GetType().Name));
                         menu.ShowAsContext();
+                    }
+                }
+                else {
+                    if (evt.button == 0 && evt.isMouse && evt.type == EventType.MouseUp)
+                    {
+                        if(action != null) action = null;
                     }
                 }
             }
@@ -319,7 +409,6 @@ namespace CharacterController
             serializedList.DeleteArrayElementAtIndex(index);
 
 
-
             DestroyImmediate(characterAction, true);
             //serializedObject.Update();
             AssetDatabase.Refresh();
@@ -330,40 +419,6 @@ namespace CharacterController
 
 
 
-        private void DrawActionInspector(SerializedObject selectedObject)
-        {
-            if(selectedObject != null)
-            {
-                GUILayout.Space(12);
-                SerializedProperty propertyIterator = selectedObject.GetIterator();
-                while (propertyIterator.NextVisible(true))
-                {
-                    //var propertyPath = propertyIterator.propertyPath;
-                    //if (propertyPath.EndsWith("m_StateName")) continue;
-                    EditorGUILayout.PropertyField(propertyIterator);
-                }
-                GUILayout.Space(12);
-
-            }
-
-        }
-
-
-        private void DrawActionInspector(CharacterAction selectedObject)
-        {
-            if (selectedObject != null)
-            {
-                GUILayout.BeginVertical("box");
-
-                GUILayout.Space(12);
-                m_ActionEditor = CreateEditor(selectedObject);
-                m_ActionEditor.DrawDefaultInspector();
-                GUILayout.Space(12);
-
-                GUILayout.EndVertical();
-            }
-
-        }
 
 
 
@@ -376,37 +431,35 @@ namespace CharacterController
 
 
 
+        //public bool Foldout(bool display, string title, int fontSize = 12)
+        //{
+        //    var style = new GUIStyle("ShurikenModuleTitle");
+        //    style.font = new GUIStyle(EditorStyles.label).font;
+        //    style.fontSize = fontSize;
+        //    //style.fontStyle = FontStyle.Bold;
+        //    style.border = new RectOffset(15, 7, 4, 4);
+        //    style.fixedHeight = 22;
+        //    style.contentOffset = new Vector2 (20f, -2f);
 
+        //    var rect = GUILayoutUtility.GetRect(16f, 22f, style);
+        //    GUI.Box(rect, title, style);
 
+        //    var e = Event.current;
 
+        //    var toggleRect = new Rect(rect.x + 4f, rect.y + 2f, 13f, 13f);
+        //    if (e.type == EventType.Repaint)
+        //    {
+        //        EditorStyles.foldout.Draw(toggleRect, false, false, display, false);
+        //    }
 
-        public bool Foldout(string title, bool display)
-        {
-            var style = new GUIStyle("ShurikenModuleTitle");
-            style.font = new GUIStyle(EditorStyles.label).font;
-            style.border = new RectOffset(15, 7, 4, 4);
-            style.fixedHeight = 22;
-            style.contentOffset = new Vector2 (20f, -2f);
+        //    if (e.type == EventType.MouseDown && rect.Contains(e.mousePosition))
+        //    {
+        //        display = !display;
+        //        e.Use();
+        //    }
 
-            var rect = GUILayoutUtility.GetRect(16f, 22f, style);
-            GUI.Box(rect, title, style);
-
-            var e = Event.current;
-
-            var toggleRect = new Rect(rect.x + 4f, rect.y + 2f, 13f, 13f);
-            if (e.type == EventType.Repaint)
-            {
-                EditorStyles.foldout.Draw(toggleRect, false, false, display, false);
-            }
-
-            if (e.type == EventType.MouseDown && rect.Contains(e.mousePosition))
-            {
-                display = !display;
-                e.Use();
-            }
-
-            return display;
-        }
+        //    return display;
+        //}
     }
 
 }

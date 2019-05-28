@@ -7,6 +7,7 @@ namespace CharacterController
     [RequireComponent(typeof(CapsuleCollider), typeof(Rigidbody), typeof(LayerManager))]
     public class RigidbodyController : MonoBehaviour
     {
+
         //  Physics variables
         [SerializeField, HideInInspector]
         protected float m_Mass = 100;
@@ -16,19 +17,21 @@ namespace CharacterController
         protected float m_SlopeLimit = 45f;
         [SerializeField, HideInInspector]
         protected float m_MaxStepHeight = 0.25f;
-        protected float m_GroundStickiness = 6f;             //  TODO:  Need to add to editor
-        protected float m_ExternalForceDamping = 0.1f;      //  TODO:  Need to add to editor
+        [SerializeField, HideInInspector]
+        protected float m_GroundStickiness = 6f;            
+        [SerializeField, HideInInspector]
+        protected float m_ExternalForceDamping = 0.1f;     
         [SerializeField, HideInInspector, Range(0, 0.3f), Tooltip("Minimum height to consider a step.")]
         protected float m_StepOffset = 0.15f;
         [SerializeField, HideInInspector]
         protected float m_StepSpeed = 4f;
-        //[SerializeField, HideInInspector]
-        protected float m_GravityModifier = 2f;           //  TODO:  Need to add to editor
+        [SerializeField, HideInInspector]
+        protected float m_GravityModifier = 2f;          
 
-        [SerializeField, HideInInspector]
-        protected bool m_AlignToGround = true;
-        [SerializeField, HideInInspector]
-        protected float m_AlignToGroundDepthOffset = 0.5f;
+        //[SerializeField, HideInInspector]
+        //protected bool m_AlignToGround = true;
+        //[SerializeField, HideInInspector]
+        //protected float m_AlignToGroundDepthOffset = 0.5f;
 
 
 
@@ -40,9 +43,8 @@ namespace CharacterController
         protected float m_GroundDistance;
         protected float m_AirbornThreshold = 0.3f;
         protected Vector3 m_GroundNormal;
-
         protected float m_GroundCheckHeight;
-
+        protected float m_GroundSlopeAngle;
 
         protected LayerManager m_Layers;
         protected CapsuleCollider m_CapsuleCollider;
@@ -53,10 +55,15 @@ namespace CharacterController
 
 
 
-
-        [Header("-- Debug --")]
-        [SerializeField]
+        //  Debug parameters.
+        [SerializeField, HideInInspector]
+        protected bool m_Debug;
+        [SerializeField, HideInInspector]
         protected bool m_DrawDebugLine;
+
+
+
+
 
 
         public RaycastHit GroundHit{
@@ -154,7 +161,7 @@ namespace CharacterController
             //Gizmos.DrawRay(transform.position + transform.up * slopeCheckHeight, slopeCheckVector );//- (transform.forward) * 0.3f);
             #endregion
 
-            if (m_DrawDebugLine && Application.isPlaying)
+            if (m_Debug && Application.isPlaying)
             {
                 DrawGizmos();
             }

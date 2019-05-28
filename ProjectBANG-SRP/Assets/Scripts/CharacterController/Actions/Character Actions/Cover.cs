@@ -4,15 +4,13 @@
     using System;
 
 
+
     public class Cover : CharacterAction
     {
         public const int ACTION_ID = (int)ActionTypeDefinition.Cover;
         private readonly bool hideflags = true;
 
 
-
-
-        [Header("-- Cover Settings --")]
         [SerializeField]
         protected float m_TakeCoverDistance = 2f;
         [SerializeField]

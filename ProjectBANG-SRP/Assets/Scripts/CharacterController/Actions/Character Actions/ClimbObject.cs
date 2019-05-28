@@ -25,16 +25,17 @@ namespace CharacterController
         //[SerializeField]
         private Vector3 m_Velocity, m_VerticalVelocity;
         private float m_PlatformHeight, m_HeightDifference;
-        private Vector3 m_EndPosition;
+        private Vector3 m_StartPosition, m_EndPosition;
 
         private RaycastHit ObjectHit, ObjectHeightHit;
 
         private MatchTargetWeightMask m_MatchTargetWeightMask = new MatchTargetWeightMask(Vector3.one, 0);
         private float m_StartTime;
 
-
-
-
+        [SerializeField, DisplayOnly]
+        private bool isMatchingTarget;
+        [SerializeField, DisplayOnly]
+        private float normalizeTime;
 
 
         [SerializeField] bool m_Debug;
@@ -68,7 +69,7 @@ namespace CharacterController
                     Vector3 heightCheckStart = ObjectHit.point;
                     //  Add a little buffer to max height.
                     heightCheckStart.y += (m_MaxHeight + 0.1f) - m_CheckHeight;
-                    heightCheckStart += m_Transform.forward * 0.2f;
+                    heightCheckStart += m_Transform.forward * m_CapsuleCollider.radius;
 
                     Debug.DrawRay(heightCheckStart, Vector3.down * (m_MaxHeight - m_MinHeight), Color.cyan, 1f);
                     if (Physics.Raycast(heightCheckStart, Vector3.down, out ObjectHeightHit, (m_MaxHeight - m_MinHeight), m_CheckLayers)){
@@ -89,6 +90,7 @@ namespace CharacterController
 
         protected override void ActionStarted()
         {
+            m_StartPosition = m_Transform.position;
             m_EndPosition = ObjectHeightHit.point;
             //  Get the objet to vault over height.
             m_PlatformHeight = (m_MaxHeight + 0.1f) - ObjectHeightHit.distance;
@@ -103,23 +105,23 @@ namespace CharacterController
 
 
             Vector3 verticalVelocity = Vector3.up * (Mathf.Sqrt((m_PlatformHeight) * -2 * Physics.gravity.y));
-            m_Rigidbody.velocity = verticalVelocity;
+            //m_Rigidbody.velocity = verticalVelocity;
             //m_Rigidbody.AddForce(verticalVelocity, ForceMode.VelocityChange);
             //Debug.LogFormat("m_PlatformHeight is:  {0}.  m_HeightDifference is : {1}", m_PlatformHeight, m_HeightDifference);
-
         }
 
 
 		public override bool UpdateRotation()
 		{
             float angle = Vector3.Angle(m_Transform.forward, -ObjectHit.normal);
-            //Quaternion rotation = Quaternion.AngleAxis(angle, m_Transform.up) * m_Transform.rotation;
-            //m_Rigidbody.MoveRotation(Quaternion.AngleAxis(angle * m_DeltaTime * 20, m_Transform.up) * m_Rigidbody.rotation);
-            m_Rigidbody.MoveRotation(Quaternion.AngleAxis(angle, m_Transform.up) * m_Rigidbody.rotation);
+            //if(angle != 0){
+            //    //Quaternion rotation = Quaternion.AngleAxis(angle, m_Transform.up) * m_Transform.rotation;
+            //    //m_Rigidbody.MoveRotation(Quaternion.AngleAxis(angle * m_DeltaTime * 20, m_Transform.up) * m_Rigidbody.rotation);
+            //    m_Rigidbody.MoveRotation(Quaternion.AngleAxis(angle, m_Transform.up) * m_Rigidbody.rotation);
+            //}
 
-
-            //Quaternion rotation = Quaternion.FromToRotation(m_Transform.forward, -ObjectHit.normal) * m_Transform.rotation;
-            //m_Rigidbody.MoveRotation(Quaternion.Slerp(rotation, m_Rigidbody.rotation, m_DeltaTime).normalized);
+            Quaternion rotation = Quaternion.FromToRotation(m_Transform.forward, -ObjectHit.normal);
+            m_Rigidbody.MoveRotation(Quaternion.Slerp(rotation, m_Rigidbody.rotation, m_DeltaTime * 10));
 
             return false;
 		}
@@ -128,31 +130,29 @@ namespace CharacterController
 		//  Move over the vault object based off of the root motion forces.
 		public override bool UpdateMovement()
         {
-            m_Controller.InputVector = Vector3.forward;
+            Vector3 verticalVelocity = Vector3.up * (Mathf.Sqrt((m_PlatformHeight) * -2 * Physics.gravity.y));
 
-            if(m_Rigidbody.position.y != m_EndPosition.y){
-                m_CapsuleCollider.height = Mathf.MoveTowards(m_CapsuleCollider.height, m_ColliderHeight * 0.75f, m_DeltaTime * 4);
-                m_VerticalVelocity = Vector3.up * (Mathf.Sqrt((m_PlatformHeight) * -2 * Physics.gravity.y));
-                m_Rigidbody.AddForce(m_VerticalVelocity * m_DeltaTime, ForceMode.Acceleration);
+            float distance = ObjectHeightHit.point.y - m_Rigidbody.position.y;
+            float percent = (m_PlatformHeight - distance) / m_PlatformHeight;
+
+            if(m_Animator.isMatchingTarget == false)
+            {
+                if (distance <= 0.12f)
+                {
+                    m_Rigidbody.isKinematic = false;
+                    Vector3 position = Vector3.Lerp(m_Rigidbody.position, m_EndPosition, percent);
+                    m_Rigidbody.MovePosition(Vector3.Lerp(m_Rigidbody.position, m_EndPosition, percent * 0.25f));
+                }
+                else
+                {
+                    //m_Controller.InputVector = m_Transform.forward;
+                    //m_Transform.position = new Vector3(m_Transform.position.x, m_Transform.position.y, m_StartPosition.z);
+                    //m_Rigidbody.position = new Vector3(m_Rigidbody.position.x, m_Rigidbody.position.y + m_CapsuleCollider.radius, m_StartPosition.z);
+                    m_Rigidbody.MovePosition(Vector3.Lerp(m_Rigidbody.position, new Vector3(m_Rigidbody.position.x, ObjectHeightHit.point.y, m_StartPosition.z), percent * 0.25f));
+
+                }
             }
-            //else {
-            //    m_CapsuleCollider.height = Mathf.MoveTowards(m_CapsuleCollider.height, m_ColliderHeight, m_DeltaTime * 4);
-            //    m_Rigidbody.AddForce(m_Transform.forward * m_DeltaTime, ForceMode.Acceleration);
-            //}
 
-            //m_CapsuleCollider.height = Mathf.MoveTowards(m_CapsuleCollider.height, m_ColliderHeight * 0.75f, m_DeltaTime * 4);
-            //m_VerticalVelocity = Vector3.up * (Mathf.Sqrt((m_PlatformHeight) * -2 * Physics.gravity.y));
-            //m_Rigidbody.AddForce(m_VerticalVelocity * m_DeltaTime, ForceMode.Acceleration);
-
-
-
-            //m_VerticalVelocity = m_VerticalVelocity * (m_PlatformHeight * 4);
-            //m_VerticalVelocity = m_VerticalVelocity * m_DeltaTime;
-            //if (m_HeightDifference >= 0.0f)
-            //    m_Rigidbody.AddForce(m_VerticalVelocity * (10), ForceMode.VelocityChange);
-            ////else
-                //////m_Rigidbody.AddForce((m_Transform.forward * m_CapsuleCollider.radius) * m_DeltaTime, ForceMode.VelocityChange);
-                ////m_Rigidbody.AddForce(m_Transform.forward * m_CapsuleCollider.radius * 10, ForceMode.VelocityChange);
 
             return false;
         }
@@ -161,14 +161,21 @@ namespace CharacterController
         Vector3 matchTarget;
         public override bool Move()
         {
-
-
-            if(m_Animator.isMatchingTarget == false){
-                if(m_MatchTargetStatesLookup.ContainsKey(m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash)){
-                    AnimatorStateMatchTarget matchState = m_MatchTargetStatesLookup[m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash];
-                    m_Animator.MatchTarget(ObjectHeightHit.point + matchState.matchTargetOffset, Quaternion.identity, matchState.avatarTarget, m_MatchTargetWeightMask, matchState.startMatchTarget, matchState.stopMatchTarget);
-                }
+            if (m_MatchTargetStatesLookup.ContainsKey(m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash))
+            {
+                AnimatorStateMatchTarget matchState = m_MatchTargetStatesLookup[m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash];
+                m_Animator.MatchTarget(ObjectHeightHit.point + matchState.matchTargetOffset, Quaternion.identity, matchState.avatarTarget, m_MatchTargetWeightMask, matchState.startMatchTarget, matchState.stopMatchTarget);
+                //Debug.Log(matchState.stateName + " | normalized time: " + m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime);
             }
+
+            //isMatchingTarget = m_Animator.isMatchingTarget;
+            //normalizeTime = Mathf.Repeat(m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime, 1f);
+            //if(m_Animator.isMatchingTarget == false){
+            //    if(m_MatchTargetStatesLookup.ContainsKey(m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash)){
+            //        AnimatorStateMatchTarget matchState = m_MatchTargetStatesLookup[m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash];
+            //        m_Animator.MatchTarget(ObjectHeightHit.point + matchState.matchTargetOffset, Quaternion.identity, matchState.avatarTarget, m_MatchTargetWeightMask, matchState.startMatchTarget, matchState.stopMatchTarget);
+            //    }
+            //}
             //else{
             //    m_Velocity = m_Animator.deltaPosition / m_DeltaTime;
 
@@ -176,8 +183,8 @@ namespace CharacterController
 
             //    m_Rigidbody.velocity = m_Velocity;
             //}
-
-
+            m_Velocity = m_Animator.deltaPosition / m_DeltaTime;
+            m_Rigidbody.velocity = m_Velocity;
             //Debug.LogFormat("Target Matching: {0}", m_Animator.isMatchingTarget);
             return false;
         }

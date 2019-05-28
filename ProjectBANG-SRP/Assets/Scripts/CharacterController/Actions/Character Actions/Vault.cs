@@ -10,7 +10,7 @@
 
 
 
-        [Header("-- Vault Settings --")]
+
         [SerializeField]
         protected float m_MoveToVaultDistance = 4f;
         [SerializeField]
@@ -140,8 +140,9 @@
         //  Move over the vault object based off of the root motion forces.
         public override bool UpdateMovement()
         {
+            //  -----
             //  Rigidbody IsKinamatic is currently on, so physics movement will do nothing.
-            //  
+            //  -----
             //  
             float heightDifference = (float)System.Math.Round(m_MatchPosition.y - m_Transform.position.y, 2);
 
