@@ -426,6 +426,7 @@ MonoBehaviour:
   m_StepOffset: 0.1
   m_StepSpeed: 4
   m_GravityModifier: 2
+  m_DetectObjectHeight: 0.4
   m_Grounded: 1
   m_Debug: 1
   m_DrawDebugLine: 1
@@ -433,7 +434,7 @@ MonoBehaviour:
   m_RootMotionSpeedMultiplier: 1
   m_Acceleration: 0.18
   m_MotorDamping: 0.2
-  m_MovementSpeed: 2
+  m_MovementSpeed: 4
   m_RotationSpeed: 10
   m_SlopeForceUp: 1
   m_SlopeForceDown: 1.25
@@ -1207,9 +1208,10 @@ MonoBehaviour:
   m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
   m_StopAudioClips: []
-  m_StartEffect: {fileID: 0}
+  m_StartEffect: {fileID: 6784883267551059862, guid: fa3ee4246aa6a4c1fa973ad6b06a6a6f,
+    type: 3}
   m_EndEffect: {fileID: 0}
-  m_Debug: 0
+  m_Debug: 1
   m_MaxDistance: 3
   m_StopLayer:
     serializedVersion: 2
@@ -1489,12 +1491,12 @@ MonoBehaviour:
   m_IsActive: 0
   m_StateName: StartMovement
   m_ActionID: 0
-  m_TransitionDuration: 0
+  m_TransitionDuration: 0.1
   m_StartType: 0
   m_StopType: 0
   m_InputNames: []
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 1
+  m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
@@ -2336,7 +2338,7 @@ SkinnedMeshRenderer:
   m_Quality: 0
   m_UpdateWhenOffscreen: 0
   m_SkinnedMotionVectors: 1
-  m_Mesh: {fileID: 4068052909087661013, guid: 997c19554ed0442ba83a96a3262fe1c6, type: 3}
+  m_Mesh: {fileID: 5339903641125903434, guid: 04a279f1da7ac40788cc8749effd50c3, type: 3}
   m_Bones:
   - {fileID: 4060261611074538}
   - {fileID: 4062153608772630}

@@ -49,9 +49,9 @@ namespace CharacterController
             }
 
 
-
+            if (m_Debug) Debug.DrawRay(m_Transform.position + Vector3.up * 0.12f, m_Transform.forward * m_MaxDistance, Color.white, 2);
             Vector3 velocity = Vector3.Scale(transform.forward, m_MaxDistance * new Vector3((Mathf.Log(1f / (m_DeltaTime * m_Rigidbody.drag + 1)) / -m_DeltaTime), 0, (Mathf.Log(1f / (m_DeltaTime * m_Rigidbody.drag + 1)) / -m_DeltaTime)));
-            m_Rigidbody.velocity = velocity;
+            m_Rigidbody.velocity = Vector3.ClampMagnitude(velocity, m_MaxDistance);
         }
 
 
@@ -102,9 +102,9 @@ namespace CharacterController
             if (layer == 0)
             {
                 if (m_RollType == RollType.Roll)
-                    return m_StateName;
+                    return m_StateName = "Roll";
                 if (m_RollType == RollType.Slide)
-                    return "Slide";
+                    return m_StateName = "Slide";
                 return m_StateName;
             }
             return "";

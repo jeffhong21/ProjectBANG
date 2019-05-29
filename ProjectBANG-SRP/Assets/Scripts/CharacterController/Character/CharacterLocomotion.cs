@@ -262,17 +262,25 @@
 
         private void DrawCheckGroundGizmo()
         {
-            Gizmos.color = groundRayHit ? Color.green : Color.red;
+            Gizmos.color = m_Grounded ? Color.green : Color.red;
+
+            //Gizmos.color = groundRayHit ? Color.green : Color.red;
             Gizmos.DrawRay(groundCastOrigin, Vector3.down * groundCheckMaxDistance);
-            Gizmos.color = groundSphereHit ? darkGreen : darkRed;
+            //Gizmos.color = groundSphereHit ? darkGreen : darkRed;
             Gizmos.DrawRay(sphereCastOrigin, Vector3.down * sphereCastHitDistance);
             Gizmos.DrawWireSphere(sphereCastOrigin + Vector3.down * sphereCastHitDistance, sphereCastRadius);
+            if (m_Grounded)
+            {
+                UnityEditor.Handles.color = groundRayHit ? Color.green : Color.red;
+                UnityEditor.Handles.DrawSolidDisc(groundHitPoint, m_GroundNormal, 0.05f);
+
+            }
         }
 
         Vector3 groundCastOrigin;
         float groundCheckMaxDistance;
         bool groundRayHit;
-        RaycastHit sphereCastHit;
+        Vector3 groundHitPoint;
         Vector3 sphereCastOrigin;
         float sphereCastMaxDistance, sphereCastHitDistance, sphereCastRadius;
         bool groundSphereHit;
@@ -325,30 +333,35 @@
 
 
 
-                if(m_Debug)Debug.DrawRay(m_GroundHit.point, m_GroundHit.normal, Color.magenta);
 
                 m_GroundDistance = (float)Math.Round(m_GroundDistance, 2);
+                var groundCheckDistance = 0.2f;
 
-
-                if(m_GroundDistance < 0.2f ){
+                if(m_GroundDistance < 0.05f)
+                {
                     Vector3 horizontalVelocity = Vector3.Project(m_Rigidbody.velocity, m_Gravity);
                     m_Stickiness = m_GroundStickiness * horizontalVelocity.magnitude * m_AirbornThreshold;
-
                     m_SlopeAngle = Vector3.Angle(m_Transform.forward, m_GroundNormal) - 90;
+
+                    m_Rigidbody.velocity = Vector3.ProjectOnPlane(m_Rigidbody.velocity, m_GroundNormal);
+
                     m_Grounded = true;
                 }
                 else
                 {
-                    m_GroundNormal = Vector3.up;
-                    m_SlopeAngle = 0;
-                    m_Grounded = false;
-                    //if (m_GroundDistance > m_AirbornThreshold)
-                    //{
-                    //    m_SlopeAngle = 0;
-                    //    m_Grounded = false;
-                    //}
+                    if (m_GroundDistance >= groundCheckDistance)
+                    {
+                        m_GroundNormal = m_Transform.up;
+                        m_SlopeAngle = 0;
+                        m_Grounded = false;
+                        m_Rigidbody.AddForce(m_Gravity * m_GravityModifier);
+                    }
                        
                 }
+
+                if (m_Debug) Debug.DrawRay(m_GroundHit.point, m_GroundNormal, Color.magenta);
+
+                groundHitPoint = m_Grounded ? m_GroundHit.point : Vector3.zero;
             }
 
         }
@@ -385,7 +398,6 @@
 
                 if (m_Grounded)
                 {
-                    //m_Velocity = m_MoveDirection + (m_DeltaTime * (m_Gravity * m_GravityModifier));
                     m_Velocity = m_MoveDirection * m_MovementSpeed;
                     m_Rigidbody.velocity = m_Rigidbody.velocity - m_Transform.up * m_Stickiness * m_DeltaTime;
 
@@ -394,8 +406,19 @@
                     //        m_Rigidbody.velocity = Vector3.zero;
                     //    }
                     //}
-                    if (m_SlopeAngle < 0)
-                        m_Velocity += Vector3.down * m_SlopeForceDown;
+                    //if (m_SlopeAngle < 0)
+                    //m_Velocity += Vector3.down * m_SlopeForceDown;
+
+                    if (m_SlopeAngle > 0 || m_SlopeAngle < 0)
+                    {
+                        Vector3 offsetPosition = new Vector3(0,
+                            (1 - Mathf.Cos(m_SlopeAngle * Mathf.Deg2Rad) * m_CapsuleCollider.radius),
+                            (Mathf.Sin(m_SlopeAngle * Mathf.Deg2Rad) * m_CapsuleCollider.radius));
+                        //m_Rigidbody.MovePosition(Vector3.Lerp(m_Rigidbody.position, m_Rigidbody.position + m_Transform.TransformVector(offsetPosition * m_CapsuleCollider.radius), m_InputMagnitude));
+                        //m_Rigidbody.MovePosition(m_Rigidbody.position + m_Transform.TransformVector(offsetPosition * m_CapsuleCollider.radius));
+                        m_Velocity += m_Rigidbody.position + m_Transform.TransformVector(offsetPosition * m_CapsuleCollider.radius);
+                        Debug.DrawRay(m_Rigidbody.position, m_Transform.TransformVector(offsetPosition * m_CapsuleCollider.radius), Color.magenta);
+                    }
                 }
                 //  If airborne.
                 else{
@@ -494,7 +517,6 @@
                         {
                             //m_Rigidbody.AddForce(m_Gravity * m_GravityModifier);
                             m_Rigidbody.AddForce(m_VerticalVelocity);
-
                             //m_Rigidbody.velocity = m_Velocity;
                         }
 
@@ -523,21 +545,22 @@
             {
                 if (m_UseRootMotion)
                 {
-                    m_Animator.deltaRotation.ToAngleAxis(out angleInDegrees, out rotationAxis);
-                    Vector3 angularDisplacement = rotationAxis * angleInDegrees * Mathf.Deg2Rad * m_RotationSpeed;
-                    m_Rigidbody.angularVelocity = angularDisplacement;
+                    //m_Animator.deltaRotation.ToAngleAxis(out angleInDegrees, out rotationAxis);
+                    //Vector3 angularDisplacement = rotationAxis * angleInDegrees * Mathf.Deg2Rad * m_RotationSpeed;
+                    //m_Rigidbody.angularVelocity = angularDisplacement;
 
 
 
                     Vector3 velocity = (m_Animator.deltaPosition / m_DeltaTime);
-                    //velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
-                    //m_Rigidbody.velocity = Vector3.SmoothDamp(m_Rigidbody.velocity, velocity, ref m_VelocitySmooth, 1- m_InputMagnitude);
+                    velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
+                    //velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y * m_CapsuleCollider.height;
+
+                    //m_Rigidbody.velocity = Vector3.SmoothDamp(m_Rigidbody.velocity, velocity, ref m_VelocitySmooth, 0.18f);
                     //m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, m_MovementSpeed);
                     m_Rigidbody.velocity = velocity;
                 }
                 else
                 {
-
                     m_Velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
                     m_Rigidbody.velocity = m_Velocity * m_InputMagnitude;
                 }
@@ -555,8 +578,6 @@
                     if (m_Move) m_Move = m_Actions[i].Move();
                 }
             }
-
-
             Move();
         }
 
@@ -571,15 +592,15 @@
             // which affects the movement speed because of the root motion.
             m_Animator.speed = m_RootMotionSpeedMultiplier;
 
-            m_Animator.SetFloat(HashID.StartAngle, m_StartAngle);
+            //m_Animator.SetFloat(HashID.StartAngle, m_StartAngle);
             m_Animator.SetBool(HashID.Moving, m_Moving);
             m_Animator.SetFloat(HashID.InputMagnitude, m_InputMagnitude);
             m_Animator.SetFloat(HashID.InputAngle, (m_InputAngle * Mathf.Deg2Rad));
             //var localVelocity = Quaternion.Inverse(m_Transform.rotation) * (m_Rigidbody.velocity / m_Acceleration);
-            if (m_Animator.pivotWeight > 0.9f){
+            if (m_Animator.pivotWeight > 0.75f){
                 m_Animator.SetBool(HashID.StopLeftUp, true);
             }
-            else if (m_Animator.pivotWeight < 0.1f){
+            else if (m_Animator.pivotWeight < 0.25f){
                 m_Animator.SetBool(HashID.StopRightUp, true);
             }
             else{
@@ -596,14 +617,14 @@
             {
                 if(m_Grounded){
                     //  Movement Input
-                    m_Animator.applyRootMotion = true;
+                    //m_Animator.applyRootMotion = true;
                     m_AnimationMonitor.SetForwardInputValue(m_InputVector.z);
                     m_AnimationMonitor.SetHorizontalInputValue(m_InputVector.x);
                 }
                 else{
                     //m_AnimationMonitor.SetForwardInputValue(0);
                     //m_AnimationMonitor.SetHorizontalInputValue(0);
-                    m_Animator.applyRootMotion = false;
+                    //m_Animator.applyRootMotion = false;
                     m_Animator.SetFloat(HashID.ForwardInput, 0);
                     m_Animator.SetFloat(HashID.HorizontalInput, 0);
                 }
@@ -646,79 +667,6 @@
 
 
         #region Actions
-
-        private void StartStopActions()
-        {
-            for (int i = 0; i < m_Actions.Length; i++)
-            {
-                //  First, check if current Action can Start or Stop.
-                var currentAction = m_Actions[i];
-                //  Current Action is Active.
-                if (m_Actions[i].enabled && m_Actions[i].IsActive)
-                {
-                    //  Check if can stop Action is StopType is NOT Manual.
-                    if (m_Actions[i].StopType != ActionStopType.Manual)
-                    {
-                        if (m_Actions[i].CanStopAction())
-                        {
-                            //  Start the Action and update the animator.
-                            m_Actions[i].StopAction();
-                            //m_Actions[i].UpdateAnimator();
-                            //  Reset Active Action.
-                            if (m_ActiveAction = m_Actions[i])
-                                m_ActiveAction = null;
-                            //  Move on to the next Action.
-                            continue;
-                        }
-                    }
-                }
-                //  Current Action is NOT Active.
-                else
-                {
-                    //  Check if can start Action is StartType is NOT Manual.
-                    if (m_Actions[i].enabled && m_Actions[i].StartType != ActionStartType.Manual )
-                    {
-                        if (m_ActiveAction == null)
-                        {
-                            if (m_Actions[i].CanStartAction())
-                            {
-                                //  Start the Action and update the animator.
-                                m_Actions[i].StartAction();
-                                //m_Actions[i].UpdateAnimator();
-                                //  Set active Action if not concurrent.
-                                if (m_Actions[i].IsConcurrentAction() == false)
-                                    m_ActiveAction = m_Actions[i];
-                                //  Move onto the next Action.
-                                continue;
-                            }
-                        }
-                        else if (m_Actions[i].IsConcurrentAction())
-                        {
-                            if (m_Actions[i].CanStartAction())
-                            {
-                                //  Start the Action and update the animator.
-                                m_Actions[i].StartAction();
-                                //m_Actions[i].UpdateAnimator();
-                                //  Move onto the next Action.
-                                continue;
-                            }
-                        }
-                        else
-                        {
-                            continue;
-                        }
-                    }
-                }
-
-
-                //  Call Action Update.
-                m_Actions[i].UpdateAction();
-
-            }  //  end of for loop
-            //  end of
-        }
-
-
 
 
         private void StopStartAction(CharacterAction charAction)
@@ -847,7 +795,13 @@
 
         public void TryStopAllActions()
         {
-
+            for (int i = 0; i < m_Actions.Length; i++)
+            {
+                if (m_Actions[i].IsActive)
+                {
+                    TryStopAction(m_Actions[i]);
+                }
+            }
         }
 
 
@@ -962,8 +916,8 @@
             {
                 string.Format("Ground Distance: {0}", m_GroundDistance),
                 string.Format("Grounded: {0}", m_Grounded),
-                string.Format("Ground Distance: {0}", m_GroundDistance),
-                string.Format("VelocityDot: {0}", (float)Math.Round(Vector3.Dot(m_VerticalVelocity, m_Gravity), 2) ),
+                //string.Format("Ground Distance: {0}", m_GroundDistance),
+                //string.Format("VelocityDot: {0}", (float)Math.Round(Vector3.Dot(m_VerticalVelocity, m_Gravity), 2) ),
                 string.Format("SlopeAngle: {0}", m_SlopeAngle),
                 string.Format("RigidbodyVelY: {0}", (float)Math.Round(m_Rigidbody.velocity.y, 2)),
 

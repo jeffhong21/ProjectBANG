@@ -70,9 +70,9 @@ namespace CharacterController
                     m_Controller.Grounded = true;
 
                     if (Time.time - m_ActionStartTime > 1)
-                        m_LandingType = LandingType.Roll;
-                    else if (Time.time - m_ActionStartTime > 2)
                         m_LandingType = LandingType.Hard;
+                    else if (Time.time - m_ActionStartTime > 1 && m_Controller.InputVector.magnitude > 0.2f)
+                        m_LandingType = LandingType.Roll;
                     else
                         m_LandingType = LandingType.Default;
 

@@ -12,7 +12,7 @@
 
 
         [SerializeField]
-        protected float m_MoveToVaultDistance = 4f;
+        protected float m_MoveToVaultDistance = 1f;
         [SerializeField]
         protected LayerMask m_VaultLayers;
         [SerializeField, Tooltip("The highest level the character can vault over.")]
@@ -72,7 +72,14 @@
                     return CachePositions();
                 }
             }
-
+            else if (m_Controller.GetAction<Sprint>().IsActive)
+            {
+                if (m_Controller.DetectObject(m_Transform.forward, out m_MoveToVaultDistanceHit, 2, m_VaultLayers))
+                {
+                    if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance, Color.green);
+                    return CachePositions();
+                }
+            }
             //if(m_MatchTargetStates.Length == 0)
                 //Debug.LogFormat("No AnimatorStateMatchTarget");
             return false;
@@ -113,7 +120,9 @@
 
         protected override void ActionStarted()
         {
-            
+            m_Animator.SetInteger(HashID.ActionID, (int)ActionTypeDefinition.Vault);
+
+
             m_EndPosition = m_EndPositionHit.point;
             m_StartPosition = m_MoveToVaultDistanceHit.point + (m_Transform.position - m_MoveToVaultDistanceHit.point);
             m_StartPosition.y = m_Transform.position.y;
@@ -134,6 +143,7 @@
 
             Vector3 verticalVelocity = Vector3.up * (Mathf.Sqrt(m_VaultObjectHeight * -2 * Physics.gravity.y));
             m_Rigidbody.velocity = verticalVelocity;
+
         }
 
 
@@ -237,7 +247,13 @@
         public override string GetDestinationState(int layer)
         {
             if (layer == 0)
-                return m_StateName;
+            {
+                if (m_Controller.GetAction<Sprint>().IsActive)
+                    return "JumpOverObstacle-1H";
+                else
+                    return m_StateName;
+            }
+                
             return "";
         }
 

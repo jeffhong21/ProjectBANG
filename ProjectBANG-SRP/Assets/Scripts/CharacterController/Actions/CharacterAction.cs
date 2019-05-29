@@ -323,6 +323,26 @@
             return false;
         }
 
+
+
+        public virtual bool CanStartAction(CharacterAction action)
+        {
+            if (action == null) return false;
+
+            int index = Array.IndexOf(m_Controller.CharActions, action);
+            for (int i = 0; i < index; i++)
+            {
+                if(m_Controller.CharActions[i].IsActive && m_Controller.CharActions[i].IsConcurrentAction() == false)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+
+
 		public virtual bool CanStopAction()
         {
             if (enabled == false || m_IsActive == false) return false;
@@ -410,10 +430,12 @@
 
 
             if(m_StartEffect != null){
+                GameObject effects = null;
                 if (ObjectPool.Instance != null)
-                    ObjectPool.Instantiate(m_StartEffect, m_Transform.position, m_Transform.rotation);
+                    effects = ObjectPool.Instantiate(m_StartEffect, m_Transform.position, m_Transform.rotation);
                 else
-                    Instantiate(m_StartEffect, m_Transform.position, m_Transform.rotation);
+                    effects = Instantiate(m_StartEffect, m_Transform.position, m_Transform.rotation);
+                Debug.Log("Start ffect: " + effects + " is active? " + effects.activeSelf);
             }
         }
 

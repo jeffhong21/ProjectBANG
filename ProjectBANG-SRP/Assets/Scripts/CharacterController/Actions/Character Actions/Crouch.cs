@@ -16,14 +16,14 @@
 
         protected override void ActionStarted()
         {
-
+            m_Animator.SetFloat(HashID.Height, m_Height);
         }
 
 
 
         protected override void ActionStopped()
         {
-
+            m_Animator.SetFloat(HashID.Height, m_DefaultHeight);
         }
 
 

@@ -1,14 +1,14 @@
 fileFormatVersion: 2
 guid: e5414ca230b754034827198e33639b25
 ModelImporter:
-  serializedVersion: 26
+  serializedVersion: 25
   internalIDToNameTable:
   - first:
       74: -203655887218126122
     second: FreehangClimb
   - first:
       74: 494423511922342049
-    second: FreehangClimb-Idle
+    second: FreehangClimb
   externalObjects: {}
   materials:
     importMaterials: 1
@@ -39,35 +39,6 @@ ModelImporter:
     clipAnimations:
     - serializedVersion: 16
       name: FreehangClimb
-      takeName: mixamo.com
-      internalID: -203655887218126122
-      firstFrame: 0
-      lastFrame: 1
-      wrapMode: 0
-      orientationOffsetY: 0
-      level: 0
-      cycleOffset: 0
-      loop: 0
-      hasAdditiveReferencePose: 0
-      loopTime: 0
-      loopBlend: 0
-      loopBlendOrientation: 1
-      loopBlendPositionY: 1
-      loopBlendPositionXZ: 1
-      keepOriginalOrientation: 0
-      keepOriginalPositionY: 0
-      keepOriginalPositionXZ: 0
-      heightFromFeet: 1
-      mirror: 0
-      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
-      curves: []
-      events: []
-      transformMask: []
-      maskType: 3
-      maskSource: {instanceID: 0}
-      additiveReferencePoseFrame: 0
-    - serializedVersion: 16
-      name: FreehangClimb-Idle
       takeName: mixamo.com
       internalID: 494423511922342049
       firstFrame: 0
@@ -102,7 +73,6 @@ ModelImporter:
     meshCompression: 0
     addColliders: 0
     useSRGBMaterialColor: 1
-    sortHierarchyByName: 1
     importVisibility: 1
     importBlendShapes: 1
     importCameras: 1

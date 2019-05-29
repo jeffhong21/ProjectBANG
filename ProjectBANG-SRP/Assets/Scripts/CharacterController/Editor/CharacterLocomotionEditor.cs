@@ -233,6 +233,12 @@ namespace CharacterController
                     InspectorUtility.PropertyField(serializedObject.FindProperty("m_DrawDebugLine"));
 
                     EditorGUI.indentLevel--;
+
+                    if(GUILayout.Button("Stop All Actions"))
+                    {
+                        m_Controller.TryStopAllActions();
+                        Debug.Log("Stopping all Actions");
+                    }
                 }
             }
 
