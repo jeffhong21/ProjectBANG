@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a4366c462a5014715a9f4a388c59a825, type: 3}
-  m_Name: New_Default
+  m_Name: ThirdPerson
   m_EditorClassIdentifier: 
-  StateName: New_Default
+  StateName: ThirdPerson
   MoveSpeed: 16
   ViewDistance: 4
   VerticalOffset: 1.35
@@ -33,6 +33,7 @@ MonoBehaviour:
   RotationSpeed: 6
   ApplyStepZoom: 0
   StepZoomSensitivity: 1
+  StepZoomSmooth: 0.15
   MinStepZooom: -1
   MaxStepZoom: 10
   LookDirection: {x: 0, y: 0, z: 1}

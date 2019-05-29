@@ -6,12 +6,15 @@ namespace CharacterController
 
     public class Roll : CharacterAction
     {
+        protected enum RollType { Roll, Slide }
         protected float m_CheckHeight = 0.4f;
         //public const int ACTION_ID = 15;
-        protected readonly float m_MaxDistance = 3f;
-        //protected readonly float m_CheckHeight = 0.35f;
+        [SerializeField]
+        protected float m_MaxDistance = 3f;
+        [SerializeField]
+        protected LayerMask m_StopLayer;
 
-
+        protected RollType m_RollType = RollType.Roll;
         protected float m_RollRecurrenceDelay = 0.2f;
         protected float m_NextRollAllowed;
 
@@ -23,11 +26,8 @@ namespace CharacterController
 
         public override bool CanStartAction()
         {
-            if (base.CanStartAction() && Time.time > m_NextRollAllowed)
+            if (base.CanStartAction() && m_Controller.Moving && Time.time > m_NextRollAllowed)
             {
-                //if(Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out m_CheckDistanceHit, m_MaxDistance, m_VaultLayers)){
-
-                //}
                 return true;
             }
             return false;
@@ -38,6 +38,17 @@ namespace CharacterController
             //  Cache variables
             m_ColliderHeight = m_CapsuleCollider.height;
             m_ColliderCenter = m_CapsuleCollider.center;
+
+            if (Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out m_CheckDistanceHit, m_MaxDistance, m_Layers.GroundLayer | m_StopLayer))
+            {
+                m_RollType = RollType.Slide;
+            }
+            else
+            {
+                m_RollType = RollType.Roll;
+            }
+
+
 
             Vector3 velocity = Vector3.Scale(transform.forward, m_MaxDistance * new Vector3((Mathf.Log(1f / (m_DeltaTime * m_Rigidbody.drag + 1)) / -m_DeltaTime), 0, (Mathf.Log(1f / (m_DeltaTime * m_Rigidbody.drag + 1)) / -m_DeltaTime)));
             m_Rigidbody.velocity = velocity;
@@ -88,7 +99,12 @@ namespace CharacterController
         //  Returns the state the given layer should be on.
         public override string GetDestinationState(int layer)
         {
-            if (layer == 0){
+            if (layer == 0)
+            {
+                if (m_RollType == RollType.Roll)
+                    return m_StateName;
+                if (m_RollType == RollType.Slide)
+                    return "Slide";
                 return m_StateName;
             }
             return "";

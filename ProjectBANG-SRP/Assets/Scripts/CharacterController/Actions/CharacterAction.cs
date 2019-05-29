@@ -42,7 +42,7 @@
 
 
         [Space(12)]
-        [Header("-- Action Debug Parameters --")]
+        [Header("-- Debug --")]
         //  InputNames to KeyCodes
         protected KeyCode[] m_KeyCodes = new KeyCode[0];
         protected int m_InputIndex = -1;
@@ -73,6 +73,8 @@
         protected AnimatorStateInfo m_StateInfo;
         protected AnimatorTransitionInfo m_TransitionInfo;
 
+        [SerializeField, HideInInspector]
+        protected bool m_Debug;
 
         //[SerializeField]
         protected bool m_ActionStopToggle;        //  Used for double clicks.
@@ -571,7 +573,7 @@
 		private void OnAnimatorMove()
 		{
 
-            if(m_IsActive && m_ApplyBuiltinRootMotion)
+            if(m_IsActive && m_Controller.UseRootMotion && m_ApplyBuiltinRootMotion)
                 m_Animator.ApplyBuiltinRootMotion();
 		}
 

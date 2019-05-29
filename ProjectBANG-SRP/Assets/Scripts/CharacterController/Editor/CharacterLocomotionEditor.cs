@@ -1,5 +1,12 @@
 namespace CharacterController
 {
+    /*  ° TODO: When selecting the action outside of prefab edit mode, it resets the selected action to null.  (2019.1.4f1)
+     *  
+     *  
+     *  
+     *  
+     *  
+     * */
     using UnityEngine;
     using UnityEditor;
     using UnityEditorInternal;
@@ -178,7 +185,7 @@ namespace CharacterController
                 GUI.enabled = true;
                 EditorGUILayout.EndHorizontal();
 
-
+                InspectorUtility.LabelField("Selected Action: " + (m_SelectedAction == null ? "<None>" : m_SelectedAction.name));
                 //  Draw Action Inspector.
                 //EditorGUI.indentLevel++;
                 EditorGUILayout.Space();
@@ -357,12 +364,12 @@ namespace CharacterController
                         menu.ShowAsContext();
                     }
                 }
-                else {
-                    if (evt.button == 0 && evt.isMouse && evt.type == EventType.MouseUp)
-                    {
-                        if(action != null) action = null;
-                    }
-                }
+                //else {
+                //    if (evt.button == 0 && evt.isMouse && evt.type == EventType.MouseUp)
+                //    {
+                //        if(action != null) action = null;
+                //    }
+                //}
             }
 
         }

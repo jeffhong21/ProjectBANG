@@ -26,14 +26,14 @@ namespace CharacterController
         [SerializeField, HideInInspector]
         protected float m_StepSpeed = 4f;
         [SerializeField, HideInInspector]
-        protected float m_GravityModifier = 2f;          
+        protected float m_GravityModifier = 2f;
 
         //[SerializeField, HideInInspector]
         //protected bool m_AlignToGround = true;
         //[SerializeField, HideInInspector]
         //protected float m_AlignToGroundDepthOffset = 0.5f;
-
-
+        [SerializeField, HideInInspector]
+        protected float m_DetectObjectHeight = 0.4f;
 
 
         [SerializeField, DisplayOnly]
@@ -44,7 +44,9 @@ namespace CharacterController
         protected float m_AirbornThreshold = 0.3f;
         protected Vector3 m_GroundNormal;
         protected float m_GroundCheckHeight;
-        protected float m_GroundSlopeAngle;
+        protected float m_SlopeAngle;
+        protected float m_Stickiness;
+
 
         protected LayerManager m_Layers;
         protected CapsuleCollider m_CapsuleCollider;
@@ -97,33 +99,28 @@ namespace CharacterController
 
 
 
-        public RaycastHit GetSphereCastHit()
+
+
+
+        public bool DetectObject(Vector3 direction, out RaycastHit raycastHit, float maxDistance, LayerMask layerMask, int rayCount = 1, float maxAngle = 0)
         {
-            m_GroundCheckHeight = m_CapsuleCollider.radius;
-            //m_GroundCheckHeight = m_CapsuleCollider.center.y - m_CapsuleCollider.height / 2 + m_SkinWidth;
-            Physics.SphereCast(m_Rigidbody.position + Vector3.up * m_GroundCheckHeight, m_CapsuleCollider.radius * 0.9f, 
-                               Vector3.down, out m_GroundHit, m_CapsuleCollider.radius * 2, m_Layers.GroundLayer);
+            if (rayCount < 1) rayCount = 1;
 
+            if (Physics.Raycast(m_Rigidbody.position + (Vector3.up * m_DetectObjectHeight), direction, out raycastHit, maxDistance, layerMask))
+            {
+                return true;
+            }
 
-
-            //Physics.SphereCast(m_Transform.position + Vector3.up * m_GroundCheckHeight, m_CapsuleCollider.radius * 0.9f,
-                               //-Vector3.up, out m_GroundHit, m_AirbornThreshold, m_Layers.GroundLayer);
-
-            m_GroundNormal = m_GroundHit.normal;
-            return m_GroundHit;
+            return false;
         }
 
 
-        //public RaycastHit GetRaycastHit()
-        //{
-        //    m_GroundCheckHeight = m_CapsuleCollider.center.y - m_CapsuleCollider.height / 2 + m_SkinWidth;
-        //    //Physics.Raycast(m_Transform.position + Vector3.up * m_GroundCheckHeight, Vector3.down, out m_GroundHit,  m_CapsuleCollider.radius, m_Layers.GroundLayer);
-        //    Physics.Raycast(m_Transform.position + Vector3.up * m_GroundCheckHeight, Vector3.down, out m_GroundHit, m_CapsuleCollider.radius, m_Layers.GroundLayer);
 
+        private void OnCollisionEnter(Collision collision)
+        {
+            
+        }
 
-        //    m_GroundNormal = m_GroundHit.normal;
-        //    return m_GroundHit;
-        //}
 
 
 
@@ -135,6 +132,8 @@ namespace CharacterController
         //        m_CapsuleCollider.center = Vector3.MoveTowards(m_CapsuleCollider.center, m_ColliderCenter * scaleFactor, Time.deltaTime * 2);
         //    }
         //}
+
+
 
 
 

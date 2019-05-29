@@ -48,7 +48,7 @@ MonoBehaviour:
   IsMoving: 0
   m_ActiveCameraState: 
   m_CameraStates:
-  - {fileID: 11400000, guid: ffcdaefce09cc4263a0195a50b35db76, type: 2}
+  - {fileID: 11400000, guid: 7e6f7bf8d3f914d2c8b9d8f007b3c2a2, type: 2}
   - {fileID: 11400000, guid: 25f2bdf1c47504e2bbba5a6aa6e4abbf, type: 2}
   m_Character: {fileID: 0}
   m_Anchor: {fileID: 0}
@@ -60,6 +60,7 @@ MonoBehaviour:
   m_MouseInput: {x: 0, y: 0, z: 0}
   m_TargetYawAngle: 0
   m_TargetPitchAngle: 0
+  m_CameraPosition: {x: 0, y: 0, z: 0}
   m_CameraStateToggle: 1
   angle: 0
 --- !u!114 &6146962280958219933
@@ -69,7 +70,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1496660069129776}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 21235574c40884e9f9c658f7213a9edc, type: 3}
   m_Name: 
@@ -89,7 +90,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4572819961280480}
-  - component: {fileID: 114205801921529198}
   m_Layer: 0
   m_Name: PitchPivot
   m_TagString: Untagged
@@ -112,18 +112,6 @@ Transform:
   m_Father: {fileID: 4465774502092068}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114205801921529198
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1649400292190392}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ed9c0d858af6140a793fe6d3487fe687, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1662552086436872
 GameObject:
   m_ObjectHideFlags: 0

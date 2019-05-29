@@ -14,7 +14,7 @@ namespace CharacterController
         [Header("--  Move Settings  --")]
         public float MoveSpeed = 16;
         [Header("--  Position Settings  --")]
-        public float ViewDistance = 3;
+        public float ViewDistance = 6;
         public float VerticalOffset;
 
 

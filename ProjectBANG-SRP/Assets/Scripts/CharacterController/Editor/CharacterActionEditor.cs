@@ -44,6 +44,9 @@
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
+            //  Header
+            InspectorUtility.LabelField(m_ActionSettingsHeader, 12, FontStyle.Bold);
+
             GUI.enabled = false;
             InspectorUtility.PropertyField(serializedObject.FindProperty("m_Script"));
             GUI.enabled = true;
@@ -100,11 +103,11 @@
             InspectorUtility.PropertyField(serializedObject.FindProperty("m_StartEffect"));
             InspectorUtility.PropertyField(serializedObject.FindProperty("m_EndEffect"));
 
-            GUILayout.Space(12);
-            InspectorUtility.LabelField(m_ActionSettingsHeader, 12, FontStyle.Bold);
+            GUILayout.Space(18);
 
             DrawPropertiesExcluding(serializedObject, m_DontIncude);
 
+            InspectorUtility.PropertyField(serializedObject.FindProperty("m_Debug"));
 
 
 

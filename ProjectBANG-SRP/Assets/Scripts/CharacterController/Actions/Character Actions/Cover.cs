@@ -300,9 +300,9 @@
 
 
 
-        [Header("--  Debug Settings --")]
+
         [SerializeField] DebugSettings m_DebugSettings = new DebugSettings();
-        [SerializeField] bool m_Debug;
+
 
         [Serializable]
         public class DebugSettings

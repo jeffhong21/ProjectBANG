@@ -145,22 +145,6 @@ namespace CharacterController
 
 
 
-
-
-
-        private void CameraInput()
-        {
-            if (m_CameraController == null) return;
-
-            m_MouseHorizontal = Input.GetAxis(m_RotateCameraXInput);
-            m_MouseVertical = Input.GetAxis(m_RotateCameraYInput);
-
-            m_CameraController.RotateCamera(m_MouseHorizontal, m_MouseVertical);
-            m_CameraController.ZoomCamera(Input.GetAxisRaw(m_MouseScrollInput));
-        }
-
-
-
         private bool LockCameraRotation()
         {
             if (Input.GetKeyDown(KeyCode.L)){

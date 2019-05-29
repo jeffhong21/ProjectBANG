@@ -37,6 +37,9 @@
         private HumanBodyBones m_AutoAnchorBone = HumanBodyBones.Head;
 
 
+        [Header("--  Debug Options --")]
+        [SerializeField]
+        private bool m_Debug;
 
 
         [Serializable]
@@ -70,7 +73,7 @@
         //[SerializeField, DisplayOnly]
         private float m_Pitch;          //  Rotation on X Axis.  (Vertical rotation)
         //[SerializeField, DisplayOnly]
-        private float m_ZoomAmount;
+        private float m_ZoomDistance;
         private float m_SmoothYaw;
         private float m_SmoothPitch;
         private float m_SmoothYawVelocity;
@@ -86,10 +89,11 @@
         private Vector3 m_TargetPosition, m_YawPivotPosition, m_PitchPivotPosition;
         private Quaternion m_TargetRotation, m_YawPivotRotation, m_PitchPivotRotation;
         private Vector3 m_LookDirection;
+        [SerializeField, DisplayOnly]
         private Vector3 m_CameraPosition;
         private float m_DistanceFromTarget;
 
-
+        private Vector3 m_ZoomVelocity;
 
         private Transform m_PitchPivot;
         private Camera m_Camera;
@@ -166,6 +170,7 @@
             if (m_CameraStates.Length == 0){
                 m_CameraState = ScriptableObject.CreateInstance<CameraState>();
                 m_CameraStateLookup.Add(m_CameraState.name, m_CameraState);
+                Debug.Log("No Camera States.  Creating a default camera state.");
             }
 
 
@@ -174,7 +179,6 @@
 
 		private void OnEnable()
 		{
-
             Cursor.lockState = m_CursorOptions.lockCursor ? CursorLockMode.Locked : CursorLockMode.Confined;
             Cursor.visible = m_CursorOptions.cursorVisible;
 		}
@@ -245,7 +249,7 @@
                 Debug.LogFormat("CameraState: {0}", m_CameraState.name);
                 return true;
             }
-            Debug.LogWarningFormat("** Camera State {0} does not exist", name);
+            Debug.LogFormat("** Camera State {0} does not exist", name);
             return false;
         }
 
@@ -263,7 +267,7 @@
         }
 
 
-		private void FixedUpdate()
+		private void LateUpdate()
 		{
             UpdatePosition();
             UpdateRotation();
@@ -276,28 +280,35 @@
             if (m_Character == null)
                 return;
 
-            //UpdateCameraMovement();
-
-
-            if(m_Camera.fieldOfView != m_CameraState.FieldOfView)
+            if (m_Camera.fieldOfView != m_CameraState.FieldOfView)
                 m_Camera.fieldOfView = Mathf.Lerp(m_Camera.fieldOfView, m_CameraState.FieldOfView, m_DeltaTime * m_CameraState.FieldOfViewSpeed);
-
-
-            //OcclusionDetection();
         }
 
 
+        private float m_ZoomStepVelocity;
+        private Vector3 m_CameraZoom;
         private void UpdatePosition()
         {
+
+
+            //if (m_CameraState.ApplyStepZoom)
+            //{
+            //    m_CameraZoom.z = Mathf.SmoothStep(m_CameraZoom.z, m_ZoomDistance, Time.deltaTime);
+            //    //m_CameraZoom.z = Mathf.SmoothDamp(m_Camera.transform.localPosition.z, m_ZoomDistance, ref m_ZoomVelocity, m_CameraState.StepZoomSmooth);
+            //    m_Camera.transform.localPosition = m_CameraZoom;
+            //}
+
+
             m_PitchPivotPosition = m_PitchPivot.localPosition;
             //m_PitchPivotPosition.z = -m_CameraState.ViewDistance;
             //m_PitchPivotPosition.y = m_CameraState.VerticalOffset;
 
             m_CameraPosition = m_Camera.transform.localPosition;
+            var viewDistance = (-1 * m_CameraState.ViewDistance);
             if (m_CameraState.ApplyCameraOffset)
-                m_CameraPosition = m_CameraState.CameraOffset;
-            m_CameraPosition.z = m_CameraPosition.z + (-m_CameraState.ViewDistance);
-            //m_CameraPosition.z = m_CameraPosition.z + m_ZoomAmount;
+                m_CameraPosition = m_CameraPosition + m_CameraState.CameraOffset + (Vector3.forward * viewDistance);
+            else
+                m_CameraPosition.z = viewDistance;
 
             //m_PitchPivot.localPosition = Vector3.Lerp(m_PitchPivot.localPosition, m_PitchPivotPosition, 12 * m_DeltaTime);
             m_Camera.transform.localPosition = Vector3.Lerp(m_Camera.transform.localPosition, m_CameraPosition, 12 * m_DeltaTime);
@@ -306,7 +317,9 @@
             m_TargetPosition = Vector3.SmoothDamp(m_Transform.position, m_Anchor.position, ref m_CameraVelocitySmooth, 0.18f);
             m_TargetPosition.y = m_Anchor.position.y + m_CameraState.VerticalOffset;
             //m_Transform.position = m_TargetPosition;
-            m_Transform.position = Vector3.Slerp(m_Transform.position, m_TargetPosition, m_CameraState.MoveSpeed * m_DeltaTime);
+            m_Transform.position = Vector3.Lerp(m_Transform.position, m_TargetPosition, m_CameraState.MoveSpeed * m_DeltaTime);
+
+
         }
 
 
@@ -317,7 +330,7 @@
             //  Main controller
             if (m_CameraState.ApplyRotation){
                 angle = Quaternion.Angle(m_Transform.rotation, m_Character.transform.rotation);
-                if (Quaternion.Angle(m_Transform.rotation, m_Character.transform.rotation) != 0){
+                if (Quaternion.Angle(m_Transform.rotation, m_Character.transform.rotation) != float.Epsilon){
                     m_TargetRotation = Quaternion.FromToRotation(m_Transform.forward, m_Character.transform.forward);
                     //m_TargetRotation = Quaternion.FromToRotation(Vector3.up, m_Character.transform.forward);
                     m_Transform.rotation = Quaternion.Lerp(m_Transform.rotation, m_TargetRotation * m_Transform.rotation, m_CameraState.RotationSpeed * m_DeltaTime);
@@ -393,7 +406,7 @@
         bool CullingRayCast(Vector3 from, ClipPlanePoints _to, out RaycastHit hitInfo, float distance, LayerMask cullingLayer, Color color)
         {
             bool value = false;
-
+            //if (m_Debug) Debug.DrawRay(from, _to.LowerLeft);
             if (Physics.Raycast(from, _to.LowerLeft - from, out hitInfo, distance, cullingLayer))
             {
                 value = true;
@@ -431,24 +444,24 @@
             m_MouseInput.y = mouseY;
         }
 
+
         public void ZoomCamera(float zoomInput)
         {
-
-            m_ZoomAmount = m_CameraState.StepZoomSensitivity * zoomInput;
-
             var direction = m_Character.transform.position - m_Camera.transform.position;
-            var distance = direction.magnitude + m_ZoomAmount;
+            m_ZoomDistance = direction.magnitude + m_CameraState.StepZoomSensitivity * Mathf.Sign(zoomInput);
 
-            //m_ZoomAmount = Mathf.Lerp(distance, newDistance, m_CameraState.StepZoomSmooth * m_DeltaTime);
-            if(distance > m_CameraState.MaxStepZoom){
-                m_ZoomAmount = m_CameraState.MaxStepZoom;
-            }
-            if (distance < m_CameraState.MinStepZooom)
+            if (m_ZoomDistance > m_CameraState.MaxStepZoom)
             {
-                m_ZoomAmount = m_CameraState.MinStepZooom;
+                m_ZoomDistance = m_CameraState.MaxStepZoom;
+            }
+            if (m_ZoomDistance < m_CameraState.MinStepZooom)
+            {
+                m_ZoomDistance = m_CameraState.MinStepZooom;
             }
 
-            if(zoomInput != 0) Debug.LogFormat("m_ZoomAmount {0} | distance {1}", m_ZoomAmount, distance);
+
+            //m_Camera.transform.localPosition += new Vector3(0, 0, m_ZoomDistance);
+            //m_CameraPosition.z = Mathf.SmoothDamp(m_CameraPosition.z, m_CameraPosition.z + m_ZoomDistance, ref cameraZoomVelocity, m_CameraState.StepZoomSmooth);
         }
 
 

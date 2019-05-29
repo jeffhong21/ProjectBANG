@@ -109,7 +109,8 @@ namespace CharacterController
             m_CurrentDist = Mathf.SmoothDamp(m_CurrentDist, targetDist, ref m_MoveVelocity,
                                            m_CurrentDist > targetDist ? clipMoveTime : returnTime);
             m_CurrentDist = Mathf.Clamp(m_CurrentDist, closestDistance, m_OriginalDist);
-            m_Cam.localPosition = -Vector3.forward*m_CurrentDist;
+            m_Cam.localPosition =  -Vector3.forward * m_CurrentDist;
+
         }
 
 

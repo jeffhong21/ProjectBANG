@@ -8,7 +8,7 @@ namespace CharacterController
     {
         protected float m_CheckHeight = 0.4f;
 
-        [Header("-- Climb Object Settings --")]
+        //[Header("-- Climb Object Settings --")]
         [SerializeField]
         protected float m_MoveToClimbDistance = 0.5f;
         [SerializeField, Tooltip("The highest level the character can climb.")]
@@ -37,8 +37,6 @@ namespace CharacterController
         [SerializeField, DisplayOnly]
         private float normalizeTime;
 
-
-        [SerializeField] bool m_Debug;
 
 
 		//
@@ -120,7 +118,7 @@ namespace CharacterController
             //    m_Rigidbody.MoveRotation(Quaternion.AngleAxis(angle, m_Transform.up) * m_Rigidbody.rotation);
             //}
 
-            Quaternion rotation = Quaternion.FromToRotation(m_Transform.forward, -ObjectHit.normal);
+            Quaternion rotation = Quaternion.FromToRotation(m_Transform.forward, -ObjectHit.normal) * m_Rigidbody.rotation;
             m_Rigidbody.MoveRotation(Quaternion.Slerp(rotation, m_Rigidbody.rotation, m_DeltaTime * 10));
 
             return false;
