@@ -58,6 +58,7 @@
         protected Vector3 m_ColliderCenter;
         protected float m_ActionStartTime;
         private float m_DefaultActionStopTime = 0.25f;
+        protected bool m_ExitingAction;
         protected float m_DeltaTime;
         protected CharacterLocomotion m_Controller;
         protected Rigidbody m_Rigidbody;
@@ -116,7 +117,8 @@
         }
 
 
-        public float ActionStartTime{
+        public float ActionStartTime
+        {
             get { return m_ActionStartTime; }
         }
 
@@ -181,7 +183,7 @@
 
 
 
-		protected virtual void OnValidate()
+        protected virtual void OnValidate()
         {
             if (string.IsNullOrEmpty(m_StateName)) m_StateName = GetType().Name;
         }
@@ -299,21 +301,21 @@
                             //{
                             //    return true;
                             //}
-                            
-                             if (Input.GetKeyDown(m_KeyCodes[i]) && m_FirstButtonPressed == m_KeyCodes[i])
-                             {
-                                 m_FirstButtonPressed = KeyCode.F12;
-                                 if (Time.time - m_TimeOfFirstButtoonPressed < 0.18f)
-                                 {
-                                     return true;
-                                 }
-                             }
-                             if (Input.GetKeyDown(m_KeyCodes[i]) && m_FirstButtonPressed != m_KeyCodes[i])
-                             {
-                                 m_FirstButtonPressed = m_KeyCodes[i];
-                                 m_TimeOfFirstButtoonPressed = Time.time;
-                                 return false;
-                             }
+
+                            if (Input.GetKeyDown(m_KeyCodes[i]) && m_FirstButtonPressed == m_KeyCodes[i])
+                            {
+                                m_FirstButtonPressed = KeyCode.F12;
+                                if (Time.time - m_TimeOfFirstButtoonPressed < 0.18f)
+                                {
+                                    return true;
+                                }
+                            }
+                            if (Input.GetKeyDown(m_KeyCodes[i]) && m_FirstButtonPressed != m_KeyCodes[i])
+                            {
+                                m_FirstButtonPressed = m_KeyCodes[i];
+                                m_TimeOfFirstButtoonPressed = Time.time;
+                                return false;
+                            }
 
                         }
                         break;
@@ -332,7 +334,7 @@
             int index = Array.IndexOf(m_Controller.CharActions, action);
             for (int i = 0; i < index; i++)
             {
-                if(m_Controller.CharActions[i].IsActive && m_Controller.CharActions[i].IsConcurrentAction() == false)
+                if (m_Controller.CharActions[i].IsActive && m_Controller.CharActions[i].IsConcurrentAction() == false)
                 {
                     return false;
                 }
@@ -343,7 +345,7 @@
 
 
 
-		public virtual bool CanStopAction()
+        public virtual bool CanStopAction()
         {
             if (enabled == false || m_IsActive == false) return false;
 
@@ -354,9 +356,31 @@
                     //if(m_ActionStartTime != -1 && Time.time >= m_ActionStartTime + m_DefaultActionStopTime)
                     for (int index = 0; index < m_Animator.layerCount; index++)
                     {
-                        if (m_Animator.GetCurrentAnimatorStateInfo(index).IsName(m_StateName))
+                        string fullPathName = m_Animator.GetLayerName(0) + "." + m_StateName + ".";
+                        if (m_Animator.GetCurrentAnimatorStateInfo(0).fullPathHash == Animator.StringToHash(fullPathName))
                         {
-                            Debug.LogFormat("Stopping Action State {0}", m_StateName);
+                            if (m_Animator.GetNextAnimatorStateInfo(0).fullPathHash == 0)
+                            {
+                                m_ExitingAction = true;
+                            }
+                            if (m_ExitingAction)
+                            {
+                                if (m_Animator.GetNextAnimatorStateInfo(0).fullPathHash != 0)
+                                {
+                                    return true;
+                                }
+                            }
+                            if (m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f - m_TransitionDuration)
+                            {
+                                //Debug.LogFormat("{0} has stopped by comparing nameHASH", m_MatchTargetState.stateName);
+                                return true;
+                            }
+                            return false;
+                        }
+
+                        if (m_Animator.GetCurrentAnimatorStateInfo(index).IsName(m_DestinationStateName))
+                        {
+                            Debug.LogFormat("Stopping Action State {0}", m_DestinationStateName);
                             return false;
                         }
                     }
@@ -414,13 +438,16 @@
 
             //m_AnimatorMonitor.SetActionID(m_ActionID);
             //m_AnimatorMonitor.SetActionTrigger(HashID.ActionChange);
-            string destinationState = m_StateName;
+            m_DestinationStateName = m_StateName;
             for (int index = 0; index < m_Animator.layerCount; index++)
             {
-                if (string.IsNullOrEmpty(GetDestinationState(index)) == false){
-                    destinationState = string.Format("{0}.{1}", m_StateName, GetDestinationState(index));
-                } else{
-                    destinationState = m_StateName;
+                if (string.IsNullOrEmpty(GetDestinationState(index)) == false)
+                {
+                    m_DestinationStateName = string.Format("{0}.{1}", m_StateName, GetDestinationState(index));
+                }
+                else
+                {
+                    m_DestinationStateName = m_StateName;
                 }
                 if (m_TransitionDuration > 0)
                     m_Animator.CrossFade(GetDestinationState(index), m_TransitionDuration, index);
@@ -429,39 +456,47 @@
             }
 
 
-            if(m_StartEffect != null){
+            if (m_StartEffect != null)
+            {
                 GameObject effects = null;
                 if (ObjectPool.Instance != null)
-                    effects = ObjectPool.Instantiate(m_StartEffect, m_Transform.position, m_Transform.rotation);
+                    effects = ObjectPool.Get(m_StartEffect, m_Transform.position, m_Transform.rotation);
                 else
                     effects = Instantiate(m_StartEffect, m_Transform.position, m_Transform.rotation);
-                Debug.Log("Start ffect: " + effects + " is active? " + effects.activeSelf);
+                //Debug.Log("Start ffect: " + effects + " is active? " + effects.activeSelf);
             }
         }
 
 
         public void StopAction()
         {
-            if (m_EndEffect != null){
-                if (ObjectPool.Instance != null)
-                    ObjectPool.Instantiate(m_EndEffect, m_Transform.position, m_Transform.rotation);
-                else
-                    Instantiate(m_EndEffect, m_Transform.position, m_Transform.rotation);
-            }
+            m_IsActive = false;
+            EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnCharacterActionActive, this, m_IsActive);
 
+            if (m_EndEffect != null)
+            {
+                GameObject effects = null;
+                if (ObjectPool.Instance != null)
+                {
+                    effects = ObjectPool.Get(m_EndEffect, m_Transform.position, m_Transform.rotation);
+                    Debug.Log(m_EndEffect.name);
+                }
+                else
+                    effects = Instantiate(m_EndEffect, m_Transform.position, m_Transform.rotation);
+            }
 
             m_Animator.SetInteger(HashID.ActionID, 0);
             m_Animator.SetInteger(HashID.ActionIntData, 0);
             m_Animator.ResetTrigger(HashID.ActionChange);
             //m_AnimatorMonitor.SetActionID(0);
 
+            m_ExitingAction = false;
             m_ActionStartTime = -1;
 
 
             ActionStopped();
 
-            m_IsActive = false;
-            EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnCharacterActionActive, this, m_IsActive);
+
         }
 
 
@@ -592,12 +627,12 @@
 
 
 
-		private void OnAnimatorMove()
-		{
+        private void OnAnimatorMove()
+        {
 
-            if(m_IsActive && m_Controller.UseRootMotion && m_ApplyBuiltinRootMotion)
+            if (m_IsActive && m_Controller.UseRootMotion && m_ApplyBuiltinRootMotion)
                 m_Animator.ApplyBuiltinRootMotion();
-		}
+        }
 
 
 
@@ -608,13 +643,13 @@
 
 
 
-		#region Debug
+        #region Debug
 
 
 
 
-		//Color debugTextColor = new Color(0, 0.6f, 1f, 1);
-		private GUIStyle textStyle = new GUIStyle();
+        //Color debugTextColor = new Color(0, 0.6f, 1f, 1);
+        private GUIStyle textStyle = new GUIStyle();
         private GUIStyle style = new GUIStyle();
 
         private Vector2 size;

@@ -92,7 +92,7 @@
             if (base.CanStartAction())
             {
                 RaycastHit startLocationHit;
-                if (Physics.Raycast(m_ObjectDetector.position, m_ObjectDetector.forward, out m_ObjectDetectorHit, m_TakeCoverDistance, m_CoverLayer))
+                if (Physics.Raycast(m_ObjectDetector.position, m_ObjectDetector.forward, out m_ObjectDetectorHit, m_TakeCoverDistance + 2 * m_CapsuleCollider.radius, m_CoverLayer))
                 {
                     m_TargetPosition = m_ObjectDetectorHit.point + (m_ObjectDetectorHit.normal * (m_CapsuleCollider.radius * 0.45f));
                     m_TargetPosition.y = m_Controller.transform.position.y;

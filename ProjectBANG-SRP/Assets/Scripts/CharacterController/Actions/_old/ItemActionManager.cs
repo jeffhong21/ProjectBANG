@@ -78,7 +78,7 @@
 
 
             //if(m_Controller.Aiming)
-            m_AnimatorMonitor.SetItemStateIndex(0);
+            //m_AnimatorMonitor.SetItemStateIndex(0);
             m_Animator.CrossFade(Animator.StringToHash(GetFullStateName(ReloadState)), m_TransitionDuration, m_LayerIndex);
             m_Animator.SetBool(HashID.Aiming, false);
             m_Inventory.ReloadItem(m_Inventory.EquippedItemType, 1);
@@ -90,20 +90,20 @@
         public void SwitchItem(bool next)
         {
             m_Inventory.SwitchItem(next);
-            m_AnimatorMonitor.SetItemID(m_Inventory.CurrentItemID);
+            //m_AnimatorMonitor.SetItemID(m_Inventory.CurrentItemID);
         }
 
 
         public void EquipItem(int index)
         {
             m_Inventory.EquipItem(index);
-            m_AnimatorMonitor.SetItemID(m_Inventory.CurrentItemID);
+            //m_AnimatorMonitor.SetItemID(m_Inventory.CurrentItemID);
         }
 
         public void ToggleItem()
         {
             m_Inventory.ToggleEquippedItem();
-            m_AnimatorMonitor.SetItemID(m_Inventory.CurrentItemID);
+            //m_AnimatorMonitor.SetItemID(m_Inventory.CurrentItemID);
         }
 
 

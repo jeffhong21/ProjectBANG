@@ -45,16 +45,16 @@ namespace CharacterController
             if (m_leftFootTrigger == null) AddCharacterFootTriggers(m_Animator.GetBoneTransform(HumanBodyBones.LeftToes), out m_leftFootTrigger);
             if (m_rightFootTrigger == null) AddCharacterFootTriggers(m_Animator.GetBoneTransform(HumanBodyBones.RightToes), out m_rightFootTrigger);
 
-            m_leftFootTrigger.Init(this);
-            m_rightFootTrigger.Init(this);
+
 		}
 
 
 
 		private void OnEnable()
 		{
-			
-		}
+            m_leftFootTrigger.Init(this);
+            m_rightFootTrigger.Init(this);
+        }
 
 
 
@@ -66,7 +66,8 @@ namespace CharacterController
                     var position = sender.transform.position + m_Controller.transform.up * 0.02f;
                     var fwdDirection = Vector3.Cross(m_Transform.right, m_Controller.GroundHit.normal);
                     var rotation = Quaternion.LookRotation(fwdDirection, m_Controller.GroundHit.normal);
-                    var footStep = ObjectPool.Instantiate(m_Decal, position, rotation);
+
+                    var footStep = ObjectPool.Get(m_Decal, position, rotation);
                 }
                 m_FootstepThreshold = Time.timeSinceLevelLoad + m_FootstepTimer;
                 m_currentStep = sender.transform;

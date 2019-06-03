@@ -10,7 +10,7 @@ public class ParticleEffectsObject : MonoBehaviour
     private float duration;             //  How long before the object is returned back.
     [SerializeField, DisplayOnly]
     private float currentDuration;      //  The current time since enabled.
-    //[SerializeField]
+    [SerializeField]
     private ParticleSystem[] particleSystems = new ParticleSystem[0];
 
 
@@ -31,7 +31,9 @@ public class ParticleEffectsObject : MonoBehaviour
         currentDuration = 0;
 
         for (int i = 0; i < particleSystems.Length; i++){
+            //particleSystems[i].time = 0;
             particleSystems[i].Play(true);
+            Debug.Log(particleSystems[i].IsAlive());
         }
 
 	}
@@ -39,24 +41,36 @@ public class ParticleEffectsObject : MonoBehaviour
 	private void OnDisable()
 	{
         for (int i = 0; i < particleSystems.Length; i++){
-            particleSystems[i].Stop(true, ParticleSystemStopBehavior.StopEmitting);
+            particleSystems[i].Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         }
         currentDuration = 0;
-	}
+        playing = false;
+
+    }
 
 
 
 
-
+    bool playing;
 	private void Update()
 	{
-        if(enabled){
+        if(enabled)
+        {
+            if(playing == false)
+            {
+                for (int i = 0; i < particleSystems.Length; i++)
+                {
+                    //particleSystems[i].time = 0;
+                    particleSystems[i].Play(true);
+                    playing = true;
+                }
+            }
             if (duration > 0)
             {
                 currentDuration += Time.deltaTime;
                 if (currentDuration > duration)
                 {
-                    ObjectPool.Destroy(gameObject);
+                    ObjectPool.Return(gameObject);
                 }
             }
         }

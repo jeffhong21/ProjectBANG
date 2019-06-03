@@ -107,7 +107,7 @@ public class ObjectPool : MonoBehaviour
 
 
 
-    public static GameObject Instantiate(GameObject original, Vector3 position, Quaternion rotation, Transform parent = null)
+    public static GameObject Get(GameObject original, Vector3 position, Quaternion rotation, Transform parent = null)
     {
         GameObject instantiatedObject = null;
         if (m_GameObjectPool.ContainsKey(original)){
@@ -156,7 +156,7 @@ public class ObjectPool : MonoBehaviour
     }
 
 
-    public static void Destroy(GameObject instantiatedObject)
+    public static void Return(GameObject instantiatedObject)
     {
         var originalInstanceID = GetOriginalInstanceID(instantiatedObject);
         var originalPrefab = m_InstanceIdMap[originalInstanceID];

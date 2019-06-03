@@ -30,7 +30,7 @@ namespace CharacterController
         private RaycastHit ObjectHit, ObjectHeightHit;
 
         private MatchTargetWeightMask m_MatchTargetWeightMask = new MatchTargetWeightMask(Vector3.one, 0);
-        private float m_StartTime;
+
 
         [SerializeField, DisplayOnly]
         private bool isMatchingTarget;
@@ -57,7 +57,9 @@ namespace CharacterController
 
 
 
-		public override bool CanStartAction()
+
+
+        public override bool CanStartAction()
         {
             if (base.CanStartAction())
             {
@@ -98,8 +100,7 @@ namespace CharacterController
             m_ColliderCenter = m_CapsuleCollider.center;
 
             //m_Rigidbody.isKinematic = !m_Rigidbody.isKinematic;
-
-
+            //m_Rigidbody.isKinematic = true;
 
 
             Vector3 verticalVelocity = Vector3.up * (Mathf.Sqrt((m_PlatformHeight) * -2 * Physics.gravity.y));
@@ -130,6 +131,9 @@ namespace CharacterController
         {
             Vector3 verticalVelocity = Vector3.up * (Mathf.Sqrt((m_PlatformHeight) * -2 * Physics.gravity.y));
 
+            float objectHeight = m_PlatformHeight < 1.5f ? ObjectHeightHit.point.y : ObjectHeightHit.point.y - m_CapsuleCollider.height;
+            //float distance = objectHeight - m_Rigidbody.position.y;
+
             float distance = ObjectHeightHit.point.y - m_Rigidbody.position.y;
             float percent = (m_PlatformHeight - distance) / m_PlatformHeight;
 
@@ -137,7 +141,7 @@ namespace CharacterController
             {
                 if (distance <= 0.12f)
                 {
-                    m_Rigidbody.isKinematic = false;
+                    //m_Rigidbody.isKinematic = false;
                     Vector3 position = Vector3.Lerp(m_Rigidbody.position, m_EndPosition, percent);
                     m_Rigidbody.MovePosition(Vector3.Lerp(m_Rigidbody.position, m_EndPosition, percent * 0.25f));
                 }
@@ -146,6 +150,7 @@ namespace CharacterController
                     //m_Controller.InputVector = m_Transform.forward;
                     //m_Transform.position = new Vector3(m_Transform.position.x, m_Transform.position.y, m_StartPosition.z);
                     //m_Rigidbody.position = new Vector3(m_Rigidbody.position.x, m_Rigidbody.position.y + m_CapsuleCollider.radius, m_StartPosition.z);
+                    //m_Rigidbody.MovePosition(Vector3.Lerp(m_Rigidbody.position, new Vector3(m_Rigidbody.position.x, objectHeight, m_StartPosition.z), percent * 0.25f));
                     m_Rigidbody.MovePosition(Vector3.Lerp(m_Rigidbody.position, new Vector3(m_Rigidbody.position.x, ObjectHeightHit.point.y, m_StartPosition.z), percent * 0.25f));
 
                 }
@@ -156,31 +161,20 @@ namespace CharacterController
         }
 
 
-        Vector3 matchTarget;
+
         public override bool Move()
         {
             if (m_MatchTargetStatesLookup.ContainsKey(m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash))
             {
                 AnimatorStateMatchTarget matchState = m_MatchTargetStatesLookup[m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash];
-                m_Animator.MatchTarget(ObjectHeightHit.point + matchState.matchTargetOffset, Quaternion.identity, matchState.avatarTarget, m_MatchTargetWeightMask, matchState.startMatchTarget, matchState.stopMatchTarget);
+                //m_Animator.MatchTarget(ObjectHeightHit.point + matchState.matchTargetOffset, Quaternion.identity, matchState.avatarTarget, m_MatchTargetWeightMask, matchState.matchTargetRange.x, matchState.matchTargetRange.y);
+                m_Animator.MatchTarget(m_Animator.GetBoneTransform(matchState.HumanBodyBone).position + matchState.matchTargetOffset, Quaternion.identity, matchState.avatarTarget, m_MatchTargetWeightMask, matchState.startMatchTarget, matchState.endMatchTarget);
+
+                //m_Animator.MatchTarget(ObjectHeightHit.point + matchState.matchTargetOffset, Quaternion.identity, matchState.avatarTarget, m_MatchTargetWeightMask, matchState.startMatchTarget, matchState.endMatchTarget);
                 //Debug.Log(matchState.stateName + " | normalized time: " + m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime);
             }
 
-            //isMatchingTarget = m_Animator.isMatchingTarget;
-            //normalizeTime = Mathf.Repeat(m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime, 1f);
-            //if(m_Animator.isMatchingTarget == false){
-            //    if(m_MatchTargetStatesLookup.ContainsKey(m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash)){
-            //        AnimatorStateMatchTarget matchState = m_MatchTargetStatesLookup[m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash];
-            //        m_Animator.MatchTarget(ObjectHeightHit.point + matchState.matchTargetOffset, Quaternion.identity, matchState.avatarTarget, m_MatchTargetWeightMask, matchState.startMatchTarget, matchState.stopMatchTarget);
-            //    }
-            //}
-            //else{
-            //    m_Velocity = m_Animator.deltaPosition / m_DeltaTime;
 
-            //    m_Velocity += m_VerticalVelocity;
-
-            //    m_Rigidbody.velocity = m_Velocity;
-            //}
             m_Velocity = m_Animator.deltaPosition / m_DeltaTime;
             m_Rigidbody.velocity = m_Velocity;
             //Debug.LogFormat("Target Matching: {0}", m_Animator.isMatchingTarget);
@@ -212,8 +206,13 @@ namespace CharacterController
             //}
             if (Vector3.Distance(m_Rigidbody.position, m_EndPosition) <= 0.1f)
                 return true;
-            
-            return Time.time > m_ActionStartTime + 2.5;
+
+            float endTime = 2.5f;
+            if (m_PlatformHeight < 1.5f){
+                endTime += 1.5f;
+            }
+
+            return Time.time > m_ActionStartTime + endTime;
             //return m_ActionStartTime + 2 < Time.time;
         }
 
@@ -233,14 +232,21 @@ namespace CharacterController
             //Debug.LogFormat("{0} Action has stopped {1}", GetType().Name, Time.time);
         }
 
-
+        string m_DestinationState;
         public override string GetDestinationState(int layer)
         {
             if (layer == 0){
                 if (m_PlatformHeight < 1.5f)
-                    return "Climb-1M";
+                {
+                    //m_ApplyBuiltinRootMotion = true;
+                    return m_DestinationState = "Climb1M";
+                }
                 else
-                    return "Climb-2M";
+                {
+                    //m_ApplyBuiltinRootMotion = false;
+                    return m_DestinationState = "Climb2M-Start";
+                }
+
             }
             return "";
         }

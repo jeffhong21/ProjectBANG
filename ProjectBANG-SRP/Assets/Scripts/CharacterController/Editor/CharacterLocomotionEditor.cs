@@ -142,6 +142,7 @@ namespace CharacterController
                 //  Motion related variables.
                 EditorGUILayout.PropertyField(m_MovementSpeed);
                 EditorGUILayout.PropertyField(m_Acceleration);
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_MotorDamping"));
                 EditorGUILayout.PropertyField(m_RotationSpeed);
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_SlopeForceUp"));
                 EditorGUILayout.PropertyField(m_SlopeForceDown);

@@ -67,7 +67,7 @@ namespace CharacterController
 		protected override void ActionStarted()
         {
             m_Inventory.SwitchItem(true);
-            m_AnimatorMonitor.SetItemID(m_Inventory.CurrentItemID);
+            //m_AnimatorMonitor.SetItemID(m_Inventory.CurrentItemID);
 
             //Debug.LogFormat("Starting EquipUnequip");
             //var currentItem = m_Inventory.EquippedItemType;

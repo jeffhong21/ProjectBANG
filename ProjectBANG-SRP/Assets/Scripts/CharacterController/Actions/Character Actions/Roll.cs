@@ -39,7 +39,8 @@ namespace CharacterController
             m_ColliderHeight = m_CapsuleCollider.height;
             m_ColliderCenter = m_CapsuleCollider.center;
 
-            if (Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out m_CheckDistanceHit, m_MaxDistance, m_Layers.GroundLayer | m_StopLayer))
+            var checkDistance = m_MaxDistance + 2 * m_CapsuleCollider.radius;
+            if (Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out m_CheckDistanceHit, checkDistance, m_Layers.GroundLayer | m_StopLayer))
             {
                 m_RollType = RollType.Slide;
             }
@@ -49,7 +50,7 @@ namespace CharacterController
             }
 
 
-            if (m_Debug) Debug.DrawRay(m_Transform.position + Vector3.up * 0.12f, m_Transform.forward * m_MaxDistance, Color.white, 2);
+            if (m_Debug) Debug.DrawRay(m_Transform.position + Vector3.up * 0.12f, m_Transform.forward * checkDistance, Color.white, 2);
             Vector3 velocity = Vector3.Scale(transform.forward, m_MaxDistance * new Vector3((Mathf.Log(1f / (m_DeltaTime * m_Rigidbody.drag + 1)) / -m_DeltaTime), 0, (Mathf.Log(1f / (m_DeltaTime * m_Rigidbody.drag + 1)) / -m_DeltaTime)));
             m_Rigidbody.velocity = Vector3.ClampMagnitude(velocity, m_MaxDistance);
         }

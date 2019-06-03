@@ -185,8 +185,8 @@ ParticleSystem:
     startColor:
       serializedVersion: 2
       minMaxState: 2
-      minColor: {r: 0.7169812, g: 0.70734334, b: 0.6933073, a: 0.5529412}
-      maxColor: {r: 0.8584906, g: 0.83390737, b: 0.78964937, a: 0.29411766}
+      minColor: {r: 0.8679245, g: 0.8679245, b: 0.8679245, a: 0.6862745}
+      maxColor: {r: 1, g: 1, b: 1, a: 0.3137255}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -248,7 +248,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 2
+      scalar: 2.5
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -1271,7 +1271,7 @@ ParticleSystem:
       maxColor: {r: 1, g: 1, b: 1, a: 1}
       maxGradient:
         serializedVersion: 2
-        key0: {r: 0.75686276, g: 0.75686276, b: 0.75686276, a: 0.54901963}
+        key0: {r: 0.75686276, g: 0.75686276, b: 0.75686276, a: 0.30588236}
         key1: {r: 0.75686276, g: 0.75686276, b: 0.75686276, a: 0}
         key2: {r: 0, g: 0, b: 0, a: 0}
         key3: {r: 0, g: 0, b: 0, a: 0}
@@ -3495,7 +3495,7 @@ ParticleSystem:
         m_NumAlphaKeys: 2
     range: {x: 0, y: 1}
   CollisionModule:
-    enabled: 0
+    enabled: 1
     serializedVersion: 3
     type: 1
     collisionMode: 0
@@ -3673,7 +3673,7 @@ ParticleSystem:
     radiusScale: 1
     collidesWith:
       serializedVersion: 2
-      m_Bits: 4294967295
+      m_Bits: 134217728
     maxCollisionShapes: 256
     quality: 0
     voxelSize: 0.5
@@ -4644,8 +4644,8 @@ ParticleSystemRenderer:
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 0
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -4687,7 +4687,7 @@ ParticleSystemRenderer:
   m_EnableGPUInstancing: 0
   m_ApplyActiveColorSpace: 0
   m_AllowRoll: 1
-  m_VertexStreams: 000304
+  m_VertexStreams: 0300
   m_Mesh: {fileID: 4300000, guid: 443dc81a3b58141458b364135d63a1a6, type: 3}
   m_Mesh1: {fileID: 0}
   m_Mesh2: {fileID: 0}
@@ -4740,3 +4740,4 @@ MonoBehaviour:
   prefabID: 0
   duration: 0
   currentDuration: 0
+  particleSystems: []

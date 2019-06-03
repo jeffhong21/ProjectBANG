@@ -154,7 +154,7 @@
             //  Get the current ItemType HASH first.  Than switch
             m_Switching = true;
             m_Inventory.SwitchItem(true);
-            m_AnimatorMonitor.SetItemID(GetItemID(), 0);
+            //m_AnimatorMonitor.SetItemID(GetItemID(), 0);
 
 
         }
@@ -188,7 +188,7 @@
         protected void Equip()
         {
             //  Get item to equip id.
-            m_AnimatorMonitor.SetItemID(GetItemID(), 0);
+            //m_AnimatorMonitor.SetItemID(GetItemID(), 0);
 
             var stateName = string.Format("{0}.{1}.{2}", m_AnimatorMonitor.UpperBodyLayerName, GetItemName(), "Equip");
             m_Animator.CrossFade(Animator.StringToHash(stateName), m_TransitionDuration, m_LayerIndex);
@@ -307,7 +307,7 @@
                             //  Not equipping an item.
                             if (m_Inventory.EquippedItemType == null)
                             {
-                                m_AnimatorMonitor.SetItemID(GetItemID(), 0);
+                                //m_AnimatorMonitor.SetItemID(GetItemID(), 0);
                                 m_Switching = false;
                             }
                             //  equipped item is not null
@@ -330,7 +330,7 @@
                         {
                             m_Equipping = false;
                             m_Switching = false;
-                            m_AnimatorMonitor.SetItemID(GetItemID(), 0);
+                            //m_AnimatorMonitor.SetItemID(GetItemID(), 0);
                             m_Animator.ResetTrigger(HashID.ItemStateIndexChange);
                         }
                     }
@@ -392,7 +392,7 @@
                     if (GetNormalizedTime(m_LayerIndex) > 1 - 0.25f)
                     {
                         m_Reloading = false;
-                        m_AnimatorMonitor.SetItemID(GetItemID(), 0);
+                        //m_AnimatorMonitor.SetItemID(GetItemID(), 0);
                     }
                 }
             }

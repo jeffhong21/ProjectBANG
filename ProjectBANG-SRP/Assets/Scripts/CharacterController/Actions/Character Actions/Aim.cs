@@ -34,7 +34,7 @@
             m_ItemID = GetItemID();
             m_ItemName = GetItemName();
 
-            m_AnimatorMonitor.SetItemID(GetItemID(), m_ItemStateID);
+            //m_AnimatorMonitor.SetItemID(GetItemID(), m_ItemStateID);
             m_Animator.SetBool(HashID.Aiming, true);
             EventHandler.ExecuteEvent(m_GameObject, "OnAimActionStart", true);
         }
@@ -43,7 +43,7 @@
         protected override void ActionStopped()
         {
             
-            m_AnimatorMonitor.SetItemID(GetItemID(), 0);
+            //m_AnimatorMonitor.SetItemID(GetItemID(), 0);
             m_Animator.SetBool(HashID.Aiming, false);
             EventHandler.ExecuteEvent(m_GameObject, "OnAimActionStart", false);
         }

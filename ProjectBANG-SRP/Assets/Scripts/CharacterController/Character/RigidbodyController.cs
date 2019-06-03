@@ -7,7 +7,6 @@ namespace CharacterController
     [RequireComponent(typeof(CapsuleCollider), typeof(Rigidbody), typeof(LayerManager))]
     public class RigidbodyController : MonoBehaviour
     {
-
         //  Physics variables
         [SerializeField, HideInInspector]
         protected float m_Mass = 100;
@@ -28,10 +27,15 @@ namespace CharacterController
         [SerializeField, HideInInspector]
         protected float m_GravityModifier = 2f;
 
-        //[SerializeField, HideInInspector]
-        //protected bool m_AlignToGround = true;
-        //[SerializeField, HideInInspector]
-        //protected float m_AlignToGroundDepthOffset = 0.5f;
+        protected CapsuleCollider m_CapsuleCollider;
+        protected Collider[] m_LinkedColliders = new Collider[0];
+        protected PhysicMaterial m_GroundIdleFrictionMaterial;
+        protected PhysicMaterial m_GroundedMovingFrictionMaterial;
+        protected PhysicMaterial m_StepFrictionMaterial;
+        protected PhysicMaterial m_SlopeFrictionMaterial;
+        protected PhysicMaterial m_AirFrictionMaterial;
+
+
         [SerializeField, HideInInspector]
         protected float m_DetectObjectHeight = 0.4f;
 
@@ -49,7 +53,6 @@ namespace CharacterController
 
 
         protected LayerManager m_Layers;
-        protected CapsuleCollider m_CapsuleCollider;
         protected Rigidbody m_Rigidbody;
         protected GameObject m_GameObject;
         protected Transform m_Transform;
@@ -84,7 +87,8 @@ namespace CharacterController
         protected virtual void Awake()
         {
             m_Rigidbody = GetComponent<Rigidbody>();
-            m_CapsuleCollider = GetComponent<CapsuleCollider>();
+            if(m_CapsuleCollider == null)
+                m_CapsuleCollider = GetComponent<CapsuleCollider>();
             m_Layers = GetComponent<LayerManager>();
             m_GameObject = gameObject;
             m_Transform = transform;
@@ -94,12 +98,49 @@ namespace CharacterController
                 m_Layers = m_GameObject.AddComponent<LayerManager>();
 
             m_Gravity = Physics.gravity;
+
+            // slides the character through walls and edges
+            m_GroundedMovingFrictionMaterial = new PhysicMaterial
+            {
+                name = "GroundedMovingFrictionMaterial",
+                staticFriction = .25f,
+                dynamicFriction = .25f,
+                frictionCombine = PhysicMaterialCombine.Multiply
+            };
+
+            // prevents the collider from slipping on ramps
+            m_GroundIdleFrictionMaterial = new PhysicMaterial
+            {
+                name = "GroundIdleFrictionMaterial",
+                staticFriction = 1f,
+                dynamicFriction = 1f,
+                frictionCombine = PhysicMaterialCombine.Maximum
+            };
+
+            // air physics 
+            m_AirFrictionMaterial = new PhysicMaterial
+            {
+                name = "AirFrictionMaterial",
+                staticFriction = 0f,
+                dynamicFriction = 0f,
+                frictionCombine = PhysicMaterialCombine.Minimum
+            };
         }
 
 
+        protected virtual void CheckGround() { }
 
+        protected virtual void CheckMovement() { }
 
+        protected virtual void UpdateRotation() { }
 
+        protected virtual void UpdateMovement() { }
+
+        protected virtual void Move() { }
+
+        protected virtual void SetPhysicsMaterial() { }
+
+        
 
 
         public bool DetectObject(Vector3 direction, out RaycastHit raycastHit, float maxDistance, LayerMask layerMask, int rayCount = 1, float maxAngle = 0)
@@ -136,8 +177,6 @@ namespace CharacterController
 
 
 
-
-
         protected Vector3 m_DebugHeightOffset = new Vector3(0, 0.25f, 0);
         protected Color _Magenta = new Color(0.8f, 0, 0.8f, 0.8f);
 
@@ -145,19 +184,19 @@ namespace CharacterController
         {
 
             #region Slope Check
-            //float slopeCheckHeight = 0.5f;
-            //Quaternion rotation = Quaternion.AngleAxis(m_SlopeLimit, -transform.right);
-            ////  Hypotenuse
-            //Gizmos.color = _Magenta;
-            //float slopeCheckHypotenuse = slopeCheckHeight / Mathf.Cos(m_SlopeLimit);
-            //Vector3 slopeAngleVector = slopeCheckHypotenuse * transform.forward;
-            //Gizmos.DrawRay(transform.position + (transform.forward) * 0.3f, rotation * slopeAngleVector - (slopeAngleVector * 0.3f));
+            float slopeCheckHeight = 0.5f;
+            Quaternion rotation = Quaternion.AngleAxis(m_SlopeLimit, -transform.right);
+            //  Hypotenuse
+            Gizmos.color = _Magenta;
+            float slopeCheckHypotenuse = slopeCheckHeight / Mathf.Cos(m_SlopeLimit);
+            Vector3 slopeAngleVector = slopeCheckHypotenuse * transform.forward;
+            Gizmos.DrawRay(transform.position + (transform.forward) * 0.3f, rotation * slopeAngleVector - (slopeAngleVector * 0.3f));
 
-            //  Check distance
-            //Gizmos.color = Color.magenta;
-            //float slopeCheckDistance = Mathf.Tan(m_SlopeLimit) * slopeCheckHeight;
-            //Vector3 slopeCheckVector = slopeCheckDistance * transform.forward;
-            //Gizmos.DrawRay(transform.position + transform.up * slopeCheckHeight, slopeCheckVector );//- (transform.forward) * 0.3f);
+            //Check distance
+            Gizmos.color = Color.magenta;
+            float slopeCheckDistance = Mathf.Tan(m_SlopeLimit) * slopeCheckHeight;
+            Vector3 slopeCheckVector = slopeCheckDistance * transform.forward;
+            Gizmos.DrawRay(transform.position + transform.up * slopeCheckHeight, slopeCheckVector );//- (transform.forward) * 0.3f);
             #endregion
 
             if (m_Debug && Application.isPlaying)
