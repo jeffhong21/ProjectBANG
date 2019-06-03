@@ -186,29 +186,34 @@ namespace CharacterController
 
         public override bool CanStopAction()
         {
-            if (m_MatchTargetStatesLookup.ContainsKey(m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash))
+            int layerIndex = 0;
+            //if (m_Animator.GetNextAnimatorStateInfo(layerIndex).fullPathHash == 0){
+            //    m_ExitingAction = true;
+            //}
+            //if (m_ExitingAction && m_Animator.IsInTransition(layerIndex))
+            //{
+            //    //Debug.LogFormat("{1} | {0} is the next state.", m_AnimatorMonitor.GetFullPathName(m_Animator.GetNextAnimatorStateInfo(0).fullPathHash), this.GetType() );
+            //    return true;
+            //}
+
+            if (m_MatchTargetStatesLookup.ContainsKey(m_Animator.GetCurrentAnimatorStateInfo(layerIndex).shortNameHash))
             {
                 if (m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f - m_TransitionDuration)
                 {
-                    //Debug.LogFormat("{0} has stopped by comparing nameHASH", m_MatchTargetState.stateName);
+                    Debug.LogFormat("{0} has stopped by comparing nameHASH", GetType());
                     return true;
                 }
             }
 
 
-            //if (m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(m_MatchTargetState.stateName))
-            //{
-            //    if (m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f - m_TransitionDuration){
-            //        //Debug.LogFormat("{0} has stopped by comparing nameHASH", m_MatchTargetState.stateName);
-            //        return true;
-            //    }
-            //    return false;
-            //}
+
+
             if (Vector3.Distance(m_Rigidbody.position, m_EndPosition) <= 0.1f)
                 return true;
 
-            float endTime = 2.5f;
-            if (m_PlatformHeight < 1.5f){
+
+            float endTime = 2f;
+            if (m_PlatformHeight > 1.5f){
                 endTime += 1.5f;
             }
 

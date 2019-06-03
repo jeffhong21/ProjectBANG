@@ -71,11 +71,9 @@
         [SerializeField]
         protected float m_ForwardInputDampTime = 0.1f;
         [SerializeField]
-        protected AnimatorStateData m_BaseState = new AnimatorStateData("Movement", 0.2f);
-        [SerializeField]
-        protected AnimatorStateData m_UpperBodyState = new AnimatorStateData("Idle", 0.2f);
-        [SerializeField]
-        protected AnimatorStateData m_AdditiveState = new AnimatorStateData("Idle", 0.2f);
+        protected AnimatorStateData[] m_AnimatorStateData = new AnimatorStateData[0];
+
+
 
 
 
@@ -83,7 +81,7 @@
         protected AnimatorController m_AnimatorController;
 
 
-
+        private int stateCount;
 
 
 
@@ -137,11 +135,38 @@
             m_Animator = GetComponent<Animator>();
             m_AnimatorController = m_Animator.runtimeAnimatorController as AnimatorController;
 
+
+
         }
 
 
         private void Start()
         {
+
+            m_AnimatorStateData = new AnimatorStateData[m_Animator.layerCount];
+            for (int i = 0; i < m_AnimatorController.layers.Length; i++)
+            {
+                Debug.LogFormat("({2}) Animator Layer name: <b>{0}</b> | AnimatorController layer name: <b>{1}</b>",
+                    m_Animator.GetLayerName(i),
+                    m_AnimatorController.layers[i].name,
+                    i);
+
+
+                AnimatorStateMachine stateMachine = m_AnimatorController.layers[i].stateMachine;
+                AnimatorState defaultState = stateMachine.defaultState;
+                if (defaultState == null)
+                {
+                    defaultState = stateMachine.AddState("Idle", Vector3.zero);
+                }
+
+                //string stateName = stateMachine.name + "." + defaultState.name;
+                string stateName = defaultState.name;
+
+                m_AnimatorStateData[i] = new AnimatorStateData(defaultState.nameHash, stateName, 0.2f);
+            }
+
+
+
             GetAllStateIDs();
         }
 
@@ -177,7 +202,7 @@
 
         }
 
-        int stateCount;
+
         private void RegisterAnimatorStates(AnimatorStateMachine stateMachine, string parentState)
         {
             foreach (ChildAnimatorState childState in stateMachine.states) //for each state
@@ -239,7 +264,6 @@
 
         private void LateUpdate()
 		{
-
             for (int layerIndex = 0; layerIndex < m_Animator.layerCount; layerIndex++)
             {
                 var animatorStateInfo = m_Animator.GetCurrentAnimatorStateInfo(layerIndex);
@@ -247,9 +271,13 @@
                 var transitionStateInfo = m_Animator.GetAnimatorTransitionInfo(layerIndex);
                 if(m_Animator.IsInTransition(layerIndex) )
                 {
-                    if (m_DebugStateChanges)
-                        Debug.LogFormat("{0} -> {1}", GetShortPathName(animatorStateInfo.shortNameHash), GetShortPathName(nextAnimatorStateInfo.shortNameHash));
+                    //if (m_DebugStateChanges)
+                        //Debug.LogFormat("{0} -> {1}", GetShortPathName(animatorStateInfo.shortNameHash), GetShortPathName(nextAnimatorStateInfo.shortNameHash));
 
+                    if(GetShortPathName(nextAnimatorStateInfo.shortNameHash) == m_AnimatorStateData[layerIndex].StateName)
+                    {
+                        Debug.LogFormat("<color=yellow> {0} </color> is exiting state", GetFullPathName(animatorStateInfo.fullPathHash) );
+                    }
                 }
 
                 
@@ -263,16 +291,14 @@
 
         public virtual bool DetermineState(int layer, AnimatorStateData defaultState, bool checkAbilities, bool baseStart)
         {
-            return true;
+            throw new NotImplementedException("<color=yellow> AnimatorMonitor </color> FormatStateName() not implemented yet.");
+
         }
 
 
         public string FormatStateName(string stateName)
         {
-            string layerName = BaseLayerName;
-
-            stateName = string.Format("{0}.{1}", layerName, stateName);
-            return stateName;
+            throw new NotImplementedException("<color=yellow> AnimatorMonitor </color> FormatStateName() not implemented yet.");
         }
 
 
@@ -410,50 +436,50 @@
             // Fields
             //  
             [SerializeField]
-            private string m_Name = "Idle";
+            private string stateName = "Idle";
             [SerializeField]
-            private float m_TransitionDuration = 0.2f;
+            private float transitionDuration = 0.2f;
             [SerializeField]
-            private float m_SpeedMultiplier = 1f;
-
-            [Header("AnimatorStateInfo")]
-            public int fullHashPath;
-            public int shortNameHash;
-            public string stateName;
-            public float length;
-            public float normalizedTime;
-            public string clipName;
-            public float clipLength;
-
+            private float speedMultiplier = 1f;
+            [SerializeField, DisplayOnly]
+            private int nameHash;
 
             //
             // Properties
             //  
-            public string Name
+            public string StateName
             {
-                get { return m_Name; }
+                get { return stateName; }
             }
 
             public float TransitionDuration
             {
-                get { return m_TransitionDuration; }
+                get { return transitionDuration; }
             }
 
             public float SpeedMultiplier
             {
-                get { return m_SpeedMultiplier; }
+                get { return speedMultiplier; }
             }
-
+            public float NameHash
+            {
+                get { return nameHash; }
+            }
 
             //
             // Constructor
             //  
-            public AnimatorStateData(string name, float transitionDuration){
-                m_Name = name;
-                m_TransitionDuration = transitionDuration;
+            public AnimatorStateData(string stateName, float transitionDuration){
+                this.stateName = stateName;
+                this.transitionDuration = transitionDuration;
             }
 
-
+            public AnimatorStateData(int nameHash, string stateName, float transitionDuration)
+            {
+                this.nameHash = nameHash;
+                this.stateName = stateName;
+                this.transitionDuration = transitionDuration;
+            }
 
         }
 

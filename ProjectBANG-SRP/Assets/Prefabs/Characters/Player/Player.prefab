@@ -540,7 +540,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b5b38972af4340e8a362154d8c837df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_DebugStateChanges: 0
+  m_DebugStateChanges: 1
   m_HorizontalInputDampTime: 0.1
   m_ForwardInputDampTime: 0.1
   m_BaseState:

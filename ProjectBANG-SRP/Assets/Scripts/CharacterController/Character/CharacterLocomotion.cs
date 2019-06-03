@@ -230,6 +230,7 @@
             m_CheckGround = true;
             m_UpdateRotation = true;
             m_UpdateMovement = true;
+            //m_UpdateAnimator = true;
             for (int i = 0; i < m_Actions.Length; i++)
             {
                 if (m_Actions[i].enabled == false)
@@ -242,16 +243,23 @@
                     if (m_CheckMovement) m_CheckMovement = charAction.CheckMovement();
                     if (m_UpdateRotation) m_UpdateRotation = charAction.UpdateRotation();
                     if (m_UpdateMovement) m_UpdateMovement = charAction.UpdateMovement();
+
+                    //if (m_UpdateAnimator) m_UpdateAnimator = charAction.UpdateAnimator();
                 }
             }  //  end of for loop
 
             SetPhysicsMaterial();
+
             CheckGround();
+
             CheckMovement();
 
             UpdateRotation();
+
             UpdateMovement();
-		}
+
+            //UpdateAnimator();
+        }
 
 
 		//  Should the character look independetly of the camera?  AI Agents do not need to use camera rotation.
@@ -909,7 +917,6 @@
                     }
                     else
                     {
-                        Debug.LogFormat(" {0} is now not active.", action.GetType().Name);
 
                     }
                 }

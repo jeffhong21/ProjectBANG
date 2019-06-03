@@ -30,12 +30,6 @@ public class ParticleEffectsObject : MonoBehaviour
 	{
         currentDuration = 0;
 
-        for (int i = 0; i < particleSystems.Length; i++){
-            //particleSystems[i].time = 0;
-            particleSystems[i].Play(true);
-            Debug.Log(particleSystems[i].IsAlive());
-        }
-
 	}
 
 	private void OnDisable()
@@ -58,6 +52,7 @@ public class ParticleEffectsObject : MonoBehaviour
         {
             if(playing == false)
             {
+
                 for (int i = 0; i < particleSystems.Length; i++)
                 {
                     //particleSystems[i].time = 0;

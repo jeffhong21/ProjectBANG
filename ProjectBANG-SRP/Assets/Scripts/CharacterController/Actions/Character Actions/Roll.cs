@@ -68,8 +68,19 @@ namespace CharacterController
 
 		public override bool CanStopAction()
         {
-            if (m_Animator.GetNextAnimatorStateInfo(0).shortNameHash == 0){
-                if (m_Animator.IsInTransition(0)){
+            int layerIndex = 0;
+            if (m_Animator.GetNextAnimatorStateInfo(layerIndex).fullPathHash == 0)
+            {
+                m_ExitingAction = true;
+            }
+            if (m_ExitingAction && m_Animator.IsInTransition(layerIndex))
+            {
+                Debug.LogFormat("{1} is exiting. | {0} is the next state.", m_AnimatorMonitor.GetFullPathName(m_Animator.GetNextAnimatorStateInfo(layerIndex).fullPathHash), this.GetType());
+                return true;
+            }
+
+            if (m_Animator.GetNextAnimatorStateInfo(layerIndex).shortNameHash == 0){
+                if (m_Animator.IsInTransition(layerIndex)){
                     //Debug.LogFormat("{0} has stopped because it is entering Exit State", m_StateName);
                     return true;
                 }
