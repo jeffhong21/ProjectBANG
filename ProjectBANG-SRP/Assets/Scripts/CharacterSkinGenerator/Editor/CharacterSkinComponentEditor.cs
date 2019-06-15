@@ -24,6 +24,7 @@ namespace CharacterSkins
             if (GUILayout.Button("Load Character Skin")){
                 _target.LoadCharacter();
                 serializedObject.ApplyModifiedProperties();
+                AssetDatabase.Refresh();
             }
 
             GUILayout.Space(8);

@@ -14,6 +14,8 @@ namespace CharacterController
         [SerializeField]
         private bool m_AxisRaw = true;
 
+        private KeyCode m_DebugBreak = KeyCode.Tab;
+
 
         [Header("-- Debug Settings --")]
         public ShakeTransformEventData data;
@@ -40,7 +42,6 @@ namespace CharacterController
         private CameraController m_CameraController;
         private Transform m_Camera;
         private CharacterLocomotion m_Controller;
-        private ItemActionManager m_ItemAction;
         private GameObject m_GameObject;
         private Transform m_Transform;
         private float m_DeltaTime;
@@ -62,7 +63,6 @@ namespace CharacterController
         private void Awake()
         {
             m_Controller = GetComponent<CharacterLocomotion>();
-            m_ItemAction = GetComponent<ItemActionManager>();
             m_GameObject = gameObject;
             m_Transform = transform;
             m_DeltaTime = Time.deltaTime;
@@ -108,8 +108,7 @@ namespace CharacterController
         }
 
 
-
-        private void FixedUpdate()
+        private void Update()
 		{
             //  LOCK CAMERA
             if (LockCameraRotation() == true) return;
@@ -127,6 +126,15 @@ namespace CharacterController
             m_Controller.LookDirection = m_LookDirection;
 
 
+
+
+
+            DebugButtonPress();
+        }
+
+
+        private void LateUpdate()
+        {
             //  -----------
             //  Camera Input
             if (m_CameraController != null)
@@ -137,12 +145,7 @@ namespace CharacterController
                 m_CameraController.RotateCamera(m_MouseHorizontal, m_MouseVertical);
                 m_CameraController.ZoomCamera(Input.GetAxisRaw(m_MouseScrollInput));
             }
-
-
-            DebugButtonPress();
-		}
-
-
+        }
 
 
         private bool LockCameraRotation()
@@ -161,26 +164,29 @@ namespace CharacterController
 
         private void DebugButtonPress()
         {
-            if (Input.GetKeyDown(KeyCode.O))
-            {
-                var health = GetComponent<CharacterHealth>();
-                health.TakeDamage(10, m_Transform.position + Vector3.up, -m_Transform.right, m_GameObject);
-            }
+            //if (Input.GetKeyDown(KeyCode.O))
+            //{
+            //    var health = GetComponent<CharacterHealth>();
+            //    health.TakeDamage(10, m_Transform.position + Vector3.up, -m_Transform.right, m_GameObject);
+            //}
 
-            if (Input.GetKeyDown(KeyCode.M))
-            {
-                m_CameraController.Camera.GetComponentInParent<CameraShake>().AddShakeEvent(data);
-            }
+            //if (Input.GetKeyDown(KeyCode.M))
+            //{
+            //    m_CameraController.Camera.GetComponentInParent<CameraShake>().AddShakeEvent(data);
+            //}
 
-            if (Input.GetKeyDown(KeyCode.P))
+            if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.P))
             {
-                //EventHandler.LogAllRegistered();
                 UnityEditor.Selection.activeGameObject = gameObject;
             }
 
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                //UnityEditor.EditorApplication.isPaused = !UnityEditor.EditorApplication.isPlaying;
+                Game.PauseGame();
+            }
+
+            if (Input.GetKeyDown(m_DebugBreak))
+            {
                 Debug.Break();
             }
         }

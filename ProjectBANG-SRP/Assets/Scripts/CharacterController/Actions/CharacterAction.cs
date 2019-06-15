@@ -17,10 +17,14 @@
         //[SerializeField, HideInInspector]
         protected string m_DestinationStateName;
         [SerializeField, HideInInspector]
+        protected int m_LayerIndex = 0;
+        [SerializeField, HideInInspector]
         protected int m_ActionID;
 
         [SerializeField, HideInInspector]
         protected float m_TransitionDuration = 0.2f;
+        [SerializeField, HideInInspector]
+        protected string m_ExitStateName;
         [SerializeField, HideInInspector]
         protected ActionStartType m_StartType = ActionStartType.Manual;
         [SerializeField, HideInInspector]
@@ -43,6 +47,8 @@
 
         [Space(12)]
         [Header("-- Debug --")]
+        [SerializeField, DisplayOnly]
+        protected int m_FullPathHash;
         //  InputNames to KeyCodes
         protected KeyCode[] m_KeyCodes = new KeyCode[0];
         protected int m_InputIndex = -1;
@@ -353,36 +359,33 @@
             switch (m_StopType)
             {
                 case ActionStopType.Automatic:
-                    //if(m_ActionStartTime != -1 && Time.time >= m_ActionStartTime + m_DefaultActionStopTime)
-                    for (int index = 0; index < m_Animator.layerCount; index++)
+
+                    string fullPathName = m_Animator.GetLayerName(m_LayerIndex) + "." + m_DestinationStateName + ".";
+                    if (m_Animator.GetCurrentAnimatorStateInfo(m_LayerIndex).fullPathHash == Animator.StringToHash(fullPathName))
                     {
-                        string fullPathName = m_Animator.GetLayerName(0) + "." + m_StateName + ".";
-                        if (m_Animator.GetCurrentAnimatorStateInfo(0).fullPathHash == Animator.StringToHash(fullPathName))
+                        if (m_Animator.GetNextAnimatorStateInfo(m_LayerIndex).fullPathHash == 0)
                         {
-                            if (m_Animator.GetNextAnimatorStateInfo(0).fullPathHash == 0)
+                            m_ExitingAction = true;
+                        }
+                        if (m_ExitingAction)
+                        {
+                            if (m_Animator.GetNextAnimatorStateInfo(m_LayerIndex).fullPathHash != 0)
                             {
-                                m_ExitingAction = true;
-                            }
-                            if (m_ExitingAction)
-                            {
-                                if (m_Animator.GetNextAnimatorStateInfo(0).fullPathHash != 0)
-                                {
-                                    return true;
-                                }
-                            }
-                            if (m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f - m_TransitionDuration)
-                            {
-                                //Debug.LogFormat("{0} has stopped by comparing nameHASH", m_MatchTargetState.stateName);
                                 return true;
                             }
-                            return false;
                         }
-
-                        if (m_Animator.GetCurrentAnimatorStateInfo(index).IsName(m_DestinationStateName))
+                        if (m_Animator.GetCurrentAnimatorStateInfo(m_LayerIndex).normalizedTime >= 1f)
                         {
-                            Debug.LogFormat("Stopping Action State {0}", m_DestinationStateName);
-                            return false;
+                            //Debug.LogFormat("{0} has stopped by comparing nameHASH", m_MatchTargetState.stateName);
+                            return true;
                         }
+                        return false;
+                    }
+
+                    if (m_Animator.GetCurrentAnimatorStateInfo(m_LayerIndex).IsName(m_DestinationStateName))
+                    {
+                        Debug.LogFormat("Stopping Action State {0}", m_DestinationStateName);
+                        return false;
                     }
                     //Debug.LogFormat("Trying to stopping Action State {0}", m_StateName);
                     m_IsActive = false;
@@ -426,45 +429,45 @@
 
         public void StartAction()
         {
+            m_ActionStartTime = Time.time;
             m_IsActive = true;
             EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnCharacterActionActive, this, m_IsActive);
 
+            //m_FullPathHash = Animator.StringToHash(string.Format("{0}.{1}", m_StateName, GetDestinationState(m_LayerIndex)));
             m_Animator.SetInteger(HashID.ActionID, m_ActionID);
             m_Animator.SetTrigger(HashID.ActionChange);
 
-            m_ActionStartTime = Time.time;
 
             ActionStarted();
 
-            //m_AnimatorMonitor.SetActionID(m_ActionID);
-            //m_AnimatorMonitor.SetActionTrigger(HashID.ActionChange);
-            m_DestinationStateName = m_StateName;
+
+            //m_DestinationStateName = m_StateName;
             for (int index = 0; index < m_Animator.layerCount; index++)
             {
-                if (string.IsNullOrEmpty(GetDestinationState(index)) == false)
-                {
+                if (string.IsNullOrEmpty(GetDestinationState(index)) == false){
                     m_DestinationStateName = string.Format("{0}.{1}", m_StateName, GetDestinationState(index));
                 }
-                else
-                {
+                else{
                     m_DestinationStateName = m_StateName;
                 }
-                if (m_TransitionDuration > 0)
-                    m_Animator.CrossFade(GetDestinationState(index), m_TransitionDuration, index);
-                else
-                    m_Animator.Play(GetDestinationState(index), index);
+
+                if (m_Animator.HasState(index, Animator.StringToHash(m_DestinationStateName)))
+                {
+                    if (m_TransitionDuration > 0)
+                        m_Animator.CrossFade(m_DestinationStateName, m_TransitionDuration, index);
+                    else
+                        m_Animator.Play(m_DestinationStateName, index);
+                }
+
+
+                //if (m_TransitionDuration > 0)
+                //    m_Animator.CrossFade(GetDestinationState(index), m_TransitionDuration, index);
+                //else
+                //m_Animator.Play(GetDestinationState(index), index);
             }
 
 
-            if (m_StartEffect != null)
-            {
-                GameObject effects = null;
-                if (ObjectPool.Instance != null)
-                    effects = ObjectPool.Get(m_StartEffect, m_Transform.position, m_Transform.rotation);
-                else
-                    effects = Instantiate(m_StartEffect, m_Transform.position, m_Transform.rotation);
-                //Debug.Log("Start ffect: " + effects + " is active? " + effects.activeSelf);
-            }
+            PlayEffect(m_StartEffect);
         }
 
 
@@ -473,17 +476,9 @@
             m_IsActive = false;
             EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnCharacterActionActive, this, m_IsActive);
 
-            if (m_EndEffect != null)
-            {
-                GameObject effects = null;
-                if (ObjectPool.Instance != null)
-                {
-                    effects = ObjectPool.Get(m_EndEffect, m_Transform.position, m_Transform.rotation);
-                    Debug.Log(m_EndEffect.name);
-                }
-                else
-                    effects = Instantiate(m_EndEffect, m_Transform.position, m_Transform.rotation);
-            }
+            PlayEffect(m_EndEffect);
+
+
 
             m_Animator.SetInteger(HashID.ActionID, 0);
             m_Animator.SetInteger(HashID.ActionIntData, 0);
@@ -498,6 +493,25 @@
 
 
         }
+
+
+        private GameObject PlayEffect(GameObject prefab)
+        {
+            if (m_EndEffect == null) return null;
+
+            GameObject effect = null;
+            if (ObjectPool.Instance != null){
+                effect = ObjectPool.Get(m_EndEffect, m_Transform.position, m_Transform.rotation);
+            }
+            else{
+                effect = Instantiate(m_EndEffect, m_Transform.position, m_Transform.rotation);
+            }
+            return effect;
+        }
+
+
+
+
 
 
         //  The action has started.  Best as an initializer.
@@ -616,12 +630,20 @@
 
         public virtual float GetNormalizedTime()
         {
+            int layerIndex = 0;
             //float normalizedTime = m_Animator.GetCurrentAnimatorStateInfo(m_AnimatorMonitor.BaseLayerIndex).normalizedTime % 1;
-            return m_Animator.GetCurrentAnimatorStateInfo(m_AnimatorMonitor.BaseLayerIndex).normalizedTime % 1; ;
+            return m_Animator.GetCurrentAnimatorStateInfo(layerIndex).normalizedTime % 1; ;
         }
 
 
-
+        //protected void ScaleCapsule(float scaleFactor)
+        //{
+        //    if (m_CapsuleCollider.height != m_ColliderHeight * scaleFactor)
+        //    {
+        //        m_CapsuleCollider.height = Mathf.MoveTowards(m_CapsuleCollider.height, m_ColliderHeight * scaleFactor, Time.deltaTime * 4);
+        //        m_CapsuleCollider.center = Vector3.MoveTowards(m_CapsuleCollider.center, m_ColliderCenter * scaleFactor, Time.deltaTime * 2);
+        //    }
+        //}
 
 
 

@@ -8,8 +8,7 @@ namespace CharacterController
     {
         [SerializeField]
         protected Collider[] m_Hitboxes = new Collider[0];
-        [SerializeField]
-        protected string m_ExitStateName;
+
 
 
         protected int ActionIntData;

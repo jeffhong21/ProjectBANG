@@ -6,6 +6,11 @@ namespace CharacterController
     [DisallowMultipleComponent]
     public class LayerManager : MonoBehaviour
     {
+        public const int Climbable = 24;
+        public const int Vaultable = 25;
+        public const int Solid = 26;
+        public const int VisualEffects = 27;
+
         //
         // Fields
         //
@@ -38,10 +43,17 @@ namespace CharacterController
 
 
 
-		private void Awake()
-		{
+		//private void Awake()
+		//{
 			
-		}
+		//}
+
+
+
+        public static void UpdateLayers()
+        {
+
+        }
 	}
 
 }

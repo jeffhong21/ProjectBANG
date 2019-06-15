@@ -7,20 +7,31 @@ using UnityEngine;
 /// <seealso cref="UnityEngine.MonoBehaviour" />
 public abstract class SingletonMonoBehaviour<T> : MonoBehaviour where T : SingletonMonoBehaviour<T>
 {
-    public static T Instance { get; private set; }
 
+    //[SerializeField]
+    //private readonly bool _persistent;
+
+    public static T Instance { get; private set; }
 
 
     protected virtual void Awake()
     {
-        if (Instance != null)
-        {
+        if (Instance != null && Instance != this){
             Debug.LogWarningFormat("Another instance of {0} has already been registered for this scene, destroying this one", this);
-            Destroy(this);
+            Destroy(this.gameObject);
             return;
         }
-
         Instance = (T)this;
+
+        //if(_persistent)
+            //DontDestroyOnLoad(gameObject);
+
+        OnAwake();
+    }
+
+
+    protected virtual void OnAwake()
+    {
 
     }
 }

@@ -23,7 +23,7 @@ namespace CharacterController
         {
             if (base.CanStartAction())
             {
-                if(m_Controller.Grounded && Time.time > m_NextJump){
+                if(m_Controller.Moving && m_Controller.DetectEdge() && Time.time > m_NextJump){
                     return true;
                 }
 
@@ -46,6 +46,15 @@ namespace CharacterController
 
         public override bool CanStopAction()
         {
+            int layerIndex = 0;
+            var currentState = m_Animator.GetCurrentAnimatorStateInfo(layerIndex);
+            if (currentState.shortNameHash == Animator.StringToHash(m_DestinationStateName))
+            {
+                if (m_Animator.IsInTransition(layerIndex) || currentState.normalizedTime >= 1)
+                {
+                    return true;
+                }
+            }
             //if(Time.time > m_ActionStartTime + 0.1f){
             //    return m_Controller.Grounded;
             //}

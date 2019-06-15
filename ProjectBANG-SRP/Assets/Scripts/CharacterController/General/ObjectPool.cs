@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using Object = UnityEngine.Object;
 
 
 public class ObjectPool : MonoBehaviour
 {
+    private static bool GroupObjectsToNewScene = true;
+    private static readonly string PoolSceneName = "Object Pool Scene";
     public static ObjectPool Instance { get; private set; }
 
 
@@ -26,12 +30,17 @@ public class ObjectPool : MonoBehaviour
     [SerializeField]
     private List<Pool> m_Pools = new List<Pool>();
 
+
+
+
+
     private static Dictionary<GameObject, Queue<GameObject>> m_GameObjectPool;
     private static Dictionary<int, GameObject> m_InstanceIdMap;
     private static Dictionary<int, int> m_InstanceIdLookup;
 
 
 
+    private static Scene m_PoolScene;
     private static Transform m_Host;
 
 
@@ -46,11 +55,16 @@ public class ObjectPool : MonoBehaviour
         Instance = this;
 
 
+
+    }
+
+    protected void Start()
+    {
         InitializePools();
     }
 
 
-	private void OnValidate()
+    private void OnValidate()
 	{
         foreach (var pool in m_Pools){
             if (pool.Prefab != null) pool.InstanceID = pool.Prefab.GetInstanceID();
@@ -60,6 +74,28 @@ public class ObjectPool : MonoBehaviour
 
 	private void InitializePools()
     {
+        if (Application.isEditor)
+        {
+            m_PoolScene = SceneManager.GetSceneByName(PoolSceneName);
+            if (m_PoolScene.isLoaded)
+            {
+                //GameObject[] rootObjects = m_PoolScene.GetRootGameObjects();
+                //for (int i = 0; i < rootObjects.Length; i++)
+                //{
+                //    GameObject instanceObject = rootObjects[i];
+                //    if(instanceObject.activeSelf == false)
+                //    {
+                //    }
+                //}
+                Debug.Log("Pool Scene has already been loaded.");
+                return;
+            }
+        }
+
+        m_PoolScene = SceneManager.CreateScene(PoolSceneName);
+
+
+
         m_GameObjectPool = new Dictionary<GameObject, Queue<GameObject>>();
         m_InstanceIdMap = new Dictionary<int, GameObject>();
         m_InstanceIdLookup = new Dictionary<int, int>();
@@ -75,7 +111,12 @@ public class ObjectPool : MonoBehaviour
                 //GameObject instance = ObjectPool.Instantiate(prefab, Vector3.zero, Quaternion.identity, m_Host);
 
                 //  Instantiate a new gameObject.
-                var instance = UnityEngine.Object.Instantiate(prefab, Vector3.zero, Quaternion.identity, m_Host);
+                //var instance = UnityEngine.Object.Instantiate(prefab, Vector3.zero, Quaternion.identity, m_Host);
+                GameObject instance = Object.Instantiate(prefab, Vector3.zero, Quaternion.identity);
+
+                if (GroupObjectsToNewScene == false)
+                    instance.transform.parent = m_Host;
+
                 //  Add to the pool.
                 m_GameObjectPool[prefab].Enqueue(instance);
                 //  Register the new instantiatedObject ID.
@@ -98,8 +139,18 @@ public class ObjectPool : MonoBehaviour
 
                 instance.SetActive(false);
                 //instance.hideFlags = HideFlags.HideInHierarchy;
+
+                //  * Move instance to PoolScene.
+                if (GroupObjectsToNewScene)
+                    SceneManager.MoveGameObjectToScene(instance, m_PoolScene);
+
+
             }
         }
+
+
+
+
     }
 
 
@@ -122,6 +173,10 @@ public class ObjectPool : MonoBehaviour
                 m_GameObjectPool[original].Enqueue(instantiatedObject);
                 //  Register the new instantiatedObject ID.
                 m_InstanceIdLookup.Add(instantiatedObject.GetInstanceID(), original.GetInstanceID());
+
+                //  * Move instance to PoolScene.
+                if (GroupObjectsToNewScene)
+                    SceneManager.MoveGameObjectToScene(instantiatedObject, m_PoolScene);
             }
             //Debug.LogFormat("Total instances of {0} remaining: {1}", original.name, m_GameObjectPool[original].Count);
         }
@@ -133,12 +188,19 @@ public class ObjectPool : MonoBehaviour
             m_GameObjectPool[original].Enqueue(instantiatedObject);
             //  Register the new instantiatedObject ID.
             m_InstanceIdLookup.Add(instantiatedObject.GetInstanceID(), original.GetInstanceID());
+
+            //  * Move instance to PoolScene.
+            if (GroupObjectsToNewScene)
+                SceneManager.MoveGameObjectToScene(instantiatedObject, m_PoolScene);
+
+
             Debug.LogFormat("Creating a new object pool for {0} (InstanceID: {1})", original.name, original.GetInstanceID());
         }
 
         instantiatedObject.transform.position = position;
         instantiatedObject.transform.rotation = rotation;
-        instantiatedObject.transform.SetParent(parent);
+        if (GroupObjectsToNewScene == false)
+            instantiatedObject.transform.SetParent(parent);
         instantiatedObject.SetActive(true);
 
 
@@ -168,7 +230,8 @@ public class ObjectPool : MonoBehaviour
         if (originalPrefab != null && m_GameObjectPool.ContainsKey(originalPrefab))
         {
             //Debug.LogFormat("Returning {0} to pool", instantiatedObject);
-            instantiatedObject.transform.SetParent(m_Host.transform);
+            if (GroupObjectsToNewScene == false)
+                instantiatedObject.transform.SetParent(m_Host.transform);
 
             instantiatedObject.transform.localPosition = Vector3.zero;
             instantiatedObject.transform.localEulerAngles = Vector3.zero;
@@ -186,6 +249,10 @@ public class ObjectPool : MonoBehaviour
     }
 
 
+    private static void MoveGameObjectToScene(GameObject instance, Scene scene)
+    {
+        SceneManager.MoveGameObjectToScene(instance, scene);
+    }
 
     //public static T Get<T>() where T : MonoBehaviour, IPooled<T>
     //{

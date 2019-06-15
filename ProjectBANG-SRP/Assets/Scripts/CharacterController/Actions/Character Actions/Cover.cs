@@ -120,7 +120,8 @@
 		protected override void ActionStopped()
         {
             m_HighCover = Physics.Raycast(m_HighCoverDetector.position, m_HighCoverDetector.forward, m_CheckCoverLength, m_CoverLayer);
-            m_Animator.SetFloat(HashID.Height, m_HighCover ? 1 : 0.5f);
+            //m_Animator.SetFloat(HashID.Height, m_HighCover ? 1 : 0.5f);
+            m_Animator.SetFloat(HashID.Height, 1);
 
             m_Animator.SetInteger(HashID.ActionID, 0);
             //m_Animator.SetInteger(HashID.ActionIntData, emergeIndex);

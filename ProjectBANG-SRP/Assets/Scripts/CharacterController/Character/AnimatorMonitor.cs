@@ -4,61 +4,27 @@
     using UnityEditor.Animations;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
-    public static class HashID
-    {
-        public static readonly int InputMagnitude = Animator.StringToHash("InputMagnitude");
-        public static readonly int InputAngle = Animator.StringToHash("InputAngle");
-        public static readonly int StartAngle = Animator.StringToHash("StartAngle");
-        public static readonly int StopLeftUp = Animator.StringToHash("StopLeftUp");
-        public static readonly int StopRightUp = Animator.StringToHash("StopRightUp");
-        public static readonly int LegUpIndex = Animator.StringToHash("LegUpIndex");
-        //public static readonly int Grounded = Animator.StringToHash("Grounded");
-
-
-        public static readonly int HorizontalInput = Animator.StringToHash("HorizontalInput");
-        public static readonly int ForwardInput = Animator.StringToHash("ForwardInput");
-        public static readonly int Rotation = Animator.StringToHash("Rotation");
-        public static readonly int InputVector = Animator.StringToHash("InputVector");
-        public static readonly int ActionID = Animator.StringToHash("ActionID");
-        public static readonly int ActionIntData = Animator.StringToHash("ActionIntData");
-        public static readonly int ActionFloatData = Animator.StringToHash("ActionFloatData");
-        public static readonly int MovementSetID = Animator.StringToHash("MovementSetID");
-
-        public static readonly int ItemID = Animator.StringToHash("ItemID");
-        public static readonly int ItemStateIndex = Animator.StringToHash("ItemStateIndex");
-        public static readonly int ItemStateIndexChange = Animator.StringToHash("ItemStateIndexChange");
-        public static readonly int ItemSubstateIndex = Animator.StringToHash("ItemSubstateIndex");
-
-        public static readonly int Moving = Animator.StringToHash("Moving");
-        public static readonly int Aiming = Animator.StringToHash("Aiming");
-        public static readonly int Crouching = Animator.StringToHash("Crouching");
-
-        public static readonly int Height = Animator.StringToHash("Height");
-        public static readonly int Speed = Animator.StringToHash("Speed");
-
-        public static readonly int ColliderHeight = Animator.StringToHash("ColliderHeight");
-
-        public static readonly int ActionChange = Animator.StringToHash("ActionChange");
-
-
-    }
 
 
     [DisallowMultipleComponent]
+    [RequireComponent(typeof(Animator))]
     public class AnimatorMonitor : MonoBehaviour
     {
-        public readonly string BaseLayerName = "Base Layer";
-        public readonly string ItemLayerName = "Item Layer";
-        public readonly string UpperBodyLayerName = "Upper Body Layer";
-        public readonly string AdditiveLayerName = "Additive Layer";
-        public readonly string FullBodyLayer = "Full Body Layer";
 
 
-        private Dictionary<int, string> m_StateNameHash = new Dictionary<int, string>();
-        private Dictionary<int, string> m_FullPathNameHash = new Dictionary<int, string>();
-        private Dictionary<int, string> m_ShortPathNameHash = new Dictionary<int, string>();
 
+
+        //public readonly string BaseLayerName = "Base Layer";
+        //public readonly string ItemLayerName = "Item Layer";
+        //public readonly string UpperBodyLayerName = "Upper Body Layer";
+        //public readonly string AdditiveLayerName = "Additive Layer";
+        //public readonly string FullBodyLayer = "Full Body Layer";
+
+
+        private readonly Dictionary<int, string> m_StateNameHash = new Dictionary<int, string>();
+        private readonly Dictionary<int, AnimatorState> m_AnimatorStates = new Dictionary<int, AnimatorState>();
 
 
         //
@@ -74,12 +40,15 @@
         protected AnimatorStateData[] m_AnimatorStateData = new AnimatorStateData[0];
 
 
-
+        [SerializeField, HideInInspector]
+        private AnimatorStateData State_1 = new AnimatorStateData("", 0);
+        [SerializeField, HideInInspector]
+        private AnimatorStateData State_2 = new AnimatorStateData("", 0);
 
 
         protected Animator m_Animator;
         protected AnimatorController m_AnimatorController;
-
+        protected CharacterLocomotion m_Controller;
 
         private int stateCount;
 
@@ -101,29 +70,29 @@
         //    get { return m_Animator.GetFloat("Yaw"); }
         //}
 
-        public int BaseLayerIndex{
-            get { return m_Animator.GetLayerIndex(BaseLayerName); }
-        }
+        //public int BaseLayerIndex{
+        //    get { return m_Animator.GetLayerIndex(BaseLayerName); }
+        //}
 
-        public int ItemLayerIndex
-        {
-            get { return m_Animator.GetLayerIndex(ItemLayerName); }
-        }
+        //public int ItemLayerIndex
+        //{
+        //    get { return m_Animator.GetLayerIndex(ItemLayerName); }
+        //}
 
-        public int UpperBodyLayerIndex
-        {
-            get { return m_Animator.GetLayerIndex(UpperBodyLayerName); }
-        }
+        //public int UpperBodyLayerIndex
+        //{
+        //    get { return m_Animator.GetLayerIndex(UpperBodyLayerName); }
+        //}
 
-        public int AdditiveLayerIndex
-        {
-            get { return m_Animator.GetLayerIndex(AdditiveLayerName); }
-        }
+        //public int AdditiveLayerIndex
+        //{
+        //    get { return m_Animator.GetLayerIndex(AdditiveLayerName); }
+        //}
 
-        public int FullBodyLayerIndex
-        {
-            get { return m_Animator.GetLayerIndex(FullBodyLayer); }
-        }
+        //public int FullBodyLayerIndex
+        //{
+        //    get { return m_Animator.GetLayerIndex(FullBodyLayer); }
+        //}
 
 
 
@@ -134,23 +103,22 @@
 		{
             m_Animator = GetComponent<Animator>();
             m_AnimatorController = m_Animator.runtimeAnimatorController as AnimatorController;
-
-
-
+            m_Controller = GetComponent<CharacterLocomotion>();
         }
 
 
         private void Start()
         {
-
             m_AnimatorStateData = new AnimatorStateData[m_Animator.layerCount];
             for (int i = 0; i < m_AnimatorController.layers.Length; i++)
             {
-                Debug.LogFormat("({2}) Animator Layer name: <b>{0}</b> | AnimatorController layer name: <b>{1}</b>",
-                    m_Animator.GetLayerName(i),
-                    m_AnimatorController.layers[i].name,
-                    i);
-
+                //if (m_DebugStateChanges)
+                //{
+                //    Debug.LogFormat("({2}) Animator Layer name: <b>{0}</b> | AnimatorController layer name: <b>{1}</b>",
+                //                    m_Animator.GetLayerName(i),
+                //                    m_AnimatorController.layers[i].name,
+                //                    i);
+                //}
 
                 AnimatorStateMachine stateMachine = m_AnimatorController.layers[i].stateMachine;
                 AnimatorState defaultState = stateMachine.defaultState;
@@ -167,11 +135,11 @@
 
 
 
-            GetAllStateIDs();
+            RegisterAllAnimatorStateIDs();
         }
 
 
-        public void GetAllStateIDs(bool debugMsg = false)
+        public void RegisterAllAnimatorStateIDs(bool debugMsg = false)
         {
             if(m_Animator == null) m_Animator = GetComponent<Animator>();
             AnimatorController animatorController = m_Animator.runtimeAnimatorController as AnimatorController;
@@ -181,19 +149,16 @@
                 RegisterAnimatorStates(layer.stateMachine, layer.name);
             }
 
+
             if (debugMsg)
             {
                 string debugStateInfo = "";
 
-                debugStateInfo += "<b>Short Name Hash: </b>\n";
-                foreach (var stateName in m_ShortPathNameHash){
-                    debugStateInfo += "<b>StateName:</b> " + stateName.Value + " | <b>shortNameHash:</b> " + stateName.Key + "\n";
+                debugStateInfo += "<b>State Name Hash: </b>\n";
+                foreach (var stateName in m_StateNameHash){
+                    debugStateInfo += "<b>StateName:</b> " + stateName.Value + " | <b>HashID:</b> " + stateName.Key + "\n";
                 }
 
-                debugStateInfo += "<b>Full Name Hash: </b>\n";
-                foreach (var stateName in m_FullPathNameHash){
-                    debugStateInfo += "<b>StateName:</b> " + stateName.Value + " | <b>fullNameHash:</b> " + stateName.Key + "\n";
-                }
                 debugStateInfo += "\n<b>Total State Count: " + stateCount + " </b>\n";
 
                 stateCount = 0;
@@ -208,23 +173,24 @@
             foreach (ChildAnimatorState childState in stateMachine.states) //for each state
             {
                 string stateName = childState.state.name;
-                int shortNameHash = Animator.StringToHash(stateName);
-
-                if(m_ShortPathNameHash.ContainsKey(shortNameHash) == false){
-                    m_ShortPathNameHash.Add(shortNameHash, stateName);
-                }
-
-                int nameHash = childState.state.nameHash;
-                if (m_StateNameHash.ContainsKey(nameHash) == false){
-                    m_StateNameHash.Add(nameHash, stateName);
-                }
-
                 string fullPathName = parentState + "." + stateName;
+                int shortNameHash = Animator.StringToHash(stateName);
                 int fullPathHash = Animator.StringToHash(fullPathName);
 
-                if (m_FullPathNameHash.ContainsKey(fullPathHash) == false){
-                    m_FullPathNameHash.Add(fullPathHash, fullPathName);
+                if (m_StateNameHash.ContainsKey(shortNameHash) == false)
+                {
+                    m_StateNameHash.Add(shortNameHash, stateName);
                 }
+                if (m_StateNameHash.ContainsKey(fullPathHash) == false)
+                {
+                    m_StateNameHash.Add(fullPathHash, fullPathName);
+                }
+
+                if (m_StateNameHash.ContainsKey(fullPathHash) == false)
+                {
+                    m_AnimatorStates.Add(fullPathHash, childState.state);
+                }
+
 
                 stateCount++;
             }
@@ -237,29 +203,53 @@
         }
 
 
-        public string GetShortPathName(int hash)
+
+        #region Change Parameters
+
+        string parameterInfo;
+        public void ChangeParameter(string oldParameter, string newParameter)
         {
-            if (m_ShortPathNameHash.ContainsKey(hash)){
-                return m_ShortPathNameHash[hash];
+            if (m_Animator == null) m_Animator = GetComponent<Animator>();
+            AnimatorController animatorController = m_Animator.runtimeAnimatorController as AnimatorController;
+
+            parameterInfo = "";
+            foreach (AnimatorControllerLayer layer in animatorController.layers)
+            {
+                LoopThroughStateMachines(layer.stateMachine, oldParameter, newParameter);
             }
-            return "";
+            Debug.Log(parameterInfo);
+            parameterInfo = "";
         }
 
-        public string GetFullPathName(int hash)
+        private void LoopThroughStateMachines(AnimatorStateMachine stateMachine, string oldParameter, string newParameter)
         {
-            if (m_FullPathNameHash.ContainsKey(hash)){
-                return m_FullPathNameHash[hash];
+            foreach (ChildAnimatorState childState in stateMachine.states) //for each state
+            {
+                AnimatorStateTransition[] transitions = childState.state.transitions;
+                foreach (AnimatorStateTransition transition in transitions)
+                {
+                    AnimatorCondition[] conditions = transition.conditions;
+                    for (int con = 0; con < conditions.Length; con++)
+                    {
+                        AnimatorCondition condition = conditions[con];
+                        if (condition.parameter == newParameter)
+                        {
+                            //parameterInfo += childState.state.name + " | " + condition.mode + " | " + condition.threshold + "\n";
+                            //condition.mode = AnimatorConditionMode.Equals;
+                            //parameterInfo += "     •" + condition.mode + " | " + condition.threshold + "\n";
+                            transition.RemoveCondition(condition);
+                        }
+                    }
+                }
             }
-            return "";
+
+            foreach (ChildAnimatorStateMachine sm in stateMachine.stateMachines) //for each state
+            {
+                LoopThroughStateMachines(sm.stateMachine, oldParameter, newParameter);
+            }
         }
 
-        public string GetNameHash(int hash)
-        {
-            if (m_StateNameHash.ContainsKey(hash)){
-                return m_FullPathNameHash[hash];
-            }
-            return "";
-        }
+        #endregion
 
 
         private void LateUpdate()
@@ -274,9 +264,10 @@
                     //if (m_DebugStateChanges)
                         //Debug.LogFormat("{0} -> {1}", GetShortPathName(animatorStateInfo.shortNameHash), GetShortPathName(nextAnimatorStateInfo.shortNameHash));
 
-                    if(GetShortPathName(nextAnimatorStateInfo.shortNameHash) == m_AnimatorStateData[layerIndex].StateName)
+                    if(GetStateName(nextAnimatorStateInfo.shortNameHash) == m_AnimatorStateData[layerIndex].StateName)
                     {
-                        Debug.LogFormat("<color=yellow> {0} </color> is exiting state", GetFullPathName(animatorStateInfo.fullPathHash) );
+                        //if(m_DebugStateChanges)
+                            //Debug.LogFormat("<color=yellow> {0} </color> is exiting state", GetStateName(animatorStateInfo.fullPathHash) );
                     }
                 }
 
@@ -287,6 +278,15 @@
 
         }
 
+
+
+        public string GetStateName(int hash)
+        {
+            if (m_StateNameHash.ContainsKey(hash)){
+                return m_StateNameHash[hash];
+            }
+            return null;
+        }
 
 
         public virtual bool DetermineState(int layer, AnimatorStateData defaultState, bool checkAbilities, bool baseStart)
@@ -355,38 +355,22 @@
 
 
 
-
-
-        private string DebugGetCurrentStateInfo(int layerIndex, bool addNewLine = false)
-        {
-            string stateInfo = "";
-
-            string layerName = m_Animator.GetLayerName(layerIndex);
-            string fullPathHash = m_Animator.GetCurrentAnimatorStateInfo(layerIndex).fullPathHash.ToString();
-            string shortPathHash = m_Animator.GetCurrentAnimatorStateInfo(layerIndex).shortNameHash.ToString();
-
-            if (m_FullPathNameHash.ContainsKey(m_Animator.GetCurrentAnimatorStateInfo(layerIndex).fullPathHash))
-            {
-                string stateName = m_FullPathNameHash[m_Animator.GetCurrentAnimatorStateInfo(layerIndex).fullPathHash];
-                stateInfo = layerName + " | State Name: " + stateName + "  | fullPathHash <" + fullPathHash + ">, shortPathHash <" + shortPathHash + ">";
-            }
-            else
-            {
-                stateInfo = layerName + " | <b>No HASHID</b>  | fullPathHash <" + fullPathHash + ">, shortPathHash <" + shortPathHash + ">";
-            }
-                
-
-
-
-            if (addNewLine)
-                stateInfo += "\n";
-            return stateInfo;
-        }
-
+        #region Debug
+        GUIStyle guiStyle;
+        GUIContent guiContent;
         private void OnGUI()
         {
             if (!Application.isPlaying) return;
             if (m_DebugStateChanges == false) return;
+
+            if (guiStyle == null){
+                guiStyle = CharacterControllerUtility.GuiStyle;
+                guiStyle.fontSize = 28;
+            }
+
+            if (guiContent == null){
+                guiContent = new GUIContent();
+            }
 
             int layerIndex = 0;
             int line = 0;
@@ -396,14 +380,22 @@
 
             GUI.BeginGroup(rect, GUI.skin.box);
             //GUI.BeginGroup(rect);
-            GUI.Label(rect, DebugGetCurrentStateInfo(layerIndex), CharacterControllerUtility.GuiStyle);
+            GUI.Label(rect, DebugGetCurrentStateInfo(layerIndex), guiStyle);
 
             if (m_Animator.IsInTransition(layerIndex))
             {
+                var transitionStateInfo = m_Animator.GetAnimatorTransitionInfo(layerIndex);
+                //string nextState = m_StateNameHash[m_Animator.GetAnimatorTransitionInfo(layerIndex).fullPathHash];
+                string nextState = GetStateName(m_Animator.GetNextAnimatorStateInfo(layerIndex).fullPathHash);
                 line++;
-                rect.y = rect.y + UnityEditor.EditorGUIUtility.singleLineHeight * line;
-                string label = "Transition Duration: < " + m_Animator.GetAnimatorTransitionInfo(layerIndex).duration.ToString() + " >";
-                GUI.Label(rect, label, CharacterControllerUtility.GuiStyle);
+
+                //string label = " °State Name: " + nextState + "Transition Duration: " + transitionStateInfo.duration.ToString() + " ";
+                guiContent.text = " °State Name: " + nextState + "Transition Duration: " + transitionStateInfo.duration.ToString() + " ";
+                float lineHeight = guiStyle.CalcHeight(guiContent, rect.width);
+
+                rect.y = rect.y + lineHeight * line;
+
+                GUI.Label(rect, guiContent, guiStyle);
             }
 
 
@@ -422,67 +414,44 @@
 
 
 
-
-
-
-
-
-
-
-        [Serializable]
-        public class AnimatorStateData
+        private string DebugGetCurrentStateInfo(int layerIndex, bool addNewLine = false)
         {
-            //
-            // Fields
-            //  
-            [SerializeField]
-            private string stateName = "Idle";
-            [SerializeField]
-            private float transitionDuration = 0.2f;
-            [SerializeField]
-            private float speedMultiplier = 1f;
-            [SerializeField, DisplayOnly]
-            private int nameHash;
+            string stateInfo = "";
 
-            //
-            // Properties
-            //  
-            public string StateName
+            var animatorStateInfo = m_Animator.GetCurrentAnimatorStateInfo(layerIndex);
+            var nextAnimatorStateInfo = m_Animator.GetNextAnimatorStateInfo(layerIndex);
+            var transitionStateInfo = m_Animator.GetAnimatorTransitionInfo(layerIndex);
+
+            string layerName = m_Animator.GetLayerName(layerIndex);
+            string fullPathHash = animatorStateInfo.fullPathHash.ToString();
+            string shortPathHash = animatorStateInfo.shortNameHash.ToString();
+
+            if (m_StateNameHash.ContainsKey(animatorStateInfo.fullPathHash))
             {
-                get { return stateName; }
-            }
+                string stateName = m_StateNameHash[m_Animator.GetCurrentAnimatorStateInfo(layerIndex).shortNameHash];
+                //stateInfo = layerName + " | State Name: " + stateName + "  | fullPathHash <" + fullPathHash + ">, shortPathHash <" + shortPathHash + ">";
+                stateInfo = " °State Name: " + stateName + 
+                            "  | Duration: " + animatorStateInfo.length + 
+                            ", NormalizeTime: " + animatorStateInfo.normalizedTime + 
+                            "    °";
 
-            public float TransitionDuration
+            }
+            else
             {
-                get { return transitionDuration; }
+                stateInfo = layerName + " | <b>No HASHID</b>  | fullPathHash <" + fullPathHash + ">, shortPathHash <" + shortPathHash + ">";
             }
 
-            public float SpeedMultiplier
-            {
-                get { return speedMultiplier; }
-            }
-            public float NameHash
-            {
-                get { return nameHash; }
-            }
 
-            //
-            // Constructor
-            //  
-            public AnimatorStateData(string stateName, float transitionDuration){
-                this.stateName = stateName;
-                this.transitionDuration = transitionDuration;
-            }
-
-            public AnimatorStateData(int nameHash, string stateName, float transitionDuration)
-            {
-                this.nameHash = nameHash;
-                this.stateName = stateName;
-                this.transitionDuration = transitionDuration;
-            }
-
+            if (addNewLine)
+                stateInfo += "\n";
+            return stateInfo;
         }
 
+
+
+
+
+        #endregion
 
 
 
