@@ -53,7 +53,7 @@ namespace CharacterController
 
         private void OnTriggerEnter(Collider other)
         {
-            if( ((1 << other.gameObject.layer) & layerManager.GroundLayer) == 1 << other.gameObject.layer)
+            if( ((1 << other.gameObject.layer) & layerManager.SolidLayers) == 1 << other.gameObject.layer)
             {
                 if (m_Footsteps != null)
                 {

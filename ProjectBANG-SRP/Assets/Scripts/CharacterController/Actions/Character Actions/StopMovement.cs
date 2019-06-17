@@ -105,8 +105,8 @@
                     return true;
                 }
             }
-            if (Time.time > m_ActionStartTime + 0.5f)
-                return true;
+
+
             return false;
         }
 

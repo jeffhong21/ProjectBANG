@@ -45,10 +45,9 @@
         protected GameObject m_EndEffect;
 
 
-        [Space(12)]
-        [Header("-- Debug --")]
-        [SerializeField, DisplayOnly]
-        protected int m_FullPathHash;
+
+        //[SerializeField, DisplayOnly]
+        //protected int m_FullPathHash;
         //  InputNames to KeyCodes
         protected KeyCode[] m_KeyCodes = new KeyCode[0];
         protected int m_InputIndex = -1;
@@ -189,10 +188,10 @@
 
 
 
-        protected virtual void OnValidate()
-        {
-            if (string.IsNullOrEmpty(m_StateName)) m_StateName = GetType().Name;
-        }
+        //protected virtual void OnValidate()
+        //{
+        //    if (string.IsNullOrEmpty(m_StateName)) m_StateName = GetType().Name;
+        //}
 
 
         protected void MoveToTarget(Vector3 targetPosition, Quaternion targetRotation, float minMoveSpeed, Action onComplete)
@@ -458,6 +457,10 @@
                     else
                         m_Animator.Play(m_DestinationStateName, index);
                 }
+                //else
+                //{
+                //    Debug.LogErrorFormat("Cannot transition to {0} in layer {1}", m_DestinationStateName, index);
+                //}
 
 
                 //if (m_TransitionDuration > 0)
@@ -497,14 +500,14 @@
 
         private GameObject PlayEffect(GameObject prefab)
         {
-            if (m_EndEffect == null) return null;
+            if (prefab == null) return null;
 
             GameObject effect = null;
             if (ObjectPool.Instance != null){
-                effect = ObjectPool.Get(m_EndEffect, m_Transform.position, m_Transform.rotation);
+                effect = ObjectPool.Get(prefab, m_Transform.position, m_Transform.rotation);
             }
             else{
-                effect = Instantiate(m_EndEffect, m_Transform.position, m_Transform.rotation);
+                effect = Instantiate(prefab, m_Transform.position, m_Transform.rotation);
             }
             return effect;
         }

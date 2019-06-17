@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
+
 using System;
-using System.Collections;
 using System.Collections.Generic;
+
+using CharacterController;
 
 //[CreateAssetMenu(fileName = "GameAsset", menuName = "Game/Level Dat")]
 public class GameData : ScriptableObject
@@ -16,17 +17,22 @@ public class GameData : ScriptableObject
 
     private ObjectPool objectPool;
     [SerializeField]
+    private CameraController cameraPrefab;
+    [SerializeField]
     private GameObject playerPrefab;
-
+    [SerializeField]
     private InGameMenu inGameMenu;
 
-    [Header("--  Level Data --")]
-    [SerializeField]
-    private SceneInfo bootScene;
+
     [SerializeField]
     private SceneData prototypeLevel;
 
 
+    public CameraController CameraPrefab
+    {
+        get { return cameraPrefab; }
+        set { cameraPrefab = value; }
+    }
 
     public GameObject PlayerPrefab
     {
@@ -34,16 +40,10 @@ public class GameData : ScriptableObject
         set { playerPrefab = value; }
     }
 
-    public InGameMenu IngameMenu
+    public InGameMenu InGameMenu
     {
         get { return inGameMenu; }
         set { inGameMenu = value; }
-    }
-
-    public SceneInfo BootScene
-    {
-        get { return bootScene; }
-        set { bootScene = value; }
     }
 
     public SceneData PrototypeLevel
@@ -62,8 +62,6 @@ public class GameData : ScriptableObject
         var _objectPool = Resources.Load<ObjectPool>(PREFAB_PATH + "ObjectPool");
         if (_objectPool != null) objectPool = Instantiate(_objectPool);
 
-        var _ingameMenu = Resources.Load<InGameMenu>(PREFAB_PATH + "IngameMenu");
-        if (_ingameMenu != null) inGameMenu = Instantiate(_ingameMenu);
 
         if (FindObjectOfType<EventSystem>() == null){
             var eventSystem = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));

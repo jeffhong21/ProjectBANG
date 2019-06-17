@@ -7,35 +7,36 @@ using TMPro;
 
 public class InGameMenu : MonoBehaviour
 {
-
-    public Button m_RestartBtn;
-    public Button m_QuitBtn;
-
-
+    //[SerializeField]
+    private GameObject loadScenePanel;
+    [SerializeField]
+    private Button restartBtn;
+    [SerializeField]
+    private Button quitBtn;
 
 
     private void Start()
     {
-        Game.OnPause += SetPanelActive;
+        LevelManager.OnPause += SetPanelActive;
 
         gameObject.SetActive(false);
     }
 
     private void OnEnable()
     {
-        m_RestartBtn.onClick.AddListener(RestartScene);
-        m_QuitBtn.onClick.AddListener(ExitGame);
+        if(restartBtn) restartBtn.onClick.AddListener(RestartScene);
+        if (quitBtn) quitBtn.onClick.AddListener(ExitGame);
     }
 
     private void OnDisable()
     {
-        m_RestartBtn.onClick.RemoveListener(RestartScene);
-        m_QuitBtn.onClick.RemoveListener(ExitGame);
+        if (restartBtn) restartBtn.onClick.RemoveListener(RestartScene);
+        if (quitBtn) quitBtn.onClick.RemoveListener(ExitGame);
     }
 
     private void OnDestroy()
     {
-        Game.OnPause -= SetPanelActive;
+        LevelManager.OnPause -= SetPanelActive;
     }
 
 
@@ -53,7 +54,7 @@ public class InGameMenu : MonoBehaviour
 
     public void ExitGame()
     {
-        Application.Quit();
+        Debug.Log("Quitting Game.");
     }
 
 }

@@ -45,7 +45,7 @@ namespace CharacterController
             {
                 //var checkDistance = m_MaxDistance + 2 * m_CapsuleCollider.radius;
 
-                //if (Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out m_CheckDistanceHit, checkDistance, m_Layers.GroundLayer | m_StopLayer))
+                //if (Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out m_CheckDistanceHit, checkDistance, m_Layers.SolidLayers | m_StopLayer))
                 //{
                 //    return true;
                 //}

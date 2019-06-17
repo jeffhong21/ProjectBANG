@@ -250,7 +250,7 @@ namespace CharacterController.CharacterCreator
 
             layermanager.EnemyLayer = 1;
             layermanager.InvisibleLayer = 1;
-            layermanager.GroundLayer = 1;
+            layermanager.SolidLayers = 1;
 
             ComponentUtility.MoveComponentDown(layermanager);
         }

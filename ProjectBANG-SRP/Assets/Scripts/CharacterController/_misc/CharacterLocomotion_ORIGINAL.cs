@@ -351,7 +351,7 @@
 //        {
 //            m_MoveDirection = m_Transform.forward * m_InputVector.z + m_Transform.right * m_InputVector.x;
 //            float radius = m_CapsuleCollider.radius * 0.9f;
-//            if(Physics.SphereCast(m_Transform.position, radius, -Vector3.up, out m_GroundHit, m_CapsuleCollider.radius + m_AlignToGroundDepthOffset + m_SkinWidth, m_Layers.GroundLayer))
+//            if(Physics.SphereCast(m_Transform.position, radius, -Vector3.up, out m_GroundHit, m_CapsuleCollider.radius + m_AlignToGroundDepthOffset + m_SkinWidth, m_Layers.SolidLayers))
 //            {
 
 //                Vector3 targetPosition = m_Transform.position;
@@ -383,7 +383,7 @@
 //            if(m_DrawDebugLine) Debug.DrawRay(m_Transform.position + Vector3.up * m_AlignToGroundDepthOffset, Vector3.down, Color.white);
 
 
-//            if (Physics.Raycast(m_Transform.position + Vector3.up * m_AlignToGroundDepthOffset, Vector3.down, out m_GroundHit, m_AlignToGroundDepthOffset + m_SkinWidth, m_Layers.GroundLayer))
+//            if (Physics.Raycast(m_Transform.position + Vector3.up * m_AlignToGroundDepthOffset, Vector3.down, out m_GroundHit, m_AlignToGroundDepthOffset + m_SkinWidth, m_Layers.SolidLayers))
 //            {
 //                var rayStart = (m_Transform.position + Vector3.up * m_MaxStepHeight) + m_Transform.forward * (m_CapsuleCollider.radius * 2);  //+ m_SkinWidth);
 //                var rayEnd = Vector3.down * (m_MaxStepHeight - m_StepOffset);
@@ -392,7 +392,7 @@
 
 //                if(m_InputVector.sqrMagnitude > 0.1f && m_Grounded)
 //                {
-//                    if (Physics.Raycast(rayStart, rayEnd, out m_StepHit, m_MaxStepHeight - m_StepOffset, m_Layers.GroundLayer))
+//                    if (Physics.Raycast(rayStart, rayEnd, out m_StepHit, m_MaxStepHeight - m_StepOffset, m_Layers.SolidLayers))
 //                    {
 //                        if (m_StepHit.point.y >= (m_Transform.position.y) && m_StepHit.point.y <= (m_Transform.position.y + m_StepOffset + m_SkinWidth))
 //                        {

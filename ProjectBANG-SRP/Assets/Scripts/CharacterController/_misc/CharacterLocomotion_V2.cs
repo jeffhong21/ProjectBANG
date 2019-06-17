@@ -315,12 +315,12 @@
 //                    Vector3 pos = m_Transform.position + Vector3.up * (m_CapsuleCollider.radius);
 
 //                    if (Physics.Raycast(m_Transform.position + Vector3.up * (m_CapsuleCollider.height / 2), Vector3.down,
-//                                        out m_GroundHit, m_CapsuleCollider.height / 2 + 2 + m_SkinWidth, m_Layers.GroundLayer))
+//                                        out m_GroundHit, m_CapsuleCollider.height / 2 + 2 + m_SkinWidth, m_Layers.SolidLayers))
 //                    {
 //                        distance = m_Transform.position.y - m_GroundHit.point.y;
 //                    }
 //                    if (Physics.SphereCast(m_Transform.position + Vector3.up * (m_CapsuleCollider.radius), m_CapsuleCollider.radius * 0.9f,
-//                                           -Vector3.up, out m_GroundHit, m_CapsuleCollider.radius * 1 + 2, m_Layers.GroundLayer))
+//                                           -Vector3.up, out m_GroundHit, m_CapsuleCollider.radius * 1 + 2, m_Layers.SolidLayers))
 //                    {
 //                        // check if sphereCast distance is small than the ray cast distance
 //                        if (distance > (m_GroundHit.distance - m_CapsuleCollider.radius * 0.1f))
@@ -332,7 +332,7 @@
 //                    //  Check if on step.
 //                    m_OnStep = false;
 //                    m_StepRayStart = (m_Transform.position + Vector3.up * m_MaxStepHeight) + m_Transform.forward * (m_CapsuleCollider.radius * 2);  //+ m_SkinWidth);
-//                    if (Physics.Raycast(m_StepRayStart, Vector3.down, out m_StepHit, m_MaxStepHeight - m_SkinWidth, m_Layers.GroundLayer) && !m_StepHit.collider.isTrigger)
+//                    if (Physics.Raycast(m_StepRayStart, Vector3.down, out m_StepHit, m_MaxStepHeight - m_SkinWidth, m_Layers.SolidLayers) && !m_StepHit.collider.isTrigger)
 //                    {
 //                        if (m_StepHit.normal == Vector3.up)
 //                        {

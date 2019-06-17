@@ -19,7 +19,7 @@ namespace CharacterController
         [SerializeField]
         protected LayerMask m_InvisibleLayer;
         [SerializeField]
-        protected LayerMask m_GroundLayer;
+        protected LayerMask m_SolidLayers;
 
 
 
@@ -35,10 +35,10 @@ namespace CharacterController
             set { m_InvisibleLayer = value; }
         }
 
-        public LayerMask GroundLayer
+        public LayerMask SolidLayers
         {
-            get { return m_GroundLayer; }
-            set { m_GroundLayer = value; }
+            get { return m_SolidLayers; }
+            set { m_SolidLayers = value; }
         }
 
 

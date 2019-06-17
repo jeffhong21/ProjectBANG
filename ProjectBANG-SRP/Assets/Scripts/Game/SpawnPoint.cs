@@ -96,10 +96,10 @@ public class SpawnPoint : MonoBehaviour
 
         if (!selected)
             //color.a = color.a * 0.25f;
-            color = Color.gray;
+            color = debugSettings.defaultColor;
 
 
-        if(Event.current.type == EventType.Repaint)
+        if (Event.current.type == EventType.Repaint)
         {
             Gizmos.color = color;
             if (selected)

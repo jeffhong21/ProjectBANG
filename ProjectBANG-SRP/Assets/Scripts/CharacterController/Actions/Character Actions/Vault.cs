@@ -105,7 +105,7 @@
                     depthCheck.y = m_HeightCheckStart.y;
                     //Debug.DrawRay(m_MoveToVaultDistanceHit.point, -m_MoveToVaultDistanceHit.normal * (m_MaxVaultDepth - m_CapsuleCollider.radius), Color.green, 3f);
                     if (m_Debug) Debug.DrawRay(depthCheck, Vector3.down * (m_MaxHeight + 0.2f), Color.yellow, 3f);
-                    if (Physics.Raycast(depthCheck, Vector3.down, out m_EndPositionHit, (m_MaxHeight + 0.2f), m_Layers.GroundLayer))
+                    if (Physics.Raycast(depthCheck, Vector3.down, out m_EndPositionHit, (m_MaxHeight + 0.2f), m_Layers.SolidLayers))
                     {
                         //Debug.LogFormat("Distance {0}", Vector3.Distance(m_MoveToVaultDistanceHit.point, m_EndPositionHit.point));
                         return true;

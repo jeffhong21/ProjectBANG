@@ -13,16 +13,6 @@
     public class AnimatorMonitor : MonoBehaviour
     {
 
-
-
-
-        //public readonly string BaseLayerName = "Base Layer";
-        //public readonly string ItemLayerName = "Item Layer";
-        //public readonly string UpperBodyLayerName = "Upper Body Layer";
-        //public readonly string AdditiveLayerName = "Additive Layer";
-        //public readonly string FullBodyLayer = "Full Body Layer";
-
-
         private readonly Dictionary<int, string> m_StateNameHash = new Dictionary<int, string>();
         private readonly Dictionary<int, AnimatorState> m_AnimatorStates = new Dictionary<int, AnimatorState>();
 
@@ -66,33 +56,6 @@
             get { return Input.GetAxis("Vertical"); }
         }
 
-        //public float YawValue{
-        //    get { return m_Animator.GetFloat("Yaw"); }
-        //}
-
-        //public int BaseLayerIndex{
-        //    get { return m_Animator.GetLayerIndex(BaseLayerName); }
-        //}
-
-        //public int ItemLayerIndex
-        //{
-        //    get { return m_Animator.GetLayerIndex(ItemLayerName); }
-        //}
-
-        //public int UpperBodyLayerIndex
-        //{
-        //    get { return m_Animator.GetLayerIndex(UpperBodyLayerName); }
-        //}
-
-        //public int AdditiveLayerIndex
-        //{
-        //    get { return m_Animator.GetLayerIndex(AdditiveLayerName); }
-        //}
-
-        //public int FullBodyLayerIndex
-        //{
-        //    get { return m_Animator.GetLayerIndex(FullBodyLayer); }
-        //}
 
 
 
@@ -204,52 +167,7 @@
 
 
 
-        #region Change Parameters
 
-        string parameterInfo;
-        public void ChangeParameter(string oldParameter, string newParameter)
-        {
-            if (m_Animator == null) m_Animator = GetComponent<Animator>();
-            AnimatorController animatorController = m_Animator.runtimeAnimatorController as AnimatorController;
-
-            parameterInfo = "";
-            foreach (AnimatorControllerLayer layer in animatorController.layers)
-            {
-                LoopThroughStateMachines(layer.stateMachine, oldParameter, newParameter);
-            }
-            Debug.Log(parameterInfo);
-            parameterInfo = "";
-        }
-
-        private void LoopThroughStateMachines(AnimatorStateMachine stateMachine, string oldParameter, string newParameter)
-        {
-            foreach (ChildAnimatorState childState in stateMachine.states) //for each state
-            {
-                AnimatorStateTransition[] transitions = childState.state.transitions;
-                foreach (AnimatorStateTransition transition in transitions)
-                {
-                    AnimatorCondition[] conditions = transition.conditions;
-                    for (int con = 0; con < conditions.Length; con++)
-                    {
-                        AnimatorCondition condition = conditions[con];
-                        if (condition.parameter == newParameter)
-                        {
-                            //parameterInfo += childState.state.name + " | " + condition.mode + " | " + condition.threshold + "\n";
-                            //condition.mode = AnimatorConditionMode.Equals;
-                            //parameterInfo += "     •" + condition.mode + " | " + condition.threshold + "\n";
-                            transition.RemoveCondition(condition);
-                        }
-                    }
-                }
-            }
-
-            foreach (ChildAnimatorStateMachine sm in stateMachine.stateMachines) //for each state
-            {
-                LoopThroughStateMachines(sm.stateMachine, oldParameter, newParameter);
-            }
-        }
-
-        #endregion
 
 
         private void LateUpdate()
@@ -330,13 +248,6 @@
 
 
 
-
-
-
-
-
-
-
         public void ExecuteEvent(string eventName)
         {
             //Debug.Log(eventName);
@@ -345,7 +256,52 @@
 
 
 
+        #region Change Parameters
 
+        string parameterInfo;
+        int parameterCount;
+        public void ChangeParameter(string parameter)
+        {
+            if (m_Animator == null) m_Animator = GetComponent<Animator>();
+            AnimatorController animatorController = m_Animator.runtimeAnimatorController as AnimatorController;
+
+            parameterInfo = "";
+            foreach (AnimatorControllerLayer layer in animatorController.layers)
+            {
+                LoopThroughStateMachines(layer.stateMachine, parameter);
+            }
+
+
+            Debug.LogFormat("{0} used count: {1}\n{2}", parameter, parameterCount, parameterInfo);
+            parameterInfo = "";
+        }
+
+        private void LoopThroughStateMachines(AnimatorStateMachine stateMachine, string parameter )
+        {
+            foreach (ChildAnimatorState childState in stateMachine.states) //for each state
+            {
+                AnimatorStateTransition[] transitions = childState.state.transitions;
+                foreach (AnimatorStateTransition transition in transitions)
+                {
+                    AnimatorCondition[] conditions = transition.conditions;
+                    for (int con = 0; con < conditions.Length; con++)
+                    {
+                        AnimatorCondition condition = conditions[con];
+                        if (condition.parameter == parameter)
+                        {
+                            parameterInfo += childState.state.name + " | " + condition.mode + " | " + condition.threshold + "\n";
+                            parameterCount++;
+                        }
+                    }
+                }
+            }
+
+            foreach (ChildAnimatorStateMachine sm in stateMachine.stateMachines) //for each state{
+                LoopThroughStateMachines(sm.stateMachine, parameter);
+
+        }
+
+        #endregion
 
 
 
@@ -458,8 +414,5 @@
 
 
     }
-
-
-
 }
 

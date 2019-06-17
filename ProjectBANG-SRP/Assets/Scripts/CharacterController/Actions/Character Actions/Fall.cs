@@ -64,7 +64,7 @@ namespace CharacterController
         public override bool CheckGround()
         {
             m_Controller.Grounded = false;
-            if (Physics.Raycast(m_Rigidbody.position, Vector3.down, out m_RaycastHit, 0.5f, m_Layers.GroundLayer)){
+            if (Physics.Raycast(m_Rigidbody.position, Vector3.down, out m_RaycastHit, 0.5f, m_Layers.SolidLayers)){
                 if(m_RaycastHit.transform != m_Transform)
                 {
                     m_Controller.Grounded = true;

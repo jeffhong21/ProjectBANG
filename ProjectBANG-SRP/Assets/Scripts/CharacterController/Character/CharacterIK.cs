@@ -369,7 +369,7 @@
             //raycast handling section 
             RaycastHit feetOutHit;
 
-            if (Physics.Raycast(footPosition, Vector3.down, out feetOutHit, raycastDownDistance + heightFromGroundRaycast, m_LayerManager.GroundLayer))
+            if (Physics.Raycast(footPosition, Vector3.down, out feetOutHit, raycastDownDistance + heightFromGroundRaycast, m_LayerManager.SolidLayers))
             {
                 //finding our feet ik positions from the sky position
                 feetIkPositions = footPosition;

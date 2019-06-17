@@ -71,35 +71,24 @@ namespace CharacterController
 
 		private void OnEnable()
 		{
-            EventHandler.RegisterEvent<bool>(m_GameObject, "OnAimActionStart", OnAimActionStart);
+            EventHandler.RegisterEvent<bool>(m_GameObject, EventIDs.OnAimActionStart, OnAimActionStart);
 		}
 
 
 		private void OnDisable()
 		{
-            EventHandler.UnregisterEvent<bool>(m_GameObject, "OnAimActionStart", OnAimActionStart);
+            EventHandler.UnregisterEvent<bool>(m_GameObject, EventIDs.OnAimActionStart, OnAimActionStart);
 		}
 
 
 		private void Start()
 		{
-            if (m_CameraController || CameraController.Instance != null)
-            {
-                if (CameraController.Instance == null){
-                    m_CameraController = Instantiate(m_CameraController) as CameraController;
-                    Debug.Log("Instantiating a new Camera Controller through the player.");
-                }
-                else{
-                    m_CameraController = CameraController.Instance;
-                }
-                m_CameraController.SetMainTarget(m_GameObject);
-                m_Camera = m_CameraController.Camera.transform;
-            }
-            else{
-                Debug.LogError("Player has no Camera");
-            }
+            m_CameraController = CameraController.Instance;
+            m_Camera = CameraController.Instance.Camera.transform;
 
-		}
+            if (m_Camera == null)
+                m_Camera = Camera.main.transform;
+        }
 
 
 
@@ -112,6 +101,7 @@ namespace CharacterController
 		{
             //  LOCK CAMERA
             if (LockCameraRotation() == true) return;
+
 
 
             //  -----------
@@ -143,7 +133,7 @@ namespace CharacterController
                 m_MouseVertical = Input.GetAxis(m_RotateCameraYInput);
 
                 m_CameraController.RotateCamera(m_MouseHorizontal, m_MouseVertical);
-                m_CameraController.ZoomCamera(Input.GetAxisRaw(m_MouseScrollInput));
+                //m_CameraController.ZoomCamera(Input.GetAxisRaw(m_MouseScrollInput));
             }
         }
 
@@ -151,6 +141,7 @@ namespace CharacterController
         private bool LockCameraRotation()
         {
             if (Input.GetKeyDown(KeyCode.L)){
+                Debug.Log(CameraController.Instance);
                 if (CameraController.Instance != null){
                     CameraController.LockRotation = !CameraController.LockRotation;
                 }
@@ -164,17 +155,6 @@ namespace CharacterController
 
         private void DebugButtonPress()
         {
-            //if (Input.GetKeyDown(KeyCode.O))
-            //{
-            //    var health = GetComponent<CharacterHealth>();
-            //    health.TakeDamage(10, m_Transform.position + Vector3.up, -m_Transform.right, m_GameObject);
-            //}
-
-            //if (Input.GetKeyDown(KeyCode.M))
-            //{
-            //    m_CameraController.Camera.GetComponentInParent<CameraShake>().AddShakeEvent(data);
-            //}
-
             if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.P))
             {
                 UnityEditor.Selection.activeGameObject = gameObject;
@@ -182,7 +162,7 @@ namespace CharacterController
 
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                Game.PauseGame();
+                LevelManager.PauseGame();
             }
 
             if (Input.GetKeyDown(m_DebugBreak))
@@ -196,15 +176,15 @@ namespace CharacterController
 
         private void OnAimActionStart(bool aim)
         {
-            if (aim == true)
-            {
-                CameraState aimState = CameraController.Instance.GetCameraStateWithName("TPS_Aim");
-                CameraController.Instance.ChangeCameraState("TPS_Aim");
-            }
-            else
-            {
-                CameraController.Instance.ChangeCameraState("TPS_Default");
-            }
+            //if (aim == true)
+            //{
+            //    CameraState aimState = CameraController.Instance.GetCameraStateWithName("TPS_Aim");
+            //    CameraController.Instance.ChangeCameraState("TPS_Aim");
+            //}
+            //else
+            //{
+            //    CameraController.Instance.ChangeCameraState("TPS_Default");
+            //}
         }
 
 

@@ -25,7 +25,7 @@ public class SpawnPointManager : SingletonMonoBehaviour<SpawnPointManager>
 
 
 
-    private void Start()
+    protected override void OnAwake()
     {
         Initialize();
 
@@ -53,7 +53,7 @@ public class SpawnPointManager : SingletonMonoBehaviour<SpawnPointManager>
 
     public static SpawnPoint GetSpawnPoint(int index)
     {
-        DebugSpawnPoints();
+        //DebugSpawnPoints();
 
         if (m_SpawnPoints.Count - 1 > index){
             return null;

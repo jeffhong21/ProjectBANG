@@ -46,11 +46,10 @@
             //    m_AnimatorMonitor.ChangeParameter("LegUpIndex1", "LegUpIndex");
             //}
 
-            GUILayout.Space(8);
-            EditorGUILayout.LabelField(string.Format("----- Play States (isPlaying: {0})-----", Application.isPlaying));
 
-            AnimatorStateDataInspector(serializedObject.FindProperty("State_1"));
-            AnimatorStateDataInspector(serializedObject.FindProperty("State_2"));
+            //EditorGUILayout.LabelField(string.Format("----- Play States (isPlaying: {0})-----", Application.isPlaying));
+            //AnimatorStateDataInspector(serializedObject.FindProperty("State_1"));
+            //AnimatorStateDataInspector(serializedObject.FindProperty("State_2"));
 
 
 
