@@ -43,10 +43,7 @@ namespace CharacterController
 
 
 
-		//private void Awake()
-		//{
-			
-		//}
+
 
 
 

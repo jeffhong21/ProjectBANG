@@ -141,7 +141,7 @@ namespace CharacterController
         private bool LockCameraRotation()
         {
             if (Input.GetKeyDown(KeyCode.L)){
-                Debug.Log(CameraController.Instance);
+                Debug.Log(CameraController.LockRotation);
                 if (CameraController.Instance != null){
                     CameraController.LockRotation = !CameraController.LockRotation;
                 }

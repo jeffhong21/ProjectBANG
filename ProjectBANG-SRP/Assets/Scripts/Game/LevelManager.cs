@@ -198,8 +198,11 @@ public class LevelManager : SingletonMonoBehaviour<LevelManager>
                 playerInstance = Instantiate(gameData.PlayerPrefab);
         }
 
-        SpawnPointManager.SpawnObject(playerInstance);
-		cameraController.SetMainTarget(playerInstance);
+        playerInstance.transform.position = SpawnPointManager.GetSpawnPoint(0).Position;
+        playerInstance.transform.rotation = SpawnPointManager.GetSpawnPoint(0).Rotation;
+
+        //SpawnPointManager.SpawnObject(playerInstance);
+        cameraController.SetMainTarget(playerInstance);
 		cameraController.transform.position = playerInstance.transform.position;
 		cameraController.transform.rotation = playerInstance.transform.rotation;
 

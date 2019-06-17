@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47038c9de20f14039ad7577604af58f9, type: 3}
   m_Name: GameData
   m_EditorClassIdentifier: 
-  cameraPrefab: {fileID: 2713867631241074765, guid: c10ea6de6eca54dd2b5787f872e3cd5a,
+  cameraPrefab: {fileID: 114390585562722546, guid: cc0355686223140779c9a54a4c1387f4,
     type: 3}
   playerPrefab: {fileID: 1141768220188808, guid: 320011f1d24764bb89cf6a862d0c04a0,
     type: 3}

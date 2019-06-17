@@ -7,7 +7,7 @@
 
     public static class CharacterControllerUtility
     {
-        private static int _guiFontSize = 18;
+        private static int _guiFontSize = 24;
         private static GUIStyle _guiStyle;
         private static Color _debugTextColor = Color.black;
         private static Rect _animatorMonitorRect = new Rect(10, 10, 200, 20);

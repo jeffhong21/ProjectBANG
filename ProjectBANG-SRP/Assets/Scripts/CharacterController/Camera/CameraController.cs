@@ -96,6 +96,7 @@
         protected Vector3 m_ZoomVelocity;
 
         protected Transform m_PitchPivot;
+        [SerializeField, DisplayOnly]
         protected Camera m_Camera;
         protected GameObject m_GameObject;
         protected Transform m_Transform;

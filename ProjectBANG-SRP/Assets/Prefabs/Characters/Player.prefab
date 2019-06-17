@@ -329,6 +329,7 @@ GameObject:
   - component: {fileID: 1013602446450159186}
   - component: {fileID: 7058910716857372807}
   - component: {fileID: 4057125413625104798}
+  - component: {fileID: 7159961758664632150}
   m_Layer: 31
   m_Name: Player
   m_TagString: Player
@@ -437,15 +438,16 @@ MonoBehaviour:
   - {fileID: 3774449784211641878}
   - {fileID: 114139823554117216}
   - {fileID: 114908900733630684}
+  - {fileID: 7159961758664632150}
   - {fileID: 114329433760099396}
   - {fileID: 1013602446450159186}
   - {fileID: 647976094}
-  - {fileID: 7058910716857372807}
-  - {fileID: 1872464415}
   - {fileID: 4057125413625104798}
-  - {fileID: 1784387541}
   - {fileID: 2521750178379034832}
   - {fileID: -8503966014793524050}
+  - {fileID: 7058910716857372807}
+  - {fileID: 1872464415}
+  - {fileID: 1784387541}
   m_ActiveAction: {fileID: 0}
   m_Moving: 0
   m_InputMagnitude: 0
@@ -454,8 +456,8 @@ MonoBehaviour:
   m_Grounded: 1
   m_Debug: 1
   m_DrawDebugLine: 1
-  displayMovement: 1
-  displayPhysics: 1
+  displayMovement: 0
+  displayPhysics: 0
   displayActions: 1
 --- !u!114 &114311917172092944
 MonoBehaviour:
@@ -586,9 +588,9 @@ MonoBehaviour:
   m_InvisibleLayer:
     serializedVersion: 2
     m_Bits: 50
-  m_GroundLayer:
+  m_SolidLayers:
     serializedVersion: 2
-    m_Bits: 234881025
+    m_Bits: 234881024
 --- !u!114 &114921923587186984
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1181,7 +1183,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bb16de68a3c6f4c2c99766840b8420c9, type: 3}
   m_Name: 
@@ -1339,7 +1341,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b6925d34e29f342f3914c6b5a519e7a0, type: 3}
   m_Name: 
@@ -1370,7 +1372,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9f63261ba55984bd9bef1d9b5d24d153, type: 3}
   m_Name: 
@@ -1513,7 +1515,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3f62eddceb76e4ce2aab0985c2db98db, type: 3}
   m_Name: 
@@ -1600,6 +1602,44 @@ MonoBehaviour:
   m_StartEffect: {fileID: 0}
   m_EndEffect: {fileID: 0}
   m_Debug: 0
+--- !u!114 &7159961758664632150
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: baed9bd3040554f2482260e0e684e139, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: Climb
+  m_LayerIndex: 0
+  m_ActionID: 0
+  m_TransitionDuration: 0
+  m_ExitStateName: 
+  m_StartType: 2
+  m_StopType: 0
+  m_InputNames:
+  - Space
+  m_SpeedMultiplier: 1
+  m_ApplyBuiltinRootMotion: 0
+  m_StartAudioClips: []
+  m_StopAudioClips: []
+  m_StartEffect: {fileID: 0}
+  m_EndEffect: {fileID: 0}
+  m_Debug: 0
+  m_MoveToClimbDistance: 2
+  m_MaxHeight: 2
+  m_MinHeight: 0.4
+  m_CheckLayers:
+    serializedVersion: 2
+    m_Bits: 234881024
+  m_MatchTargetStates: []
+  isMatchingTarget: 0
+  normalizeTime: 0
 --- !u!1 &1142656612551902
 GameObject:
   m_ObjectHideFlags: 0
@@ -2478,7 +2518,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f5ee5acc98c44fa6b1ce64aec653011, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skinData: {fileID: 11400000, guid: adddf65e1081d4d98aea86c4bcfb944c, type: 2}
+  skinData: {fileID: 11400000, guid: 038fdb96af3544c7a9567a882434e721, type: 2}
   skinOverrideMaterial: {fileID: 0}
   enableHat: 0
   hat: {fileID: 0}

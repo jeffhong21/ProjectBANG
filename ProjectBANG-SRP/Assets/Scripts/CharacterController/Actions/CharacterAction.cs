@@ -509,6 +509,7 @@
             else{
                 effect = Instantiate(prefab, m_Transform.position, m_Transform.rotation);
             }
+            Debug.LogFormat("{0} has just spawned {1}", GetType(), effect.name);
             return effect;
         }
 

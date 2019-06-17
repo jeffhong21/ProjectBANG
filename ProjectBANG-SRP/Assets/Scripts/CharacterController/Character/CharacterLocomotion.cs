@@ -617,7 +617,7 @@
                 case (MovementType.Adventure):
 
                     Vector3 axisSign = Vector3.Cross(m_LookDirection, m_Transform.forward);
-                    m_InputAngle = Vector3.Angle(m_Transform.forward, m_LookDirection) * (axisSign.y >= 0 ? -1f : 1f);
+                    m_InputAngle = Vector3.Angle(m_Transform.forward, m_LookDirection) * (axisSign.y >= 0 ? -1f : 1f) * m_DeltaTime;
                     m_InputAngle = (float)Math.Round(m_InputAngle, 2);
 
                     if (m_Moving && m_LookDirection.sqrMagnitude > 0.2f)
@@ -1138,8 +1138,8 @@
         {
             debugMsgs = new string[]
             {
-                //string.Format("Right Dot Product: {0}", hitDetectionDotProduct),
-                //string.Format("StopMovement Rad2Deg: {0}", m_StopMovementThreshold * Mathf.Rad2Deg),
+                string.Format("InputAngle: {0}", m_InputAngle),
+                string.Format("StopMovement Rad2Deg: {0}", m_StopMovementThreshold * Mathf.Rad2Deg),
                 string.Format("StopMovement Rad2Deg: {0}", Mathf.Acos(m_StopMovementThreshold) * Mathf.Rad2Deg),
                 //string.Format("hitDetectionEndRayAngle: {0}", hitDetectionEndRayAngle ),
                 //string.Format("VelocityDot: {0}", (float)Math.Round(Vector3.Dot(m_VerticalVelocity, m_Gravity), 2) ),
