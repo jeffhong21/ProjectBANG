@@ -77,12 +77,14 @@ namespace CharacterController
 
         public void PlayFootFallSound(CharacterFootTrigger sender)
         {
-            if (m_Controller.Grounded )
+            if (m_Controller.Grounded && Time.timeSinceLevelLoad > m_FootstepThreshold && m_SpawnFootprints)
             {
                 var index = Random.Range(0, footstepClips.Length);
                 var clip = footstepClips[index];
                 sender.AudioSource.clip = clip;
                 sender.AudioSource.Play();
+
+                m_FootstepThreshold = Time.timeSinceLevelLoad + m_FootstepTimer;
             }
 
         }

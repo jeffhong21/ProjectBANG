@@ -20,6 +20,8 @@
         [SerializeField, Tooltip("How deep the character can vault over.")]
         protected float m_MaxVaultDepth = 1f;
         [SerializeField]
+        public float m_MinMoveSpeed = 0.5f;
+        [SerializeField]
         public float m_HorizontalOffset = 0.1f;
         [SerializeField]
         public float m_VerticalOffset;
@@ -27,8 +29,15 @@
         public float m_StartMatchTarget = 0.01f;
         [SerializeField, Range(0.01f, 1)]
         public float m_StopMatchTarget = 0.1f;
+
         //[SerializeField]
         protected float m_JumpForce = 4f;
+        protected float m_TimeToApex = 0.4f;
+        protected float m_JumpVelocity;
+        protected float m_MoveSpeed;
+        protected float m_VelocitySmooth;
+        protected float m_AccelerationTime = 0.2f;
+        protected float m_Distance;
 
         //[SerializeField]
         Vector3 m_VerticalVelocity;
@@ -61,11 +70,11 @@
         {
             if(base.CanStartAction() )
             {
-                if (m_Controller.DetectObject(m_Transform.forward, out m_MoveToVaultDistanceHit, m_MoveToVaultDistance, m_VaultLayers))
-                {
-                    if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance, Color.green);
-                    return CachePositions();
-                }
+                //if (m_Controller.DetectObject(m_Transform.forward, out m_MoveToVaultDistanceHit, m_MoveToVaultDistance, m_VaultLayers))
+                //{
+                //    if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance, Color.green);
+                //    return CachePositions();
+                //}
 
                 if (Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out m_MoveToVaultDistanceHit, m_MoveToVaultDistance, m_VaultLayers)){
                     if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance, Color.green);
@@ -91,7 +100,6 @@
             m_HeightCheckStart = m_MoveToVaultDistanceHit.point;
             m_HeightCheckStart.y += (m_MaxHeight + 0.2f) - m_CheckHeight;
 
-            if(m_Debug) Debug.DrawRay(m_HeightCheckStart, Vector3.down * m_MaxHeight, Color.magenta, 1f);
             if (Physics.Raycast(m_HeightCheckStart, Vector3.down, out m_MatchPositionHit, m_MaxHeight, m_VaultLayers)){
                 //  cache HeightCheckHit distance.
                 var heightCheckDist = m_MatchPositionHit.distance;
@@ -99,14 +107,17 @@
                 {
                     //  Get the objet to vault over height.
                     m_VaultObjectHeight = m_MaxHeight - heightCheckDist;
-                    if(m_Debug) Debug.DrawRay(m_MoveToVaultDistanceHit.point, -m_MoveToVaultDistanceHit.normal , Color.cyan, 3f);
+
                     Vector3 depthCheck = (m_MoveToVaultDistanceHit.point - (m_MoveToVaultDistanceHit.normal * m_MaxVaultDepth)) ;
-                    //Debug.DrawRay(m_MoveToVaultDistanceHit.point, -m_MoveToVaultDistanceHit.normal * (m_MaxVaultDepth - m_CapsuleCollider.radius), Color.green, 3f);
                     depthCheck.y = m_HeightCheckStart.y;
                     //Debug.DrawRay(m_MoveToVaultDistanceHit.point, -m_MoveToVaultDistanceHit.normal * (m_MaxVaultDepth - m_CapsuleCollider.radius), Color.green, 3f);
-                    if (m_Debug) Debug.DrawRay(depthCheck, Vector3.down * (m_MaxHeight + 0.2f), Color.yellow, 3f);
                     if (Physics.Raycast(depthCheck, Vector3.down, out m_EndPositionHit, (m_MaxHeight + 0.2f), m_Layers.SolidLayers))
                     {
+                        if (m_Debug) Debug.DrawRay(m_HeightCheckStart, Vector3.down * m_MaxHeight, Color.magenta, 1f); //  First depthCheck
+                        if (m_Debug) Debug.DrawRay(m_MoveToVaultDistanceHit.point, -m_MoveToVaultDistanceHit.normal, Color.cyan, 3f);  //  Above depth
+                        //if (m_Debug) Debug.DrawRay(m_MoveToVaultDistanceHit.point, -m_MoveToVaultDistanceHit.normal * (m_MaxVaultDepth - m_CapsuleCollider.radius), Color.green, 3f);
+                        if (m_Debug) Debug.DrawRay(depthCheck, Vector3.down * (m_MaxHeight + 0.2f), Color.yellow, 3f);      //  Last raycast
+
                         //Debug.LogFormat("Distance {0}", Vector3.Distance(m_MoveToVaultDistanceHit.point, m_EndPositionHit.point));
                         return true;
                     }
@@ -122,27 +133,41 @@
         {
             m_Animator.SetInteger(HashID.ActionID, (int)ActionTypeDefinition.Vault);
 
-
             m_EndPosition = m_EndPositionHit.point;
             m_StartPosition = m_MoveToVaultDistanceHit.point + (m_Transform.position - m_MoveToVaultDistanceHit.point);
             m_StartPosition.y = m_Transform.position.y;
             //  Get the position of when the characters hand is placed on the object.
             m_MatchPosition = m_MatchPositionHit.point + (Vector3.up * m_VerticalOffset + m_Transform.right * m_HorizontalOffset);
             //m_MatchPosition = m_MatchPosition + (m_Transform.forward * m_CapsuleCollider.radius);
-            m_MatchPosition = m_MatchPosition + (m_Transform.forward * 0.1f);
+            m_MatchPosition = m_MatchPosition + (m_Transform.forward * m_AccelerationTime);
+
+
+            m_VaultObjectHeight = Mathf.Clamp(m_VaultObjectHeight, 0.4f, m_MaxHeight) + m_VerticalOffset;
+            m_JumpForce = -(2 * m_VaultObjectHeight) / Mathf.Pow(0.4f, 2);
+            m_JumpVelocity = Mathf.Abs(m_JumpForce) * m_TimeToApex;
+            m_Velocity = m_Controller.Velocity;
+            m_MoveSpeed = Mathf.Clamp(m_MoveSpeed, m_MinMoveSpeed, 8);
+            m_Distance = Vector3.Distance(m_StartPosition, m_EndPosition);
+
+            //float targetVelocityX = m_Controller.InputVector.z * m_MoveSpeed;
+            //m_Velocity.z = Mathf.SmoothDamp(m_Velocity.z, targetVelocityX, ref m_VelocitySmooth, m_AccelerationTime);
+            //m_Velocity.y += m_JumpForce * m_DeltaTime;
+            ////m_Rigidbody.AddForce(m_Velocity * m_DeltaTime, ForceMode.VelocityChange);
 
 
 
-            m_CharacterIK.disableIK = true;
+
+
+            //m_CharacterIK.disableIK = true;
             //  Cache variables
             m_ColliderHeight = m_CapsuleCollider.height;
             m_ColliderCenter = m_CapsuleCollider.center;
 
-            m_Rigidbody.isKinematic = !m_Rigidbody.isKinematic;
+            //m_Rigidbody.isKinematic = !m_Rigidbody.isKinematic;
 
 
-            Vector3 verticalVelocity = Vector3.up * (Mathf.Sqrt(m_VaultObjectHeight * -2 * Physics.gravity.y));
-            m_Rigidbody.velocity = verticalVelocity;
+            //Vector3 verticalVelocity = Vector3.up * (Mathf.Sqrt(m_VaultObjectHeight * -2 * Physics.gravity.y));
+            //m_Rigidbody.velocity = verticalVelocity;
 
         }
 
@@ -155,35 +180,39 @@
         //  Move over the vault object based off of the root motion forces.
         public override bool UpdateMovement()
         {
-            //  -----
-            //  Rigidbody IsKinamatic is currently on, so physics movement will do nothing.
-            //  -----
-            //  
-            float heightDifference = (float)System.Math.Round(m_MatchPosition.y - m_Transform.position.y, 2);
+            ////  -----
+            ////  Rigidbody IsKinamatic is currently on, so physics movement will do nothing.
+            ////  -----
+            ////  
+            //float heightDifference = (float)System.Math.Round(m_MatchPosition.y - m_Transform.position.y, 2);
 
-            float colliderScale = 1 / (m_VaultObjectHeight - heightDifference);
-            colliderScale = Mathf.Clamp(colliderScale - 0.5f, 0.5f, 1);
-            m_CapsuleCollider.height = Mathf.MoveTowards(m_CapsuleCollider.height, m_ColliderHeight * colliderScale, Time.deltaTime * 4);
-            m_CapsuleCollider.center = Vector3.MoveTowards(m_CapsuleCollider.center, m_ColliderCenter * colliderScale, Time.deltaTime * 2);
+            //float colliderScale = 1 / (m_VaultObjectHeight - heightDifference);
+            //colliderScale = Mathf.Clamp(colliderScale - 0.5f, 0.5f, 1);
+            //m_CapsuleCollider.height = Mathf.MoveTowards(m_CapsuleCollider.height, m_ColliderHeight * colliderScale, Time.deltaTime * 4);
+            //m_CapsuleCollider.center = Vector3.MoveTowards(m_CapsuleCollider.center, m_ColliderCenter * colliderScale, Time.deltaTime * 2);
 
-            //var velocity = Vector3.Project(m_Rigidbody.velocity, Physics.gravity * 2);
-            //var velocityY = Mathf.Sin()
-            //if (Vector3.Dot(velocity, Physics.gravity) > 0)
-                //velocityY = -velocityY;
+            ////var velocity = Vector3.Project(m_Rigidbody.velocity, Physics.gravity * 2);
+            ////var velocityY = Mathf.Sin()
+            ////if (Vector3.Dot(velocity, Physics.gravity) > 0)
+            //    //velocityY = -velocityY;
 
-            m_VerticalVelocity = Vector3.up * (m_VaultObjectHeight + m_VerticalOffset) ;
-            m_VerticalVelocity = m_VerticalVelocity * m_DeltaTime;
-            if (heightDifference >= 0.0f)
-            {
-                m_Rigidbody.AddForce(m_VerticalVelocity * 10, ForceMode.VelocityChange);
-                //m_Rigidbody.AddForce(m_VerticalVelocity, ForceMode.VelocityChange);
-                //m_Rigidbody.velocity = m_VerticalVelocity;
-            }
-            else{
+            //m_VerticalVelocity = Vector3.up * (m_VaultObjectHeight + m_VerticalOffset) ;
+            //m_VerticalVelocity = m_VerticalVelocity * m_DeltaTime;
+            //if (heightDifference >= 0.0f)
+            //{
+            //    m_Rigidbody.AddForce(m_VerticalVelocity * 10, ForceMode.VelocityChange);
+            //    //m_Rigidbody.AddForce(m_VerticalVelocity, ForceMode.VelocityChange);
+            //    //m_Rigidbody.velocity = m_VerticalVelocity;
+            //}
+            //else{
 
-                m_Rigidbody.AddForce(m_Transform.forward * m_CapsuleCollider.radius, ForceMode.VelocityChange);
-            }
+            //    m_Rigidbody.AddForce(m_Transform.forward * m_CapsuleCollider.radius, ForceMode.VelocityChange);
+            //}
 
+            float targetVelocityX = Mathf.Abs(m_Distance) * m_MoveSpeed;
+            m_Velocity.z = Mathf.SmoothDamp(m_Velocity.z, targetVelocityX, ref m_VelocitySmooth, m_AccelerationTime);
+            m_Velocity.y += m_JumpForce * m_DeltaTime;
+            m_Rigidbody.AddForce(m_Velocity * m_DeltaTime, ForceMode.VelocityChange);
 
             return true;
         }
@@ -191,16 +220,16 @@
 
 		public override bool Move()
 		{
-            //m_Animator.MatchTarget(m_MatchPosition, Quaternion.Euler(0, m_Transform.eulerAngles.y, 0), AvatarTarget.LeftHand, m_MatchTargetWeightMask, m_StartMatchTarget, m_StopMatchTarget);
+            ////m_Animator.MatchTarget(m_MatchPosition, Quaternion.Euler(0, m_Transform.eulerAngles.y, 0), AvatarTarget.LeftHand, m_MatchTargetWeightMask, m_StartMatchTarget, m_StopMatchTarget);
             m_Animator.MatchTarget(m_MatchPosition, Quaternion.identity, AvatarTarget.LeftHand, m_MatchTargetWeightMask, m_StartMatchTarget, m_StopMatchTarget);
 
-            m_Velocity = m_Animator.deltaPosition / m_DeltaTime;
+            //m_Velocity = m_Animator.deltaPosition / m_DeltaTime;
 
 
 
-            //m_Rigidbody.velocity = m_Velocity;
-            m_Rigidbody.velocity = m_Velocity + m_VerticalVelocity;
-            //Debug.LogFormat("Target Matching: {0}", m_Animator.isMatchingTarget);
+            ////m_Rigidbody.velocity = m_Velocity;
+            //m_Rigidbody.velocity = m_Velocity + m_VerticalVelocity;
+            ////Debug.LogFormat("Target Matching: {0}", m_Animator.isMatchingTarget);
             return true;
 		}
 
@@ -209,7 +238,7 @@
 
 		protected override void ActionStopped()
         {
-            m_Rigidbody.isKinematic = !m_Rigidbody.isKinematic;
+            //m_Rigidbody.isKinematic = !m_Rigidbody.isKinematic;
 
 
             m_CharacterIK.disableIK = false;

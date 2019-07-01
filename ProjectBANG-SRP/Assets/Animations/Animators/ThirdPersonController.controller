@@ -659,7 +659,7 @@ AnimatorStateTransition:
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 7749392909132660161}
   m_Solo: 0
-  m_Mute: 0
+  m_Mute: 1
   m_IsExit: 0
   serializedVersion: 3
   m_TransitionDuration: 0.25
@@ -965,19 +965,11 @@ BlendTree:
     m_CycleOffset: 0
     m_DirectBlendParameter: InputMagnitude
     m_Mirror: 0
-  - serializedVersion: 2
-    m_Motion: {fileID: 7400006, guid: b52825ddb24a82a47a0938b30bf593f5, type: 3}
-    m_Threshold: 1
-    m_Position: {x: 0, y: 0}
-    m_TimeScale: 1
-    m_CycleOffset: 0
-    m_DirectBlendParameter: InputMagnitude
-    m_Mirror: 0
-  m_BlendParameter: ActionFloatData
+  m_BlendParameter: HorizontalInput
   m_BlendParameterY: InputMagnitude
   m_MinThreshold: 0
-  m_MaxThreshold: 1
-  m_UseAutomaticThresholds: 1
+  m_MaxThreshold: 0
+  m_UseAutomaticThresholds: 0
   m_NormalizedBlendValues: 0
   m_BlendType: 0
 --- !u!1102 &-6199905980458794426
@@ -1317,7 +1309,7 @@ AnimatorStateTransition:
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 5543513491218073886}
   m_Solo: 0
-  m_Mute: 0
+  m_Mute: 1
   m_IsExit: 0
   serializedVersion: 3
   m_TransitionDuration: 0
@@ -2036,7 +2028,7 @@ BlendTree:
     m_CycleOffset: 0
     m_DirectBlendParameter: InputMagnitude
     m_Mirror: 0
-  m_BlendParameter: InputAngle
+  m_BlendParameter: Rotation
   m_BlendParameterY: Blend
   m_MinThreshold: -0.5
   m_MaxThreshold: 0.5
@@ -3175,7 +3167,7 @@ AnimatorController:
     m_DefaultInt: 0
     m_DefaultBool: 0
     m_Controller: {fileID: 9100000}
-  - m_Name: InputAngle
+  - m_Name: Rotation
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
@@ -12285,7 +12277,7 @@ AnimatorStateTransition:
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 1387463981664735064}
   m_Solo: 0
-  m_Mute: 0
+  m_Mute: 1
   m_IsExit: 0
   serializedVersion: 3
   m_TransitionDuration: 0.25
@@ -13820,7 +13812,7 @@ AnimatorStateTransition:
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -3857978327521010595}
   m_Solo: 0
-  m_Mute: 0
+  m_Mute: 1
   m_IsExit: 0
   serializedVersion: 3
   m_TransitionDuration: 0.25
@@ -14182,7 +14174,7 @@ AnimatorStateTransition:
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 1340821447951967142}
   m_Solo: 0
-  m_Mute: 0
+  m_Mute: 1
   m_IsExit: 0
   serializedVersion: 3
   m_TransitionDuration: 0.25

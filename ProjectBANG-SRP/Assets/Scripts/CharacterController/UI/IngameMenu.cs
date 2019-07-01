@@ -15,6 +15,8 @@ public class InGameMenu : MonoBehaviour
     private Button quitBtn;
 
 
+
+
     private void Start()
     {
         LevelManager.OnPause += SetPanelActive;
@@ -49,12 +51,13 @@ public class InGameMenu : MonoBehaviour
 
     public void RestartScene()
     {
-        Debug.Log("Restarting Scene.");
+        Debug.Log(" ** Restarting Scene. **");
     }
 
     public void ExitGame()
     {
         Debug.Log("Quitting Game.");
+        Application.Quit();
     }
 
 }

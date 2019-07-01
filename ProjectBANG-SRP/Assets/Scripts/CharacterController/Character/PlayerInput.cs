@@ -5,31 +5,40 @@ namespace CharacterController
     [DisallowMultipleComponent]
     public class PlayerInput : MonoBehaviour
     {
-        private string m_HorizontalInputName = "Horizontal";
-        private string m_VerticalInputName = "Vertical";
-        private string m_RotateCameraXInput = "Mouse X";
-        private string m_RotateCameraYInput = "Mouse Y";
-        private string m_MouseScrollInput = "Mouse ScrollWheel";
+        private static readonly string m_HorizontalInputName = "Horizontal";
+        private static readonly string m_VerticalInputName = "Vertical";
+        private static readonly string m_RotateCameraXInput = "Mouse X";
+        private static readonly string m_RotateCameraYInput = "Mouse Y";
+        private static readonly string m_MouseScrollInput = "Mouse ScrollWheel";
+
 
         [SerializeField]
-        private bool m_AxisRaw = true;
-
-        private KeyCode m_DebugBreak = KeyCode.Tab;
-
-
-        [Header("-- Debug Settings --")]
-        public ShakeTransformEventData data;
-        //[SerializeField, DisplayOnly]
-        private float m_Horizontal, m_Forward;
-        //[SerializeField, DisplayOnly]
-        private Vector3 m_InputVector;
-        [SerializeField, DisplayOnly]
-        private float m_MouseHorizontal, m_MouseVertical;
-        private Vector3 m_MouseInputVector;
+        private float m_MoveAxisDeadZone = 0.2f;
         [SerializeField]
         private float m_LookDistance = 50f;
         //[SerializeField]
         //private LayerMask m_LayerMask;
+        [SerializeField]
+        private bool m_AxisRaw = true;
+
+
+
+        [Header("-- Debug Settings --")]
+        [SerializeField, Tooltip("Shift + what key to select player.")]
+        private KeyCode m_SelectPlayerKeyCode = KeyCode.Alpha0;
+        [SerializeField, Tooltip("Locks camera's rotation.")]
+        private KeyCode m_LockCameraRotation = KeyCode.L;
+        [SerializeField, Tooltip("Shift + what key to debug.break.")]
+        private KeyCode m_DebugBreakKeyCode = KeyCode.Tab;
+
+        //[SerializeField, DisplayOnly]
+        private float m_Horizontal, m_Forward;
+        [SerializeField, DisplayOnly]
+        private Vector3 m_InputVector, m_InputVectorRaw;
+        //[SerializeField, DisplayOnly]
+        private float m_MouseHorizontal, m_MouseVertical;
+        private Vector3 m_MouseInputVector;
+
 
 
         private Vector3 m_CameraFwd;
@@ -37,7 +46,7 @@ namespace CharacterController
 
 
 
-
+        public ShakeTransformEventData data;
         [SerializeField]
         private CameraController m_CameraController;
         private Transform m_Camera;
@@ -48,14 +57,38 @@ namespace CharacterController
 
 
 
-        public string HorizontalInputName{
-            get { return m_HorizontalInputName; }
+
+
+        private Vector3 InputVectorRaw{
+            get {
+                m_InputVectorRaw.Set(Input.GetAxisRaw(m_HorizontalInputName), 0f, Input.GetAxisRaw(m_VerticalInputName));
+                return m_InputVectorRaw;
+            }
         }
 
-        public string VerticalInputName{
-            get { return m_VerticalInputName; }
+        private Vector3 InputVector{
+            get {
+                m_InputVector.Set(Input.GetAxis(m_HorizontalInputName), 0f, Input.GetAxis(m_VerticalInputName));
+                return m_InputVector;
+            }
         }
 
+        private Vector2 MouseInputVector{
+            get { return new Vector2(Input.GetAxis(m_RotateCameraXInput), Input.GetAxis(m_RotateCameraYInput)); }
+        }
+
+        private Vector2 MouseInputVectorRaw{
+            get { return new Vector2(Input.GetAxisRaw(m_RotateCameraXInput), Input.GetAxisRaw(m_RotateCameraYInput)); }
+        }
+
+        private float MouseZoomInput{
+            get { return Input.GetAxis(m_MouseScrollInput) ; }
+        }
+
+        private float MouseZoomInputRaw
+        {
+            get { return Input.GetAxisRaw(m_MouseScrollInput); }
+        }
 
 
 
@@ -92,9 +125,8 @@ namespace CharacterController
 
 
 
-		public virtual float GetAxis(string name, bool useRaw = false){
-            return useRaw ? Input.GetAxisRaw(name) : Input.GetAxis(name);
-        }
+
+
 
 
         private void Update()
@@ -103,20 +135,11 @@ namespace CharacterController
             if (LockCameraRotation() == true) return;
 
 
+            m_Controller.InputVector = InputVectorRaw;
 
-            //  -----------
-            //  Character Input
-            m_Horizontal = GetAxis(m_HorizontalInputName, m_AxisRaw);
-            m_Forward = GetAxis(m_VerticalInputName, m_AxisRaw);
-
-            m_InputVector.Set(m_Horizontal, 0, m_Forward);
-            m_Controller.InputVector = m_InputVector;
 
             m_LookDirection = m_CameraController == null ? m_Transform.forward : Vector3.Scale(m_Camera.forward, new Vector3(1, 0, 1)).normalized;
             m_Controller.LookDirection = m_LookDirection;
-
-
-
 
 
             DebugButtonPress();
@@ -129,18 +152,23 @@ namespace CharacterController
             //  Camera Input
             if (m_CameraController != null)
             {
-                m_MouseHorizontal = Input.GetAxis(m_RotateCameraXInput);
-                m_MouseVertical = Input.GetAxis(m_RotateCameraYInput);
+                //m_MouseHorizontal = Input.GetAxis(m_RotateCameraXInput);
+                //m_MouseVertical = Input.GetAxis(m_RotateCameraYInput);
 
-                m_CameraController.RotateCamera(m_MouseHorizontal, m_MouseVertical);
+                //m_CameraController.RotateCamera(m_MouseHorizontal, m_MouseVertical);
+                m_CameraController.RotateCamera(MouseInputVector.x, MouseInputVector.y);
+
                 //m_CameraController.ZoomCamera(Input.GetAxisRaw(m_MouseScrollInput));
             }
+
+            //  Check if character is moving.
+            //m_Controller.Moving = InputVector != Vector3.zero || InputVectorRaw != Vector3.zero;
         }
 
 
         private bool LockCameraRotation()
         {
-            if (Input.GetKeyDown(KeyCode.L)){
+            if (Input.GetKeyDown(m_LockCameraRotation)){
                 Debug.Log(CameraController.LockRotation);
                 if (CameraController.Instance != null){
                     CameraController.LockRotation = !CameraController.LockRotation;
@@ -155,9 +183,21 @@ namespace CharacterController
 
         private void DebugButtonPress()
         {
-            if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.P))
+
+            if (Input.GetKeyDown(m_SelectPlayerKeyCode))
             {
                 UnityEditor.Selection.activeGameObject = gameObject;
+            }
+
+
+            if (Input.GetKeyDown(m_DebugBreakKeyCode))
+            {
+                Debug.Break();
+            }
+
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+
             }
 
             if (Input.GetKeyDown(KeyCode.Escape))
@@ -165,10 +205,7 @@ namespace CharacterController
                 LevelManager.PauseGame();
             }
 
-            if (Input.GetKeyDown(m_DebugBreak))
-            {
-                Debug.Break();
-            }
+
         }
 
 
@@ -190,24 +227,6 @@ namespace CharacterController
 
 
 
-
-
-
-
-
-
-        private void OnGUI()
-        {
-            //if (Application.isPlaying)
-            //{
-
-            //    GUI.color = Color.black;
-            //    GUI.Label(new Rect(10, Screen.height / 2, 200, 20), string.Format("Input Mag: {0}", m_InputVector.magnitude));
-            //    GUI.Label(new Rect(10, Screen.height / 2 + 30, 200, 20), string.Format("Input Angle: {0}", Vector3.Angle((Vector3.Scale(m_Camera.forward, new Vector3(1, 0, 1)).normalized), m_Transform.forward)));
-
-            //}
-
-        }
 	}
 }
 

@@ -59,6 +59,9 @@
         private void OnActivateThrowableObject()
         {
             Debug.Log("OnActivateThrowableObject!");
+
+
+            Debug.Break();
         }
 
 

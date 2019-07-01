@@ -244,7 +244,7 @@ GameObject:
   - component: {fileID: 2927782743272165681}
   - component: {fileID: 2927782743272165682}
   - component: {fileID: 2927782743272165683}
-  - component: {fileID: 4874273387158687087}
+  - component: {fileID: 1963739879739996759}
   m_Layer: 5
   m_Name: InGameMenu
   m_TagString: Untagged
@@ -333,7 +333,7 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &4874273387158687087
+--- !u!114 &1963739879739996759
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -342,7 +342,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2927782743272165676}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 235ca288c18d944a3a9fb9dd069f0ed8, type: 3}
+  m_Script: {fileID: 11500000, guid: abaa16225fd794de1b9a18cde8ff9979, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   restartBtn: {fileID: 2927782743563273308}

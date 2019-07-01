@@ -93,17 +93,17 @@ public class LevelManager : SingletonMonoBehaviour<LevelManager>
 
 
 
-    private void Update()
-    {
+    //private void Update()
+    //{
 
-        if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.Q))
-        {
-            RestartScene();
-        }
+    //    if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.Q))
+    //    {
+    //        RestartScene();
+    //    }
 
 
 
-    }
+    //}
 
 
 

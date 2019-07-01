@@ -98,14 +98,14 @@ namespace CharacterController
 
 
 
-        protected override void DrawOnGUI()
-        {
-            content.text = "";
-            content.text += string.Format("Speed: {0}\n", m_SpeedInput);
+        //protected override void DrawOnGUI()
+        //{
+        //    content.text = "";
+        //    content.text += string.Format("Speed: {0}\n", m_SpeedInput);
 
 
-            GUILayout.Label(content);
-        }
+        //    GUILayout.Label(content);
+        //}
 	}
 
 }

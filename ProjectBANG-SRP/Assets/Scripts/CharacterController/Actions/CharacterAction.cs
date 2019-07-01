@@ -44,6 +44,10 @@
         [SerializeField, HideInInspector]
         protected GameObject m_EndEffect;
 
+        private float m_StartEffectStartTime;
+        private float m_EndEffectStartTime;
+        private float m_EffectCooldown = 0.5f;
+
 
 
         //[SerializeField, DisplayOnly]
@@ -270,32 +274,33 @@
                                 m_InputIndex = i;
                                 return true;
                             }
-
-                            ////if (Input.GetKeyDown(m_KeyCodes[i]) && m_ButtonDownPressed == m_KeyCodes[i])
-                            ////{
-                            ////    if (Time.time - m_ButtonDownPressedTime < 0.25f)
-                            ////    {
-                            ////        m_ButtonDownPressed = KeyCode.F12;
-                            ////        if (m_StopType == ActionStopType.ButtonToggle)
-                            ////            m_ActionStopToggle = true;
-                            ////        m_InputIndex = i;
-                            ////        return true;
-                            ////    }
-                            ////}
-                            //if (Time.time - m_ButtonDownPressedTime < 0.25f && m_ButtonDownPressed == m_KeyCodes[i])
+                            /*
+                            //if (Input.GetKeyDown(m_KeyCodes[i]) && m_ButtonDownPressed == m_KeyCodes[i])
                             //{
-                            //    m_ButtonDownPressed = KeyCode.F12;
-                            //    if (m_StopType == ActionStopType.ButtonToggle)
-                            //        m_ActionStopToggle = true;
-                            //    m_InputIndex = i;
-                            //    return true;
+                            //    if (Time.time - m_ButtonDownPressedTime < 0.25f)
+                            //    {
+                            //        m_ButtonDownPressed = KeyCode.F12;
+                            //        if (m_StopType == ActionStopType.ButtonToggle)
+                            //            m_ActionStopToggle = true;
+                            //        m_InputIndex = i;
+                            //        return true;
+                            //    }
                             //}
-                            //if (Input.GetKeyDown(m_KeyCodes[i]) && m_ButtonDownPressed != m_KeyCodes[i])
-                            //{
-                            //    m_ButtonDownPressed = m_KeyCodes[i];
-                            //    m_ButtonDownPressedTime = Time.time;
-                            //    return false;
-                            //}
+                            if (Time.time - m_ButtonDownPressedTime < 0.25f && m_ButtonDownPressed == m_KeyCodes[i])
+                            {
+                                m_ButtonDownPressed = KeyCode.F12;
+                                if (m_StopType == ActionStopType.ButtonToggle)
+                                    m_ActionStopToggle = true;
+                                m_InputIndex = i;
+                                return true;
+                            }
+                            if (Input.GetKeyDown(m_KeyCodes[i]) && m_ButtonDownPressed != m_KeyCodes[i])
+                            {
+                                m_ButtonDownPressed = m_KeyCodes[i];
+                                m_ButtonDownPressedTime = Time.time;
+                                return false;
+                            }
+                            */
                         }
                         break;
                     case ActionStartType.DoublePress:
@@ -469,8 +474,9 @@
                 //m_Animator.Play(GetDestinationState(index), index);
             }
 
+            if(Time.time > m_StartEffectStartTime + m_EffectCooldown)
+                PlayEffect(m_StartEffect, ref m_StartEffectStartTime);
 
-            PlayEffect(m_StartEffect);
         }
 
 
@@ -479,7 +485,9 @@
             m_IsActive = false;
             EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnCharacterActionActive, this, m_IsActive);
 
-            PlayEffect(m_EndEffect);
+            if (Time.time > m_EndEffectStartTime + m_EffectCooldown)
+                PlayEffect(m_EndEffect, ref m_EndEffectStartTime);
+
 
 
 
@@ -513,7 +521,23 @@
             return effect;
         }
 
+        private GameObject PlayEffect(GameObject prefab, ref float startTime)
+        {
+            if (prefab == null) return null;
 
+            startTime = Time.time;
+            GameObject effect = null;
+            if (ObjectPool.Instance != null)
+            {
+                effect = ObjectPool.Get(prefab, m_Transform.position, m_Transform.rotation);
+            }
+            else
+            {
+                effect = Instantiate(prefab, m_Transform.position, m_Transform.rotation);
+            }
+            Debug.LogFormat("{0} has just spawned {1}", GetType(), effect.name);
+            return effect;
+        }
 
 
 

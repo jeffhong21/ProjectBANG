@@ -22,13 +22,14 @@ namespace CharacterController
         //private static readonly string[] m_DontIncude = new string[] { "m_Script" };
         //private static readonly string[] m_DontIncude = new string[] { "m_Actions" };
 
-        private readonly bool m_UseDefaultFoldout = false;
+        private readonly bool m_UseDefaultFoldout = true;
 
 
         private const string MotorFoldoutHeader = "Character Movement";
         private const string PhysicsFoldoutHeader = "Character Physics";
+        private const string AnimationFoldoutHeader = "Character Animation";
         private const string ActionsFoldoutHeader = "Actions List";
-        private const string DebugHeader = "-- Debug --";
+        private const string DebugHeader = "Debug ";
 
 
 
@@ -74,11 +75,11 @@ namespace CharacterController
 
         private SerializedProperty displayMovement;
         private SerializedProperty displayPhysics;
+        private SerializedProperty displayAnimations;
         private SerializedProperty displayActions;
 
 
-
-		private void OnEnable()
+        private void OnEnable()
 		{
             if (target == null) return;
             m_Controller = (CharacterLocomotion)target;
@@ -89,6 +90,7 @@ namespace CharacterController
 
             displayMovement = serializedObject.FindProperty("displayMovement");
             displayPhysics = serializedObject.FindProperty("displayPhysics");
+            displayAnimations = serializedObject.FindProperty("displayAnimations");
             displayActions = serializedObject.FindProperty("displayActions");
 
             m_Script = serializedObject.FindProperty("m_Script");
@@ -148,6 +150,7 @@ namespace CharacterController
                 EditorGUILayout.PropertyField(m_SlopeForceDown);
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_StopMovementThreshold"));
 
+
             }
 
             //  -----
@@ -167,8 +170,32 @@ namespace CharacterController
                 EditorGUILayout.PropertyField(m_StepSpeed);
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_GravityModifier"));
 
+                //  Collisions
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_HorizontalCollisionCount"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_VerticalCollisionCount"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_ColliderLayerMask"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_MaxCollisionCount"));
 
             }
+
+
+            //  -----
+            //  Character Animation
+            //  -----
+            EditorGUILayout.Space();
+            displayAnimations.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayAnimations.boolValue, AnimationFoldoutHeader) : InspectorUtility.Foldout(displayAnimations.boolValue, AnimationFoldoutHeader);
+            if (displayAnimations.boolValue)
+            {
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_IdleRotationMultiplier"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_MovingStateName"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_AirborneStateName"));
+                //EditorGUILayout.PropertyField(serializedObject.FindProperty("m_MaxCollisionCount"));
+
+
+
+            }
+
+
 
             //  -----
             //  Character Actions
@@ -232,6 +259,8 @@ namespace CharacterController
                     EditorGUI.indentLevel++;
 
                     InspectorUtility.PropertyField(serializedObject.FindProperty("m_DrawDebugLine"));
+                    InspectorUtility.PropertyField(serializedObject.FindProperty("m_DebugCollisions"));
+
 
                     EditorGUI.indentLevel--;
 
@@ -265,13 +294,13 @@ namespace CharacterController
             {
                 Rect headerRect = rect;
                 headerRect.x += 12;
-                EditorGUI.LabelField(headerRect, m_Actions.displayName);
+                EditorGUI.LabelField(headerRect, "Action Type");  // m_Actions.displayName
 
                 //  Action state name.
                 //headerRect.x = rect.width * 0.465f;
                 headerRect.x += rect.width * 0.40f;
                 headerRect.width = rect.width * 0.36f;
-                EditorGUI.LabelField(headerRect, "State Name");
+                EditorGUI.LabelField(headerRect, "Sub-State Machine");
 
                 //  Action state name.
                 headerRect.x = rect.width - 50f;
