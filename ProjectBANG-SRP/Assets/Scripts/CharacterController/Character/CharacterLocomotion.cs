@@ -59,12 +59,15 @@
 
         protected override void Update()
 		{
-            if (Time.timeScale == 0) return;
+            m_TimeScale = Time.timeScale;
+            if (m_TimeScale == 0) return;
             m_DeltaTime = Time.deltaTime;
 
-            m_PreviousVelocity = m_Velocity;
 
-
+            m_CheckGround = true;
+            m_CheckMovement = true;
+            m_Move = true;
+            m_UpdateAnimator = true;
 
 
             ////  Start Stop Actions.
@@ -75,35 +78,41 @@
                 CharacterAction charAction = m_Actions[i];
                 StopStartAction(charAction);
 
-                //if (m_CheckGround) m_CheckGround = charAction.CheckGround();
+                if(charAction.IsActive)
+                {
+                    if (m_CheckGround) m_CheckGround = charAction.CheckGround();
 
-                //if (m_CheckMovement) m_CheckMovement = charAction.CheckMovement();
+                    if (m_CheckMovement) m_CheckMovement = charAction.CheckMovement();
+
+                    if (m_Move) m_Move = charAction.Move();
+
+                    if (m_UpdateAnimator) m_UpdateAnimator = charAction.UpdateAnimator();
+                }
 
                 //  Call Action Update.
                 charAction.UpdateAction();
             }
 
-            //CheckGround();
+            if (m_CheckGround) CheckGround();
 
-            //CheckMovement();
+            if (m_CheckMovement) CheckMovement();
 
             SetPhysicsMaterial();
+
+            if (m_Move) Move();
+
+            if (m_UpdateAnimator) UpdateAnimator();
         }
 
 
         protected override void FixedUpdate()
 		{
-            if (Time.timeScale == 0) return;
+            if (m_TimeScale == 0) return;
             m_DeltaTime = Time.fixedDeltaTime;
 
-
-            m_Velocity = Vector3.zero;
-
-            m_CheckGround = true;
-            m_CheckMovement = true;
             m_UpdateRotation = true;
             m_UpdateMovement = true;
-            m_UpdateAnimator = true;
+
 
             for (int i = 0; i < m_Actions.Length; i++)
             {
@@ -113,57 +122,24 @@
 
                 if (charAction.IsActive)
                 {
-                    if (m_CheckGround)m_CheckGround = charAction.CheckGround();
-
-                    if (m_CheckMovement) m_CheckMovement = charAction.CheckMovement();
-
                     if (m_UpdateRotation) m_UpdateRotation = charAction.UpdateRotation();
 
                     if (m_UpdateMovement) m_UpdateMovement = charAction.UpdateMovement();
 
-                    if (m_UpdateAnimator) m_UpdateAnimator = charAction.UpdateAnimator();
                 }
             }  //  end of for loop
 
 
+            if (m_UpdateRotation) UpdateRotation();
 
-            CheckGround();
-
-            CheckMovement();
-
-            UpdateRotation();
-
-            UpdateMovement();
-
-            UpdateAnimator();
+            if (m_UpdateMovement) UpdateMovement();
 
         }
 
 
 
 
-        protected override void LateUpdate()
-        {
-            if (Time.timeScale == 0) return;
-            m_DeltaTime = Time.deltaTime;
 
-
-
-            m_Move = true;
-            for (int i = 0; i < m_Actions.Length; i++)
-            {
-                if (m_Actions[i].IsActive)
-                {
-                    if (m_Move) m_Move = m_Actions[i].Move();
-                }
-            }
-            Move();
-
-            //  -----
-            //  Debug messages
-            if (m_Debug) DebugMessages();
-            //  -----
-        }
 
 
 
@@ -366,11 +342,12 @@
                     if(activated)
                     {
                         //Debug.LogFormat(" {0} is starting.", action.GetType().Name);
+                        CharacterDebug.Log(action.GetType().Name, action.GetType());
 
                     }
                     else
                     {
-
+                        CharacterDebug.Remove(action.GetType().Name);
                     }
                 }
             }
@@ -384,7 +361,6 @@
         }
 
         #endregion
-
 
 
 

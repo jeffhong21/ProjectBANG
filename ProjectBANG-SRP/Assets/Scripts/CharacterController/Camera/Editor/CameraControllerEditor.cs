@@ -4,11 +4,11 @@ namespace CharacterController
     using UnityEditor;
 
 
-    [CustomEditor(typeof(CameraController))]
+    [CustomEditor(typeof(ThirdPersonCameraController))]
     public class CameraControllerEditor : Editor
     {
 
-        private CameraController m_Controller;
+        private ThirdPersonCameraController m_Controller;
         private SerializedObject m_CameraState;
 
         private bool m_CameraStateToggle;
@@ -18,7 +18,7 @@ namespace CharacterController
         private void OnEnable()
         {
             if (target == null) return;
-            m_Controller = (CameraController)target;
+            m_Controller = (ThirdPersonCameraController)target;
 
             m_CameraStateToggle = serializedObject.FindProperty("m_CameraStateToggle").boolValue;
         }

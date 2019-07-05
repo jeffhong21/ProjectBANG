@@ -2,14 +2,11 @@
 //{
 //    using UnityEngine;
 //    using System;
-//    using System.Collections;
-//    using System.Text;
 
 //    [DisallowMultipleComponent]
 //    [RequireComponent(typeof(CapsuleCollider), typeof(Rigidbody), typeof(LayerManager))]
-//    public class CharacterLocomotion : MonoBehaviour
+//    public class RigidbodyCharacterController : MonoBehaviour
 //    {
-//        public event Action<bool> OnAim = delegate {};
 //        public enum MovementType { Adventure, Combat };
 
 //        //  Locomotion variables
@@ -20,7 +17,7 @@
 //        [SerializeField, HideInInspector]
 //        protected float m_Acceleration = 0.12f;
 //        [SerializeField, HideInInspector]
-//        protected float m_MotorDamping = 0.2f;       
+//        protected float m_MotorDamping = 0.2f;
 //        [SerializeField, HideInInspector]
 //        protected float m_MovementSpeed = 1f;
 //        [SerializeField, HideInInspector]
@@ -60,18 +57,36 @@
 
 
 //        //  -- Collision detection
+//        [SerializeField, HideInInspector]
+//        protected bool mDetectHorizontalCollision = true;
+//        [SerializeField, HideInInspector]
 //        protected int m_HorizontalCollisionCount = 10;
+//        [SerializeField, HideInInspector]
 //        protected int m_VerticalCollisionCount = 10;
+//        [SerializeField, HideInInspector]
 //        protected LayerMask m_ColliderLayerMask;
+//        [SerializeField, HideInInspector]
 //        protected int m_MaxCollisionCount = 50;
 
 
+//        //  -- Animation
+//        [Header("Animations")]
+//        [SerializeField, HideInInspector]
+//        protected float m_IdleRotationMultiplier = 2f;
+//        [SerializeField, HideInInspector]
+//        protected string m_MovingStateName = "Movement.Movement";
+//        [SerializeField, HideInInspector]
+//        protected string m_AirborneStateName = "Fall";
 
-//        //  --  Character Actions
-//        [SerializeField, HideInInspector]
-//        protected CharacterAction[] m_Actions;
-//        [SerializeField, HideInInspector]
-//        protected CharacterAction m_ActiveAction;
+
+
+//        protected float m_TimeScale = 1;
+//        //  How collision info every X frames.
+//        protected int m_CollisionCastInterval = 3;
+//        protected int m_CollisionCastCount;
+//        //  Internal variable to to notify if Move() was called from outside, so it doesn't get called twice.
+//        protected bool m_UpdateMove = true;
+//        protected RaycastHit[] m_Collisions;
 
 
 
@@ -81,10 +96,8 @@
 //        [SerializeField, DisplayOnly]
 //        protected bool m_Moving;
 //        protected bool m_Aiming;
-//        [SerializeField, DisplayOnly]
-//        protected float m_InputMagnitude;
 //        protected float m_InputAngle;
-//        protected Vector3 m_Velocity, m_VerticalVelocity;
+//        protected Vector3 m_Velocity, m_PreviousVelocity;
 //        [SerializeField, DisplayOnly]
 //        protected Vector3 m_InputVector;
 //        protected Vector3 m_LookDirection;
@@ -119,14 +132,13 @@
 
 
 //        private Vector3 m_VelocitySmooth;
+//        private float m_RotationSmoothDamp;
 
 
 
-//        private bool m_CheckGround = true, m_UpdateRotation = true, m_UpdateMovement = true, m_UpdateAnimator = true, m_Move = true, m_CheckMovement = true;
 
-
-//        private Animator m_Animator;
-//        private AnimatorMonitor m_AnimationMonitor;
+//        protected Animator m_Animator;
+//        protected AnimatorMonitor m_AnimationMonitor;
 //        protected LayerManager m_Layers;
 //        protected Rigidbody m_Rigidbody;
 //        protected GameObject m_GameObject;
@@ -138,11 +150,11 @@
 //        [SerializeField, HideInInspector]
 //        protected bool m_Debug;
 //        [SerializeField, HideInInspector]
+//        protected bool m_DebugCollisions;
+//        [SerializeField, HideInInspector]
 //        protected bool m_DrawDebugLine;
 //        [SerializeField, HideInInspector]
-//        private bool displayMovement = true, displayPhysics = true, displayActions = true;
-
-
+//        protected bool displayMovement = true, displayPhysics = true, displayAnimations = true, displayActions = true;
 
 
 
@@ -156,13 +168,16 @@
 //            get { return m_MovementType; }
 //        }
 
-//        public bool Moving{
-//            get { return m_Moving;}
+//        public bool Moving
+//        {
+//            get { return m_Moving; }
 //            set { m_Moving = value; }
 //        }
 
-//        public bool Aiming{
-//            get{
+//        public bool Aiming
+//        {
+//            get
+//            {
 //                if (m_Aiming && Grounded)
 //                    return true;
 //                return false;
@@ -170,43 +185,45 @@
 //            set { m_Aiming = value; }
 //        }
 
-//        public bool Grounded{
+//        public bool Grounded
+//        {
 //            get { return m_Grounded; }
 //            set { m_Grounded = value; }
 //        }
 
-//        public float RotationSpeed{
+//        public float RotationSpeed
+//        {
 //            get { return m_RotationSpeed; }
 //            set { m_RotationSpeed = value; }
 //        }
 
-//        public Vector3 InputVector{
+//        public Vector3 InputVector
+//        {
 //            get { return m_InputVector; }
 //            set { m_InputVector = value; }
 //        }
 
-//        public Vector3 MoveDirection{
+//        public Vector3 MoveDirection
+//        {
 //            get { return m_MoveDirection; }
 //        }
 
-//        public Vector3 LookDirection{
+//        public Vector3 LookDirection
+//        {
 //            get { return m_LookDirection; }
 //            set { m_LookDirection = value == Vector3.zero ? m_Transform.forward : value; }
 //        }
 
-//        public Vector3 Velocity{
+//        public Vector3 Velocity
+//        {
 //            get { return m_Velocity; }
 //            set { m_Velocity = value; }
 //        }
 
-//        public Quaternion LookRotation{
+//        public Quaternion LookRotation
+//        {
 //            get { return m_LookRotation; }
 //            set { m_LookRotation = value; }
-//        }
-
-//        public CharacterAction[] CharActions{
-//            get { return m_Actions; }
-//            set { m_Actions = value; }
 //        }
 
 //        public bool UseRootMotion
@@ -215,6 +232,10 @@
 //            set { m_UseRootMotion = value; }
 //        }
 
+//        public Vector3 RaycastOrigin
+//        {
+//            get { return m_Transform.position + Vector3.up * m_SkinWidth; }
+//        }
 
 //        public RaycastHit GroundHit
 //        {
@@ -230,7 +251,7 @@
 
 
 
-//        protected void Awake()
+//        protected virtual void Awake()
 //        {
 //            m_AnimationMonitor = GetComponent<AnimatorMonitor>();
 //            m_Animator = GetComponent<Animator>();
@@ -250,30 +271,34 @@
 
 //            m_Gravity = Physics.gravity;
 
+
 //        }
 
 
 
-//		protected void OnEnable()
-//		{
+//        protected virtual void OnEnable()
+//        {
 //            m_Rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
 //            m_Rigidbody.mass = m_Mass;
 //            m_Animator.applyRootMotion = m_UseRootMotion;
 
-//            EventHandler.RegisterEvent<CharacterAction, bool>(m_GameObject, EventIDs.OnCharacterActionActive, OnActionActive);
-//            EventHandler.RegisterEvent<bool>(m_GameObject, EventIDs.OnAimActionStart, OnAimActionStart);
-//		}
+
+//        }
 
 
-//		protected void OnDisable()
-//		{
-//            EventHandler.UnregisterEvent<CharacterAction, bool>(m_GameObject, EventIDs.OnCharacterActionActive, OnActionActive);
-//            EventHandler.UnregisterEvent<bool>(m_GameObject, EventIDs.OnAimActionStart, OnAimActionStart);
-//		}
+//        protected virtual void OnDisable()
+//        {
+
+//        }
 
 
 //        protected void Start()
 //        {
+//            m_ColliderLayerMask = m_Layers.SolidLayers;
+
+//            m_Collisions = new RaycastHit[m_MaxCollisionCount];
+
+
 //            // slides the character through walls and edges
 //            m_GroundedMovingFrictionMaterial = new PhysicMaterial
 //            {
@@ -303,109 +328,77 @@
 //        }
 
 
-//        private void Update()
-//		{
-//            if (Time.timeScale == 0) return;
+//        protected virtual void Update()
+//        {
+//            m_TimeScale = Time.timeScale;
+//            if (m_TimeScale == 0) return;
 //            m_DeltaTime = Time.deltaTime;
 
-//            //m_InputMagnitude = m_InputVector.magnitude;
-//            //if (m_InputMagnitude < 0.01f || m_InputMagnitude > 0.99f)
-//            //    m_InputMagnitude = Mathf.Round(m_InputMagnitude);
-//            //if (m_InputMagnitude > 1)
-//            //    m_InputVector.Normalize();
-
-//            m_Moving = m_InputVector != Vector3.zero;
 
 
+//            CheckGround();
 
-
-//            ////  Start Stop Actions.
-//            for (int i = 0; i < m_Actions.Length; i++)
-//            {
-//                if (m_Actions[i].enabled == false)
-//                    continue;
-//                CharacterAction charAction = m_Actions[i];
-//                StopStartAction(charAction);
-
-//                //  Call Action Update.
-//                charAction.UpdateAction();
-//            }
+//            CheckMovement();
 
 //            SetPhysicsMaterial();
 
 //        }
 
 
-//        private void FixedUpdate()
-//		{
-//            if (Time.timeScale == 0) return;
+//        protected virtual void FixedUpdate()
+//        {
+//            if (m_TimeScale == 0) return;
 //            m_DeltaTime = Time.fixedDeltaTime;
 
 
 //            m_Velocity = Vector3.zero;
 
-//            m_CheckGround = true;
-//            m_CheckMovement = true;
-//            m_UpdateRotation = true;
-//            m_UpdateMovement = true;
-//            m_UpdateAnimator = true;
-//            for (int i = 0; i < m_Actions.Length; i++)
-//            {
-//                if (m_Actions[i].enabled == false)
-//                    continue;
-//                CharacterAction charAction = m_Actions[i];
-
-//                if (charAction.IsActive)
-//                {
-//                    if (m_CheckGround) m_CheckGround = charAction.CheckGround();
-
-//                    if (m_CheckMovement) m_CheckMovement = charAction.CheckMovement();
-
-//                    if (m_UpdateRotation) m_UpdateRotation = charAction.UpdateRotation();
-
-//                    if (m_UpdateMovement) m_UpdateMovement = charAction.UpdateMovement();
-
-//                    if (m_UpdateAnimator) m_UpdateAnimator = charAction.UpdateAnimator();
-//                }
-//            }  //  end of for loop
-
 
 
 //            CheckGround();
+
 //            CheckMovement();
+
 //            UpdateRotation();
+
 //            UpdateMovement();
+
 //            UpdateAnimator();
+
+
 //        }
 
 
-//        private void OnAnimatorMove()
+//        protected virtual void OnAnimatorMove()
 //        {
-//            if(m_Grounded)
-//            {
-//                if (m_UseRootMotion)
-//                {
-//                    //m_Animator.ApplyBuiltinRootMotion();
-//                }
-//            }
-//            else
-//            {
+//            // The anim speed multiplier allows the overall speed of walking/running to be tweaked in the inspector,
+//            // which affects the movement speed because of the root motion.
+//            m_Animator.speed = m_RootMotionSpeedMultiplier;
 
-//            }
+//            //m_Velocity += m_Animator.deltaPosition;
+//            //m_LookRotation *= m_Animator.deltaRotation;
+
+//            //if (m_Grounded)
+//            //{
+//            //    if (m_UseRootMotion)
+//            //    {
+//            //        m_Animator.ApplyBuiltinRootMotion();
+
+//            //    }
+//            //}
+
+
 //        }
 
 
-//        private void LateUpdate()
+//        protected virtual void LateUpdate()
 //        {
-//            m_Move = true;
-//            for (int i = 0; i < m_Actions.Length; i++){
-//                if (m_Actions[i].IsActive){
-//                    if (m_Move) m_Move = m_Actions[i].Move();
-//                }
-//            }
+//            if (m_TimeScale == 0) return;
+//            m_DeltaTime = Time.deltaTime;
+
 //            Move();
 
-
+//            m_PreviousVelocity = m_Velocity;
 //            //  -----
 //            //  Debug messages
 //            if (m_Debug) DebugMessages();
@@ -420,10 +413,11 @@
 //        }
 
 
-//        //  Should the character look independetly of the camera?  AI Agents do not need to use camera rotation.
+//        //  If true, the character looks independently of the camera.  AI Agents do not need to use camera rotation.
 //        public bool IndependentLook()
 //        {
-//            if(m_Moving || m_Aiming){
+//            if (m_Moving || m_Aiming)
+//            {
 //                return false;
 //            }
 //            //if(m_Aiming) return true;
@@ -461,162 +455,127 @@
 
 //        #endregion
 
+
 //        protected virtual void CheckGround()
 //        {
-//            //  First, do anything that is independent of a character action.
+//            m_GroundDistance = 10;
 
-
-//            //  Does the current active character action virtual this method.
-//            if (m_CheckGround == true)
+//            m_GroundCheckHeight = m_CapsuleCollider.center.y - m_CapsuleCollider.height / 2 + m_SkinWidth;
+//            groundCastOrigin = m_Rigidbody.position + Vector3.up * m_GroundCheckHeight;
+//            groundCheckMaxDistance = m_CapsuleCollider.radius;
+//            groundRayHit = false;
+//            if (Physics.Raycast(groundCastOrigin, Vector3.down, out m_GroundHit, groundCheckMaxDistance, m_Layers.SolidLayers))
 //            {
-//                m_GroundDistance = 10;
-
-//                m_GroundCheckHeight = m_CapsuleCollider.center.y - m_CapsuleCollider.height / 2 + m_SkinWidth;
-//                groundCastOrigin = m_Rigidbody.position + Vector3.up * m_GroundCheckHeight;
-//                groundCheckMaxDistance = m_CapsuleCollider.radius;
-//                groundRayHit = false;
-//                if (Physics.Raycast(groundCastOrigin, Vector3.down,
-//                                    out m_GroundHit, groundCheckMaxDistance, m_Layers.SolidLayers))
+//                if (m_GroundHit.transform != m_Transform)
 //                {
-//                    if(m_GroundHit.transform != m_Transform)
-//                    {
-//                        groundRayHit = true;
-//                        //m_GroundDistance = m_Transform.position.y - m_GroundHit.point.y;
-//                        m_GroundDistance = Vector3.Project(m_Rigidbody.position - m_GroundHit.point, m_Transform.up).magnitude;
-//                        m_GroundNormal = m_GroundHit.normal;
-//                    }
-
+//                    groundRayHit = true;
+//                    //m_GroundDistance = m_Transform.position.y - m_GroundHit.point.y;
+//                    m_GroundDistance = Vector3.Project(m_Rigidbody.position - m_GroundHit.point, m_Transform.up).magnitude;
+//                    m_GroundNormal = m_GroundHit.normal;
 //                }
 
-//                sphereCastOrigin = m_Rigidbody.position + Vector3.up * m_CapsuleCollider.radius;
-//                //sphereCastRadius = m_CapsuleCollider.radius - m_SkinWidth;
-//                sphereCastRadius = m_CapsuleCollider.radius * 0.9f;
-//                sphereCastMaxDistance = m_CapsuleCollider.radius + 2;
-//                sphereCastHitDistance = sphereCastMaxDistance;
-//                groundSphereHit = false;
-//                if (Physics.SphereCast(sphereCastOrigin, sphereCastRadius,
-//                                       Vector3.down, out m_GroundHit, sphereCastMaxDistance, m_Layers.SolidLayers))
-//                {
-//                    sphereCastHitDistance = m_GroundHit.distance;
-//                    groundSphereHit = true;
-//                    // check if sphereCast distance is small than the ray cast distance
-//                    if (m_GroundDistance > (m_GroundHit.distance - m_CapsuleCollider.radius * 0.1f))
-//                        m_GroundDistance = (m_GroundHit.distance - m_CapsuleCollider.radius * 0.1f);
-//                }
-
-
-
-
-//                m_GroundDistance = (float)Math.Round(m_GroundDistance, 2);
-//                var groundCheckDistance = 0.2f;
-
-//                //  Character is grounded.
-//                if(m_GroundDistance < 0.05f)
-//                {
-//                    Vector3 horizontalVelocity = Vector3.Project(m_Rigidbody.velocity, m_Gravity);
-//                    m_Stickiness = m_GroundStickiness * horizontalVelocity.magnitude * m_AirbornThreshold;
-//                    m_SlopeAngle = Vector3.Angle(m_Transform.forward, m_GroundNormal) - 90;
-
-//                    m_Animator.applyRootMotion = m_UseRootMotion;
-//                    m_Grounded = true;
-//                }
-//                else
-//                {
-//                    if (m_GroundDistance >= groundCheckDistance)
-//                    {
-//                        m_InputVector = Vector3.zero;
-//                        m_GroundNormal = m_Transform.up;
-//                        m_SlopeAngle = 0;
-//                        m_Rigidbody.AddForce(m_Gravity * m_GravityModifier);
-
-//                        m_Animator.applyRootMotion = false;
-//                        m_Grounded = false;
-//                    }
-                       
-//                }
-
-//                //if (m_Debug) Debug.DrawRay(m_GroundHit.point, m_GroundNormal, Color.magenta);
-
-//                groundHitPoint = m_Grounded ? m_GroundHit.point : Vector3.zero;
 //            }
 
-//            if (m_Grounded)
+//            sphereCastOrigin = m_Rigidbody.position + Vector3.up * m_CapsuleCollider.radius;
+//            //sphereCastRadius = m_CapsuleCollider.radius - m_SkinWidth;
+//            sphereCastRadius = m_CapsuleCollider.radius * 0.9f;
+//            sphereCastMaxDistance = m_CapsuleCollider.radius + 2;
+//            sphereCastHitDistance = sphereCastMaxDistance;
+//            groundSphereHit = false;
+//            if (Physics.SphereCast(sphereCastOrigin, sphereCastRadius,
+//                                    Vector3.down, out m_GroundHit, sphereCastMaxDistance, m_Layers.SolidLayers))
 //            {
-//                DetectEdge();
+//                sphereCastHitDistance = m_GroundHit.distance;
+//                groundSphereHit = true;
+//                // check if sphereCast distance is small than the ray cast distance
+//                if (m_GroundDistance > (m_GroundHit.distance - m_CapsuleCollider.radius * 0.1f))
+//                    m_GroundDistance = (m_GroundHit.distance - m_CapsuleCollider.radius * 0.1f);
 //            }
+
+
+//            m_GroundDistance = (float)Math.Round(m_GroundDistance, 2);
+//            var groundCheckDistance = 0.2f;
+
+//            //  Character is grounded.
+//            if (m_GroundDistance < 0.05f)
+//            {
+//                Vector3 horizontalVelocity = Vector3.Project(m_Rigidbody.velocity, m_Gravity);
+//                m_Stickiness = m_GroundStickiness * horizontalVelocity.magnitude * m_AirbornThreshold;
+//                m_SlopeAngle = Vector3.Angle(m_Transform.forward, m_GroundNormal) - 90;
+
+//                m_Grounded = true;
+//            }
+//            else
+//            {
+//                if (m_GroundDistance >= groundCheckDistance)
+//                {
+//                    m_InputVector = Vector3.zero;
+//                    m_GroundNormal = m_Transform.up;
+//                    m_SlopeAngle = 0;
+
+//                    //m_Rigidbody.AddForce(m_Gravity * m_GravityModifier);
+
+
+//                    m_Grounded = false;
+//                }
+
+//            }
+
+//            //if (m_Debug) Debug.DrawRay(m_GroundHit.point, m_GroundNormal, Color.magenta);
+//            groundHitPoint = m_Grounded ? m_GroundHit.point : Vector3.zero;
 //        }
-
-
 
 
 //        //  Ensure the current movement direction is valid.
 //        protected virtual void CheckMovement()
 //        {
-//            if (m_CheckMovement == false) return;
+//            m_Moving = m_InputVector != Vector3.zero;
+//            if (m_Moving == false) return;
 
 
-
-//            //  We want the cos angle since we know "adjacent" and "hypotenuse".
-//            float stopMovementAngle = Mathf.Acos(m_StopMovementThreshold) * Mathf.Rad2Deg;
-//            float checkDistance = 2;
-
-
-//            float nearestHitDistance = 0;
-//            float hitDetectionDotProduct = -1;
-//            RaycastHit detectionHitInfo;
+//            float direction = Mathf.Clamp(m_InputVector.z, -1, 1);
+//            if (direction == 0) direction = 1;
+//            float rayLength = 2f + m_SkinWidth;
+//            float dstBetweenRays = 0.4f;
 
 
-//            //  Check look direction.
-//            if (DetectionRaycast(Mathf.Acos(1) * Mathf.Rad2Deg, out detectionHitInfo, checkDistance, m_DetectObjectHeight, m_Layers.SolidLayers))
+//            float colliderHeight = m_CapsuleCollider.height - (m_SkinWidth * 2);
+//            int horizontalRayCount = mDetectHorizontalCollision ? Mathf.RoundToInt(colliderHeight / dstBetweenRays) : 3;
+//            float horizontalRaySpacing = colliderHeight / (horizontalRayCount - 1);
+
+
+//            RaycastHit hit;
+//            for (int i = 0; i < horizontalRayCount; i++)
 //            {
-//                if (detectionHitInfo.distance <= nearestHitDistance)
+//                Vector3 rayOrigin = RaycastOrigin + m_Transform.forward * (m_CapsuleCollider.radius - m_SkinWidth);
+//                rayOrigin += Vector3.up * (horizontalRaySpacing * i);
+
+//                bool hitDetected = Physics.Raycast(rayOrigin, m_Transform.forward * direction, out hit, rayLength, m_ColliderLayerMask);
+//                if (hitDetected && hit.collider != null)
 //                {
-//                    nearestHitDistance = detectionHitInfo.distance;
-//                    hitDetectionDotProduct = Vector3.Dot(detectionHitInfo.normal, Vector3.up);
+//                    float slopeAngle = Vector3.Angle(hit.normal, Vector3.up);
+//                    if (i == 0 && slopeAngle <= m_SlopeLimit)
+//                    {
+
+//                    }
+//                    if (slopeAngle > m_SlopeLimit)
+//                    {
+//                        if (hit.distance < Mathf.Abs(direction))
+//                        {
+//                            m_Moving = false;
+//                        }
+//                        rayLength = hit.distance;
+//                    }
 //                }
-//            }
-//            //  Check left side
-//            if (DetectionRaycast(-stopMovementAngle, out detectionHitInfo, checkDistance, m_DetectObjectHeight, m_Layers.SolidLayers))
-//            {
-//                if (detectionHitInfo.distance <= nearestHitDistance){
-//                    nearestHitDistance = detectionHitInfo.distance;
-//                    hitDetectionDotProduct = Vector3.Dot(detectionHitInfo.normal, Vector3.up);
-//                }
-//            }
-//            //  Check right side./
-//            if (DetectionRaycast(stopMovementAngle, out detectionHitInfo, checkDistance, m_DetectObjectHeight, m_Layers.SolidLayers))
-//            {
-//                if (detectionHitInfo.distance <= nearestHitDistance){
-//                    nearestHitDistance = detectionHitInfo.distance;
-//                    hitDetectionDotProduct = Vector3.Dot(detectionHitInfo.normal, Vector3.up);
-//                }
-//            }
 
 
 
+//                if (m_Debug) Debug.DrawRay(rayOrigin, m_Transform.forward * direction * rayLength, hitDetected == true ? Color.blue : Color.grey);
+//            }
+
+
+//            m_Animator.SetBool(HashID.Moving, m_Moving);
 //        }
-
-
-
-//        protected bool DetectionRaycast(float stopMovementAngle, out RaycastHit hitInfo, float checkDistance, float checkHeight = 0.4f, int layerMask = 1 << 27)
-//        {
-//            //checkHeight = Mathf.Clamp(checkHeight, 0, m_CapsuleCollider.height);
-//            //  TODO: check if stopMovementAngle exceedes 180.
-
-//            Vector3 hitDetectionStartRay = m_Transform.position + Vector3.up * checkHeight;
-//            Quaternion rayRotation = Quaternion.AngleAxis(stopMovementAngle, m_Transform.up) * m_Transform.rotation;
-//            Vector3 hitDetectionEndRay = rayRotation * m_Transform.InverseTransformDirection(m_Transform.forward);
-
-//            bool hitObject = false;
-//            if (Physics.Raycast(hitDetectionStartRay, hitDetectionEndRay + Vector3.up * checkHeight, out hitInfo, checkDistance, layerMask)){
-//                if (hitInfo.collider != null){
-//                    hitObject = true;
-//                }
-//            }
-//            Debug.DrawRay(hitDetectionStartRay, hitDetectionEndRay * checkDistance, hitObject == true ? Color.red : Color.blue);
-//            return hitObject;
-//        }
-
 
 
 
@@ -625,176 +584,239 @@
 //        //  Update the rotation forces.
 //        protected virtual void UpdateRotation()
 //        {
-//            if (m_UpdateRotation == false) return;
+//            Vector3 axisSign = Vector3.Cross(m_LookDirection, m_Transform.forward);
+//            m_InputAngle = Vector3.Angle(m_Transform.forward, m_LookDirection) * (axisSign.y >= 0 ? -1f : 1f) * m_DeltaTime;
+//            m_InputAngle = (float)Math.Round(m_InputAngle, 2);
+
+//            //  Add any LookRotation from OnAnimatorUpdate()
+//            m_Rigidbody.MoveRotation(m_Transform.rotation * m_LookRotation.normalized);
+//            m_LookRotation = Quaternion.identity;
+
+//            //  Get the turn amount from the input vector.
+//            Vector3 local = m_Transform.InverseTransformDirection(m_LookDirection);
+//            float turnAmount = Mathf.Atan2(local.x, local.z) * Mathf.Rad2Deg;
+//            if (m_InputVector == Vector3.zero)
+//                turnAmount *= (1.01f - (Mathf.Abs(turnAmount) / 180)) * m_IdleRotationMultiplier;
 
 //            switch (m_MovementType)
 //            {
 //                case (MovementType.Adventure):
 
-//                    Vector3 axisSign = Vector3.Cross(m_LookDirection, m_Transform.forward);
-//                    m_InputAngle = Vector3.Angle(m_Transform.forward, m_LookDirection) * (axisSign.y >= 0 ? -1f : 1f) * m_DeltaTime;
-//                    m_InputAngle = (float)Math.Round(m_InputAngle, 2);
+//                    //  -- Get the start move angle
+//                    if (m_Moving && Mathf.Abs(m_InputAngle) < 10)
+//                        m_StartAngle = Mathf.SmoothDamp(m_StartAngle, 0, ref m_StartAngleSmooth, 0.25f);
+//                    else if (!m_Moving)
+//                        m_StartAngle = m_InputAngle;
+//                    m_StartAngle = Mathf.Approximately(m_StartAngle, 0) ? 0 : (float)Math.Round(m_StartAngle, 2);
+//                    //  Set the animator parameter.
+//                    m_Animator.SetFloat(HashID.StartAngle, m_StartAngle);
+//                    //   ---
 
-//                    if (m_Moving && m_LookDirection.sqrMagnitude > 0.2f)
+//                    if (m_Moving && m_LookDirection.sqrMagnitude > 0.0f)
 //                    {
-//                        Vector3 local = m_Transform.InverseTransformDirection(m_LookDirection);
-//                        float angle = Mathf.Atan2(local.x, local.z) * Mathf.Rad2Deg;
-//                        if (m_InputVector == Vector3.zero)
-//                            angle *= (1.01f - (Mathf.Abs(angle) / 180)) * 1;
-
-//                        //m_Rigidbody.MoveRotation(Quaternion.AngleAxis(angle * m_DeltaTime * m_RotationSpeed, m_Transform.up) * m_Rigidbody.rotation);
-
-//                        Quaternion rotation = Quaternion.AngleAxis(angle * m_DeltaTime * m_RotationSpeed, m_Transform.up);
-//                        if (m_Grounded){
+//                        m_LookRotation = Quaternion.AngleAxis(turnAmount * m_DeltaTime * m_RotationSpeed, m_Transform.up);
+//                        if (m_Grounded)
+//                        {
 //                            Vector3 d = transform.position - m_Animator.pivotPosition;
-//                            m_Rigidbody.MovePosition(m_Animator.pivotPosition + rotation * d);
+//                            m_Rigidbody.MovePosition(m_Animator.pivotPosition + m_LookRotation * d);
 //                        }
-//                        m_Rigidbody.MoveRotation(rotation * m_Rigidbody.rotation);
+//                        m_Rigidbody.MoveRotation(m_LookRotation * m_Rigidbody.rotation);
 //                    }
-//                    return;
+//                    else
+//                    {
+//                        m_LookRotation = Quaternion.AngleAxis(turnAmount * m_DeltaTime * m_RotationSpeed, m_Transform.up);
+//                        if (m_Grounded)
+//                        {
+//                            Vector3 d = transform.position - m_Animator.pivotPosition;
+//                            m_Rigidbody.MovePosition(m_Animator.pivotPosition + m_LookRotation * d);
+//                        }
+//                        m_Rigidbody.MoveRotation(m_LookRotation * m_Rigidbody.rotation);
+
+//                        //float turnSpeed = Mathf.Lerp(m_IdleRotationMultiplier * m_RotationSpeed, m_RotationSpeed, local.z);
+//                        //turnSpeed = Mathf.SmoothDampAngle(turnSpeed, turnSpeed * turnAmount, ref m_RotationSmoothDamp, 0.1f);
+//                        //m_LookRotation = Quaternion.Euler(0, turnSpeed, 0);
+//                        //m_Rigidbody.MoveRotation(m_LookRotation * m_Rigidbody.rotation);
+//                        //m_LookRotation = Quaternion.AngleAxis(rotationAngle, Vector3.up);
+//                        //m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Rigidbody.rotation, m_LookRotation * m_Rigidbody.rotation, m_DeltaTime * m_RotationSpeed));
+//                    }
+
+//                    break;
 
 
 //                case (MovementType.Combat):
 
-//                    return;
-//            }
-//        }
+//                    if (m_Moving && m_LookDirection.sqrMagnitude > 0.2f)
+//                    {
+//                        m_LookRotation = Quaternion.AngleAxis(turnAmount * m_DeltaTime * m_RotationSpeed, m_Transform.up);
+//                        if (m_Grounded)
+//                        {
+//                            Vector3 d = transform.position - m_Animator.pivotPosition;
+//                            m_Rigidbody.MovePosition(m_Animator.pivotPosition + m_LookRotation * d);
+//                        }
+//                        m_Rigidbody.MoveRotation(m_LookRotation * m_Rigidbody.rotation);
+//                    }
 
+//                    break;
+//            }
+
+//            m_Animator.SetFloat(HashID.Rotation, (m_InputAngle * Mathf.Deg2Rad));
+
+//        }
 
 
 //        //  Apply any movement.
 //        protected virtual void UpdateMovement()
 //        {
-//            if (m_UpdateMovement == false) return;
+//            #region Slope
+//            //float directionZ = Mathf.Sign(m_Velocity.z);
+
+//            //RaycastHit hitInfo;
+//            //if (Physics.Raycast(m_Transform.position + Vector3.up * m_SkinWidth, m_Transform.forward, out hitInfo, 1, m_ColliderLayerMask))
+//            //{
+//            //    m_SlopeAngle = Vector3.Angle(hitInfo.normal, Vector3.up);
+//            //    if (m_Grounded && m_SlopeAngle <= m_SlopeLimit)
+//            //    {
+//            //        float distanceToSlopeStart = 0;
+//            //        if (m_SlopeAngle > 0)
+//            //        {
+//            //            distanceToSlopeStart = hitInfo.distance - m_SkinWidth;
+//            //            m_Velocity.z -= distanceToSlopeStart * directionZ;
+//            //        }
+
+//            //        float moveDistance = Mathf.Abs(m_Velocity.z);
+//            //        float climbVelocityY = Mathf.Sin(m_SlopeAngle * Mathf.Deg2Rad) * moveDistance;
+
+//            //        if (m_Velocity.y <= climbVelocityY)
+//            //        {
+//            //            m_Velocity.y = climbVelocityY;
+//            //            m_Velocity.z = Mathf.Cos(m_SlopeAngle * Mathf.Deg2Rad) * moveDistance * Mathf.Sign(m_Velocity.z);
+//            //        }
+
+//            //        m_Velocity.z += distanceToSlopeStart * directionZ;
+//            //    }
+
+//            //    if (m_SlopeAngle > m_SlopeLimit)
+//            //    {
+//            //        m_Velocity.z = (hitInfo.distance - m_SkinWidth) * directionZ;
+
+//            //        if (Vector3.Angle(m_Transform.forward, m_GroundNormal) - 90 > 0)
+//            //        {
+//            //            m_Velocity.x = m_Velocity.y / Mathf.Tan(m_SlopeAngle * Mathf.Deg2Rad) * Mathf.Sign(Velocity.x);
+//            //            m_Velocity.y = Mathf.Tan(m_SlopeAngle * Mathf.Deg2Rad) * Mathf.Abs(Velocity.x);
+//            //        }
+//            //    }
+//            //}
+//            //Debug.DrawRay(m_Transform.position + (Vector3.up * m_SkinWidth), m_Transform.forward * 1, Color.red);
+//            #endregion
+
+//            if (m_Grounded)
+//            {
+//                m_MoveDirection = Vector3.Cross(m_Transform.right, m_GroundNormal);
+//                if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_SkinWidth) + m_Transform.right * m_SkinWidth, m_MoveDirection * 1, Color.cyan);
+
+//                m_Velocity = m_MoveDirection.normalized * m_MovementSpeed * m_InputVector.z;
+//            }
+//            //  If airborne.
+//            else
+//            {
+//                float m_AirSpeed = 6;
+//                m_MoveDirection = (Quaternion.Inverse(m_Transform.rotation) * m_Transform.forward) * m_AirSpeed;
+//                m_Velocity = Vector3.Project(m_MoveDirection, m_Gravity * m_GravityModifier);
+
+//            }
+
+//            //var verticalVelocity = Vector3.Project(m_Rigidbody.velocity, m_Gravity * m_GravityModifier);
+//            //m_Velocity += verticalVelocity;
+
+//            if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_SkinWidth), m_Velocity, Color.yellow);
+//            m_Rigidbody.AddForce(m_Velocity * m_DeltaTime, ForceMode.VelocityChange);
+//        }
+
+
+//        protected virtual void Move()
+//        {
+//            Vector3 moveDirection = Vector3.Cross(m_Transform.right, m_GroundNormal);
+//            m_Velocity.z = moveDirection.z * m_InputVector.z;
+//            m_Velocity.y += m_Gravity.y * m_DeltaTime;
 
 //            switch (m_MovementType)
 //            {
 //                case (MovementType.Adventure):
 
-//                    if (m_Grounded)
+//                    if (m_UseRootMotion)
 //                    {
-//                        //  Get the start move angle
-//                        if (m_Moving && Mathf.Abs(m_InputAngle) < 10)
-//                            m_StartAngle = Mathf.SmoothDamp(m_StartAngle, 0, ref m_StartAngleSmooth, 0.25f);
-//                        else if (!m_Moving)
-//                            m_StartAngle = m_InputAngle;
-//                        m_StartAngle = Mathf.Approximately(m_StartAngle, 0) ? 0 : (float)Math.Round(m_StartAngle, 2);
-//                        //   ---
+//                        float angleInDegrees;
+//                        Vector3 rotationAxis;
+//                        m_Animator.deltaRotation.ToAngleAxis(out angleInDegrees, out rotationAxis);
+//                        Vector3 angularDisplacement = rotationAxis * angleInDegrees * Mathf.Deg2Rad * m_RotationSpeed;
+//                        m_Rigidbody.angularVelocity = angularDisplacement;
 
 
-//                        m_MoveDirection = Vector3.Cross(m_Transform.right, m_GroundNormal);
+//                        //velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y * m_CapsuleCollider.height;
+//                        //Vector3 velocity = (m_Animator.deltaPosition / m_DeltaTime);
+//                        //velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
+//                        //m_Rigidbody.velocity = velocity;
 
-//                        if (m_SlopeAngle > 0 || m_SlopeAngle < 0)
-//                        {
-//                            Vector3 slopeDirection = new Vector3(0,
-//                                        (1 - Mathf.Cos(m_SlopeAngle * Mathf.Deg2Rad) * m_CapsuleCollider.radius),
-//                                        (Mathf.Sin(m_SlopeAngle * Mathf.Deg2Rad) * m_CapsuleCollider.radius)) * m_CapsuleCollider.radius;
-//                            m_MoveDirection = Quaternion.Inverse(m_Rigidbody.rotation) * Vector3.RotateTowards(m_MoveDirection, slopeDirection, 10 * m_DeltaTime, 1f);
-//                        }
-
-//                        m_Velocity = m_MoveDirection.normalized * m_MovementSpeed;
-//                        //m_Velocity = m_MoveDirection.normalized;
-
+//                        m_Velocity = (m_Animator.deltaPosition / m_DeltaTime);
+//                        //m_Velocity = m_Velocity.normalized + (m_Animator.deltaPosition / m_DeltaTime);
+//                        m_Velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
+//                        m_Rigidbody.velocity = m_Velocity;
 //                    }
-//                    //  If airborne.
 //                    else
 //                    {
-//                        float m_AirSpeed = 6;
-//                        m_MoveDirection = (Quaternion.Inverse(m_Transform.rotation) * m_Transform.forward) * m_AirSpeed;
-//                        m_Velocity = Vector3.Project(m_MoveDirection, m_Gravity * m_GravityModifier);
+//                        Vector3 targetVelocity = m_Velocity * m_InputVector.magnitude;
+
+//                        if (m_Moving)
+//                            m_Velocity = Vector3.SmoothDamp(m_Velocity, targetVelocity, ref m_VelocitySmooth, m_Acceleration);
+//                        else
+//                            m_Velocity = Vector3.SmoothDamp(m_Velocity, Vector3.zero, ref m_VelocitySmooth, m_MotorDamping);
+
+//                        m_Velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
+//                        m_Rigidbody.velocity = m_Velocity;
 //                    }
-//                    m_VerticalVelocity = Vector3.Project(m_Rigidbody.velocity, m_Gravity * m_GravityModifier);
-//                    m_Velocity = Quaternion.Inverse(m_Rigidbody.rotation) * m_Velocity + m_VerticalVelocity;
 
+//                    break;
 
-//                    m_Rigidbody.AddForce(m_Velocity * m_DeltaTime, ForceMode.VelocityChange);
-
-//                    return;
 //                case (MovementType.Combat):
 
-//                    return;
+//                    break;
+//            }
+
+//            if (m_Grounded)
+//            {
+//                m_Rigidbody.velocity = Vector3.ProjectOnPlane(m_Rigidbody.velocity, m_GroundNormal * m_Stickiness);
 //            }
 
 
 //        }
 
 
-
-//        protected virtual void Move()
-//		{
-//            if(m_Move == true)
-//            {
-//                if (m_UseRootMotion)
-//                {
-//                    float angleInDegrees;
-//                    Vector3 rotationAxis;
-//                    m_Animator.deltaRotation.ToAngleAxis(out angleInDegrees, out rotationAxis);
-//                    Vector3 angularDisplacement = rotationAxis * angleInDegrees * Mathf.Deg2Rad * m_RotationSpeed;
-//                    m_Rigidbody.angularVelocity = angularDisplacement;
-
-
-//                    //velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y * m_CapsuleCollider.height;
-//                    Vector3 velocity = (m_Animator.deltaPosition / m_DeltaTime);
-//                    velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
-//                    m_Rigidbody.velocity = velocity;
-//                }
-//                else
-//                {
-//                    m_Velocity.y = m_Grounded ? 0 : m_Rigidbody.velocity.y;
-//                    m_Rigidbody.velocity = Vector3.SmoothDamp(m_Rigidbody.velocity, m_Velocity, ref m_VelocitySmooth, m_Acceleration);
-//                    //m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, m_MovementSpeed);
-//                    m_Rigidbody.velocity = m_Velocity * m_InputVector.sqrMagnitude;
-//                }
-
-
-//                if (m_Grounded){
-//                    m_Rigidbody.velocity = Vector3.ProjectOnPlane(m_Rigidbody.velocity, m_GroundNormal * m_Stickiness);
-//                }
-//            }
-
-//		}
-
-
-
-
+//        public virtual void Move(float horizontalMovement, float forwardMovement, Quaternion lookRotation)
+//        {
+//            throw new NotImplementedException(string.Format("<color=yellow>{0}</color> MoveCharacter not Implemented.", GetType()));
+//        }
 
 
 //        protected void UpdateAnimator()
 //        {
-//            //  First, do anything that is independent of a character action.
-//            //  -----------
-
-//            // The anim speed multiplier allows the overall speed of walking/running to be tweaked in the inspector,
-//            // which affects the movement speed because of the root motion.
-//            m_Animator.speed = m_RootMotionSpeedMultiplier;
-
-//            m_Animator.SetFloat(HashID.StartAngle, m_StartAngle);
-//            m_Animator.SetBool(HashID.Moving, m_Moving);
-//            m_Animator.SetFloat(HashID.InputAngle, (m_InputAngle * Mathf.Deg2Rad));
-//            //var localVelocity = Quaternion.Inverse(m_Transform.rotation) * (m_Rigidbody.velocity / m_Acceleration);
 
 //            //  1 means left foot is up. 
 //            m_Animator.SetFloat(HashID.LegUpIndex, m_Animator.pivotWeight);
-
+//            m_Animator.SetBool(HashID.Moving, m_Moving);
 
 //            //  -----------
 //            //  Does a character action virtual the controllers update animator.
 //            //  -----------
-//            if (m_UpdateAnimator == true)
+//            if (m_Grounded)
 //            {
-//                if(m_Grounded){
-//                    //  Movement Input
-//                    //m_Animator.applyRootMotion = true;
-//                    m_AnimationMonitor.SetForwardInputValue(m_InputVector.z);
-//                    m_AnimationMonitor.SetHorizontalInputValue(m_InputVector.x);
-//                }
-//                else{
-//                    //m_AnimationMonitor.SetForwardInputValue(0);
-//                    //m_AnimationMonitor.SetHorizontalInputValue(0);
-//                    //m_Animator.applyRootMotion = false;
-//                    m_Animator.SetFloat(HashID.ForwardInput, 0);
-//                    m_Animator.SetFloat(HashID.HorizontalInput, 0);
-//                }
+//                //  Movement Input
+//                m_AnimationMonitor.SetForwardInputValue(m_InputVector.z);
+//                m_AnimationMonitor.SetHorizontalInputValue(m_InputVector.x);
+//            }
+//            else
+//            {
+//                m_Animator.SetFloat(HashID.ForwardInput, 0);
+//                m_Animator.SetFloat(HashID.HorizontalInput, 0);
 //            }
 //        }
 
@@ -816,13 +838,70 @@
 
 //        //protected void OnCollisionEnter(Collision collision)
 //        //{
-
+//        //    //for (int i = 0; i < collision.contacts.Length; i++)
+//        //    //{
+//        //    //    ContactPoint contact = collision.contacts[i];
+//        //    //    if(m_Debug) Debug.DrawRay(contact.point, contact.normal, Color.white, 1.25f);
+//        //    //}
 //        //}
 
 
 
 
 //        #region Public Functions
+
+
+
+
+
+
+//        protected void VerticalCollision()
+//        {
+//            //  We want the cos angle since we know "adjacent" and "hypotenuse".
+//            float startAngle = Mathf.Acos(m_StopMovementThreshold) * Mathf.Rad2Deg;
+//            float checkHeight = m_CapsuleCollider.height / 2;
+//            float rayDistance = 2;
+//            float verticalAngle = 15;
+
+//            Quaternion startRayRotation = Quaternion.AngleAxis(-startAngle, Vector3.up);
+//            Vector3 startRay = startRayRotation * m_Transform.forward;
+//            Vector3 startDir = startRay;
+
+//            float angleAmount = (startAngle * 2) / (m_VerticalCollisionCount - 1);
+
+//            bool detectEdge = false;
+
+//            Vector3 raycastOrigin = m_Transform.position + Vector3.up * checkHeight;
+
+//            for (int i = 0; i < m_VerticalCollisionCount; i++)
+//            {
+//                if (i == 0) continue;
+//                startDir = Quaternion.AngleAxis(angleAmount, Vector3.up) * startDir;
+//                Vector3 hitDirection = startDir;
+
+//                Quaternion angleRotation = Quaternion.AngleAxis(verticalAngle, m_Transform.right);
+//                hitDirection = Vector3.ClampMagnitude(angleRotation * hitDirection, rayDistance);
+
+
+//                if (Physics.Raycast(raycastOrigin, hitDirection + Vector3.up * checkHeight, rayDistance, m_ColliderLayerMask) == false)
+//                {
+
+//                    Vector3 start = m_Transform.position + (m_Transform.forward * m_CapsuleCollider.radius);
+//                    start.y += m_DetectObjectHeight;
+//                    float maxDetectEdgeDistance = 1 + m_DetectObjectHeight;
+//                    if (Physics.Raycast(start, Vector3.down, maxDetectEdgeDistance, m_ColliderLayerMask) == false)
+//                    {
+//                        detectEdge = true;
+//                    }
+//                }
+
+//                if (m_DebugCollisions) Debug.DrawRay(raycastOrigin, hitDirection * rayDistance, detectEdge == true ? Color.red : Color.grey);
+//            }
+
+
+//        }
+
+
 
 //        public bool DetectEdge()
 //        {
@@ -840,10 +919,11 @@
 
 
 
-//            if (Physics.Raycast(m_Transform.position + (Vector3.up * m_DetectObjectHeight), m_Transform.forward,  2, m_Layers.SolidLayers ) == false )
+//            if (Physics.Raycast(m_Transform.position + (Vector3.up * m_DetectObjectHeight), m_Transform.forward, 2, m_Layers.SolidLayers) == false)
 //            {
 
-//                if (Physics.Raycast(start, dir, maxDetectEdgeDistance, m_Layers.SolidLayers) == false){
+//                if (Physics.Raycast(start, dir, maxDetectEdgeDistance, m_Layers.SolidLayers) == false)
+//                {
 //                    detectEdge = true;
 //                }
 //            }
@@ -865,7 +945,8 @@
 
 //            if (rayCount < 1) rayCount = 1;
 
-//            if (Physics.Raycast(start, dir, out raycastHit, maxDistance, layerMask)){
+//            if (Physics.Raycast(start, dir, out raycastHit, maxDistance, layerMask))
+//            {
 //                detectObject = true;
 //            }
 
@@ -874,19 +955,22 @@
 //        }
 
 
-//        public void SetPosition(Vector3 position){
+
+
+
+
+
+
+
+//        public void SetPosition(Vector3 position)
+//        {
 //            m_Rigidbody.MovePosition(position);
 //        }
 
 
-//        public void SetRotation(Quaternion rotation){
-//            m_Rigidbody.MoveRotation(rotation.normalized);
-//        }
-
-
-//		public void MoveCharacter(float horizontalMovement, float forwardMovement, Quaternion lookRotation)
+//        public void SetRotation(Quaternion rotation)
 //        {
-//            throw new NotImplementedException(string.Format("<color=yellow>{0}</color> MoveCharacter not Implemented.", GetType()));
+//            m_Rigidbody.MoveRotation(rotation.normalized);
 //        }
 
 
@@ -901,224 +985,7 @@
 
 
 
-//        #region Actions
 
-
-//        protected void StopStartAction(CharacterAction charAction)
-//        {
-//            //  First, check if current Action can Start or Stop.
-
-//            //  Current Action is Active.
-//            if (charAction.enabled && charAction.IsActive)
-//            {
-//                //  Check if can stop Action is StopType is NOT Manual.
-//                if (charAction.StopType != ActionStopType.Manual)
-//                {
-//                    if (charAction.CanStopAction())
-//                    {
-//                        //  Start the Action and update the animator.
-//                        charAction.StopAction();
-//                        //  Reset Active Action.
-//                        if (m_ActiveAction = charAction)
-//                            m_ActiveAction = null;
-//                        //  Move on to the next Action.
-//                        return;
-//                    }
-//                }
-//            }
-//            //  Current Action is NOT Active.
-//            else
-//            {
-//                //  Check if can start Action is StartType is NOT Manual.
-//                if (charAction.enabled && charAction.StartType != ActionStartType.Manual)
-//                {
-//                    if (m_ActiveAction == null)
-//                    {
-//                        if (charAction.CanStartAction())
-//                        {
-//                            //  Start the Action and update the animator.
-//                            charAction.StartAction();
-//                            //charAction.UpdateAnimator();
-//                            //  Set active Action if not concurrent.
-//                            if (charAction.IsConcurrentAction() == false)
-//                                m_ActiveAction = charAction;
-//                            //  Move onto the next Action.
-//                            return;
-//                        }
-//                    }
-//                    else if (charAction.IsConcurrentAction())
-//                    {
-//                        if (charAction.CanStartAction())
-//                        {
-//                            //  Start the Action and update the animator.
-//                            charAction.StartAction();
-//                            //charAction.UpdateAnimator();
-//                            //  Move onto the next Action.
-//                            return;
-//                        }
-//                    }
-//                    else
-//                    {
-//                        return;
-//                    }
-//                }
-//            }
-
-
-//        }
-
-
-//        public T GetAction<T>() where T : CharacterAction
-//        {
-//            for (int i = 0; i < m_Actions.Length; i++){
-//                if (m_Actions[i] is T){
-//                    return (T)m_Actions[i];
-//                }
-//            }
-//            return null;
-//        }
-
-
-//        public bool TryStartAction(CharacterAction action)
-//        {
-//            if (action == null) return false;
-
-//            int index = Array.IndexOf(m_Actions, action);
-//            //  If there is an active action and current action is non concurrent.
-//            if(m_ActiveAction != null && action.IsConcurrentAction() == false){
-//                int activeActionIndex = Array.IndexOf(m_Actions, m_ActiveAction);
-//                //Debug.LogFormat("Action index {0} | Active Action index {1}", index, activeActionIndex);
-//                if(index < activeActionIndex){
-//                    if (action.CanStartAction()){
-//                        //  Stop the current active action.
-//                        TryStopAction(m_ActiveAction);
-//                        //  Set the active action.
-//                        m_ActiveAction = m_Actions[index];
-//                        //m_ActiveActions[index] = m_Actions[index];
-//                        action.StartAction();
-//                        //action.UpdateAnimator();
-//                        return true;
-//                    }
-//                } 
-//            }
-//            //  If there is an active action and current action is concurrent.
-//            else if (m_ActiveAction != null && action.IsConcurrentAction())
-//            {
-//                if (action.CanStartAction()){
-//                    //m_ActiveActions[index] = m_Actions[index];
-//                    action.StartAction();
-//                    //action.UpdateAnimator();
-//                    return true;
-//                }
-//            }
-//            //  If there is no active action.
-//            else if (m_ActiveAction == null){
-//                if (action.CanStartAction())
-//                {
-//                    m_ActiveAction = m_Actions[index];
-//                    //m_ActiveActions[index] = m_Actions[index];
-//                    action.StartAction();
-//                    //action.UpdateAnimator();
-//                    return true;
-//                }
-//            }
-
-
-//            return false;
-//        }
-
-
-//        public void TryStopAllActions()
-//        {
-//            for (int i = 0; i < m_Actions.Length; i++)
-//            {
-//                if (m_Actions[i].IsActive)
-//                {
-//                    TryStopAction(m_Actions[i]);
-//                }
-//            }
-//        }
-
-
-//        public void TryStopAction(CharacterAction action)
-//        {
-//            if (action == null) return; 
-
-//            if (action.CanStopAction()){
-//                int index = Array.IndexOf(m_Actions, action);
-//                if (m_ActiveAction == action)
-//                    m_ActiveAction = null;
-
-
-//                action.StopAction();
-//                ActionStopped();
-//            }
-//        }
-
-
-//        public void TryStopAction(CharacterAction action, bool force)
-//        {
-//            if (action == null) return; 
-//            if(force){
-//                int index = Array.IndexOf(m_Actions, action);
-//                if (m_ActiveAction == action)
-//                    m_ActiveAction = null;
-
-
-//                action.StopAction();
-//                ActionStopped();
-//                return;
-//            }
-
-//            TryStopAction(action);
-//        }
-
-//        #endregion
-
-
-
-//        #region OnAction execute
-
-//        protected void OnAimActionStart(bool aim)
-//        {
-//            m_Aiming = aim;
-//            m_MovementType = m_Aiming ? MovementType.Combat : MovementType.Adventure;
-//            //  Call On Aim Delegate.
-//            OnAim(aim);
-
-//            //CameraController.Instance.FreeRotation = aim;
-//            //Debug.LogFormat("Camera Free Rotation is {0}", CameraController.Instance.FreeRotation);
-//        }
-
-
-//        protected void OnActionActive(CharacterAction action, bool activated)
-//        {
-//            int index = Array.IndexOf(m_Actions, action);
-//            if (action == m_Actions[index])
-//            {
-//                if (m_Actions[index].enabled)
-//                {
-//                    if(activated)
-//                    {
-//                        //Debug.LogFormat(" {0} is starting.", action.GetType().Name);
-
-//                    }
-//                    else
-//                    {
-
-//                    }
-//                }
-//            }
-
-//        }
-
-
-//        public void ActionStopped()
-//        {
-
-//        }
-
-//        #endregion
 
 
 
@@ -1138,16 +1005,16 @@
 
 //        protected virtual void DrawGizmos()
 //        {
-//            DrawCheckGroundGizmo();
-
 //            if (m_Rigidbody == null) return;
-//            //  Move direction
-//            Gizmos.color = Color.blue;
-//            Gizmos.DrawRay(m_Rigidbody.position + debugHeightOffset, m_MoveDirection);
 
-//            Gizmos.color = Color.cyan;
-//            Gizmos.DrawSphere(m_CapsuleCollider.bounds.min, 0.05f);
-//            Gizmos.DrawSphere(m_CapsuleCollider.bounds.max, 0.5f);
+//            DrawCheckGroundGizmo();
+//            //  Move direction
+//            //Gizmos.color = Color.blue;
+//            //Gizmos.DrawRay(m_Rigidbody.position + debugHeightOffset, m_MoveDirection);
+
+//            Gizmos.color = Color.magenta;
+//            Gizmos.DrawSphere(m_CapsuleCollider.bounds.min, 0.08f);
+
 //            //GizmosUtils.DrawString("m_LookDirection", m_Transform.position + m_MoveDirection, Color.white);
 //            //  Velocity
 //            //Gizmos.color = Color.cyan;
@@ -1156,13 +1023,13 @@
 
 
 
-//        private void DebugMessages()
+//        protected virtual void DebugMessages()
 //        {
 //            debugMsgs = new string[]
 //            {
-//                string.Format("InputAngle: {0}", m_InputAngle),
-//                string.Format("StopMovement Rad2Deg: {0}", m_StopMovementThreshold * Mathf.Rad2Deg),
-//                string.Format("StopMovement Rad2Deg: {0}", Mathf.Acos(m_StopMovementThreshold) * Mathf.Rad2Deg),
+//                //string.Format("InputAngle: {0}", m_InputAngle),
+//                //string.Format("StopMovement Rad2Deg: {0}", m_StopMovementThreshold * Mathf.Rad2Deg),
+//                //string.Format("StopMovement Rad2Deg: {0}", Mathf.Acos(m_StopMovementThreshold) * Mathf.Rad2Deg),
 //                //string.Format("hitDetectionEndRayAngle: {0}", hitDetectionEndRayAngle ),
 //                //string.Format("VelocityDot: {0}", (float)Math.Round(Vector3.Dot(m_VerticalVelocity, m_Gravity), 2) ),
 //                string.Format("SlopeAngle: {0}", m_SlopeAngle)
@@ -1184,7 +1051,8 @@
 //                Rect rect = CharacterControllerUtility.CharacterControllerRect;
 //                GUI.BeginGroup(rect, GUI.skin.box);
 //                //GUI.Label(rect, debugMessages.ToString(0, debugMessages.Length));
-//                for (int i = 0; i < debugMsgs.Length; i++){
+//                for (int i = 0; i < debugMsgs.Length; i++)
+//                {
 //                    rect.y = 16 * i;
 //                    //GUI.Label(rect, debugMsgs[i]);
 //                    GUI.Label(rect, debugMsgs[i], CharacterControllerUtility.GuiStyle);
@@ -1224,7 +1092,6 @@
 //        }
 
 
-
-//        //------
 //    }
+
 //}

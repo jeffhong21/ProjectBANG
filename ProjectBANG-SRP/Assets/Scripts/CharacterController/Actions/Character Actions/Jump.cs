@@ -23,10 +23,10 @@ namespace CharacterController
         {
             if (base.CanStartAction())
             {
-                if(m_Controller.Moving && m_Controller.DetectEdge() && Time.time > m_NextJump){
-                    return true;
-                }
-
+                //if(m_Controller.Moving && m_Controller.DetectEdge() && Time.time > m_NextJump){
+                //    return true;
+                //}
+                return false;
             }
             return false;
 		}

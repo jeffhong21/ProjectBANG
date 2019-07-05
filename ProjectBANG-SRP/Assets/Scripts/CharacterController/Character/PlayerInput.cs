@@ -31,8 +31,7 @@ namespace CharacterController
         [SerializeField, Tooltip("Shift + what key to debug.break.")]
         private KeyCode m_DebugBreakKeyCode = KeyCode.Tab;
 
-        //[SerializeField, DisplayOnly]
-        private float m_Horizontal, m_Forward;
+
         [SerializeField, DisplayOnly]
         private Vector3 m_InputVector, m_InputVectorRaw;
         //[SerializeField, DisplayOnly]
@@ -105,13 +104,17 @@ namespace CharacterController
 		private void OnEnable()
 		{
             EventHandler.RegisterEvent<bool>(m_GameObject, EventIDs.OnAimActionStart, OnAimActionStart);
-		}
+
+            CharacterDebug.ActiveCharacter = m_Controller;
+        }
 
 
 		private void OnDisable()
 		{
             EventHandler.UnregisterEvent<bool>(m_GameObject, EventIDs.OnAimActionStart, OnAimActionStart);
-		}
+
+            CharacterDebug.ActiveCharacter = null;
+        }
 
 
 		private void Start()
@@ -121,6 +124,11 @@ namespace CharacterController
 
             if (m_Camera == null)
                 m_Camera = Camera.main.transform;
+
+
+            //CharacterDebugUI.Instance.Initialize(m_Controller);
+            //Debug.Log(Resources.Load<CharacterDebugUI>("CharacterDebugUI"));
+
         }
 
 
@@ -132,14 +140,17 @@ namespace CharacterController
         private void Update()
 		{
             //  LOCK CAMERA
-            if (LockCameraRotation() == true) return;
+            //if (LockCameraRotation() == true) return;
 
+            Vector3 lookDirection = m_CameraController == null ? m_Transform.forward : Vector3.Scale(m_Camera.forward, new Vector3(1, 0, 1)).normalized;
+            //Quaternion lookRotation = Quaternion.LookRotation(lookDirection, Vector3.up);
+            Quaternion lookRotation = Quaternion.FromToRotation(m_Transform.forward, lookDirection);
+            m_Controller.Move(InputVectorRaw.x, InputVectorRaw.z, lookRotation);
+            m_Controller.LookDirection = lookDirection;
 
-            m_Controller.InputVector = InputVectorRaw;
-
-
-            m_LookDirection = m_CameraController == null ? m_Transform.forward : Vector3.Scale(m_Camera.forward, new Vector3(1, 0, 1)).normalized;
-            m_Controller.LookDirection = m_LookDirection;
+            //m_Controller.InputVector = InputVectorRaw;
+            //m_LookDirection = m_CameraController == null ? m_Transform.forward : Vector3.Scale(m_Camera.forward, new Vector3(1, 0, 1)).normalized;
+            //m_Controller.LookDirection = m_LookDirection;
 
 
             DebugButtonPress();
@@ -152,10 +163,6 @@ namespace CharacterController
             //  Camera Input
             if (m_CameraController != null)
             {
-                //m_MouseHorizontal = Input.GetAxis(m_RotateCameraXInput);
-                //m_MouseVertical = Input.GetAxis(m_RotateCameraYInput);
-
-                //m_CameraController.RotateCamera(m_MouseHorizontal, m_MouseVertical);
                 m_CameraController.RotateCamera(MouseInputVector.x, MouseInputVector.y);
 
                 //m_CameraController.ZoomCamera(Input.GetAxisRaw(m_MouseScrollInput));
@@ -166,18 +173,18 @@ namespace CharacterController
         }
 
 
-        private bool LockCameraRotation()
-        {
-            if (Input.GetKeyDown(m_LockCameraRotation)){
-                Debug.Log(CameraController.LockRotation);
-                if (CameraController.Instance != null){
-                    CameraController.LockRotation = !CameraController.LockRotation;
-                }
+        //private bool LockCameraRotation()
+        //{
+        //    if (Input.GetKeyDown(m_LockCameraRotation)){
+        //        Debug.Log(CameraController.LockRotation);
+        //        if (CameraController.Instance != null){
+        //            CameraController.LockRotation = !CameraController.LockRotation;
+        //        }
 
-                return true;
-            }
-            return false;
-        }
+        //        return true;
+        //    }
+        //    return false;
+        //}
 
 
 

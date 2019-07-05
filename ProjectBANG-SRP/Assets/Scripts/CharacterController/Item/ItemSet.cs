@@ -1,18 +1,18 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class ItemSet : MonoBehaviour
+﻿namespace CharacterController.Items
 {
-    // Start is called before the first frame update
-    void Start()
+    using UnityEngine;
+
+    /// <summary>
+    /// Default class for Items.
+    /// </summary>
+    public class ItemSet : MonoBehaviour
     {
-        
+
+
+
+
+
+
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

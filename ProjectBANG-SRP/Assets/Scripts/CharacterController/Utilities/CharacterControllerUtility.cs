@@ -9,7 +9,7 @@
     {
         private static int _guiFontSize = 16;
         private static GUIStyle _guiStyle;
-        private static Color _debugTextColor = Color.black;
+        private static Color _debugTextColor = Color.white;
         private static Rect _animatorMonitorRect = new Rect(10, 10, 200, 20);
         private static Rect _characterControllerRect = new Rect(10, 50, 200, 20);
 

@@ -27,8 +27,8 @@ namespace CharacterController
         [Tooltip("Limit vertical axis?")]
         public bool ApplyPitchLimit = true;
         [Tooltip("Minimum and maximum up and down rotation. ")]
-        public float MinPitch = -60;
-        public float MaxPitch = 70;
+        public float XAxisMin = -60;
+        public float XAxisMax = 70;
 
         public bool ApplyCameraOffset;
         [Tooltip("The offset between the anchor and the location of the camera.  This determines the cameras look direction.")]

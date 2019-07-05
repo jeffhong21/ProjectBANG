@@ -66,10 +66,11 @@ public class LevelManager : SingletonMonoBehaviour<LevelManager>
         //  Instantiate the UI.
         inGameMenu = Instantiate(gameData.InGameMenu);
 
-		if (gameData.CameraPrefab != null)
-			cameraController = Instantiate(gameData.CameraPrefab);
-		else
-			cameraController = Instantiate(Resources.Load<CameraController>("Prefabs/PlayerCamera"));
+        if (gameData.CameraPrefab != null)
+            cameraController = Instantiate(gameData.CameraPrefab);
+        else
+            Debug.LogError("No Camera");
+			//cameraController = Instantiate(Resources.Load<CameraController>("Prefabs/PlayerCamera"));
 	}
 
 

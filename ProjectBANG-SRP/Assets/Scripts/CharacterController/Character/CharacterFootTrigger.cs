@@ -59,7 +59,7 @@ namespace CharacterController
                 {
                     //Debug.Log(other.gameObject.name + " | " + other.gameObject.layer);
                     m_Footsteps.StepOnMesh(this);
-                    m_Footsteps.PlayFootFallSound(this);
+                    //m_Footsteps.PlayFootFallSound(this);
                 }
             }
 

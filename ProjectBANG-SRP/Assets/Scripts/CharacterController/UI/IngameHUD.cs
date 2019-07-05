@@ -24,6 +24,13 @@ namespace CharacterController.UI
             gameObject.SetActive(active);
         }
 
-        
+
+        public void RegisterCharacter(CharacterLocomotion controller)
+        {
+
+        }
+
+
+
     }
 }

@@ -24,8 +24,6 @@
         [SerializeField, HideInInspector]
         protected float m_TransitionDuration = 0.2f;
         [SerializeField, HideInInspector]
-        protected string m_ExitStateName;
-        [SerializeField, HideInInspector]
         protected ActionStartType m_StartType = ActionStartType.Manual;
         [SerializeField, HideInInspector]
         protected ActionStopType m_StopType = ActionStopType.Manual;
@@ -535,7 +533,7 @@
             {
                 effect = Instantiate(prefab, m_Transform.position, m_Transform.rotation);
             }
-            Debug.LogFormat("{0} has just spawned {1}", GetType(), effect.name);
+            //Debug.LogFormat("{0} has just spawned {1}", GetType(), effect.name);
             return effect;
         }
 

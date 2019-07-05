@@ -118,14 +118,14 @@
         }
 
 
-        protected void Update()
-        {
-            if (CameraController.Instance == null)
-                return;
-            var horizontalForward = Vector3.Scale(CameraController.Instance.Camera.transform.forward, new Vector3(1, 0, 1)).normalized;
-            m_TooltipUI.forward = horizontalForward;
+        //protected void Update()
+        //{
+        //    if (CameraController.Instance == null)
+        //        return;
+        //    var horizontalForward = Vector3.Scale(CameraController.Instance.Camera.transform.forward, new Vector3(1, 0, 1)).normalized;
+        //    m_TooltipUI.forward = horizontalForward;
 
-        }
+        //}
 
 
 

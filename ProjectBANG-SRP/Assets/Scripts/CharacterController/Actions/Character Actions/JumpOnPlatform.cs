@@ -6,184 +6,180 @@
 
     public class JumpOnPlatform : CharacterAction
     {
-        protected float m_CheckHeight = 0.4f;
 
-        //[Header("-- Climb Object Settings --")]
         [SerializeField]
-        protected float m_MoveToClimbDistance = 2f;
+        protected float checkHeight = 0.4f;
+        [SerializeField]
+        protected float startDistance = 2f;
         [SerializeField, Tooltip("The highest level the character can climb.")]
-        protected float m_MaxHeight = 2f;
+        protected float maxHeight = 2f;
         [SerializeField]
-        protected float m_MinHeight = 0.4f;
+        protected float minHeight = 0.4f;
         [SerializeField]
-        protected LayerMask m_CheckLayers;
+        protected LayerMask collisionLayers;
         [SerializeField]
-        protected AnimatorStateMatchTarget[] m_MatchTargetStates = new AnimatorStateMatchTarget[0];
+        protected AnimatorStateMatchTarget matchTarget;
 
 
+        //  Where to start the vertical raycast.
+        protected Vector3 heightCheckStart;
+        //  Height of the platform
+        protected float height;
 
-        private float m_DistanceToWall;
-        private Vector3 m_Velocity, m_VerticalVelocity;
-        private float m_PlatformHeight, m_HeightDifference;
-        private Vector3 m_StartPosition, m_EndPosition;
+        protected float jumpForce;
+        protected float timeToApex = 0.4f;
+        protected float verticalVelocity;
 
-        private RaycastHit m_WallCheckHit, m_GrabPointHit;
-
-        private MatchTargetWeightMask m_MatchTargetWeightMask = new MatchTargetWeightMask(Vector3.one, 0);
-
-
-        [SerializeField, DisplayOnly]
-        private bool isMatchingTarget;
-        [SerializeField, DisplayOnly]
-        private float normalizeTime;
+        Vector3 velocity;
+        protected Vector3 rayOrigin;
+        protected RaycastHit horizontalRayHit, verticalRayHit;
+        protected Vector3 startPosition, endPosition;
 
 
-        private Vector3 heightCheckStart;
+        protected float velocitySmooth;
+        protected float accelerationTime = 0.1f;
+        //protected float distance;
 
 
-
-        //
-        // Methods
-        //
         public override bool CanStartAction()
         {
-            if (!base.CanStartAction()) return false;
-
-
-
-            if (Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out m_WallCheckHit, m_MoveToClimbDistance, m_CheckLayers))
+            if (base.CanStartAction())
             {
-                //if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance, Color.green);
-                heightCheckStart = m_WallCheckHit.point;
-                //  Add a little buffer to max height.
-                heightCheckStart.y += (m_MaxHeight + 0.1f) - m_CheckHeight;
-                heightCheckStart += m_Transform.forward * m_CapsuleCollider.radius;
+                rayOrigin = m_Transform.position + (Vector3.up * checkHeight) + (m_Transform.forward * (m_CapsuleCollider.radius - 0.1f));
 
-                if(m_Debug) Debug.DrawRay(heightCheckStart, Vector3.down * (m_MaxHeight - m_MinHeight), Color.cyan, 1f);
+                Debug.DrawRay(rayOrigin, m_Transform.forward * startDistance, Color.green);
 
-
-                if (Physics.Raycast(heightCheckStart, Vector3.down, out m_GrabPointHit, (m_MaxHeight - m_MinHeight), m_CheckLayers))
+                //  This will check if character is within range.
+                if (Physics.Raycast(rayOrigin, m_Transform.forward, out horizontalRayHit, startDistance, collisionLayers))
                 {
-                    if (m_GrabPointHit.distance < m_MaxHeight)
+
+                    heightCheckStart = horizontalRayHit.point;
+                    heightCheckStart.y += (maxHeight + 0.2f) - checkHeight;
+
+                    //  This will check if platform is too high for character.
+                    if (Physics.SphereCast(heightCheckStart, m_CapsuleCollider.radius, Vector3.down, out verticalRayHit, maxHeight, collisionLayers))
                     {
+
+                        var heightCheckDist = verticalRayHit.distance;
+                        if (heightCheckDist < maxHeight)
+                        {
+                            //  Get the objet to vault over height.
+                            height = maxHeight - heightCheckDist;
+
+                        }
+
                         return true;
                     }
+
                 }
             }
+
+
+            return false;
+        }
+
+
+        protected override void ActionStarted()
+        {
+
+            endPosition = verticalRayHit.point;
+            startPosition = m_Transform.position;
+
+            jumpForce = -(2 * height) / Mathf.Pow(0.4f, 2);
+            verticalVelocity = Mathf.Abs(jumpForce) * timeToApex;
+
+            velocity = CalculateVelocity(endPosition, startPosition, timeToApex);
+
+
+
+            //  Cache variables
+            m_ColliderHeight = m_CapsuleCollider.height;
+            m_ColliderCenter = m_CapsuleCollider.center;
+
+            //m_Rigidbody.isKinematic = !m_Rigidbody.isKinematic;
+
+
+            velocity.y = verticalVelocity;
+            m_Rigidbody.velocity = velocity;
+        }
+
+
+
+
+        public override bool UpdateRotation()
+        {
+            var rotation = Quaternion.FromToRotation(-m_Transform.forward, horizontalRayHit.normal) * m_Transform.rotation;
+            m_Rigidbody.MoveRotation(Quaternion.Slerp(rotation, m_Rigidbody.rotation, 2 * m_DeltaTime).normalized);
             return false;
         }
 
 
 
 
-
-        protected override void ActionStarted()
+        //  Move over the vault object based off of the root motion forces.
+        public override bool UpdateMovement()
         {
-            m_DistanceToWall = m_WallCheckHit.distance;
-            m_StartPosition = m_Transform.position;
-            m_EndPosition = m_GrabPointHit.point;
-            //  Get the objet to vault over height.
-            m_PlatformHeight = (m_MaxHeight + 0.1f) - m_GrabPointHit.distance;
+            //float targetVelocityX = Mathf.Abs(distance) * 1;
+            //velocity.z = Mathf.SmoothDamp(velocity.z, targetVelocityX, ref velocitySmooth, accelerationTime);
+            velocity.y += jumpForce * m_DeltaTime;
+            m_Rigidbody.AddForce(velocity * m_DeltaTime, ForceMode.VelocityChange);
 
-            //  Cache variables
-            m_ColliderHeight = m_CapsuleCollider.height;
-            m_ColliderCenter = m_CapsuleCollider.center;
+            return false;
+        }
 
 
+        public override bool Move()
+        {
+            ////m_Animator.MatchTarget(m_MatchPosition, Quaternion.Euler(0, m_Transform.eulerAngles.y, 0), AvatarTarget.LeftHand, m_MatchTargetWeightMask, m_StartMatchTarget, m_StopMatchTarget);
+            //m_Animator.MatchTarget(m_MatchPosition, Quaternion.identity, AvatarTarget.LeftHand, m_MatchTargetWeightMask, m_StartMatchTarget, m_StopMatchTarget);
 
-
-            float fwdSpeed = Vector3.Dot(m_Rigidbody.velocity, m_Transform.forward);
-            m_Velocity = m_Transform.forward * fwdSpeed;
-            m_VerticalVelocity = Vector3.up * (Mathf.Sqrt((m_PlatformHeight) * -2 * Physics.gravity.y));
-            Debug.DrawRay(m_Transform.position, m_VerticalVelocity, Color.yellow, 2);
-
-
-            m_Velocity = Quaternion.Inverse(m_Transform.rotation) * m_Velocity + m_VerticalVelocity;
-            //m_Velocity = Quaternion.Inverse(m_Transform.rotation) * m_Velocity + m_VerticalVelocity;
-            Debug.DrawRay(m_Transform.position, m_Velocity, Color.cyan, 2);
+            return false;
+        }
 
 
 
-            //m_Rigidbody.velocity = verticalVelocity;
-            m_Rigidbody.AddForce(m_Velocity, ForceMode.VelocityChange);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="origin"></param>
+        /// <param name="time"> time is how long per second</param>
+        /// <returns></returns>
+        Vector3 CalculateVelocity(Vector3 target, Vector3 origin, float time)
+        {
+            //  Define the distance x and y first.
+            Vector3 distance = target - origin;
+            Vector3 distanceXZ = distance;
+            distanceXZ.y = 0;
 
-            Debug.LogFormat("{0} height: {1}, distance: {2}", m_WallCheckHit.transform.name, m_PlatformHeight, m_DistanceToWall);
-            Debug.LogFormat("Velocity: {0} | VerticalVel;ocity {1} | FwdSpeed : {2}", m_Velocity, m_VerticalVelocity, fwdSpeed);
 
+            //  Create a float that repsents our distance
+            float Sy = distance.y;              //  vertical distance
+            float Sxz = distanceXZ.magnitude;   //  horizontal distance
+
+
+            //  Calculate the initial velocity.  This is distance / time.
+            float Vxz = Sxz / time;
+            float Vy = Sy / time + 0.5f * Mathf.Abs(Physics.gravity.y) * time;
+
+
+
+            Vector3 result = distanceXZ.normalized;
+            result *= Vxz;
+            result.y = Vy;
+
+            return result;
         }
 
 
 
         public override string GetDestinationState(int layer)
         {
-            if (layer != 0) return "";
-
-
-            if (m_Controller.Moving || m_DistanceToWall > 1f){
-                return m_DestinationStateName = "RunningClimb1M";
-            }
-            else{
+            if (layer == 0)
                 return m_DestinationStateName = "Climb1M";
-            }
+            return "";
+                
         }
-
-
-
-        public override bool UpdateRotation()
-        {
-
-            Quaternion targetRotation = Quaternion.Inverse(m_Transform.rotation) * Quaternion.FromToRotation(-m_Transform.forward, m_WallCheckHit.normal);
-            float wallAngleDifference = Vector3.Angle(m_Transform.forward, -m_WallCheckHit.normal);
-            //if(angle != 0){
-            //    //Quaternion rotation = Quaternion.AngleAxis(angle, m_Transform.up) * m_Transform.rotation;
-            //    //m_Rigidbody.MoveRotation(Quaternion.AngleAxis(angle * m_DeltaTime * 20, m_Transform.up) * m_Rigidbody.rotation);
-            //    m_Rigidbody.MoveRotation(Quaternion.AngleAxis(angle, m_Transform.up) * m_Rigidbody.rotation);
-            //}
-
-            m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Rigidbody.rotation, targetRotation, m_DeltaTime * 10));
-
-
-            //Quaternion rotation = Quaternion.FromToRotation(m_Transform.forward, -m_WallCheckHit.normal) * m_Rigidbody.rotation;
-            //m_Rigidbody.MoveRotation(Quaternion.Slerp(rotation, m_Rigidbody.rotation, m_DeltaTime * 10));
-
-            return false;
-        }
-
-
-        //  Move over the vault object based off of the root motion forces.
-        public override bool UpdateMovement()
-        {
-            Vector3 verticalVelocity = Vector3.up * (Mathf.Sqrt((m_PlatformHeight) * -2 * Physics.gravity.y));
-
-            float objectHeight = m_PlatformHeight < 1.5f ? m_GrabPointHit.point.y : m_GrabPointHit.point.y - m_CapsuleCollider.height;
-            //float distance = objectHeight - m_Rigidbody.position.y;
-
-            float distance = m_GrabPointHit.point.y - m_Rigidbody.position.y;
-            float percent = (m_PlatformHeight - distance) / m_PlatformHeight;
-
-
-            m_Rigidbody.MovePosition(Vector3.Lerp(m_Rigidbody.position, new Vector3(m_Rigidbody.position.x, m_GrabPointHit.point.y, m_StartPosition.z), percent * 0.25f));
-
-
-
-
-            return false;
-        }
-
-
-
-        public override bool Move()
-        {
-
-            //m_Velocity = m_Animator.deltaPosition / m_DeltaTime;
-            //m_Rigidbody.velocity = m_Velocity;
-            //Debug.LogFormat("Target Matching: {0}", m_Animator.isMatchingTarget);
-            return false;
-        }
-
-
-
-
 
 
 
@@ -200,16 +196,14 @@
                 }
 
             }
-
-            //if (m_ExitingAction && m_Animator.GetCurrentAnimatorStateInfo(layerIndex).shortNameHash == Animator.StringToHash(m_DestinationStateName))
-            //{
-            //    if(m_Animator.GetCurrentAnimatorStateInfo(layerIndex).normalizedTime >= 0.96f && m_Animator.IsInTransition(layerIndex))
-            //    {
-            //        //Debug.LogFormat("{0} is exiting via {1}.",  this.GetType(), "normalized time greater than 0.9");
-            //        return true;
-            //    }
-            //}
-
+            if (m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(m_DestinationStateName))
+            {
+                if (m_Animator.IsInTransition(0))
+                {
+                    //Debug.LogFormat("{0} is exiting.", m_StateName);
+                    return true;
+                }
+            }
 
 
             return false;
@@ -218,80 +212,61 @@
 
         protected override void ActionStopped()
         {
-            if (m_Animator.isMatchingTarget)
-                m_Animator.InterruptMatchTarget();
 
-            m_Rigidbody.isKinematic = false;
 
-            m_CapsuleCollider.center = m_ColliderCenter;
-            m_CapsuleCollider.height = m_ColliderHeight;
+            //m_Rigidbody.isKinematic = false;
 
-            m_EndPosition = Vector3.zero;
-            m_Velocity = Vector3.zero;
-            m_VerticalVelocity = Vector3.zero;
-            //m_StartPosition = m_MatchPosition = m_EndPosition = Vector3.zero;
-            //Debug.LogFormat("{0} Action has stopped {1}", GetType().Name, Time.time);
+
         }
 
 
 
 
-        private void OnDrawGizmos()
-        {
-            if (Application.isPlaying && m_IsActive)
-            {
-
-                if (m_EndPosition != Vector3.zero)
-                {
-                    Gizmos.color = Color.magenta;
-                    Gizmos.DrawWireSphere(m_EndPosition, 0.1f);
-                }
-            }
-        }
 
 
 
 
-        float velocity;
-        float angle = 45f;
-        int resolution = 5;
 
-        float gravity;
-        float radianAngle;
-        Vector3[] arcPoints = new Vector3[0];
+        //float velocity;
+        //float angle = 45f;
+        //int resolution = 5;
 
-        protected Vector3[] CalculateArcArray()
-        {
-            resolution = 5;
-            Vector3[] arcArray = new Vector3[resolution];
-            angle = 45f;
-            velocity = m_DistanceToWall - m_CapsuleCollider.radius * 2;
-            gravity = Mathf.Abs(Physics.gravity.y);
-            radianAngle = Mathf.Deg2Rad * angle;
+        //float gravity;
+        //float radianAngle;
+        //Vector3[] arcPoints = new Vector3[0];
 
-            //Debug.Log(gravity);
+        //protected Vector3[] CalculateArcArray()
+        //{
+        //    resolution = 5;
+        //    Vector3[] arcArray = new Vector3[resolution];
+        //    angle = 45f;
+        //    velocity = m_DistanceToWall - m_CapsuleCollider.radius * 2;
+        //    gravity = Mathf.Abs(Physics.gravity.y);
+        //    radianAngle = Mathf.Deg2Rad * angle;
 
-
-
-            float maxDistance = (velocity * velocity * Mathf.Sin(2 * radianAngle)) / gravity;
-
-            for (int index = 0; index < resolution; index++)
-            {
-                float t = (float)index / (float)resolution;
-                arcArray[index] = CalculateArcPoint(t, maxDistance);
-            }
-
-            return arcArray;
-        }
+        //    //Debug.Log(gravity);
 
 
-        //  Calculate height and distance of each vertex.
-        Vector3 CalculateArcPoint(float t, float maxDistance)
-        {
-            float x = t * maxDistance;
-            float y = x * Mathf.Tan(radianAngle) - ((gravity * x * x) / (2 * velocity * velocity * Mathf.Cos(radianAngle) * Mathf.Cos(radianAngle)));
-            return new Vector3(x, y);
-        }
+
+        //    float maxDistance = (velocity * velocity * Mathf.Sin(2 * radianAngle)) / gravity;
+
+        //    for (int index = 0; index < resolution; index++)
+        //    {
+        //        float t = (float)index / (float)resolution;
+        //        arcArray[index] = CalculateArcPoint(t, maxDistance);
+        //    }
+
+        //    return arcArray;
+        //}
+
+
+        ////  Calculate height and distance of each vertex.
+        //Vector3 CalculateArcPoint(float t, float maxDistance)
+        //{
+        //    float x = t * maxDistance;
+        //    float y = x * Mathf.Tan(radianAngle) - ((gravity * x * x) / (2 * velocity * velocity * Mathf.Cos(radianAngle) * Mathf.Cos(radianAngle)));
+        //    return new Vector3(x, y);
+        //}
 
 
 

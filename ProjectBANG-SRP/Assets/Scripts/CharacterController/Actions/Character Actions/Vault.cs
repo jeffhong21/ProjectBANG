@@ -36,13 +36,10 @@
         protected float m_JumpVelocity;
         protected float m_MoveSpeed;
         protected float m_VelocitySmooth;
-        protected float m_AccelerationTime = 0.2f;
+        protected float m_AccelerationTime = 0.1f;
         protected float m_Distance;
 
-        //[SerializeField]
-        Vector3 m_VerticalVelocity;
-        //[SerializeField]
-        float m_VerticalHeight;
+
 
 
         float m_ColliderAnimHeight;
@@ -70,16 +67,16 @@
         {
             if(base.CanStartAction() )
             {
-                //if (m_Controller.DetectObject(m_Transform.forward, out m_MoveToVaultDistanceHit, m_MoveToVaultDistance, m_VaultLayers))
-                //{
-                //    if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance, Color.green);
-                //    return CachePositions();
-                //}
-
-                if (Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out m_MoveToVaultDistanceHit, m_MoveToVaultDistance, m_VaultLayers)){
+                if (m_Controller.DetectObject(m_Transform.forward, out m_MoveToVaultDistanceHit, m_MoveToVaultDistance, m_VaultLayers))
+                {
                     if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance, Color.green);
                     return CachePositions();
                 }
+
+                //if (Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out m_MoveToVaultDistanceHit, m_MoveToVaultDistance, m_VaultLayers)){
+                //    if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance, Color.green);
+                //    return CachePositions();
+                //}
             }
             else if (m_Controller.GetAction<Sprint>().IsActive)
             {
@@ -145,34 +142,30 @@
             m_VaultObjectHeight = Mathf.Clamp(m_VaultObjectHeight, 0.4f, m_MaxHeight) + m_VerticalOffset;
             m_JumpForce = -(2 * m_VaultObjectHeight) / Mathf.Pow(0.4f, 2);
             m_JumpVelocity = Mathf.Abs(m_JumpForce) * m_TimeToApex;
+
             m_Velocity = m_Controller.Velocity;
             m_MoveSpeed = Mathf.Clamp(m_MoveSpeed, m_MinMoveSpeed, 8);
-            m_Distance = Vector3.Distance(m_StartPosition, m_EndPosition);
-
-            //float targetVelocityX = m_Controller.InputVector.z * m_MoveSpeed;
-            //m_Velocity.z = Mathf.SmoothDamp(m_Velocity.z, targetVelocityX, ref m_VelocitySmooth, m_AccelerationTime);
-            //m_Velocity.y += m_JumpForce * m_DeltaTime;
-            ////m_Rigidbody.AddForce(m_Velocity * m_DeltaTime, ForceMode.VelocityChange);
+            m_Distance = Vector3.Distance(m_StartPosition, m_MoveToVaultDistanceHit.point);
 
 
-
-
-
-            //m_CharacterIK.disableIK = true;
             //  Cache variables
             m_ColliderHeight = m_CapsuleCollider.height;
             m_ColliderCenter = m_CapsuleCollider.center;
 
-            //m_Rigidbody.isKinematic = !m_Rigidbody.isKinematic;
+            m_Rigidbody.isKinematic = !m_Rigidbody.isKinematic;
 
 
-            //Vector3 verticalVelocity = Vector3.up * (Mathf.Sqrt(m_VaultObjectHeight * -2 * Physics.gravity.y));
-            //m_Rigidbody.velocity = verticalVelocity;
-
+            m_Velocity.y = m_JumpVelocity;
+            m_Rigidbody.velocity = m_Velocity;
         }
 
 
-
+        public override bool UpdateRotation()
+        {
+            var rotation = Quaternion.FromToRotation(-m_Transform.forward, m_MoveToVaultDistanceHit.normal) * m_Transform.rotation;
+            m_Rigidbody.MoveRotation(Quaternion.Slerp(rotation, m_Rigidbody.rotation, 2 * m_DeltaTime).normalized);
+            return false;
+        }
 
 
 
@@ -180,41 +173,12 @@
         //  Move over the vault object based off of the root motion forces.
         public override bool UpdateMovement()
         {
-            ////  -----
-            ////  Rigidbody IsKinamatic is currently on, so physics movement will do nothing.
-            ////  -----
-            ////  
-            //float heightDifference = (float)System.Math.Round(m_MatchPosition.y - m_Transform.position.y, 2);
-
-            //float colliderScale = 1 / (m_VaultObjectHeight - heightDifference);
-            //colliderScale = Mathf.Clamp(colliderScale - 0.5f, 0.5f, 1);
-            //m_CapsuleCollider.height = Mathf.MoveTowards(m_CapsuleCollider.height, m_ColliderHeight * colliderScale, Time.deltaTime * 4);
-            //m_CapsuleCollider.center = Vector3.MoveTowards(m_CapsuleCollider.center, m_ColliderCenter * colliderScale, Time.deltaTime * 2);
-
-            ////var velocity = Vector3.Project(m_Rigidbody.velocity, Physics.gravity * 2);
-            ////var velocityY = Mathf.Sin()
-            ////if (Vector3.Dot(velocity, Physics.gravity) > 0)
-            //    //velocityY = -velocityY;
-
-            //m_VerticalVelocity = Vector3.up * (m_VaultObjectHeight + m_VerticalOffset) ;
-            //m_VerticalVelocity = m_VerticalVelocity * m_DeltaTime;
-            //if (heightDifference >= 0.0f)
-            //{
-            //    m_Rigidbody.AddForce(m_VerticalVelocity * 10, ForceMode.VelocityChange);
-            //    //m_Rigidbody.AddForce(m_VerticalVelocity, ForceMode.VelocityChange);
-            //    //m_Rigidbody.velocity = m_VerticalVelocity;
-            //}
-            //else{
-
-            //    m_Rigidbody.AddForce(m_Transform.forward * m_CapsuleCollider.radius, ForceMode.VelocityChange);
-            //}
-
             float targetVelocityX = Mathf.Abs(m_Distance) * m_MoveSpeed;
             m_Velocity.z = Mathf.SmoothDamp(m_Velocity.z, targetVelocityX, ref m_VelocitySmooth, m_AccelerationTime);
             m_Velocity.y += m_JumpForce * m_DeltaTime;
             m_Rigidbody.AddForce(m_Velocity * m_DeltaTime, ForceMode.VelocityChange);
 
-            return true;
+            return false;
         }
 
 
@@ -223,14 +187,7 @@
             ////m_Animator.MatchTarget(m_MatchPosition, Quaternion.Euler(0, m_Transform.eulerAngles.y, 0), AvatarTarget.LeftHand, m_MatchTargetWeightMask, m_StartMatchTarget, m_StopMatchTarget);
             m_Animator.MatchTarget(m_MatchPosition, Quaternion.identity, AvatarTarget.LeftHand, m_MatchTargetWeightMask, m_StartMatchTarget, m_StopMatchTarget);
 
-            //m_Velocity = m_Animator.deltaPosition / m_DeltaTime;
-
-
-
-            ////m_Rigidbody.velocity = m_Velocity;
-            //m_Rigidbody.velocity = m_Velocity + m_VerticalVelocity;
-            ////Debug.LogFormat("Target Matching: {0}", m_Animator.isMatchingTarget);
-            return true;
+            return false;
 		}
 
 
@@ -238,10 +195,10 @@
 
 		protected override void ActionStopped()
         {
-            //m_Rigidbody.isKinematic = !m_Rigidbody.isKinematic;
+            m_Rigidbody.isKinematic = false;
 
 
-            m_CharacterIK.disableIK = false;
+            //m_CharacterIK.disableIK = false;
             m_CapsuleCollider.height = m_ColliderHeight;
             m_CapsuleCollider.center = m_ColliderCenter;
             m_StartPosition = m_MatchPosition = m_EndPosition = Vector3.zero;
@@ -323,27 +280,6 @@
 		}
 
 
-
-
-
-
-		//protected override void DrawOnGUI()
-		//{
-  //          //content.text = string.Format("State Name: {0}\n", Animator.StringToHash(m_StateName));
-  //          //content.text += string.Format("ShortNameHash: {0}\n", m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash);
-
-  //          //content.text = string.Format("Vertical Height: {0}\n", m_VerticalHeight.ToString());
-  //          //content.text += string.Format("Height Difference: {0}\n", m_HeightDifference);
-  //          //content.text += string.Format("Distance Remaing: {0}\n", (m_EndPosition - m_Transform.position).sqrMagnitude);
-  //          //content.text += string.Format("Vertical Object Height: {0}\n", m_VaultObjectHeight);
-  //          //content.text += string.Format("Vertical Velocity: {0}\n", m_VerticalVelocity);
-  //          //content.text += string.Format("Rigidbody Velocity: {0}\n", m_Rigidbody.velocity);
-  //          ////content.text += string.Format("Velocity: {0}\n", m_Velocity);
-  //          //content.text += string.Format("Normalize Time: {0}\n", GetNormalizedTime());
-  //          //content.text += string.Format("Matching Target: {0}\n", m_Animator.isMatchingTarget);
-
-  //          GUILayout.Label(content);
-		//}
 
 
 

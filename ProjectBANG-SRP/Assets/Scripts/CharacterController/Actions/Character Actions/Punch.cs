@@ -57,7 +57,7 @@ namespace CharacterController
 
 		public override bool CanStopAction()
         {
-            if (m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(m_ExitStateName))
+            if (m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash("Punch.Exit"))
             {
                 if (m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f - m_TransitionDuration)
                 {
