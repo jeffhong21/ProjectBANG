@@ -39,6 +39,7 @@
         protected float m_AccelerationTime = 0.1f;
         protected float m_Distance;
 
+        protected float m_TotalDistance;
 
 
 
@@ -135,18 +136,18 @@
             m_StartPosition.y = m_Transform.position.y;
             //  Get the position of when the characters hand is placed on the object.
             m_MatchPosition = m_MatchPositionHit.point + (Vector3.up * m_VerticalOffset + m_Transform.right * m_HorizontalOffset);
-            //m_MatchPosition = m_MatchPosition + (m_Transform.forward * m_CapsuleCollider.radius);
-            m_MatchPosition = m_MatchPosition + (m_Transform.forward * m_AccelerationTime);
+            m_MatchPosition = m_MatchPosition + (m_Transform.forward * m_CapsuleCollider.radius);
+            //m_MatchPosition = m_MatchPosition + (m_Transform.forward * m_AccelerationTime);
 
 
             m_VaultObjectHeight = Mathf.Clamp(m_VaultObjectHeight, 0.4f, m_MaxHeight) + m_VerticalOffset;
-            m_JumpForce = -(2 * m_VaultObjectHeight) / Mathf.Pow(0.4f, 2);
+            m_JumpForce = -(2 * m_VaultObjectHeight + m_CapsuleCollider.radius) / Mathf.Pow(0.4f, 2);
             m_JumpVelocity = Mathf.Abs(m_JumpForce) * m_TimeToApex;
 
             m_Velocity = m_Controller.Velocity;
             m_MoveSpeed = Mathf.Clamp(m_MoveSpeed, m_MinMoveSpeed, 8);
             m_Distance = Vector3.Distance(m_StartPosition, m_MoveToVaultDistanceHit.point);
-
+            m_TotalDistance = Vector3.Distance(m_StartPosition, m_EndPosition);
 
             //  Cache variables
             m_ColliderHeight = m_CapsuleCollider.height;
@@ -162,8 +163,18 @@
 
         public override bool UpdateRotation()
         {
-            var rotation = Quaternion.FromToRotation(-m_Transform.forward, m_MoveToVaultDistanceHit.normal) * m_Transform.rotation;
-            m_Rigidbody.MoveRotation(Quaternion.Slerp(rotation, m_Rigidbody.rotation, 2 * m_DeltaTime).normalized);
+            //var rotation = Quaternion.FromToRotation(-m_Transform.forward, m_MoveToVaultDistanceHit.normal) * m_Transform.rotation;
+            //m_Rigidbody.MoveRotation(Quaternion.Slerp(rotation, m_Rigidbody.rotation, 2 * m_DeltaTime).normalized);
+
+            Debug.DrawRay(m_MoveToVaultDistanceHit.point, m_MoveToVaultDistanceHit.normal, Color.cyan);
+
+            float distance = m_MatchPositionHit.point.y - m_Transform.position.y;
+            float percent = (m_VaultObjectHeight - distance) / m_VaultObjectHeight;
+            percent = (float)System.Math.Round(percent, 2);
+            Debug.Log(percent);
+
+            var rotation = Quaternion.FromToRotation(m_Transform.forward, -m_MoveToVaultDistanceHit.normal) * m_Rigidbody.rotation;
+            m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Rigidbody.rotation, rotation, 2 * percent).normalized);
             return false;
         }
 
@@ -173,10 +184,16 @@
         //  Move over the vault object based off of the root motion forces.
         public override bool UpdateMovement()
         {
-            float targetVelocityX = Mathf.Abs(m_Distance) * m_MoveSpeed;
-            m_Velocity.z = Mathf.SmoothDamp(m_Velocity.z, targetVelocityX, ref m_VelocitySmooth, m_AccelerationTime);
+
+            //float targetVelocityX = Mathf.Abs(m_Distance - m_CapsuleCollider.radius * 2) * m_MoveSpeed;
+            //m_Velocity.z = Mathf.SmoothDamp(m_Velocity.z, targetVelocityX, ref m_VelocitySmooth, m_AccelerationTime);
             m_Velocity.y += m_JumpForce * m_DeltaTime;
-            m_Rigidbody.AddForce(m_Velocity * m_DeltaTime, ForceMode.VelocityChange);
+            m_Rigidbody.AddForce(m_Velocity, ForceMode.VelocityChange);
+
+
+
+            m_Animator.MatchTarget(m_MatchPosition, Quaternion.identity, AvatarTarget.LeftHand, m_MatchTargetWeightMask, m_StartMatchTarget, m_StopMatchTarget);
+
 
             return false;
         }
@@ -184,8 +201,7 @@
 
 		public override bool Move()
 		{
-            ////m_Animator.MatchTarget(m_MatchPosition, Quaternion.Euler(0, m_Transform.eulerAngles.y, 0), AvatarTarget.LeftHand, m_MatchTargetWeightMask, m_StartMatchTarget, m_StopMatchTarget);
-            m_Animator.MatchTarget(m_MatchPosition, Quaternion.identity, AvatarTarget.LeftHand, m_MatchTargetWeightMask, m_StartMatchTarget, m_StopMatchTarget);
+
 
             return false;
 		}
@@ -195,6 +211,7 @@
 
 		protected override void ActionStopped()
         {
+
             m_Rigidbody.isKinematic = false;
 
 

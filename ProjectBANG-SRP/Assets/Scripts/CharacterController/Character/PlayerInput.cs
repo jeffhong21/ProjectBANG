@@ -29,7 +29,7 @@ namespace CharacterController
         [SerializeField, Tooltip("Locks camera's rotation.")]
         private KeyCode m_LockCameraRotation = KeyCode.L;
         [SerializeField, Tooltip("Shift + what key to debug.break.")]
-        private KeyCode m_DebugBreakKeyCode = KeyCode.Tab;
+        private KeyCode m_DebugBreakKeyCode = KeyCode.Delete;
 
 
         [SerializeField, DisplayOnly]
@@ -44,8 +44,6 @@ namespace CharacterController
         private Vector3 m_LookDirection;
 
 
-
-        public ShakeTransformEventData data;
         [SerializeField]
         private CameraController m_CameraController;
         private Transform m_Camera;

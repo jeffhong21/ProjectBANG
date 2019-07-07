@@ -44,7 +44,7 @@
 
         private float m_StartEffectStartTime;
         private float m_EndEffectStartTime;
-        private float m_EffectCooldown = 0.5f;
+        private float m_EffectCooldown = 1f;
 
 
 

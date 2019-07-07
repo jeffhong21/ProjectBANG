@@ -21,7 +21,10 @@
         protected virtual void Start()
         {
             vfxMarker = Instantiate(vfxMarkerPrefab) as GameObject;
+            vfxMarker.transform.parent = m_Transform;
             vfxMarker.SetActive(false);
+            vfxMarker.transform.hideFlags = HideFlags.HideInHierarchy;
+
             mainCamera = CameraController.Instance.Camera;
             ray = new Ray(mainCamera.transform.position, mainCamera.transform.forward);
             EventHandler.RegisterEvent(m_GameObject, "OnActivateThrowableObject", OnActivateThrowableObject);
@@ -56,47 +59,36 @@
 
         public override void UpdateAction()
         {
-            if(m_IsActive)
+            if (m_IsActive)
             {
-                if(Input.GetMouseButtonDown(1))
+                aiming = true;
+                vfxMarker.SetActive(true);
+
+                RaycastHit hit;
+                ray.origin = mainCamera.transform.position;
+                ray.direction = mainCamera.transform.forward;
+                if (Physics.Raycast(ray, out hit, 50, m_Layers.SolidLayers))
                 {
-                    aiming = true;
                     vfxMarker.SetActive(true);
+                    vfxMarker.transform.position = hit.point;
                 }
-                //if (Input.GetMouseButtonUp(1))
-                //{
-                //    aiming = false;
-                //    vfxMarker.SetActive(false);
-                //}
-                if (aiming)
+                else
                 {
-                    RaycastHit hit;
-                    ray.origin = mainCamera.transform.position;
-                    ray.direction = mainCamera.transform.forward;
-                    if (Physics.Raycast(ray, out hit, 50, m_Layers.SolidLayers))
-                    {
-                        vfxMarker.SetActive(true);
-                        vfxMarker.transform.position = hit.point;
-                    }
-                    else
-                    {
-                        vfxMarker.SetActive(false);
+                    vfxMarker.SetActive(false);
 
-                    }
-
-                    if (Input.GetMouseButtonUp(0))
-                    {
-                        vfxMarker.SetActive(false);
-
-                        int actionIntID = 1;
-                        if (hit.distance > 10)
-                            actionIntID = 2;
-                        m_Animator.SetInteger(HashID.ActionIntData, actionIntID);
-
-                        throwLocation = hit.point;
-                    }
                 }
 
+                if (Input.GetMouseButtonUp(0))
+                {
+                    vfxMarker.SetActive(false);
+
+                    int actionIntID = 1;
+                    if (hit.distance > 10)
+                        actionIntID = 2;
+                    m_Animator.SetInteger(HashID.ActionIntData, actionIntID);
+
+                    throwLocation = hit.point;
+                }
             }
         }
 

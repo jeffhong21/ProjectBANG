@@ -457,13 +457,13 @@ MonoBehaviour:
   displayActions: 1
   m_Actions:
   - {fileID: 114776445558567580}
+  - {fileID: 647976094}
   - {fileID: 7159961758664632150}
   - {fileID: 3774449784211641878}
   - {fileID: 114908900733630684}
   - {fileID: 114139823554117216}
   - {fileID: 114329433760099396}
   - {fileID: 1013602446450159186}
-  - {fileID: 647976094}
   - {fileID: 4057125413625104798}
   - {fileID: 2521750178379034832}
   - {fileID: -8503966014793524050}
@@ -522,21 +522,21 @@ MonoBehaviour:
   - stateName: 
     transitionDuration: 0
     speedMultiplier: 0
-    stateID: 0
+    nameHash: 0
   - stateName: 
     transitionDuration: 0
     speedMultiplier: 0
-    stateID: 0
+    nameHash: 0
   State_1:
     stateName: 
     transitionDuration: 0
     speedMultiplier: 1
-    stateID: 0
+    nameHash: 0
   State_2:
     stateName: 
     transitionDuration: 0
     speedMultiplier: 1
-    stateID: 0
+    nameHash: 0
 --- !u!114 &114901688824212290
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -575,10 +575,9 @@ MonoBehaviour:
   m_AxisRaw: 1
   m_SelectPlayerKeyCode: 112
   m_LockCameraRotation: 108
-  m_DebugBreakKeyCode: 9
+  m_DebugBreakKeyCode: 13
   m_InputVector: {x: 0, y: 0, z: 0}
   m_InputVectorRaw: {x: 0, y: 0, z: 0}
-  data: {fileID: 0}
   m_CameraController: {fileID: 0}
 --- !u!114 &114078442416988612
 MonoBehaviour:
@@ -1093,11 +1092,11 @@ MonoBehaviour:
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
-  m_EndEffect: {fileID: 6784883267551059862, guid: fa3ee4246aa6a4c1fa973ad6b06a6a6f,
-    type: 3}
+  m_EndEffect: {fileID: 0}
   m_Debug: 0
-  m_MinFallHeight: 1
-  m_LandSurfaceImpact: {fileID: 0}
+  m_MinFallHeight: 2
+  m_LandSurfaceImpact: {fileID: 6784883267551059862, guid: fa3ee4246aa6a4c1fa973ad6b06a6a6f,
+    type: 3}
   m_MinSurfaceImpactVelocity: 1
 --- !u!114 &114908900733630684
 MonoBehaviour:
@@ -1239,7 +1238,7 @@ MonoBehaviour:
   m_InputNames:
   - LeftShift
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 0
+  m_ApplyBuiltinRootMotion: 1
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
@@ -1260,7 +1259,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2c01eb0da1c5e446ab394e6736460ef1, type: 3}
   m_Name: 
@@ -1307,7 +1306,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b6925d34e29f342f3914c6b5a519e7a0, type: 3}
   m_Name: 
@@ -1337,7 +1336,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9f63261ba55984bd9bef1d9b5d24d153, type: 3}
   m_Name: 
@@ -1477,7 +1476,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3f62eddceb76e4ce2aab0985c2db98db, type: 3}
   m_Name: 
@@ -1571,7 +1570,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: baed9bd3040554f2482260e0e684e139, type: 3}
   m_Name: 
@@ -1582,7 +1581,7 @@ MonoBehaviour:
   m_ActionID: 0
   m_TransitionDuration: 0
   m_StartType: 2
-  m_StopType: 1
+  m_StopType: 0
   m_InputNames:
   - Space
   m_SpeedMultiplier: 1

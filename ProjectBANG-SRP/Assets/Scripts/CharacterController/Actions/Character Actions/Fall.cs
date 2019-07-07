@@ -14,40 +14,36 @@ namespace CharacterController
         protected LandingType m_LandingType = LandingType.Default;
 
         [SerializeField]
-        protected float m_MinFallHeight = 1f;
+        protected float m_MinFallHeight = 2f;
         [SerializeField]
         protected GameObject m_LandSurfaceImpact;
         [SerializeField]
         protected float m_MinSurfaceImpactVelocity = 1f;
 
 
-
+        protected Vector3 m_LandPosition;
         protected RaycastHit m_RaycastHit;
         protected float m_StartHeight;
-
+        protected float m_FallHeight;
         
         //
         // Methods
         //
         public override bool CanStartAction()
         {
-            if(m_Controller.Grounded){
-                m_StartHeight = m_Rigidbody.position.y;
-            }
-            if (m_Controller.Grounded == false  &&
-                m_Rigidbody.velocity.y < 0 )
-            {
-                if(m_StartHeight - m_Rigidbody.position.y > m_MinFallHeight)
-                {
-                    if (m_Debug) Debug.LogFormat(" Rigidbody velocity: {0} | Fall Height: {1}", m_Rigidbody.velocity.y, m_StartHeight - m_Rigidbody.position.y);
-                    return true;
 
+            if (m_Controller.Grounded == false  &&
+                m_Rigidbody.velocity.y < -1f )
+            {
+                if (Physics.Raycast(m_Transform.position, Vector3.down, out m_RaycastHit, 50, m_Layers.SolidLayers))
+                {
+                    m_LandPosition = m_RaycastHit.point;
+                    if(m_RaycastHit.distance > m_MinFallHeight)
+                    {
+                        Debug.LogFormat(" **  Rigidbody velocity: {0} | Fall Height: {1}", m_Rigidbody.velocity.y, m_RaycastHit.distance);
+                        return true;
+                    }
                 }
-                //if (Mathf.Abs(m_Rigidbody.velocity.y) > m_MinFallHeight)
-                //{
-                //    if(m_Debug) Debug.LogFormat(" Rigidbody velocity: {0} | Fall Height: {1}", m_Rigidbody.velocity.y, m_StartHeight - m_Rigidbody.position.y);
-                //    return true;
-                //}
 
             }
 
@@ -58,43 +54,65 @@ namespace CharacterController
         {
             m_Animator.SetInteger(HashID.ActionID, (int)ActionTypeDefinition.Fall);
             m_ActionStartTime = Time.time;
+
         }
 
 
         public override bool CheckGround()
         {
             m_Controller.Grounded = false;
-            if (Physics.Raycast(m_Rigidbody.position, Vector3.down, out m_RaycastHit, 0.5f, m_Layers.SolidLayers)){
-                if(m_RaycastHit.transform != m_Transform)
+
+            //float distanceRemaining = (m_LandPosition - m_Transform.position).sqrMagnitude;
+            //if(distanceRemaining <= )
+            if(m_Controller.Grounded == false)
+            {
+                if (Physics.Raycast(m_Transform.position, Vector3.down, out m_RaycastHit, 1, m_Layers.SolidLayers))
                 {
                     m_Controller.Grounded = true;
 
                     if (Time.time - m_ActionStartTime > 1)
                         m_LandingType = LandingType.Hard;
-                    else if (Time.time - m_ActionStartTime > 1 && m_Controller.InputVector.magnitude > 0.2f)
+                    else if (Time.time - m_ActionStartTime > 1 && m_Controller.InputVector.sqrMagnitude > 0.2f)
                         m_LandingType = LandingType.Roll;
                     else
                         m_LandingType = LandingType.Default;
 
 
 
-                    if(m_Debug) Debug.LogFormat("Falling has landed. Hit {0} | Total air time: {1}", m_RaycastHit.transform.name, Time.time - m_ActionStartTime);
+                    if (m_Debug) Debug.LogFormat("Falling has landed. Hit {0} | Total air time: {1}", m_RaycastHit.transform.name, Time.time - m_ActionStartTime);
                     //Debug.Break();
-                }
 
+
+                }
             }
+
 
             return false;
         }
 
 
+        //public override bool UpdateAnimator()
+        //{
+            
+
+        //    return false;
+        //}
 
 
-
-		public override bool CanStopAction()
+        public override bool CanStopAction()
         {
             if (m_Controller.Grounded)
+            {
+                //int layerIndex = 0;
+                //if (m_Animator.GetNextAnimatorStateInfo(layerIndex).fullPathHash == 0)
+                //{
+                //    m_ExitingAction = true;
+
+                //    return true;
+                //}
                 return true;
+            }
+
             return false;
         }
 
@@ -102,7 +120,7 @@ namespace CharacterController
         protected override void ActionStopped()
         {
             m_Animator.SetInteger(HashID.ActionIntData, (int)m_LandingType);
-            //if(m_Debug) Debug.LogFormat("Total air time: {0}", Time.time - m_ActionStartTime);
+            Debug.LogFormat("Total air time: {0}", Time.time - m_ActionStartTime);
         }
 
 

@@ -371,8 +371,13 @@ namespace CharacterController
         {
             m_PreviousVelocity = m_Velocity;
 
+            CharacterDebug.Log("m_InputAngle", m_InputAngle);
             CharacterDebug.Log("m_SlopeAngle", m_SlopeAngle);
             CharacterDebug.Log("m_Velocity", m_Velocity);
+
+            CharacterDebug.Log("rb_AngularVelocity", m_Rigidbody.angularVelocity);
+            CharacterDebug.Log("rb_Velocity", m_Rigidbody.velocity);
+
         }
 
 
@@ -575,17 +580,17 @@ namespace CharacterController
         //  Update the rotation forces.
         protected virtual void UpdateRotation()
         {
+            Vector3 axisSign = Vector3.Cross(m_LookDirection, m_Transform.forward);
+            m_InputAngle = Vector3.Angle(m_Transform.forward, m_LookDirection) * (axisSign.y >= 0 ? -1f : 1f) * m_DeltaTime;
+            m_InputAngle = (float)Math.Round(m_InputAngle, 2);
 
-
-            //  Add any LookRotation from OnAnimatorUpdate()
-            //m_Rigidbody.MoveRotation(m_Transform.rotation * m_LookRotation.normalized);
-            //m_LookRotation = Quaternion.identity;
-
-            //Get the turn amount from the input vector.
-            //Vector3 local = m_Transform.InverseTransformDirection(m_LookDirection);
-            //float turnAmount = Mathf.Atan2(local.x, local.z) * Mathf.Rad2Deg;
-            //if (m_InputVector == Vector3.zero)
-            //    turnAmount *= (1.01f - (Mathf.Abs(turnAmount) / 180)) * m_IdleRotationMultiplier;
+            //  -- Get the start move angle
+            if (m_Moving && Mathf.Abs(m_InputAngle) < 10)
+                m_StartAngle = Mathf.SmoothDamp(m_StartAngle, 0, ref m_StartAngleSmooth, 0.25f);
+            else if (!m_Moving)
+                m_StartAngle = m_InputAngle;
+            m_StartAngle = Mathf.Approximately(m_StartAngle, 0) ? 0 : (float)Math.Round(m_StartAngle, 2);
+            //  Set the animator parameter.
 
             switch (m_MovementType)
             {
@@ -593,6 +598,8 @@ namespace CharacterController
 
 
                     Vector3 local = m_Transform.InverseTransformDirection(m_LookDirection);
+
+
 
                     Debug.DrawRay(m_Transform.position + Vector3.up * 1.4f, m_Transform.rotation * local, Color.magenta);
 
@@ -758,22 +765,19 @@ namespace CharacterController
 
 
 
-            ////  -- Get the start move angle
-            //if (m_Moving && Mathf.Abs(m_InputAngle) < 10)
-            //    m_StartAngle = Mathf.SmoothDamp(m_StartAngle, 0, ref m_StartAngleSmooth, 0.25f);
-            //else if (!m_Moving)
-            //    m_StartAngle = m_InputAngle;
-            //m_StartAngle = Mathf.Approximately(m_StartAngle, 0) ? 0 : (float)Math.Round(m_StartAngle, 2);
-            ////  Set the animator parameter.
-            //m_Animator.SetFloat(HashID.StartAngle, m_StartAngle);
-            ////   ---
+
+
+
+            //   ---
         }
 
 
         protected void UpdateAnimator()
         {
             //m_Animator.SetFloat(HashID.Rotation, (m_InputAngle * Mathf.Deg2Rad));
-            //  1 means left foot is up. 
+            //  1 means left foot is up.
+            m_Animator.SetFloat(HashID.StartAngle, m_StartAngle);
+            m_Animator.SetFloat(HashID.Rotation, m_InputAngle);
             m_Animator.SetFloat(HashID.LegUpIndex, m_Animator.pivotWeight);
             m_Animator.SetBool(HashID.Moving, m_Moving);
 

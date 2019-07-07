@@ -209,6 +209,18 @@
 
         public virtual bool DetermineState(int layer, AnimatorStateData defaultState, bool checkAbilities, bool baseStart)
         {
+            if (m_Animator.IsInTransition(layer))
+            {
+                if(m_Animator.GetNextAnimatorStateInfo(layer).fullPathHash == defaultState.NameHash)
+                {
+
+                }
+
+                Debug.LogFormat("{1} is exiting. | {0} is the next state.", GetStateName(m_Animator.GetNextAnimatorStateInfo(layer).fullPathHash), this.GetType());
+                return true;
+            }
+
+
             throw new NotImplementedException("<color=yellow> AnimatorMonitor </color> FormatStateName() not implemented yet.");
 
         }

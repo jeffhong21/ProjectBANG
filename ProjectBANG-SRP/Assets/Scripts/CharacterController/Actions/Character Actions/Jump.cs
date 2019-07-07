@@ -23,13 +23,61 @@ namespace CharacterController
         {
             if (base.CanStartAction())
             {
-                //if(m_Controller.Moving && m_Controller.DetectEdge() && Time.time > m_NextJump){
-                //    return true;
-                //}
-                return false;
+                if (m_Controller.Moving && DetectEdge() && Time.time > m_NextJump)
+                {
+                    return true;
+                }
+
+
+
+
+
             }
             return false;
 		}
+
+
+
+        protected bool DetectEdge()
+        {
+            if (!m_Controller.Grounded)
+                return false;
+            bool detectEdge = false;
+
+
+
+            var m_DetectObjectHeight = 0.25f;
+            Vector3 start = m_Transform.position + (m_Transform.forward * m_CapsuleCollider.radius);
+            start.y = start.y + m_DetectObjectHeight;
+            //start.y = start.y + 0.05f + (Mathf.Tan(m_SlopeAngle) * start.magnitude);
+
+            Vector3 dir = -m_Transform.up;
+            float maxDetectEdgeDistance = 1 + m_DetectObjectHeight;
+
+
+            float front = m_CapsuleCollider.radius * Mathf.Sign(m_Transform.InverseTransformDirection(m_Controller.Velocity).z);
+            Vector3 raycastOrigin = m_Transform.TransformPoint(0, m_CapsuleCollider.center.y - m_CapsuleCollider.height / 2 + 0.1f, front);
+            Debug.DrawRay(raycastOrigin, -m_Transform.up * maxDetectEdgeDistance, detectEdge ? Color.green : Color.gray);
+
+            //  Check if anything is in front of the character.
+            if (Physics.Raycast(m_Transform.position + (Vector3.up * m_DetectObjectHeight), m_Transform.forward, 2, m_Layers.SolidLayers) == false)
+            {
+                //  Check if there is anything solid.
+                if (Physics.Raycast(start, dir, maxDetectEdgeDistance, m_Layers.SolidLayers) == false)
+                {
+                    detectEdge = true;
+                }
+            }
+
+
+
+            //if (Debug && hitObject == false) Debug.DrawRay(m_Transform.position + (Vector3.up * m_DetectObjectHeight), m_Transform.forward * 2, hitObject ? Color.red : Color.green);
+            if (m_Debug) Debug.DrawRay(start, dir * maxDetectEdgeDistance, detectEdge ? Color.green : Color.gray);
+
+            return detectEdge;
+        }
+
+
 
 		protected override void ActionStarted()
         {

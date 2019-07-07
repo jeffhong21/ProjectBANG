@@ -13,7 +13,7 @@
         [SerializeField]
         private float speedMultiplier = 1f;
         [SerializeField, DisplayOnly]
-        private int stateID;
+        private int nameHash;
 
         //
         // Properties
@@ -21,7 +21,7 @@
         public string StateName { get { return stateName; } set { stateName = value; } }
         public float TransitionDuration { get { return transitionDuration; } set { transitionDuration = value; } }
         public float SpeedMultiplier { get { return speedMultiplier; } set { speedMultiplier = value; } }
-        public float NameHash { get { return stateID; } }
+        public int NameHash { get { return nameHash; } }
 
         //
         // Constructor
@@ -32,9 +32,9 @@
             this.transitionDuration = transitionDuration;
         }
 
-        public AnimatorStateData(int stateID, string stateName, float transitionDuration)
+        public AnimatorStateData(int nameHash, string stateName, float transitionDuration)
         {
-            this.stateID = stateID;
+            this.nameHash = nameHash;
             this.stateName = stateName;
             this.transitionDuration = transitionDuration;
         }

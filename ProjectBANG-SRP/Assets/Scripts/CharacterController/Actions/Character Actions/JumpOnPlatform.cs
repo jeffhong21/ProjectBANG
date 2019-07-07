@@ -8,7 +8,7 @@
     {
 
         [SerializeField]
-        protected float checkHeight = 0.4f;
+        protected float checkHeight = 0.25f;
         [SerializeField]
         protected float startDistance = 2f;
         [SerializeField, Tooltip("The highest level the character can climb.")]
@@ -19,12 +19,12 @@
         protected LayerMask collisionLayers;
         [SerializeField]
         protected AnimatorStateMatchTarget matchTarget;
-
+        protected MatchTargetWeightMask matchTargetWeightMask = new MatchTargetWeightMask(Vector3.one, 0);
 
         //  Where to start the vertical raycast.
         protected Vector3 heightCheckStart;
         //  Height of the platform
-        protected float height;
+        protected float platformHeight;
 
         protected float jumpForce;
         protected float timeToApex = 0.4f;
@@ -61,12 +61,8 @@
                     {
 
                         var heightCheckDist = verticalRayHit.distance;
-                        if (heightCheckDist < maxHeight)
-                        {
-                            //  Get the objet to vault over height.
-                            height = maxHeight - heightCheckDist;
-
-                        }
+                        //  Get the objet to vault over platformHeight.
+                        platformHeight = maxHeight - heightCheckDist;
 
                         return true;
                     }
@@ -81,14 +77,16 @@
 
         protected override void ActionStarted()
         {
-
-            endPosition = verticalRayHit.point;
+            var jumpTime = timeToApex * platformHeight;
+            endPosition = verticalRayHit.point + (m_Transform.forward * (m_CapsuleCollider.radius + 0.12f));
             startPosition = m_Transform.position;
 
-            jumpForce = -(2 * height) / Mathf.Pow(0.4f, 2);
-            verticalVelocity = Mathf.Abs(jumpForce) * timeToApex;
+            jumpForce = -(2 * platformHeight) / Mathf.Pow(jumpTime, 2);
+            verticalVelocity = Mathf.Abs(jumpForce) * jumpTime;
 
-            velocity = CalculateVelocity(endPosition, startPosition, timeToApex);
+            var adjustedStartingPos = startPosition;
+            //adjustedStartingPos.y = endPosition.y;
+            velocity = CalculateVelocity(endPosition, adjustedStartingPos, jumpTime);
 
 
 
@@ -98,8 +96,9 @@
 
             //m_Rigidbody.isKinematic = !m_Rigidbody.isKinematic;
 
-
             velocity.y = verticalVelocity;
+            velocity.x = 0;
+            velocity.z = 0;
             m_Rigidbody.velocity = velocity;
         }
 
@@ -108,8 +107,11 @@
 
         public override bool UpdateRotation()
         {
-            var rotation = Quaternion.FromToRotation(-m_Transform.forward, horizontalRayHit.normal) * m_Transform.rotation;
-            m_Rigidbody.MoveRotation(Quaternion.Slerp(rotation, m_Rigidbody.rotation, 2 * m_DeltaTime).normalized);
+            float distance = verticalRayHit.point.y - m_Transform.position.y;
+            float percent = (platformHeight - distance) / platformHeight;
+
+            var rotation = Quaternion.FromToRotation(m_Transform.forward, -horizontalRayHit.normal) * m_Transform.rotation;
+            m_Rigidbody.MoveRotation(Quaternion.Slerp(rotation, m_Rigidbody.rotation, 2 * percent).normalized);
             return false;
         }
 
@@ -119,10 +121,15 @@
         //  Move over the vault object based off of the root motion forces.
         public override bool UpdateMovement()
         {
+
             //float targetVelocityX = Mathf.Abs(distance) * 1;
             //velocity.z = Mathf.SmoothDamp(velocity.z, targetVelocityX, ref velocitySmooth, accelerationTime);
             velocity.y += jumpForce * m_DeltaTime;
-            m_Rigidbody.AddForce(velocity * m_DeltaTime, ForceMode.VelocityChange);
+            m_Rigidbody.AddForce(velocity, ForceMode.VelocityChange);
+
+            //m_Rigidbody.MovePosition(velocity);
+            //m_Animator.MatchTarget(endPosition + matchTarget.matchTargetOffset, Quaternion.identity, matchTarget.avatarTarget, matchTargetWeightMask,
+            //    matchTarget.startMatchTarget, matchTarget.endMatchTarget);
 
             return false;
         }
@@ -138,13 +145,7 @@
 
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="target"></param>
-        /// <param name="origin"></param>
-        /// <param name="time"> time is how long per second</param>
-        /// <returns></returns>
+
         Vector3 CalculateVelocity(Vector3 target, Vector3 origin, float time)
         {
             //  Define the distance x and y first.
@@ -187,41 +188,57 @@
         public override bool CanStopAction()
         {
             int layerIndex = 0;
-            if (m_Animator.GetNextAnimatorStateInfo(layerIndex).fullPathHash == 0){
+            if (m_Animator.GetNextAnimatorStateInfo(layerIndex).fullPathHash == 0)
+            {
                 m_ExitingAction = true;
             }
-            if (m_ExitingAction && m_Animator.IsInTransition(layerIndex)){
-                if (m_Animator.GetAnimatorTransitionInfo(layerIndex).normalizedTime >= 0.96f){
-                    return true;
-                }
-
-            }
-            if (m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(m_DestinationStateName))
+            if (m_ExitingAction && m_Animator.IsInTransition(layerIndex))
             {
-                if (m_Animator.IsInTransition(0))
-                {
-                    //Debug.LogFormat("{0} is exiting.", m_StateName);
+                Debug.LogFormat("{1} is exiting. | {0} is the next state.", m_AnimatorMonitor.GetStateName(m_Animator.GetNextAnimatorStateInfo(layerIndex).fullPathHash), this.GetType());
+                return true;
+            }
+
+            if (m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(m_StateName + "." + m_DestinationStateName)){
+                if (m_Animator.IsInTransition(0)){
                     return true;
                 }
             }
 
-
-            return false;
+            return Time.time > m_ActionStartTime + 2;
         }
 
 
         protected override void ActionStopped()
         {
-
-
-            //m_Rigidbody.isKinematic = false;
-
+            m_Rigidbody.isKinematic = false;
+            startPosition = endPosition = Vector3.zero;
 
         }
 
 
 
 
+        private void OnDrawGizmos()
+        {
+            if (Application.isPlaying && m_IsActive)
+            {
+                if (startPosition != Vector3.zero)
+                {
+                    Gizmos.color = Color.magenta;
+                    Gizmos.DrawWireSphere(startPosition, 0.2f);
+                    //GizmosUtils.DrawString("Start Position", m_StartPosition, Color.white);
+                }
+                if (endPosition != Vector3.zero)
+                {
+                    Gizmos.color = Color.yellow;
+                    Gizmos.DrawWireSphere(endPosition, 0.2f);
+                    UnityEditor.Handles.color = Color.yellow;
+                    UnityEditor.Handles.DrawSolidDisc(endPosition, Vector3.up, 0.2f);
+                    //GizmosUtils.DrawString("Match Position", m_MatchPosition, Color.white);
+                }
+
+            }
+        }
 
 
 
@@ -260,7 +277,7 @@
         //}
 
 
-        ////  Calculate height and distance of each vertex.
+        ////  Calculate platformHeight and distance of each vertex.
         //Vector3 CalculateArcPoint(float t, float maxDistance)
         //{
         //    float x = t * maxDistance;
