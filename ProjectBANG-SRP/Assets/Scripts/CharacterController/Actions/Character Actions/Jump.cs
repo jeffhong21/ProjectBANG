@@ -7,13 +7,10 @@ namespace CharacterController
     public class Jump : CharacterAction
     {
         [SerializeField]
-        protected float m_Force = 1;
+        protected float m_Force = 5;
         [SerializeField]
-        protected float m_RecurrenceDelay = 0.1f;
+        protected float m_RecurrenceDelay = 0.2f;
 
-
-
-        private float m_AirborneHeight = 0.6f;
         private float m_NextJump;
 
 		//
@@ -23,92 +20,40 @@ namespace CharacterController
         {
             if (base.CanStartAction())
             {
-                if (m_Controller.Moving && DetectEdge() && Time.time > m_NextJump)
+                if(m_NextJump < Time.time)
                 {
-                    return true;
+                    if (m_Controller.Grounded && m_Rigidbody.velocity.y > -0.001f)
+                    {
+                        return true;
+                    }
                 }
-
-
-
-
 
             }
             return false;
 		}
 
 
-
-        protected bool DetectEdge()
-        {
-            if (!m_Controller.Grounded)
-                return false;
-            bool detectEdge = false;
-
-
-
-            var m_DetectObjectHeight = 0.25f;
-            Vector3 start = m_Transform.position + (m_Transform.forward * m_CapsuleCollider.radius);
-            start.y = start.y + m_DetectObjectHeight;
-            //start.y = start.y + 0.05f + (Mathf.Tan(m_SlopeAngle) * start.magnitude);
-
-            Vector3 dir = -m_Transform.up;
-            float maxDetectEdgeDistance = 1 + m_DetectObjectHeight;
-
-
-            float front = m_CapsuleCollider.radius * Mathf.Sign(m_Transform.InverseTransformDirection(m_Controller.Velocity).z);
-            Vector3 raycastOrigin = m_Transform.TransformPoint(0, m_CapsuleCollider.center.y - m_CapsuleCollider.height / 2 + 0.1f, front);
-            Debug.DrawRay(raycastOrigin, -m_Transform.up * maxDetectEdgeDistance, detectEdge ? Color.green : Color.gray);
-
-            //  Check if anything is in front of the character.
-            if (Physics.Raycast(m_Transform.position + (Vector3.up * m_DetectObjectHeight), m_Transform.forward, 2, m_Layers.SolidLayers) == false)
-            {
-                //  Check if there is anything solid.
-                if (Physics.Raycast(start, dir, maxDetectEdgeDistance, m_Layers.SolidLayers) == false)
-                {
-                    detectEdge = true;
-                }
-            }
-
-
-
-            //if (Debug && hitObject == false) Debug.DrawRay(m_Transform.position + (Vector3.up * m_DetectObjectHeight), m_Transform.forward * 2, hitObject ? Color.red : Color.green);
-            if (m_Debug) Debug.DrawRay(start, dir * maxDetectEdgeDistance, detectEdge ? Color.green : Color.gray);
-
-            return detectEdge;
-        }
-
-
-
 		protected override void ActionStarted()
         {
             m_Animator.SetInteger(HashID.ActionID, (int)ActionTypeDefinition.Jump);
 
-            if(m_Controller.Moving){
-                Vector3 verticalVelocity = Vector3.up * (Mathf.Sqrt(m_Force * -2 * Physics.gravity.y));
-                Vector3 fwdVelocity = m_Transform.forward * m_Force;
+            float timeToJumpApex = 0.4f;
+            var gravity = -(2 * m_Force) / Mathf.Pow(timeToJumpApex, 2);
+            Vector3 verticalVelocity = Vector3.up * Mathf.Abs(gravity) * timeToJumpApex;
+            //Vector3 verticalVelocity = Vector3.up * (Mathf.Sqrt(m_Force * -2 * Physics.gravity.y));
 
-                m_Rigidbody.velocity += fwdVelocity + verticalVelocity;
-            }
+
+            //verticalVelocity = Vector3.up * (Mathf.Pow(m_Force, 2) / -2 * Physics.gravity.y);
+            //m_Rigidbody.AddForce(verticalVelocity, ForceMode.VelocityChange);
+            //m_Rigidbody.velocity += verticalVelocity;
+            m_Rigidbody.AddForce(Vector3.up * m_Force, ForceMode.VelocityChange);
+            Debug.Log(verticalVelocity);
         }
 
 
         public override bool CanStopAction()
         {
-            int layerIndex = 0;
-            var currentState = m_Animator.GetCurrentAnimatorStateInfo(layerIndex);
-            if (currentState.shortNameHash == Animator.StringToHash(m_DestinationStateName))
-            {
-                if (m_Animator.IsInTransition(layerIndex) || currentState.normalizedTime >= 1)
-                {
-                    return true;
-                }
-            }
-            //if(Time.time > m_ActionStartTime + 0.1f){
-            //    return m_Controller.Grounded;
-            //}
-            //return false;
-
-            return Time.time > m_ActionStartTime + 0.9f;
+            return m_Rigidbody.velocity.y < 0.01f || m_Controller.Grounded;
         }
 
 
@@ -121,10 +66,10 @@ namespace CharacterController
 
 		public override bool CheckGround()
 		{
-            //RaycastHit hit = m_Controller.GetRaycastHit();
-            //m_Controller.Grounded = hit.distance < m_AirborneHeight;
-
-            m_Controller.Grounded = false;
+            if (m_Rigidbody.velocity.y > -0.01f || m_Rigidbody.velocity.y <= 0f)
+            {
+                m_Controller.Grounded = false;
+            }
 
             return false;
 		}
@@ -159,26 +104,6 @@ namespace CharacterController
 
 
 
-
-
-
-
-
-
-        private void OnDrawGizmos()
-        {
-            if (Application.isPlaying && m_IsActive)
-            {
-
-            }
-        }
-
-
-
-        protected override void DrawOnGUI()
-        {
-
-        }
     }
 
 }

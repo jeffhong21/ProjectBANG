@@ -8,8 +8,7 @@ namespace CharacterController
     public class AnimatorStateMatchTarget
     {
         public string stateName;
-        //[HideInInspector]
-        //public bool matchTarget = true;
+
         public Vector3 matchTargetOffset = new Vector3(0.1f, 0, 0);
         [Range(0.01f,0.99f)]
         public float startMatchTarget = 0.1f;
@@ -18,7 +17,7 @@ namespace CharacterController
         //[MinMaxRange(0, 1)]
         //public Vector2 matchTargetRange = new Vector2(0.1f, 0.2f);
 
-        public AvatarTarget avatarTarget = AvatarTarget.LeftHand;
+        public AvatarTarget avatarTarget = AvatarTarget.Root;
 
 
         //
@@ -45,7 +44,7 @@ namespace CharacterController
                         bone = HumanBodyBones.RightFoot;
                         break;
                     case AvatarTarget.Body:
-                        bone = HumanBodyBones.Spine;
+                        bone = HumanBodyBones.Hips;
                         break;
                 }
                 return bone;
@@ -72,7 +71,7 @@ namespace CharacterController
                 case AvatarTarget.RightFoot:
                     return HumanBodyBones.RightFoot;
                 case AvatarTarget.Body:
-                    return HumanBodyBones.Spine;
+                    return HumanBodyBones.Hips;
                 default:
                     return HumanBodyBones.Hips;
             }

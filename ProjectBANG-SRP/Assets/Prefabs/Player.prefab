@@ -306,7 +306,6 @@ GameObject:
   - component: {fileID: 136461347018360410}
   - component: {fileID: 54223540320120752}
   - component: {fileID: 114933608758217926}
-  - component: {fileID: 114311917172092944}
   - component: {fileID: 114429236655991950}
   - component: {fileID: 114901688824212290}
   - component: {fileID: 114921923587186984}
@@ -364,7 +363,7 @@ Animator:
   m_Avatar: {fileID: 9000000, guid: ad9b136e9ac104c66b5fb99ea52cfb13, type: 3}
   m_Controller: {fileID: 9100000, guid: 287eb83efc3b84e5f9107ff1963efd83, type: 2}
   m_CullingMode: 1
-  m_UpdateMode: 0
+  m_UpdateMode: 1
   m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
   m_WarningMessage: 
@@ -415,12 +414,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_UseRootMotion: 1
   m_RootMotionSpeedMultiplier: 1
-  m_Acceleration: 0.1
-  m_AirAcceleration: 0.2
+  m_GroundAcceleration: 0.12
+  m_AirborneAcceleration: 0.2
   m_MotorDamping: 0.2
-  m_MovementSpeed: 4
-  m_AirSpeed: 0.5
-  m_RotationSpeed: 6
+  m_AirborneDamping: 0.3
+  m_GroundSpeed: 4
+  m_AirborneSpeed: 0.5
+  m_RotationSpeed: 3
   m_SlopeForceUp: 1
   m_SlopeForceDown: 1.25
   m_StopMovementThreshold: 0.5
@@ -428,12 +428,12 @@ MonoBehaviour:
   m_Mass: 100
   m_SkinWidth: 0.08
   m_SlopeLimit: 45
-  m_MaxStepHeight: 0.25
-  m_GroundStickiness: 6
+  m_MaxStepHeight: 0.4
+  m_GroundStickiness: 0.2
   m_ExternalForceDamping: 0.1
   m_StepOffset: 0.1
   m_StepSpeed: 4
-  m_GravityModifier: 2
+  m_GravityModifier: 0.4
   mDetectHorizontalCollision: 1
   m_HorizontalCollisionCount: 10
   m_VerticalCollisionCount: 10
@@ -446,63 +446,30 @@ MonoBehaviour:
   m_AirborneStateName: Falling
   m_Moving: 0
   m_InputVector: {x: 0, y: 0, z: 0}
-  m_MoveDirection: {x: 0, y: 0, z: 0}
   m_Grounded: 1
   m_Debug: 1
   m_DebugCollisions: 1
   m_DrawDebugLine: 1
-  displayMovement: 0
-  displayPhysics: 0
+  displayMovement: 1
+  displayPhysics: 1
   displayAnimations: 0
   displayActions: 1
   m_Actions:
-  - {fileID: 114776445558567580}
-  - {fileID: 647976094}
-  - {fileID: 7159961758664632150}
   - {fileID: 3774449784211641878}
+  - {fileID: 7159961758664632150}
   - {fileID: 114908900733630684}
   - {fileID: 114139823554117216}
   - {fileID: 114329433760099396}
   - {fileID: 1013602446450159186}
-  - {fileID: 4057125413625104798}
   - {fileID: 2521750178379034832}
   - {fileID: -8503966014793524050}
+  - {fileID: 647976094}
+  - {fileID: 114776445558567580}
   - {fileID: 7058910716857372807}
+  - {fileID: 4057125413625104798}
   - {fileID: 1872464415}
   - {fileID: 1784387541}
   m_ActiveAction: {fileID: 0}
---- !u!114 &114311917172092944
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3946f6ecb1374ed08bc4fed2edc0265, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bodyPosition: {x: 0, y: 0, z: 0}
-  m_DebugDrawLookRay: 0
-  m_LookAtAimBodyWeight: 1
-  m_LookAtBodyWeight: 0.12
-  m_LookAtHeadWeight: 0.15
-  m_LookAtEyesWeight: 0
-  m_LookAtClampWeight: 1
-  m_LookAtAdjustmentSpeed: 0.2
-  m_LookAtOffset: {x: 0, y: 0, z: 0}
-  m_HandIKWeight: 0
-  m_HandIKAdjustmentSpeed: 0.2
-  m_HandIKOffset: {x: 0, y: 0, z: 0}
-  heightFromGroundRaycast: 1.14
-  raycastDownDistance: 1.5
-  m_HipOffset: 0
-  m_HipsMovingPositionAdjustmentSpeed: 0.609
-  m_FootPositionAdjustmentSpeed: 0.284
-  m_RightHandTarget: {fileID: 0}
-  m_LeftHandTarget: {fileID: 0}
-  disableIK: 1
 --- !u!114 &114429236655991950
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -586,7 +553,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aa7477202022244aca8f8b4dfa3d0348, type: 3}
   m_Name: 
@@ -616,7 +583,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a70e525c82ce9413fa4d940ad7fcf1db, type: 3}
   m_Name: 
@@ -1097,7 +1064,7 @@ MonoBehaviour:
   m_MinFallHeight: 2
   m_LandSurfaceImpact: {fileID: 6784883267551059862, guid: fa3ee4246aa6a4c1fa973ad6b06a6a6f,
     type: 3}
-  m_MinSurfaceImpactVelocity: 1
+  m_MinSurfaceImpactVelocity: 5
 --- !u!114 &114908900733630684
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1105,7 +1072,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d3005a58794a74e28bd4e9600cba665f, type: 3}
   m_Name: 
@@ -1151,7 +1118,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bb16de68a3c6f4c2c99766840b8420c9, type: 3}
   m_Name: 
@@ -1184,7 +1151,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a33cd0f36f52540f39f9a4bf04b5add6, type: 3}
   m_Name: 
@@ -1223,7 +1190,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2a4e7b03d117640dd9395532c24e86e0, type: 3}
   m_Name: 
@@ -1316,19 +1283,19 @@ MonoBehaviour:
   m_LayerIndex: 0
   m_ActionID: 0
   m_TransitionDuration: 0
-  m_StartType: 0
+  m_StartType: 2
   m_StopType: 0
   m_InputNames:
   - Space
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 1
+  m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
   m_EndEffect: {fileID: 0}
   m_Debug: 0
-  m_Force: 2.5
-  m_RecurrenceDelay: 0.1
+  m_Force: 5
+  m_RecurrenceDelay: 0.2
 --- !u!114 &1872464415
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1336,7 +1303,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9f63261ba55984bd9bef1d9b5d24d153, type: 3}
   m_Name: 
@@ -1395,7 +1362,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6c72e1df647af4c0098866e944a04b01, type: 3}
   m_Name: 
@@ -1433,7 +1400,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e45ea437e115a4fb6be25b8464e6de7a, type: 3}
   m_Name: 
@@ -1448,7 +1415,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6154c3fa2c49643758284fb02e121cd3, type: 3}
   m_Name: 
@@ -1476,7 +1443,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3f62eddceb76e4ce2aab0985c2db98db, type: 3}
   m_Name: 
@@ -1539,7 +1506,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2658d7a7387f248cab67dcab657ad07a, type: 3}
   m_Name: 
@@ -1570,7 +1537,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: baed9bd3040554f2482260e0e684e139, type: 3}
   m_Name: 

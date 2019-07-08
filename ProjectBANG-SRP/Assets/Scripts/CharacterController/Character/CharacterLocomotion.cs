@@ -11,8 +11,6 @@
         public event Action<bool> OnAim = delegate {};
 
 
-
-
         //  --  Character Actions
         [SerializeField, HideInInspector]
         protected CharacterAction[] m_Actions;
@@ -20,12 +18,7 @@
         protected CharacterAction m_ActiveAction;
 
 
-        protected bool m_CheckGround = true;
-        protected bool m_CheckMovement = true;
-        protected bool m_UpdateRotation = true;
-        protected bool m_UpdateMovement = true;
-        protected bool m_UpdateAnimator = true;
-        protected bool m_Move = true;
+
 
 
 
@@ -43,7 +36,7 @@
 		{
             m_Rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
             m_Rigidbody.mass = m_Mass;
-            m_Animator.applyRootMotion = m_UseRootMotion;
+            //m_Animator.applyRootMotion = m_UseRootMotion;
 
             EventHandler.RegisterEvent<CharacterAction, bool>(m_GameObject, EventIDs.OnCharacterActionActive, OnActionActive);
             EventHandler.RegisterEvent<bool>(m_GameObject, EventIDs.OnAimActionStart, OnAimActionStart);
@@ -59,15 +52,16 @@
 
         protected override void Update()
 		{
-            m_TimeScale = Time.timeScale;
+            m_TimeScale = Mathf.RoundToInt(Time.timeScale);
             if (m_TimeScale == 0) return;
-            m_DeltaTime = Time.deltaTime;
+            m_DeltaTime = deltaTime;
 
 
-            m_CheckGround = true;
-            m_CheckMovement = true;
-            m_Move = true;
-            m_UpdateAnimator = true;
+            //m_CheckGround = true;
+            //m_CheckMovement = true;
+            //m_SetPhysicsMaterial = true;
+            //m_Move = true;
+            //m_UpdateAnimator = true;
 
 
             ////  Start Stop Actions.
@@ -78,40 +72,24 @@
                 CharacterAction charAction = m_Actions[i];
                 StopStartAction(charAction);
 
-                if(charAction.IsActive)
-                {
-                    if (m_CheckGround) m_CheckGround = charAction.CheckGround();
-
-                    if (m_CheckMovement) m_CheckMovement = charAction.CheckMovement();
-
-                    if (m_Move) m_Move = charAction.Move();
-
-                    if (m_UpdateAnimator) m_UpdateAnimator = charAction.UpdateAnimator();
-                }
-
                 //  Call Action Update.
                 charAction.UpdateAction();
             }
-
-            if (m_CheckGround) CheckGround();
-
-            if (m_CheckMovement) CheckMovement();
-
-            SetPhysicsMaterial();
-
-            if (m_Move) Move();
-
-            if (m_UpdateAnimator) UpdateAnimator();
         }
 
 
         protected override void FixedUpdate()
 		{
             if (m_TimeScale == 0) return;
-            m_DeltaTime = Time.fixedDeltaTime;
+            m_DeltaTime = fixedDeltaTime;
 
+            m_Move = true;
+            m_CheckGround = true;
+            m_CheckMovement = true;
+            m_SetPhysicsMaterial = true;
             m_UpdateRotation = true;
             m_UpdateMovement = true;
+            m_UpdateAnimator = true;
 
 
             for (int i = 0; i < m_Actions.Length; i++)
@@ -122,17 +100,35 @@
 
                 if (charAction.IsActive)
                 {
+                    if (m_Move) m_Move = charAction.Move();
+
+                    if (m_CheckGround) m_CheckGround = charAction.CheckGround();
+
+                    if (m_CheckMovement) m_CheckMovement = charAction.CheckMovement();
+
                     if (m_UpdateRotation) m_UpdateRotation = charAction.UpdateRotation();
 
                     if (m_UpdateMovement) m_UpdateMovement = charAction.UpdateMovement();
+
+                    if (m_UpdateAnimator) m_UpdateAnimator = charAction.UpdateAnimator();
 
                 }
             }  //  end of for loop
 
 
+            if (m_Move) Move();
+
+            if (m_CheckGround) CheckGround();
+
+            if (m_CheckMovement) CheckMovement();
+
+            if (m_SetPhysicsMaterial) SetPhysicsMaterial();
+
             if (m_UpdateRotation) UpdateRotation();
 
             if (m_UpdateMovement) UpdateMovement();
+
+            if (m_UpdateAnimator) UpdateAnimator();
 
         }
 

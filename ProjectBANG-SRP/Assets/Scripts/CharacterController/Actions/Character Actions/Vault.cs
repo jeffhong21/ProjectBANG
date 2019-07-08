@@ -68,24 +68,31 @@
         {
             if(base.CanStartAction() )
             {
-                if (m_Controller.DetectObject(m_Transform.forward, out m_MoveToVaultDistanceHit, m_MoveToVaultDistance, m_VaultLayers))
+                //if (m_Controller.DetectObject(m_Transform.forward, out m_MoveToVaultDistanceHit, m_MoveToVaultDistance, m_VaultLayers))
+                //{
+                //    if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance, Color.green);
+                //    return CachePositions();
+                //}
+
+                if (Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out m_MoveToVaultDistanceHit, m_MoveToVaultDistance, m_VaultLayers))
+                {
+                    if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance, Color.green);
+                    return CachePositions();
+                }
+            }
+            else if (m_Controller.GetAction<Sprint>().IsActive)
+            {
+                if (Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out m_MoveToVaultDistanceHit, m_MoveToVaultDistance, m_VaultLayers))
                 {
                     if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance, Color.green);
                     return CachePositions();
                 }
 
-                //if (Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out m_MoveToVaultDistanceHit, m_MoveToVaultDistance, m_VaultLayers)){
+                //if (m_Controller.DetectObject(m_Transform.forward, out m_MoveToVaultDistanceHit, 2, m_VaultLayers))
+                //{
                 //    if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance, Color.green);
                 //    return CachePositions();
                 //}
-            }
-            else if (m_Controller.GetAction<Sprint>().IsActive)
-            {
-                if (m_Controller.DetectObject(m_Transform.forward, out m_MoveToVaultDistanceHit, 2, m_VaultLayers))
-                {
-                    if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance, Color.green);
-                    return CachePositions();
-                }
             }
             //if(m_MatchTargetStates.Length == 0)
                 //Debug.LogFormat("No AnimatorStateMatchTarget");
@@ -136,8 +143,8 @@
             m_StartPosition.y = m_Transform.position.y;
             //  Get the position of when the characters hand is placed on the object.
             m_MatchPosition = m_MatchPositionHit.point + (Vector3.up * m_VerticalOffset + m_Transform.right * m_HorizontalOffset);
-            m_MatchPosition = m_MatchPosition + (m_Transform.forward * m_CapsuleCollider.radius);
-            //m_MatchPosition = m_MatchPosition + (m_Transform.forward * m_AccelerationTime);
+            //m_MatchPosition = m_MatchPosition + (m_Transform.forward * m_CapsuleCollider.radius);
+            m_MatchPosition = m_MatchPosition + (m_Transform.forward * 0.1f);
 
 
             m_VaultObjectHeight = Mathf.Clamp(m_VaultObjectHeight, 0.4f, m_MaxHeight) + m_VerticalOffset;
@@ -171,7 +178,7 @@
             float distance = m_MatchPositionHit.point.y - m_Transform.position.y;
             float percent = (m_VaultObjectHeight - distance) / m_VaultObjectHeight;
             percent = (float)System.Math.Round(percent, 2);
-            Debug.Log(percent);
+            //Debug.Log(percent);
 
             var rotation = Quaternion.FromToRotation(m_Transform.forward, -m_MoveToVaultDistanceHit.normal) * m_Rigidbody.rotation;
             m_Rigidbody.MoveRotation(Quaternion.Slerp(m_Rigidbody.rotation, rotation, 2 * percent).normalized);

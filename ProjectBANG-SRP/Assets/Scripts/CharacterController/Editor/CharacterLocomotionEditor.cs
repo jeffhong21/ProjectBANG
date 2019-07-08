@@ -58,8 +58,8 @@ namespace CharacterController
         private SerializedProperty m_Actions;
         private SerializedProperty m_UseRootMotion;
         private SerializedProperty m_RootMotionSpeedMultiplier;
-        private SerializedProperty m_Acceleration;
-        private SerializedProperty m_MovementSpeed;
+        private SerializedProperty m_GroundAcceleration;
+        private SerializedProperty m_GroundSpeed;
         private SerializedProperty m_RotationSpeed;
         private SerializedProperty m_SlopeForceDown;
 
@@ -98,8 +98,8 @@ namespace CharacterController
             m_Actions = serializedObject.FindProperty("m_Actions");
             m_UseRootMotion = serializedObject.FindProperty("m_UseRootMotion");
             m_RootMotionSpeedMultiplier = serializedObject.FindProperty("m_RootMotionSpeedMultiplier");
-            m_Acceleration = serializedObject.FindProperty("m_Acceleration");
-            m_MovementSpeed = serializedObject.FindProperty("m_MovementSpeed");
+            m_GroundAcceleration = serializedObject.FindProperty("m_GroundAcceleration");
+            m_GroundSpeed = serializedObject.FindProperty("m_GroundSpeed");
             m_RotationSpeed = serializedObject.FindProperty("m_RotationSpeed");
             m_SlopeForceDown = serializedObject.FindProperty("m_SlopeForceDown");
 
@@ -142,8 +142,8 @@ namespace CharacterController
                 EditorGUILayout.PropertyField(m_RootMotionSpeedMultiplier);
                 //EditorGUI.indentLevel--;
                 //  Motion related variables.
-                EditorGUILayout.PropertyField(m_MovementSpeed);
-                EditorGUILayout.PropertyField(m_Acceleration);
+                EditorGUILayout.PropertyField(m_GroundSpeed);
+                EditorGUILayout.PropertyField(m_GroundAcceleration);
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_MotorDamping"));
                 EditorGUILayout.PropertyField(m_RotationSpeed);
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_SlopeForceUp"));

@@ -25,14 +25,14 @@ namespace CharacterController
 
 		protected override void ActionStarted()
         {
-            //  Start walk angle
-            Vector3 axisSign = Vector3.Cross(m_Controller.LookDirection, m_Transform.forward);
-            startAngle = Vector3.Angle(m_Transform.forward, m_Controller.LookDirection) * (axisSign.y >= 0 ? -1f : 1f);
-            startAngle = (float)Math.Round(startAngle, 2);
-            startAngle = Mathf.Approximately(startAngle, 0) ? 0 : (float)Math.Round(startAngle, 2);
+            ////  Start walk angle
+            //Vector3 axisSign = Vector3.Cross(m_Controller.LookDirection, m_Transform.forward);
+            //startAngle = Vector3.Angle(m_Transform.forward, m_Controller.LookDirection) * (axisSign.y >= 0 ? -1f : 1f);
+            //startAngle = (float)Math.Round(startAngle, 2);
+            //startAngle = Mathf.Approximately(startAngle, 0) ? 0 : (float)Math.Round(startAngle, 2);
 
-            //Debug.LogFormat("Starting to move.  Start angle is {0}", startAngle);
-            m_Animator.SetFloat(HashID.StartAngle, startAngle);
+            ////Debug.LogFormat("Starting to move.  Start angle is {0}", startAngle);
+            //m_Animator.SetFloat(HashID.StartAngle, startAngle);
         }
 
 

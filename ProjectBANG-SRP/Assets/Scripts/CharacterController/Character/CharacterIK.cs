@@ -221,7 +221,7 @@
 
             m_AimPivot.position = m_RightShoulder.position;
             //m_LookAtPoint = m_Head.position + m_Controller.LookDirection;
-            m_LookAtPoint = Vector3.Lerp(m_LookAtPoint, m_Head.position + m_Controller.LookDirection, Time.deltaTime * 15);
+            //m_LookAtPoint = Vector3.Lerp(m_LookAtPoint, m_Head.position + m_Controller.LookDirection, Time.deltaTime * 15);
 
 
             m_TargetDirection = m_LookAtPoint - m_AimPivot.position;

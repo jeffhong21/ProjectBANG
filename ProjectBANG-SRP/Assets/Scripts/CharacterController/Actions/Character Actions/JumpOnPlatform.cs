@@ -30,63 +30,69 @@
         protected float timeToApex = 0.4f;
         protected float verticalVelocity;
 
-        Vector3 velocity;
+        protected Vector3 velocity;
         protected Vector3 rayOrigin;
-        protected RaycastHit horizontalRayHit, verticalRayHit;
+        protected RaycastHit detectObjectHit, detectObjectHeightHit;
         protected Vector3 startPosition, endPosition;
 
+        ////  Smooth velocity for forward movement.
+        //protected float velocitySmooth;
+        //protected float accelerationTime = 0.1f;
 
-        protected float velocitySmooth;
-        protected float accelerationTime = 0.1f;
-        //protected float distance;
+
+
 
 
         public override bool CanStartAction()
         {
+            bool canStart = false;
             if (base.CanStartAction())
             {
+                //  Check if character is within range.
+
                 rayOrigin = m_Transform.position + (Vector3.up * checkHeight) + (m_Transform.forward * (m_CapsuleCollider.radius - 0.1f));
-
-                Debug.DrawRay(rayOrigin, m_Transform.forward * startDistance, Color.green);
-
-                //  This will check if character is within range.
-                if (Physics.Raycast(rayOrigin, m_Transform.forward, out horizontalRayHit, startDistance, collisionLayers))
+                if (Physics.Raycast(rayOrigin, m_Transform.forward, out detectObjectHit, startDistance, collisionLayers))
                 {
 
-                    heightCheckStart = horizontalRayHit.point;
+                    heightCheckStart = detectObjectHit.point;
                     heightCheckStart.y += (maxHeight + 0.2f) - checkHeight;
 
                     //  This will check if platform is too high for character.
-                    if (Physics.SphereCast(heightCheckStart, m_CapsuleCollider.radius, Vector3.down, out verticalRayHit, maxHeight, collisionLayers))
+                    if (Physics.SphereCast(heightCheckStart, m_CapsuleCollider.radius, Vector3.down, out detectObjectHeightHit, maxHeight, collisionLayers))
                     {
 
-                        var heightCheckDist = verticalRayHit.distance;
+                        var heightCheckDist = detectObjectHeightHit.distance;
                         //  Get the objet to vault over platformHeight.
                         platformHeight = maxHeight - heightCheckDist;
 
-                        return true;
+                        canStart = true;
                     }
 
                 }
+
+                if (m_Debug) Debug.DrawRay(rayOrigin, m_Transform.forward * startDistance, Color.green);
+
             }
 
 
-            return false;
+            return canStart;
         }
 
 
         protected override void ActionStarted()
         {
             var jumpTime = timeToApex * platformHeight;
-            endPosition = verticalRayHit.point + (m_Transform.forward * (m_CapsuleCollider.radius + 0.12f));
+            endPosition = detectObjectHeightHit.point + (m_Transform.forward * (m_CapsuleCollider.radius + 0.12f));
             startPosition = m_Transform.position;
 
             jumpForce = -(2 * platformHeight) / Mathf.Pow(jumpTime, 2);
             verticalVelocity = Mathf.Abs(jumpForce) * jumpTime;
 
-            var adjustedStartingPos = startPosition;
-            //adjustedStartingPos.y = endPosition.y;
-            velocity = CalculateVelocity(endPosition, adjustedStartingPos, jumpTime);
+            //platformHeight = jumpForce * Mathf.Pow(jumpTime, 2) / -2;
+
+            //var adjustedStartingPos = startPosition;
+            ////adjustedStartingPos.y = endPosition.y;
+            velocity = CalculateVelocity(endPosition, startPosition, jumpTime);
 
 
 
@@ -107,10 +113,10 @@
 
         public override bool UpdateRotation()
         {
-            float distance = verticalRayHit.point.y - m_Transform.position.y;
+            float distance = detectObjectHeightHit.point.y - m_Transform.position.y;
             float percent = (platformHeight - distance) / platformHeight;
 
-            var rotation = Quaternion.FromToRotation(m_Transform.forward, -horizontalRayHit.normal) * m_Transform.rotation;
+            var rotation = Quaternion.FromToRotation(m_Transform.forward, -detectObjectHit.normal) * m_Transform.rotation;
             m_Rigidbody.MoveRotation(Quaternion.Slerp(rotation, m_Rigidbody.rotation, 2 * percent).normalized);
             return false;
         }
@@ -146,7 +152,7 @@
 
 
 
-        Vector3 CalculateVelocity(Vector3 target, Vector3 origin, float time)
+        protected Vector3 CalculateVelocity(Vector3 target, Vector3 origin, float time)
         {
             //  Define the distance x and y first.
             Vector3 distance = target - origin;
@@ -244,46 +250,7 @@
 
 
 
-        //float velocity;
-        //float angle = 45f;
-        //int resolution = 5;
 
-        //float gravity;
-        //float radianAngle;
-        //Vector3[] arcPoints = new Vector3[0];
-
-        //protected Vector3[] CalculateArcArray()
-        //{
-        //    resolution = 5;
-        //    Vector3[] arcArray = new Vector3[resolution];
-        //    angle = 45f;
-        //    velocity = m_DistanceToWall - m_CapsuleCollider.radius * 2;
-        //    gravity = Mathf.Abs(Physics.gravity.y);
-        //    radianAngle = Mathf.Deg2Rad * angle;
-
-        //    //Debug.Log(gravity);
-
-
-
-        //    float maxDistance = (velocity * velocity * Mathf.Sin(2 * radianAngle)) / gravity;
-
-        //    for (int index = 0; index < resolution; index++)
-        //    {
-        //        float t = (float)index / (float)resolution;
-        //        arcArray[index] = CalculateArcPoint(t, maxDistance);
-        //    }
-
-        //    return arcArray;
-        //}
-
-
-        ////  Calculate platformHeight and distance of each vertex.
-        //Vector3 CalculateArcPoint(float t, float maxDistance)
-        //{
-        //    float x = t * maxDistance;
-        //    float y = x * Mathf.Tan(radianAngle) - ((gravity * x * x) / (2 * velocity * velocity * Mathf.Cos(radianAngle) * Mathf.Cos(radianAngle)));
-        //    return new Vector3(x, y);
-        //}
 
 
 

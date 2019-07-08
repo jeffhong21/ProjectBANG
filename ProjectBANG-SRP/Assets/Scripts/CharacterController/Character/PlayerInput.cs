@@ -1,6 +1,7 @@
 namespace CharacterController
 {
     using UnityEngine;
+    using static CharacterController.RigidbodyCharacterController;
 
     [DisallowMultipleComponent]
     public class PlayerInput : MonoBehaviour
@@ -24,11 +25,11 @@ namespace CharacterController
 
 
         [Header("-- Debug Settings --")]
-        [SerializeField, Tooltip("Shift + what key to select player.")]
+        [SerializeField, Tooltip("What key to select player.")]
         private KeyCode m_SelectPlayerKeyCode = KeyCode.Alpha0;
         [SerializeField, Tooltip("Locks camera's rotation.")]
         private KeyCode m_LockCameraRotation = KeyCode.L;
-        [SerializeField, Tooltip("Shift + what key to debug.break.")]
+        [SerializeField, Tooltip("What key to debug.break.")]
         private KeyCode m_DebugBreakKeyCode = KeyCode.Delete;
 
 
@@ -39,9 +40,6 @@ namespace CharacterController
         private Vector3 m_MouseInputVector;
 
 
-
-        private Vector3 m_CameraFwd;
-        private Vector3 m_LookDirection;
 
 
         [SerializeField]
@@ -137,18 +135,32 @@ namespace CharacterController
 
         private void Update()
 		{
-            //  LOCK CAMERA
-            //if (LockCameraRotation() == true) return;
+            //Vector3 lookDirection = m_CameraController == null ? m_Transform.forward : Vector3.Scale(m_Camera.forward, new Vector3(1, 0, 1)).normalized;
+            ////Quaternion lookRotation = Quaternion.LookRotation(lookDirection, Vector3.up);
+            //Quaternion lookRotation = Quaternion.FromToRotation(m_Transform.forward, lookDirection);
+            //m_Controller.Move(InputVectorRaw.x, InputVectorRaw.z, lookRotation);
+            //m_Controller.LookDirection = lookDirection;
 
+            
             Vector3 lookDirection = m_CameraController == null ? m_Transform.forward : Vector3.Scale(m_Camera.forward, new Vector3(1, 0, 1)).normalized;
-            //Quaternion lookRotation = Quaternion.LookRotation(lookDirection, Vector3.up);
             Quaternion lookRotation = Quaternion.FromToRotation(m_Transform.forward, lookDirection);
-            m_Controller.Move(InputVectorRaw.x, InputVectorRaw.z, lookRotation);
-            m_Controller.LookDirection = lookDirection;
+            m_Controller.InputVector = InputVectorRaw;
+            m_Controller.LookRotation = lookRotation;
+            //m_Controller.LookDirection = lookDirection;
 
-            //m_Controller.InputVector = InputVectorRaw;
-            //m_LookDirection = m_CameraController == null ? m_Transform.forward : Vector3.Scale(m_Camera.forward, new Vector3(1, 0, 1)).normalized;
-            //m_Controller.LookDirection = m_LookDirection;
+            switch (m_Controller.Movement)
+            {
+                case (MovementType.Adventure):
+
+
+
+                    break;
+
+
+                case (MovementType.Combat):
+
+                    break;
+            }
 
 
             DebugButtonPress();
@@ -162,12 +174,15 @@ namespace CharacterController
             if (m_CameraController != null)
             {
                 m_CameraController.RotateCamera(MouseInputVector.x, MouseInputVector.y);
-
                 //m_CameraController.ZoomCamera(Input.GetAxisRaw(m_MouseScrollInput));
+
+                if (Input.GetKey(KeyCode.Tab))
+                {
+
+                }
             }
 
-            //  Check if character is moving.
-            //m_Controller.Moving = InputVector != Vector3.zero || InputVectorRaw != Vector3.zero;
+
         }
 
 

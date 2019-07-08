@@ -41,7 +41,7 @@ public class ToolboxEditorWindow : EditorWindow
         {
             string layerName = InternalEditorUtility.GetLayerName(index);
             if (layerName.Length > 0)
-                EditorGUILayout.LabelField(index + ":" + layerName);
+                EditorGUILayout.LabelField(index + " : " + layerName);
         }
 
 

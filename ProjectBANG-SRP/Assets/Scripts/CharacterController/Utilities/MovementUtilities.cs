@@ -35,4 +35,52 @@
 
 //        return result;
 //    }
+
+
+
+
+//    public class DrawLineRenderer
+//    {
+//        float velocity;
+//        float angle = 45f;
+//        int resolution = 5;
+
+//        float gravity;
+//        float radianAngle;
+//        Vector3[] arcPoints = new Vector3[0];
+
+//        protected Vector3[] CalculateArcArray()
+//        {
+//            resolution = 5;
+//            Vector3[] arcArray = new Vector3[resolution];
+//            angle = 45f;
+//            velocity = m_DistanceToWall - m_CapsuleCollider.radius * 2;
+//            gravity = Mathf.Abs(Physics.gravity.y);
+//            radianAngle = Mathf.Deg2Rad * angle;
+
+//            //Debug.Log(gravity);
+
+
+
+//            float maxDistance = (velocity * velocity * Mathf.Sin(2 * radianAngle)) / gravity;
+
+//            for (int index = 0; index < resolution; index++)
+//            {
+//                float t = (float)index / (float)resolution;
+//                arcArray[index] = CalculateArcPoint(t, maxDistance);
+//            }
+
+//            return arcArray;
+//        }
+
+
+//        //  Calculate platformHeight and distance of each vertex.
+//        Vector3 CalculateArcPoint(float t, float maxDistance)
+//        {
+//            float x = t * maxDistance;
+//            float y = x * Mathf.Tan(radianAngle) - ((gravity * x * x) / (2 * velocity * velocity * Mathf.Cos(radianAngle) * Mathf.Cos(radianAngle)));
+//            return new Vector3(x, y);
+//        }
+//    }
+
 //}

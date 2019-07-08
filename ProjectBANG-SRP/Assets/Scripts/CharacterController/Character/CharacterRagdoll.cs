@@ -33,7 +33,7 @@
         [SerializeField]
         private List<Rigidbody> m_RagdollRigidbody = new List<Rigidbody>();
 
-
+        private PhysicMaterial m_LimbFrictionMaterial;
 
 
         private CharacterLocomotion m_Controller;
@@ -56,7 +56,15 @@
 
             SetupRagdoll();
 
-
+            m_LimbFrictionMaterial = new PhysicMaterial
+            {
+                name = "LimbFrictionMaterial",
+                dynamicFriction = .25f,
+                staticFriction = .25f,
+                bounciness = 0,
+                frictionCombine = PhysicMaterialCombine.Average,
+                bounceCombine = PhysicMaterialCombine.Average
+            };
         }
 
 

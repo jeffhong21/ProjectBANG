@@ -28,6 +28,8 @@
         public static readonly int Moving = Animator.StringToHash("Moving");
         public static readonly int Aiming = Animator.StringToHash("Aiming");
         public static readonly int Crouching = Animator.StringToHash("Crouching");
+        public static readonly int Grounded = Animator.StringToHash("Grounded");
+
 
         public static readonly int Height = Animator.StringToHash("Height");
         public static readonly int Speed = Animator.StringToHash("Speed");
