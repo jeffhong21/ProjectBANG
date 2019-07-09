@@ -132,7 +132,7 @@ namespace CharacterController
             //  -----
             //  Character Movement
             //  -----
-            EditorGUILayout.Space();
+            //EditorGUILayout.Space();
             displayMovement.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayMovement.boolValue, MotorFoldoutHeader) : InspectorUtility.Foldout(displayMovement.boolValue, MotorFoldoutHeader);
             if(displayMovement.boolValue)
             {
@@ -156,7 +156,7 @@ namespace CharacterController
             //  -----
             //  Character Physics
             //  -----
-            EditorGUILayout.Space();
+            //EditorGUILayout.Space();
             displayPhysics.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayPhysics.boolValue, PhysicsFoldoutHeader) : InspectorUtility.Foldout(displayPhysics.boolValue, PhysicsFoldoutHeader);
             if(displayPhysics.boolValue)
             {
@@ -182,7 +182,7 @@ namespace CharacterController
             //  -----
             //  Character Animation
             //  -----
-            EditorGUILayout.Space();
+            //EditorGUILayout.Space();
             displayAnimations.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayAnimations.boolValue, AnimationFoldoutHeader) : InspectorUtility.Foldout(displayAnimations.boolValue, AnimationFoldoutHeader);
             if (displayAnimations.boolValue)
             {
@@ -200,7 +200,7 @@ namespace CharacterController
             //  -----
             //  Character Actions
             //  -----
-            EditorGUILayout.Space();
+            //EditorGUILayout.Space();
             displayActions.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayActions.boolValue, ActionsFoldoutHeader) : InspectorUtility.Foldout(displayActions.boolValue, ActionsFoldoutHeader);
             if(displayActions.boolValue)
             {

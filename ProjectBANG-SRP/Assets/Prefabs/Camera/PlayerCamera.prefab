@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4465774502092068}
-  - component: {fileID: 114390585562722546}
   - component: {fileID: -7592335448768670560}
   m_Layer: 0
   m_Name: PlayerCamera
@@ -33,32 +32,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114390585562722546
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1496660069129776}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2c0271eab96de4b799dd36d0fe7b06c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ActiveCameraState: 
-  m_CameraStates:
-  - {fileID: 11400000, guid: 7e6f7bf8d3f914d2c8b9d8f007b3c2a2, type: 2}
-  - {fileID: 11400000, guid: 25f2bdf1c47504e2bbba5a6aa6e4abbf, type: 2}
-  m_Character: {fileID: 0}
-  m_Anchor: {fileID: 0}
-  m_AutoAnchor: 0
-  m_AutoAnchorBone: 10
-  m_Debug: 0
-  m_CursorOptions:
-    lockCursor: 0
-    cursorVisible: 0
-  m_Camera: {fileID: 0}
-  m_CameraStateToggle: 1
 --- !u!114 &-7592335448768670560
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -71,6 +44,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8504035ec3e1a482a908e1fe2d9da4b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_ActiveCameraState: 
+  m_CameraStates: []
+  m_Character: {fileID: 0}
+  m_Anchor: {fileID: 0}
+  m_AutoAnchor: 0
+  m_AutoAnchorBone: 10
+  m_Debug: 0
+  m_CursorOptions:
+    lockCursor: 0
+    cursorVisible: 0
+  m_CameraStateToggle: 0
 --- !u!1 &1649400292190392
 GameObject:
   m_ObjectHideFlags: 0

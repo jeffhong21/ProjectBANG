@@ -9,27 +9,63 @@
 
     public class CinamachineCameraController : CameraController
     {
+        [Serializable]
+        public class VirtualCameraState
+        {
+            [SerializeField] private string stateName;
+            [SerializeField] private CinemachineVirtualCameraBase virtualCamera;
+
+            public string StateName {
+                get { return stateName; }
+                set {
+                    stateName = value;
+                    if (stateName.Length == 0)
+                        stateName = virtualCamera.name;
+                }
+            }
+
+            public CinemachineVirtualCameraBase VirtualCamera
+            {
+                get { return virtualCamera; }
+                set { virtualCamera = value; }
+            }
+
+
+            public VirtualCameraState(string stateName)
+            {
+                this.stateName = stateName;
+            }
+
+            public VirtualCameraState(string stateName, CinemachineVirtualCameraBase virtualCamera)
+            {
+                this.stateName = stateName;
+                this.virtualCamera = virtualCamera;
+            }
+        }
+
+
+
+
+
         [Header("Cinemachine")]
         [SerializeField]
         private CinemachineBrain m_CMBrain;
-        [SerializeField]
-        private CinemachineFreeLook m_DefaultVCam;
-        [SerializeField]
-        private CinemachineFreeLook m_AimVCam;
         [Header("Targets")]
         [SerializeField]
         private Transform m_FollowTarget;
         [SerializeField]
         private Transform m_LookAtTarget;
-
-
-        private CinemachineFreeLook activeVCam;
+        [Header("Virtual Cameras")]
+        [SerializeField]
+        private VirtualCameraState[] virtualCameras = { new VirtualCameraState("DEFAULT") };
         private int currentCamera;
-        private CinemachineFreeLook[] m_VCameraList;
+
+        private CinemachineVirtualCameraBase activeCamera;
+        private CinemachineFreeLook[] freeLookCameras;
         private CinemachineFreeLook.Orbit[] originalOrbits;
 
         //private CinemachineCollider m_CinemachineCollider;
-        //private CinemachineImpulseSource m_CinemachineImpulseSource;
+        private CinemachineImpulseSource m_CinemachineImpulseSource;
         //private PostProcessVolume m_PostProcessVolume;
         //private PostProcessProfile m_PostProcessProfile;
 
@@ -47,19 +83,19 @@
 
 
 
-//            if (m_DefaultVCam != null)
-//            {
-//                originalOrbits = new CinemachineFreeLook.Orbit[activeVCam.m_Orbits.Length];
-//                for (int i = 0; i < originalOrbits.Length; i++)
-//                {
-//                    originalOrbits[i].m_Height = activeVCam.m_Orbits[i].m_Height;
-//                    originalOrbits[i].m_Radius = activeVCam.m_Orbits[i].m_Radius;
-//                }
-//#if UNITY_EDITOR
-//                SaveDuringPlay.SaveDuringPlay.OnHotSave -= RestoreOriginalOrbits;
-//                SaveDuringPlay.SaveDuringPlay.OnHotSave += RestoreOriginalOrbits;
-//#endif
-//            }
+            //if (m_DefaultVCam != null)
+            //{
+            //    originalOrbits = new CinemachineFreeLook.Orbit[activeVCam.m_Orbits.Length];
+            //    for (int i = 0; i < originalOrbits.Length; i++)
+            //    {
+            //        originalOrbits[i].m_Height = activeVCam.m_Orbits[i].m_Height;
+            //        originalOrbits[i].m_Radius = activeVCam.m_Orbits[i].m_Radius;
+            //    }
+            //    #if UNITY_EDITOR
+            //    SaveDuringPlay.SaveDuringPlay.OnHotSave -= RestoreOriginalOrbits;
+            //    SaveDuringPlay.SaveDuringPlay.OnHotSave += RestoreOriginalOrbits;
+            //    #endif
+            //}
             //originalZoom = freeLook.m_Orbits[1].m_Radius;
             //m_CinemachineCollider = freeLook.GetComponent<CinemachineCollider>();
             //m_CinemachineImpulseSource = freeLook.GetComponent<CinemachineImpulseSource>();
@@ -70,22 +106,41 @@
 
         private void Start()
         {
-            m_Camera = m_CMBrain.OutputCamera; 
-            var cameraList = new List<CinemachineFreeLook>();
 
-            cameraList.Add(m_DefaultVCam);
-            cameraList.Add(m_AimVCam);
-
-            m_VCameraList = cameraList.ToArray();
-            for (int i = 0; i < m_VCameraList.Length; i++)
+            currentCamera = 0;
+            if(virtualCameras.Length > 0)
             {
-                InitializeVirtualCamera(m_VCameraList[i]);
-                m_VCameraList[i].gameObject.SetActive(false);
+                for (int i = 0; i < virtualCameras.Length; i++)
+                {
+                    virtualCameras[i].VirtualCamera.gameObject.SetActive(false);
+                }
+
+                virtualCameras[0].VirtualCamera.gameObject.SetActive(true);
             }
-            
-            activeVCam = m_DefaultVCam;
-            activeVCam.gameObject.SetActive(true);
+
+
+
+
+            m_Camera = m_CMBrain.OutputCamera; 
+
         }
+
+
+        private void OnValidate()
+        {
+            if(m_FollowTarget && m_LookAtTarget != null)
+            {
+                for (int i = 0; i < transform.childCount; i++){
+                    if (transform.GetChild(i).GetComponent<ICinemachineCamera>() != null){
+                        ICinemachineCamera cmCamera = transform.GetChild(i).GetComponent<ICinemachineCamera>();
+                        if (cmCamera.Follow == null) cmCamera.Follow = m_FollowTarget;
+                        if (cmCamera.LookAt == null) cmCamera.LookAt = m_LookAtTarget;
+                    }
+                }
+            }
+
+        }
+
 
 
         private void InitializeVirtualCamera(CinemachineVirtualCameraBase vCam)
@@ -95,10 +150,6 @@
             vCam.Follow = m_FollowTarget;
             vCam.LookAt = m_LookAtTarget;
         }
-
-
-
-
 
 
         public override void SetMainTarget(GameObject target)
@@ -112,18 +163,6 @@
 
 
 
-        //public bool ChangeCameraState(CameraState state)
-        //{
-        //    if (m_CameraStateLookup.ContainsKey(state.name))
-        //    {
-        //        m_CameraState = m_CameraStateLookup[state.name];
-        //        InitializeState();
-        //        Debug.LogFormat("CameraState: {0}", m_CameraState.name);
-        //        return true;
-        //    }
-        //    Debug.LogFormat("** Camera State {0} does not exist", name);
-        //    return false;
-        //}
 
 
 
@@ -141,13 +180,10 @@
             //    }
             //}
 
-            if (Input.GetKeyDown(KeyCode.Tab))
-            {
-                foreach (var vCam in m_VCameraList)
-                {
-                    Debug.Log(vCam.Name + ": Priority:" + vCam.Priority);
-                }
-            }
+            //if (Input.GetKeyDown(KeyCode.Tab))
+            //{
+            //    ToggleNextCamera(true);
+            //}
         }
 
 
@@ -156,15 +192,8 @@
 
         }
 
-        public override CameraState GetCameraStateWithName(string name)
-        {
-            throw new NotImplementedException();
-        }
 
-        public override bool ChangeCameraState(CameraState state)
-        {
-            throw new NotImplementedException();
-        }
+
 
         public override void RotateCamera(float mouseX, float mouseY)
         {
@@ -177,27 +206,82 @@
         }
 
 
-
-
-
-#if UNITY_EDITOR
-        private void OnDestroy()
+        public override bool SetCameraState(string stateName)
         {
-            SaveDuringPlay.SaveDuringPlay.OnHotSave -= RestoreOriginalOrbits;
-        }
-
-        private void RestoreOriginalOrbits()
-        {
-            if (originalOrbits != null)
+            bool foundState = false;
+            for (int i = 0; i < virtualCameras.Length; i++)
             {
-                for (int i = 0; i < originalOrbits.Length; i++)
+                if(virtualCameras[i].StateName == stateName)
                 {
-                    activeVCam.m_Orbits[i].m_Height = originalOrbits[i].m_Height;
-                    activeVCam.m_Orbits[i].m_Radius = originalOrbits[i].m_Radius;
+                    currentCamera = i;
+                    foundState = true;
+                    break;
                 }
+                //virtualCameras[i].VirtualCamera.gameObject.SetActive(false);
             }
+
+            for (int i = 0; i < virtualCameras.Length; i++){
+                virtualCameras[i].VirtualCamera.gameObject.SetActive(currentCamera == i);
+            }
+
+            return foundState;
         }
-#endif
+
+
+        public void ToggleNextCamera(bool debugMsg = false)
+        {
+            currentCamera++;
+            if (currentCamera < virtualCameras.Length)
+            {
+                virtualCameras[currentCamera - 1].VirtualCamera.gameObject.SetActive(false);
+                virtualCameras[currentCamera].VirtualCamera.gameObject.SetActive(true);
+            }
+            else
+            {
+                //virtualCameras[currentCamera - 1].VirtualCamera.gameObject.SetActive(false);
+                currentCamera = 0;
+                virtualCameras[currentCamera].VirtualCamera.gameObject.SetActive(true);
+            }
+
+            if (debugMsg) Debug.LogFormat("Toggleing <b>{0}</b> on.", virtualCameras[currentCamera].VirtualCamera.Name);
+        }
+
+
+
+        public void SetActiveCamera()
+        {
+
+        }
+
+
+
+        public void PlayImpulse()
+        {
+
+        }
+
+
+
+
+
+//#if UNITY_EDITOR
+//        private void OnDestroy()
+//        {
+//            SaveDuringPlay.SaveDuringPlay.OnHotSave -= RestoreOriginalOrbits;
+//        }
+
+//        private void RestoreOriginalOrbits()
+//        {
+//            if (originalOrbits != null)
+//            {
+//                for (int i = 0; i < originalOrbits.Length; i++)
+//                {
+//                    activeVCam.m_Orbits[i].m_Height = originalOrbits[i].m_Height;
+//                    activeVCam.m_Orbits[i].m_Radius = originalOrbits[i].m_Radius;
+//                }
+//            }
+//        }
+//#endif
 
 
 
