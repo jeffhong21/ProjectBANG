@@ -100,34 +100,39 @@
 
                 if (charAction.IsActive)
                 {
+                    //  Move charatcer based on input values.
                     if (m_Move) m_Move = charAction.Move();
-
+                    //  Perform checks to determine if the character is on the ground.
                     if (m_CheckGround) m_CheckGround = charAction.CheckGround();
-
+                    //  Ensure the current movement direction is valid.
                     if (m_CheckMovement) m_CheckMovement = charAction.CheckMovement();
 
-                    if (m_UpdateRotation) m_UpdateRotation = charAction.UpdateRotation();
 
-                    if (m_UpdateMovement) m_UpdateMovement = charAction.UpdateMovement();
-
-                    if (m_UpdateAnimator) m_UpdateAnimator = charAction.UpdateAnimator();
+                    //  Update the rotation forces.
+                    if (m_UpdateRotation)m_UpdateRotation = charAction.UpdateRotation();
+                    //  Apply any movement.
+                    if (m_UpdateMovement)m_UpdateMovement = charAction.UpdateMovement();
+                    // Update the Animator.
+                    if (m_UpdateAnimator)m_UpdateAnimator = charAction.UpdateAnimator();
 
                 }
             }  //  end of for loop
 
-
+            //  Moves the character according to the input.
             if (m_Move) Move();
-
+            //  Perform checks to determine if the character is on the ground.
             if (m_CheckGround) CheckGround();
-
+            //  Ensure the current movement direction is valid.
             if (m_CheckMovement) CheckMovement();
-
+            //  Set the physic material based on the grounded and stepping state
             if (m_SetPhysicsMaterial) SetPhysicsMaterial();
 
+
+            //  Update the rotation forces.
             if (m_UpdateRotation) UpdateRotation();
-
+            //  Apply any movement.
             if (m_UpdateMovement) UpdateMovement();
-
+            // Update the Animator.
             if (m_UpdateAnimator) UpdateAnimator();
 
         }

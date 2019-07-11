@@ -53,7 +53,7 @@ namespace CharacterController
 
         public override bool CanStopAction()
         {
-            return m_Rigidbody.velocity.y < 0.01f || m_Controller.Grounded;
+            return m_Rigidbody.velocity.y < 0;
         }
 
 

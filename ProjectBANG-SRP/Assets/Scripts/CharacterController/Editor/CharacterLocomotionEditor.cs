@@ -69,8 +69,7 @@ namespace CharacterController
         private SerializedProperty m_MaxStepHeight;
 
 
-        private SerializedProperty m_StepOffset;
-        private SerializedProperty m_StepSpeed;
+
 
 
         private SerializedProperty displayMovement;
@@ -105,13 +104,11 @@ namespace CharacterController
 
             m_Mass = serializedObject.FindProperty("m_Mass");
             m_MaxStepHeight = serializedObject.FindProperty("m_MaxStepHeight");
-            m_MaxStepHeight = serializedObject.FindProperty("m_MaxStepHeight");
             m_SkinWidth = serializedObject.FindProperty("m_SkinWidth");
             m_SlopeLimit = serializedObject.FindProperty("m_SlopeLimit");
 
 
-            m_StepOffset = serializedObject.FindProperty("m_StepOffset");
-            m_StepSpeed = serializedObject.FindProperty("m_StepSpeed");
+
 
             m_ActionsList = new ReorderableList(serializedObject, serializedObject.FindProperty("m_Actions"), true, true, true, true);
 		}
@@ -166,8 +163,6 @@ namespace CharacterController
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_ExternalForceDamping"));
                 EditorGUILayout.PropertyField(m_SlopeLimit);
                 EditorGUILayout.PropertyField(m_MaxStepHeight);
-                EditorGUILayout.PropertyField(m_StepOffset);
-                EditorGUILayout.PropertyField(m_StepSpeed);
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_GravityModifier"));
 
                 //  Collisions

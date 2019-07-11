@@ -380,7 +380,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.25
+  m_Radius: 0.3
   m_Height: 1.8
   m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0}
@@ -414,9 +414,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_UseRootMotion: 1
   m_RootMotionSpeedMultiplier: 1
-  m_GroundAcceleration: 0.12
+  m_GroundAcceleration: 0.18
   m_AirborneAcceleration: 0.2
-  m_MotorDamping: 0.2
+  m_MotorDamping: 0.27
   m_AirborneDamping: 0.3
   m_GroundSpeed: 4
   m_AirborneSpeed: 0.5
@@ -427,13 +427,13 @@ MonoBehaviour:
   m_DetectObjectHeight: 0.4
   m_Mass: 100
   m_SkinWidth: 0.08
-  m_SlopeLimit: 45
+  m_SlopeLimit: 60
   m_MaxStepHeight: 0.4
-  m_GroundStickiness: 0.2
   m_ExternalForceDamping: 0.1
   m_StepOffset: 0.1
   m_StepSpeed: 4
   m_GravityModifier: 0.4
+  m_GroundStickiness: 6
   mDetectHorizontalCollision: 1
   m_HorizontalCollisionCount: 10
   m_VerticalCollisionCount: 10
@@ -444,9 +444,6 @@ MonoBehaviour:
   m_IdleRotationMultiplier: 1.5
   m_MovingStateName: Movement
   m_AirborneStateName: Falling
-  m_Moving: 0
-  m_InputVector: {x: 0, y: 0, z: 0}
-  m_Grounded: 1
   m_Debug: 1
   m_DebugCollisions: 1
   m_DrawDebugLine: 1
@@ -539,6 +536,8 @@ MonoBehaviour:
   m_MoveAxisDeadZone: 0.2
   m_LookDistance: 50
   m_AxisRaw: 1
+  m_LockCursor: 1
+  m_CursorVisible: 0
   m_SelectPlayerKeyCode: 112
   m_LockCameraRotation: 108
   m_DebugBreakKeyCode: 13
@@ -552,7 +551,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aa7477202022244aca8f8b4dfa3d0348, type: 3}
   m_Name: 
@@ -1130,9 +1129,9 @@ MonoBehaviour:
   m_StartType: 3
   m_StopType: 0
   m_InputNames:
-  - Space
+  - W
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 0
+  m_ApplyBuiltinRootMotion: 1
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 6784883267551059862, guid: fa3ee4246aa6a4c1fa973ad6b06a6a6f,
@@ -1285,12 +1284,13 @@ MonoBehaviour:
   m_StartType: 2
   m_StopType: 0
   m_InputNames:
-  - F
+  - Space
   m_SpeedMultiplier: 1
   m_ApplyBuiltinRootMotion: 1
   m_StartAudioClips: []
   m_StopAudioClips: []
-  m_StartEffect: {fileID: 0}
+  m_StartEffect: {fileID: 1000012906409722, guid: 8887970892f60ae469bbd550b0a91a04,
+    type: 3}
   m_EndEffect: {fileID: 0}
   m_Debug: 0
   m_Force: 5
@@ -1399,7 +1399,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e45ea437e115a4fb6be25b8464e6de7a, type: 3}
   m_Name: 
@@ -1508,7 +1508,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: baed9bd3040554f2482260e0e684e139, type: 3}
   m_Name: 
