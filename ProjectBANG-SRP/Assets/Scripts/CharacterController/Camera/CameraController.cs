@@ -25,16 +25,6 @@
 
 
         protected Camera m_Camera;
-        protected Dictionary<string, CameraState> m_CameraStateLookup = new Dictionary<string, CameraState>();
-
-
-
-
-
-
-
-
-
 
         public Camera Camera{
             get { return m_Camera; }
@@ -57,33 +47,20 @@
                 m_Camera = GetComponentInChildren<Camera>();
 
 
-
-
-
-            
         }
 
 
         protected virtual void OnEnable()
-		{
+        {
 
-		}
+        }
 
         protected virtual void OnDisable()
-		{
-			
-		}
+        {
 
-
+        }
 
         public abstract void SetMainTarget(GameObject target);
-
-
-
-        public abstract CameraState GetCameraStateWithName(string name);
-
-
-        public abstract bool ChangeCameraState(CameraState state);
 
 
         public abstract void RotateCamera(float mouseX, float mouseY);
@@ -92,7 +69,10 @@
         public abstract void ZoomCamera(float zoomInput);
 
 
-
+        public virtual bool SetCameraState(string stateName)
+        {
+            return false;
+        }
 
 
 

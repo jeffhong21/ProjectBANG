@@ -21,7 +21,10 @@ namespace CharacterController
         //private LayerMask m_LayerMask;
         [SerializeField]
         private bool m_AxisRaw = true;
-
+        [SerializeField]
+        private bool m_LockCursor = true;
+        [SerializeField]
+        private bool m_CursorVisible = false;
 
 
         [Header("-- Debug Settings --")]
@@ -115,6 +118,9 @@ namespace CharacterController
 
 		private void Start()
 		{
+            Cursor.lockState = m_LockCursor ? CursorLockMode.Locked : CursorLockMode.Confined;
+            Cursor.visible = m_CursorVisible;
+
             m_CameraController = CameraController.Instance;
             m_Camera = CameraController.Instance.Camera.transform;
 
@@ -135,25 +141,32 @@ namespace CharacterController
 
         private void Update()
 		{
+            if (Input.GetMouseButton(1)) OnAimActionStart(Aiming);
+
+
             //Vector3 lookDirection = m_CameraController == null ? m_Transform.forward : Vector3.Scale(m_Camera.forward, new Vector3(1, 0, 1)).normalized;
             ////Quaternion lookRotation = Quaternion.LookRotation(lookDirection, Vector3.up);
             //Quaternion lookRotation = Quaternion.FromToRotation(m_Transform.forward, lookDirection);
             //m_Controller.Move(InputVectorRaw.x, InputVectorRaw.z, lookRotation);
             //m_Controller.LookDirection = lookDirection;
 
-            
+
             Vector3 lookDirection = m_CameraController == null ? m_Transform.forward : Vector3.Scale(m_Camera.forward, new Vector3(1, 0, 1)).normalized;
             Quaternion lookRotation = Quaternion.FromToRotation(m_Transform.forward, lookDirection);
             m_Controller.InputVector = InputVectorRaw;
             m_Controller.LookRotation = lookRotation;
             //m_Controller.LookDirection = lookDirection;
 
+            //Debug.DrawRay(m_Transform.position + Vector3.up * 1.8f, lookDirection, Color.black);
+
             switch (m_Controller.Movement)
             {
                 case (MovementType.Adventure):
 
 
-
+                    var targetAngle = Mathf.Atan2(m_Controller.InputVector.x, Mathf.Abs(m_Controller.InputVector.z)) * Mathf.Rad2Deg * m_DeltaTime;
+                    targetAngle *= m_InputVector.x;
+                    targetAngle += m_Transform.eulerAngles.y;
                     break;
 
 
@@ -165,6 +178,7 @@ namespace CharacterController
 
             DebugButtonPress();
         }
+
 
 
         private void LateUpdate()
@@ -181,23 +195,8 @@ namespace CharacterController
 
                 }
             }
-
-
         }
 
-
-        //private bool LockCameraRotation()
-        //{
-        //    if (Input.GetKeyDown(m_LockCameraRotation)){
-        //        Debug.Log(CameraController.LockRotation);
-        //        if (CameraController.Instance != null){
-        //            CameraController.LockRotation = !CameraController.LockRotation;
-        //        }
-
-        //        return true;
-        //    }
-        //    return false;
-        //}
 
 
 
@@ -208,7 +207,6 @@ namespace CharacterController
             {
                 UnityEditor.Selection.activeGameObject = gameObject;
             }
-
 
             if (Input.GetKeyDown(m_DebugBreakKeyCode))
             {
@@ -230,7 +228,7 @@ namespace CharacterController
 
 
 
-
+        bool Aiming = false;
         private void OnAimActionStart(bool aim)
         {
             //if (aim == true)
@@ -242,6 +240,13 @@ namespace CharacterController
             //{
             //    CameraController.Instance.ChangeCameraState("TPS_Default");
             //}
+            Aiming = !Aiming;
+
+            if (Aiming)
+                CameraController.Instance.SetCameraState("AIM");
+            else
+                CameraController.Instance.SetCameraState("DEFAULT");
+
         }
 
 

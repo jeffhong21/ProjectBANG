@@ -66,45 +66,23 @@ public class LevelManager : SingletonMonoBehaviour<LevelManager>
         //  Instantiate the UI.
         inGameMenu = Instantiate(gameData.InGameMenu);
 
-        if (gameData.CameraPrefab != null)
-            cameraController = Instantiate(gameData.CameraPrefab);
-        else
-            Debug.LogError("No Camera");
-			//cameraController = Instantiate(Resources.Load<CameraController>("Prefabs/PlayerCamera"));
-	}
+
+        //  Spawn Player.
+        InitializePlayer(true);
+        //  Spawn Camera.
+        InitializeCamera(playerInstance);
+    }
 
 
 
     private void Start()
     {
-
         LoadScene(gameData.PrototypeLevel.ActiveScene);
-
         //  Initialize level.
         InitializeLevel();
-        //  Spawn Player.
-        InitializePlayer(true);
-
 
         //Debug.LogFormat(" ** Loaded Scene: <b>{0}</b> | Root Count: {1}", SceneManager.GetActiveScene().name, SceneManager.GetActiveScene().rootCount);
     }
-
-
-
-
-
-
-    //private void Update()
-    //{
-
-    //    if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.Q))
-    //    {
-    //        RestartScene();
-    //    }
-
-
-
-    //}
 
 
 
@@ -184,33 +162,44 @@ public class LevelManager : SingletonMonoBehaviour<LevelManager>
 
     public void InitializePlayer(bool selectOnCreation = true)
     {
-
         if (doNotRemoveAssetsWithTag)
         {
             var player = GameObject.FindWithTag("Player");
             if (player != null)
                 playerInstance = player;
-            else
-                playerInstance = Instantiate(gameData.PlayerPrefab);
         }
-        else
+
+        if (playerInstance == null)
         {
-            if (playerInstance == null)
-                playerInstance = Instantiate(gameData.PlayerPrefab);
+            playerInstance = Instantiate(gameData.PlayerPrefab);
+
+            playerInstance.transform.position = SpawnPointManager.GetSpawnPoint(0).Position;
+            playerInstance.transform.rotation = SpawnPointManager.GetSpawnPoint(0).Rotation;
         }
 
-        playerInstance.transform.position = SpawnPointManager.GetSpawnPoint(0).Position;
-        playerInstance.transform.rotation = SpawnPointManager.GetSpawnPoint(0).Rotation;
-
-        //SpawnPointManager.SpawnObject(playerInstance);
-        cameraController.SetMainTarget(playerInstance);
-		cameraController.transform.position = playerInstance.transform.position;
-		cameraController.transform.rotation = playerInstance.transform.rotation;
 
 		//  Select Player on creation.
 		if (selectOnCreation) UnityEditor.Selection.activeGameObject = playerInstance;
     }
 
+
+
+    private void InitializeCamera(GameObject target)
+    {
+        cameraController = CameraController.Instance;
+        if (cameraController == null)
+        {
+            if (gameData.CameraPrefab != null)
+                cameraController = Instantiate(gameData.CameraPrefab);
+            else
+                Debug.LogErrorFormat("<color=red><b>{0}</b>{1}</color>", "•[Error] ", "No Camera.");
+            //cameraController = Instantiate(Resources.Load<CameraController>("Prefabs/PlayerCamera"));
+        }
+
+        cameraController.SetMainTarget(target);
+        cameraController.transform.position = target.transform.position;
+        cameraController.transform.rotation = target.transform.rotation;
+    }
 
 
 

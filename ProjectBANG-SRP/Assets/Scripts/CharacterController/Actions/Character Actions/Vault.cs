@@ -68,12 +68,6 @@
         {
             if(base.CanStartAction() )
             {
-                //if (m_Controller.DetectObject(m_Transform.forward, out m_MoveToVaultDistanceHit, m_MoveToVaultDistance, m_VaultLayers))
-                //{
-                //    if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance, Color.green);
-                //    return CachePositions();
-                //}
-
                 if (Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out m_MoveToVaultDistanceHit, m_MoveToVaultDistance, m_VaultLayers))
                 {
                     if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance, Color.green);
@@ -87,15 +81,8 @@
                     if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance, Color.green);
                     return CachePositions();
                 }
-
-                //if (m_Controller.DetectObject(m_Transform.forward, out m_MoveToVaultDistanceHit, 2, m_VaultLayers))
-                //{
-                //    if (m_Debug) Debug.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance, Color.green);
-                //    return CachePositions();
-                //}
             }
-            //if(m_MatchTargetStates.Length == 0)
-                //Debug.LogFormat("No AnimatorStateMatchTarget");
+
             return false;
         }
 
@@ -191,6 +178,7 @@
         //  Move over the vault object based off of the root motion forces.
         public override bool UpdateMovement()
         {
+            m_CapsuleCollider.height = m_ColliderHeight * 0.75f;
 
             //float targetVelocityX = Mathf.Abs(m_Distance - m_CapsuleCollider.radius * 2) * m_MoveSpeed;
             //m_Velocity.z = Mathf.SmoothDamp(m_Velocity.z, targetVelocityX, ref m_VelocitySmooth, m_AccelerationTime);
@@ -209,6 +197,7 @@
 		public override bool Move()
 		{
 
+            
 
             return false;
 		}

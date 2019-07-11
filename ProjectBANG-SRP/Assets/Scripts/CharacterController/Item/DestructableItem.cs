@@ -20,7 +20,7 @@
         [SerializeField]
         protected GameObject m_DefaultDust;
 
-        protected SphereCollider m_Collider;
+        protected Collider m_Collider;
 
         protected Transform m_Transform;
 

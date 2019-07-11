@@ -69,8 +69,7 @@ namespace CharacterController
         private SerializedProperty m_MaxStepHeight;
 
 
-        private SerializedProperty m_StepOffset;
-        private SerializedProperty m_StepSpeed;
+
 
 
         private SerializedProperty displayMovement;
@@ -105,13 +104,11 @@ namespace CharacterController
 
             m_Mass = serializedObject.FindProperty("m_Mass");
             m_MaxStepHeight = serializedObject.FindProperty("m_MaxStepHeight");
-            m_MaxStepHeight = serializedObject.FindProperty("m_MaxStepHeight");
             m_SkinWidth = serializedObject.FindProperty("m_SkinWidth");
             m_SlopeLimit = serializedObject.FindProperty("m_SlopeLimit");
 
 
-            m_StepOffset = serializedObject.FindProperty("m_StepOffset");
-            m_StepSpeed = serializedObject.FindProperty("m_StepSpeed");
+
 
             m_ActionsList = new ReorderableList(serializedObject, serializedObject.FindProperty("m_Actions"), true, true, true, true);
 		}
@@ -132,7 +129,7 @@ namespace CharacterController
             //  -----
             //  Character Movement
             //  -----
-            EditorGUILayout.Space();
+            //EditorGUILayout.Space();
             displayMovement.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayMovement.boolValue, MotorFoldoutHeader) : InspectorUtility.Foldout(displayMovement.boolValue, MotorFoldoutHeader);
             if(displayMovement.boolValue)
             {
@@ -156,7 +153,7 @@ namespace CharacterController
             //  -----
             //  Character Physics
             //  -----
-            EditorGUILayout.Space();
+            //EditorGUILayout.Space();
             displayPhysics.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayPhysics.boolValue, PhysicsFoldoutHeader) : InspectorUtility.Foldout(displayPhysics.boolValue, PhysicsFoldoutHeader);
             if(displayPhysics.boolValue)
             {
@@ -166,8 +163,6 @@ namespace CharacterController
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_ExternalForceDamping"));
                 EditorGUILayout.PropertyField(m_SlopeLimit);
                 EditorGUILayout.PropertyField(m_MaxStepHeight);
-                EditorGUILayout.PropertyField(m_StepOffset);
-                EditorGUILayout.PropertyField(m_StepSpeed);
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_GravityModifier"));
 
                 //  Collisions
@@ -182,7 +177,7 @@ namespace CharacterController
             //  -----
             //  Character Animation
             //  -----
-            EditorGUILayout.Space();
+            //EditorGUILayout.Space();
             displayAnimations.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayAnimations.boolValue, AnimationFoldoutHeader) : InspectorUtility.Foldout(displayAnimations.boolValue, AnimationFoldoutHeader);
             if (displayAnimations.boolValue)
             {
@@ -200,7 +195,7 @@ namespace CharacterController
             //  -----
             //  Character Actions
             //  -----
-            EditorGUILayout.Space();
+            //EditorGUILayout.Space();
             displayActions.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayActions.boolValue, ActionsFoldoutHeader) : InspectorUtility.Foldout(displayActions.boolValue, ActionsFoldoutHeader);
             if(displayActions.boolValue)
             {

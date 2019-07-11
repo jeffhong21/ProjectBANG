@@ -199,7 +199,7 @@
 
 
 
-        public override CameraState GetCameraStateWithName(string name)
+        public CameraState GetCameraStateWithName(string name)
         {
             if (m_CameraStateLookup.ContainsKey(name))
                 return m_CameraStateLookup[name];
@@ -221,7 +221,7 @@
         }
 
 
-        public override bool ChangeCameraState(CameraState state)
+        public bool ChangeCameraState(CameraState state)
         {
             if (m_CameraStateLookup.ContainsKey(state.name))
             {
