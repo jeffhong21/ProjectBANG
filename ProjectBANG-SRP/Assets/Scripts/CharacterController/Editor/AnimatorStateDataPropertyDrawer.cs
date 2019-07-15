@@ -26,7 +26,7 @@
         SerializedProperty stateName;
         SerializedProperty transitionDuration;
         SerializedProperty speedMultiplier;
-        SerializedProperty stateID;
+        SerializedProperty nameHash;
         Animator animator;
 
 
@@ -40,7 +40,7 @@
             stateName = property.FindPropertyRelative("stateName");
             transitionDuration = property.FindPropertyRelative("transitionDuration");
             speedMultiplier = property.FindPropertyRelative("speedMultiplier");
-            stateID = property.FindPropertyRelative("stateID");
+            nameHash = property.FindPropertyRelative("nameHash");
 
 
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
@@ -50,11 +50,11 @@
             {
                 if(string.IsNullOrEmpty(stateName.stringValue) == false)
                 {
-                    stateID.intValue = Animator.StringToHash(stateName.stringValue);
+                    nameHash.intValue = Animator.StringToHash(stateName.stringValue);
                     bool stateExist = false;
                     for (int index = 0; index < animator.layerCount; index++)
                     {
-                        if (animator.HasState(index, stateID.intValue))
+                        if (animator.HasState(index, nameHash.intValue))
                         {
                             stateExist = true;
                         }
@@ -62,7 +62,7 @@
                     if (stateExist == false)
                     {
                         EditorGUILayout.HelpBox(string.Format("{0} does not exist.>", stateName.stringValue), MessageType.Error);
-                        stateID.intValue = 0;
+                        nameHash.intValue = 0;
                     }
                 }
 
@@ -75,12 +75,12 @@
 
             EditorGUILayout.PropertyField(transitionDuration);
             EditorGUILayout.PropertyField(speedMultiplier);
-            EditorGUILayout.PropertyField(stateID);
+            EditorGUILayout.PropertyField(nameHash);
 
             EditorGUILayout.EndVertical();
             //EditorGUI.PropertyField(rect, transitionDuration);
             //EditorGUI.PropertyField(rect, speedMultiplier);
-            //EditorGUI.PropertyField(rect, stateID);
+            //EditorGUI.PropertyField(rect, nameHash);
             //EditorGUILayout.LabelField(property.displayName, EditorStyles.boldLabel);
 
 

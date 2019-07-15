@@ -136,7 +136,7 @@
         protected virtual void Awake()
         {
             m_Controller = GetComponent<CharacterLocomotion>();
-            m_CapsuleCollider = GetComponent<CapsuleCollider>();
+            
             m_Rigidbody = GetComponent<Rigidbody>();
             m_Animator = GetComponent<Animator>();
             m_CharacterIK = GetComponent<CharacterIK>();
@@ -148,6 +148,7 @@
             m_DeltaTime = Time.deltaTime;
             //EventHandler.RegisterEvent<CharacterAction, bool>(m_GameObject, "OnCharacterActionActive", OnActionActive);
 
+            //m_CapsuleCollider = GetComponent<CapsuleCollider>();
 
             Initialize();
         }
@@ -178,6 +179,7 @@
 
         protected void OnEnable()
         {
+            m_CapsuleCollider = m_Controller.Collider;
             m_ColliderHeight = m_CapsuleCollider.height;
             m_ColliderCenter = m_CapsuleCollider.center;
         }
@@ -186,6 +188,8 @@
         {
 
         }
+
+
 
 
 
@@ -313,7 +317,7 @@
                             if (Input.GetKeyDown(m_KeyCodes[i]) && m_FirstButtonPressed == m_KeyCodes[i])
                             {
                                 m_FirstButtonPressed = KeyCode.F12;
-                                if (Time.time - m_TimeOfFirstButtoonPressed < 0.18f)
+                                if (Time.time - m_TimeOfFirstButtoonPressed < 0.25f )
                                 {
                                     return true;
                                 }

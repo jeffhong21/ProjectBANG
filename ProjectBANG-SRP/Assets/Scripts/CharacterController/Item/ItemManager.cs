@@ -95,7 +95,7 @@
 
 
 
-        [MenuItem("Assets/Create/Character Controller/Items/ItemType Manager", false, 140)]
+        [MenuItem("Assets/Create/Character Controller/Items/ItemType Manager", false, 2500)]
         public static void CreateItemManager()
         {
             if (Directory.Exists(StorageFolder)){
@@ -114,7 +114,7 @@
         }
 
 
-        [MenuItem("Assets/Create/Character Controller/Items/Primary ItemType", false, 0)]
+        [MenuItem("Assets/Create/Character Controller/Items/Primary ItemType", false, 2000)]
         public static void CreatePrimaryItem()
         {
             PrimaryItem item = CreateItemType<PrimaryItem>("PrimaryItem");
@@ -122,7 +122,7 @@
         }
 
 
-        [MenuItem("Assets/Create/Character Controller/Items/Consumable ItemType", false, 0)]
+        [MenuItem("Assets/Create/Character Controller/Items/Consumable ItemType", false, 2000)]
         public static void CreateConsumableItem()
         {
             ConsumableItem item = CreateItemType<ConsumableItem>("ConsumableItem");

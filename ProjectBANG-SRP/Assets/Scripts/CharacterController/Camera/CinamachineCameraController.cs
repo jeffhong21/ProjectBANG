@@ -49,18 +49,18 @@
 
         [Header("Cinemachine")]
         [SerializeField]
-        private CinemachineBrain m_CMBrain;
+        private CinemachineBrain CMBrain;
         [Header("Targets")]
         [SerializeField]
-        private Transform m_FollowTarget;
+        private Transform followTarget;
         [SerializeField]
-        private Transform m_LookAtTarget;
+        private Transform lookAtTarget;
         [Header("Virtual Cameras")]
         [SerializeField]
         private VirtualCameraState[] virtualCameras = { new VirtualCameraState("DEFAULT") };
         private int currentCamera;
-
         private CinemachineVirtualCameraBase activeCamera;
+
         private CinemachineFreeLook[] freeLookCameras;
         private CinemachineFreeLook.Orbit[] originalOrbits;
 
@@ -78,7 +78,7 @@
             _instance = this;
 
 
-            m_CMBrain = GetComponentInChildren<CinemachineBrain>();
+            CMBrain = GetComponentInChildren<CinemachineBrain>();
 
 
 
@@ -121,20 +121,20 @@
 
 
 
-            m_Camera = m_CMBrain.OutputCamera; 
+            m_Camera = CMBrain.OutputCamera; 
 
         }
 
 
         private void OnValidate()
         {
-            if(m_FollowTarget && m_LookAtTarget != null)
+            if(followTarget && lookAtTarget != null)
             {
                 for (int i = 0; i < transform.childCount; i++){
                     if (transform.GetChild(i).GetComponent<ICinemachineCamera>() != null){
                         ICinemachineCamera cmCamera = transform.GetChild(i).GetComponent<ICinemachineCamera>();
-                        if (cmCamera.Follow == null) cmCamera.Follow = m_FollowTarget;
-                        if (cmCamera.LookAt == null) cmCamera.LookAt = m_LookAtTarget;
+                        if (cmCamera.Follow == null) cmCamera.Follow = followTarget;
+                        if (cmCamera.LookAt == null) cmCamera.LookAt = lookAtTarget;
                     }
                 }
             }
@@ -147,18 +147,18 @@
         {
             if(vCam == null) { return; }
 
-            vCam.Follow = m_FollowTarget;
-            vCam.LookAt = m_LookAtTarget;
+            vCam.Follow = followTarget;
+            vCam.LookAt = lookAtTarget;
         }
 
 
         public override void SetMainTarget(GameObject target)
         {
-            if(m_LookAtTarget == null) m_LookAtTarget = target.transform;
-            if (m_FollowTarget == null) m_FollowTarget = target.transform;
+            if(lookAtTarget == null) lookAtTarget = target.transform;
+            if (followTarget == null) followTarget = target.transform;
 
-            //activeVCam.LookAt = m_LookAtTarget;
-            //activeVCam.Follow = m_FollowTarget;
+            //activeVCam.LookAt = lookAtTarget;
+            //activeVCam.Follow = followTarget;
         }
 
 
@@ -219,9 +219,17 @@
                 }
                 //virtualCameras[i].VirtualCamera.gameObject.SetActive(false);
             }
-
-            for (int i = 0; i < virtualCameras.Length; i++){
-                virtualCameras[i].VirtualCamera.gameObject.SetActive(currentCamera == i);
+            activeCamera = virtualCameras[currentCamera].VirtualCamera;
+            activeCamera.gameObject.SetActive(true);
+            for (int i = 0; i < virtualCameras.Length; i++)
+            {
+                //if (virtualCameras[i].VirtualCamera == activeCamera) continue;
+                virtualCameras[i].VirtualCamera.gameObject.SetActive(i == currentCamera);
+                //if (virtualCameras[i].VirtualCamera.Priority > activeCamera.Priority)
+                //{
+                //    virtualCameras[i].VirtualCamera.gameObject.SetActive(i == currentCamera);
+                //}
+                
             }
 
             return foundState;

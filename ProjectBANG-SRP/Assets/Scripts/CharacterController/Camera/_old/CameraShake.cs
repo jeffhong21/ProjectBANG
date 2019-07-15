@@ -114,7 +114,7 @@ public class CameraShake : MonoBehaviour {
 }
 
 
-[CreateAssetMenu(fileName = "Camera Shake Event", menuName = "Character Controller/Camera Shake")]
+//[CreateAssetMenu(fileName = "Camera Shake Event", menuName = "Character Controller/Camera Shake")]
 public class ShakeTransformEventData : ScriptableObject
 {
     public enum Target

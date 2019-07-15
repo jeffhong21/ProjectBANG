@@ -4,7 +4,7 @@ namespace CharacterSkins
     using System.Collections.Generic;
     using UnityEngine;
 
-    [CreateAssetMenu(fileName = "TextureSetData", menuName = "Character Skins/Set Data/Texture Set Data")]
+    [CreateAssetMenu(fileName = "TextureSetData", menuName = "Character Controller/Character Skins/Set Data/Texture Set Data")]
     public class TextureSetData : ScriptableObject, ISetData
     {
         public string setId;

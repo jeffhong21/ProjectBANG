@@ -31,7 +31,7 @@
             get
             {
                 _characterControllerRect.y = AnimatorMonitorRect.y + AnimatorMonitorRect.height;
-                _characterControllerRect.width = 300;
+                _characterControllerRect.width = 250;
                 _characterControllerRect.height = Screen.height * 0.75f;
                 return _characterControllerRect;
             }

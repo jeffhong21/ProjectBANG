@@ -34,28 +34,26 @@
 
 		protected override void OnEnable()
 		{
-            m_Rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-            m_Rigidbody.mass = m_Mass;
-            //m_Animator.applyRootMotion = m_UseRootMotion;
+            base.OnEnable();
 
             EventHandler.RegisterEvent<CharacterAction, bool>(m_GameObject, EventIDs.OnCharacterActionActive, OnActionActive);
-            EventHandler.RegisterEvent<bool>(m_GameObject, EventIDs.OnAimActionStart, OnAimActionStart);
+
         }
 
 
 		protected override void OnDisable()
 		{
+            base.OnDisable();
+
             EventHandler.UnregisterEvent<CharacterAction, bool>(m_GameObject, EventIDs.OnCharacterActionActive, OnActionActive);
-            EventHandler.UnregisterEvent<bool>(m_GameObject, EventIDs.OnAimActionStart, OnAimActionStart);
         }
 
 
         protected override void Update()
 		{
-            m_TimeScale = Mathf.RoundToInt(Time.timeScale);
-            if (m_TimeScale == 0) return;
+            m_TimeScale = Time.timeScale;
+            if (Math.Abs(m_TimeScale) < float.Epsilon) return;
             m_DeltaTime = deltaTime;
-
 
             //m_CheckGround = true;
             //m_CheckMovement = true;
@@ -321,16 +319,7 @@
 
         #region OnAction execute
 
-        protected void OnAimActionStart(bool aim)
-        {
-            m_Aiming = aim;
-            m_MovementType = m_Aiming ? MovementType.Combat : MovementType.Adventure;
-            //  Call On Aim Delegate.
-            OnAim(aim);
 
-            //CameraController.Instance.FreeRotation = aim;
-            //Debug.LogFormat("Camera Free Rotation is {0}", CameraController.Instance.FreeRotation);
-        }
 
 
         protected void OnActionActive(CharacterAction action, bool activated)

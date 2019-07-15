@@ -5,6 +5,8 @@ namespace CharacterController
 
     public class CharacterFootsteps : MonoBehaviour
     {
+
+
         [SerializeField]
         protected bool m_SpawnFootprints;
         [SerializeField]

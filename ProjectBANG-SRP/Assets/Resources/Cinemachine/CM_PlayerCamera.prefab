@@ -334,7 +334,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9384ab8608cdc3d479fe89cd51eed48f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_BindingMode: 2
+  m_BindingMode: 4
   m_FollowOffset: {x: 0, y: 3, z: -5.07}
   m_XDamping: 1
   m_YDamping: 1
@@ -349,7 +349,7 @@ MonoBehaviour:
     m_VelocityFilterStrength: 4
     m_Bias: -14
   m_RecenterToTargetHeading:
-    m_enabled: 0
+    m_enabled: 1
     m_WaitTime: 3
     m_RecenteringTime: 5
     m_LegacyHeadingDefinition: -1
@@ -426,7 +426,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1718815361967978978}
-  m_LocalRotation: {x: -0.30199093, y: 0.170887, z: -0.93534917, w: 0.06871039}
+  m_LocalRotation: {x: -0.49608213, y: 0.8047689, z: 0.31370252, w: 0.088545196}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -535,7 +535,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9384ab8608cdc3d479fe89cd51eed48f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_BindingMode: 2
+  m_BindingMode: 4
   m_FollowOffset: {x: 0, y: 3, z: -5.07}
   m_XDamping: 1
   m_YDamping: 1
@@ -627,7 +627,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1718815362388559994}
-  m_LocalRotation: {x: -0.3142299, y: 0.14881049, z: -0.93759555, w: 0.005452887}
+  m_LocalRotation: {x: -0.54916143, y: 0.76933664, z: 0.30680168, w: 0.11142555}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -706,8 +706,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1718815362960522756}
-  m_LocalRotation: {x: 0.13330203, y: -0.12076516, z: 0.016367419, w: 0.983554}
-  m_LocalPosition: {x: 12.726543, y: 3, z: 4.3306003}
+  m_LocalRotation: {x: 0.016367419, y: 0.983554, z: -0.133302, w: 0.120765194}
+  m_LocalPosition: {x: -1.5365438, y: 3, z: 16.8694}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 5033000927492876682}
@@ -887,7 +887,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1718815363623873241}
   m_LocalRotation: {x: -0.18712825, y: 0.06404661, z: -0.8743219, w: 0.44321826}
-  m_LocalPosition: {x: 12.726543, y: 3, z: 4.3306003}
+  m_LocalPosition: {x: -1.5365438, y: 3, z: 16.8694}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1718815361967978988}
@@ -978,12 +978,12 @@ MonoBehaviour:
     m_VelocityFilterStrength: 4
     m_Bias: -14
   m_RecenterToTargetHeading:
-    m_enabled: 0
+    m_enabled: 1
     m_WaitTime: 3
     m_RecenteringTime: 5
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
-  m_BindingMode: 2
+  m_BindingMode: 4
   m_SplineCurvature: 0
   m_Orbits:
   - m_Height: 4
@@ -1084,7 +1084,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9384ab8608cdc3d479fe89cd51eed48f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_BindingMode: 2
+  m_BindingMode: 4
   m_FollowOffset: {x: 0, y: 3, z: -5.07}
   m_XDamping: 1
   m_YDamping: 1
@@ -1176,7 +1176,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1718815363890255673}
-  m_LocalRotation: {x: 0.15635858, y: 0.31054303, z: 0.028102968, w: 0.9371901}
+  m_LocalRotation: {x: 0.7823794, y: 0.5304145, z: 0.10398095, w: -0.30940408}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -2013,9 +2013,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e08cc3c0c100e4eb0a094b2c8b3d409f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_CMBrain: {fileID: 1718815362960522759}
-  m_FollowTarget: {fileID: 0}
-  m_LookAtTarget: {fileID: 0}
+  CMBrain: {fileID: 1718815362960522759}
+  followTarget: {fileID: 0}
+  lookAtTarget: {fileID: 0}
   virtualCameras:
   - stateName: DEFAULT
     virtualCamera: {fileID: 1718815363623873240}
@@ -2252,8 +2252,8 @@ MonoBehaviour:
     m_InputAxisName: Mouse X
     m_InputAxisValue: 0
     m_InvertInput: 0
-    m_MinValue: -65
-    m_MaxValue: 65
+    m_MinValue: -180
+    m_MaxValue: 180
     m_Wrap: 0
     m_Recentering:
       m_enabled: 0
@@ -2271,7 +2271,7 @@ MonoBehaviour:
     m_RecenteringTime: 5
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
-  m_BindingMode: 1
+  m_BindingMode: 4
   m_SplineCurvature: 0.049
   m_Orbits:
   - m_Height: 2.4

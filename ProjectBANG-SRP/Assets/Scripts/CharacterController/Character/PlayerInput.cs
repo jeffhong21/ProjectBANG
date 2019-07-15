@@ -141,7 +141,7 @@ namespace CharacterController
 
         private void Update()
 		{
-            if (Input.GetMouseButton(1)) OnAimActionStart(Aiming);
+
 
 
             //Vector3 lookDirection = m_CameraController == null ? m_Transform.forward : Vector3.Scale(m_Camera.forward, new Vector3(1, 0, 1)).normalized;
@@ -155,9 +155,9 @@ namespace CharacterController
             Quaternion lookRotation = Quaternion.FromToRotation(m_Transform.forward, lookDirection);
             m_Controller.InputVector = InputVectorRaw;
             m_Controller.LookRotation = lookRotation;
-            //m_Controller.LookDirection = lookDirection;
+            m_Controller.LookDirection = lookDirection;
 
-            //Debug.DrawRay(m_Transform.position + Vector3.up * 1.8f, lookDirection, Color.black);
+            Debug.DrawRay(m_Transform.position + Vector3.up * 1.5f, lookDirection, Color.black);
 
             switch (m_Controller.Movement)
             {
@@ -228,7 +228,6 @@ namespace CharacterController
 
 
 
-        bool Aiming = false;
         private void OnAimActionStart(bool aim)
         {
             //if (aim == true)
@@ -240,9 +239,9 @@ namespace CharacterController
             //{
             //    CameraController.Instance.ChangeCameraState("TPS_Default");
             //}
-            Aiming = !Aiming;
+  
 
-            if (Aiming)
+            if (aim)
                 CameraController.Instance.SetCameraState("AIM");
             else
                 CameraController.Instance.SetCameraState("DEFAULT");

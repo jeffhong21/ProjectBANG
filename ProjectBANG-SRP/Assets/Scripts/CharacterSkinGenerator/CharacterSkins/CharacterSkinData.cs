@@ -11,7 +11,7 @@ namespace CharacterSkins
     }
 
 
-    [CreateAssetMenu(fileName = "SkinSetData", menuName = "Character Skins/Skin Set Data")]
+    [CreateAssetMenu(fileName = "SkinSetData", menuName = "Character Controller/Character Skins/Skin Set Data")]
     public class CharacterSkinData : ScriptableObject, ISetData
     {
         [SerializeField]

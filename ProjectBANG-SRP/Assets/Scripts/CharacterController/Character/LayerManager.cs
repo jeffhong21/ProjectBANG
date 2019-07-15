@@ -1,17 +1,18 @@
 namespace CharacterController
 {
     using UnityEngine;
-
+    using System.Collections.Generic;
 
     [DisallowMultipleComponent]
     public class LayerManager : MonoBehaviour
     {
-        public const int Climbable = 24;
-        public const int Vaultable = 25;
-        public const int Solid = 26;
-        public const int VisualEffects = 27;
 
-        //
+        public const int Solid = 27;
+        public const int VisualEffects = 28;
+        public const int CharacterCollider = 29;
+        public const int Agent = 30;
+        public const int Player = 31;
+        //  
         // Fields
         //
         [SerializeField]
@@ -43,7 +44,34 @@ namespace CharacterController
 
 
 
+        private static Dictionary<Collider, HashSet<Collider>> collisions = new Dictionary<Collider, HashSet<Collider>>();
 
+
+        public static void IgnoreCollision(Collider mainCollider, Collider otherCollider)
+        {
+            Physics.IgnoreCollision(mainCollider, otherCollider, true);
+
+            if(collisions.ContainsKey(mainCollider)){
+                if(collisions[mainCollider].Contains(otherCollider) == false)
+                    collisions[mainCollider].Add(otherCollider);
+            }
+            else{
+                collisions.Add(mainCollider, new HashSet<Collider>());
+                collisions[mainCollider].Add(otherCollider);
+            }
+
+        }
+
+        public static void RevertCollision(Collider mainCollider)
+        {
+            if (collisions.ContainsKey(mainCollider))
+            {
+                foreach (Collider collider in collisions[mainCollider])
+                {
+                    Physics.IgnoreCollision(mainCollider, collider, false);
+                }
+            }
+        }
 
 
 

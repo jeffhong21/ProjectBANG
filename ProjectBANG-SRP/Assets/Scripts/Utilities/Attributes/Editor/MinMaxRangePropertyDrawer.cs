@@ -26,6 +26,7 @@ public class MinMaxRangePropertyDrawer : PropertyDrawer
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
         //base.OnGUI(position, property, label);
+        int originalIndentLevel = EditorGUI.indentLevel;
         EditorGUI.BeginProperty(position, label, property);
 
         EditorGUILayout.Space();
@@ -40,8 +41,9 @@ public class MinMaxRangePropertyDrawer : PropertyDrawer
         {
             Rect controlRect = EditorGUILayout.GetControlRect();
             //  If indent level is zero, value is infinity.
-            int indentLevel = EditorGUI.indentLevel > 0 ? EditorGUI.indentLevel : 0;
 
+            //EditorGUI.indentLevel = 0;
+            int indentLevel = EditorGUI.indentLevel > 0 ? EditorGUI.indentLevel : 0;
             float labelWidth = EditorGUIUtility.labelWidth;
             float floatFieldWidth = EditorGUIUtility.fieldWidth;
             float positionOffset = indentLevel > 0 ? floatFieldWidth * (floatFieldWidth / (floatFieldWidth * indentLevel)) * indentLevel : indentLevel;
@@ -101,6 +103,8 @@ public class MinMaxRangePropertyDrawer : PropertyDrawer
         }
 
         EditorGUI.EndProperty();
+        EditorGUI.indentLevel = originalIndentLevel;
+
     }
 
 

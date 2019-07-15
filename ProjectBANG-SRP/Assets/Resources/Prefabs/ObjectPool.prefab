@@ -44,14 +44,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Pools:
-  - InstanceID: 16924
+  - InstanceID: 26966
     Prefab: {fileID: 6784883267551059862, guid: 13671d90be5e74e6781c058327c266b6,
       type: 3}
     Count: 100
-  - InstanceID: 17060
+  - InstanceID: 27002
     Prefab: {fileID: 1359636532566120, guid: e7fd3bc00cb0e4705ad206d71d216190, type: 3}
     Count: 15
-  - InstanceID: 19962
+  - InstanceID: 27614
     Prefab: {fileID: 6784883267551059862, guid: fa3ee4246aa6a4c1fa973ad6b06a6a6f,
       type: 3}
     Count: 10
+  _showInstanceID: 1

@@ -303,13 +303,12 @@ GameObject:
   m_Component:
   - component: {fileID: 4800368842353962}
   - component: {fileID: 95278574169747482}
-  - component: {fileID: 136461347018360410}
   - component: {fileID: 54223540320120752}
   - component: {fileID: 114933608758217926}
   - component: {fileID: 114429236655991950}
   - component: {fileID: 114901688824212290}
+  - component: {fileID: 6833756693936532953}
   - component: {fileID: 114921923587186984}
-  - component: {fileID: 114078442416988612}
   - component: {fileID: 3255776655029733184}
   - component: {fileID: 114776445558567580}
   - component: {fileID: 114908900733630684}
@@ -319,11 +318,8 @@ GameObject:
   - component: {fileID: 3774449784211641878}
   - component: {fileID: 647976094}
   - component: {fileID: 1872464415}
-  - component: {fileID: 1784387541}
   - component: {fileID: 5595395500200508759}
   - component: {fileID: 2432881533187493989}
-  - component: {fileID: 1013602446450159186}
-  - component: {fileID: 7058910716857372807}
   - component: {fileID: 4057125413625104798}
   - component: {fileID: 7159961758664632150}
   m_Layer: 31
@@ -370,20 +366,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!136 &136461347018360410
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1141768220188808}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.3
-  m_Height: 1.8
-  m_Direction: 1
-  m_Center: {x: 0, y: 0.9, z: 0}
 --- !u!54 &54223540320120752
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -430,8 +412,6 @@ MonoBehaviour:
   m_SlopeLimit: 60
   m_MaxStepHeight: 0.4
   m_ExternalForceDamping: 0.1
-  m_StepOffset: 0.1
-  m_StepSpeed: 4
   m_GravityModifier: 0.4
   m_GroundStickiness: 6
   mDetectHorizontalCollision: 1
@@ -444,6 +424,7 @@ MonoBehaviour:
   m_IdleRotationMultiplier: 1.5
   m_MovingStateName: Movement
   m_AirborneStateName: Falling
+  m_Collider: {fileID: 0}
   m_Debug: 1
   m_DebugCollisions: 1
   m_DrawDebugLine: 1
@@ -457,14 +438,11 @@ MonoBehaviour:
   - {fileID: 114908900733630684}
   - {fileID: 114139823554117216}
   - {fileID: 114329433760099396}
-  - {fileID: 1013602446450159186}
   - {fileID: 2521750178379034832}
   - {fileID: 647976094}
   - {fileID: 114776445558567580}
-  - {fileID: 7058910716857372807}
   - {fileID: 4057125413625104798}
   - {fileID: 1872464415}
-  - {fileID: 1784387541}
   m_ActiveAction: {fileID: 0}
 --- !u!114 &114429236655991950
 MonoBehaviour:
@@ -521,6 +499,29 @@ MonoBehaviour:
   m_SolidLayers:
     serializedVersion: 2
     m_Bits: 234881024
+--- !u!114 &6833756693936532953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1141768220188808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 237708b6abd49482994d4ab3d250cf80, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  surfaceEffect: {fileID: 11400000, guid: 867b450d6e444446488210bdd678fdd5, type: 2}
+  minVelocity: 3
+  footstepMode: 0
+  footOffset: 0.03
+  leftFoot:
+    foot: {fileID: 0}
+    audioSource: {fileID: 0}
+  rightFoot:
+    foot: {fileID: 0}
+    audioSource: {fileID: 0}
+  moveDirectionFrameCount: 4
 --- !u!114 &114921923587186984
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -544,36 +545,6 @@ MonoBehaviour:
   m_InputVector: {x: 0, y: 0, z: 0}
   m_InputVectorRaw: {x: 0, y: 0, z: 0}
   m_CameraController: {fileID: 0}
---- !u!114 &114078442416988612
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa7477202022244aca8f8b4dfa3d0348, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SpawnFootprints: 1
-  m_Decal: {fileID: 6784883267551059862, guid: 13671d90be5e74e6781c058327c266b6, type: 3}
-  footstepClips:
-  - {fileID: 8300000, guid: a500354e164584fd082b22db2be9986d, type: 3}
-  - {fileID: 8300000, guid: b1110643b1cda4691a9a448d58f25d79, type: 3}
-  - {fileID: 8300000, guid: 75f3b912cbdc14b4a9c8f00f28b84473, type: 3}
-  - {fileID: 8300000, guid: 8491201043cf84d928d1d2abad198cfe, type: 3}
-  - {fileID: 8300000, guid: e0b5fffbab44443a7a5acf37a5b7400a, type: 3}
-  - {fileID: 8300000, guid: baaf5a0aadd2b485694e068fa5123771, type: 3}
-  - {fileID: 8300000, guid: 05a5e5bbd81234fc18c14d21ebe19676, type: 3}
-  - {fileID: 8300000, guid: 5fa96dd163cd04c61986992ae3899b81, type: 3}
-  - {fileID: 8300000, guid: 4e08c2a878dcd4958829fe431418738a, type: 3}
-  - {fileID: 8300000, guid: f077dc462ed484229aeaa0af3df292e1, type: 3}
-  m_leftFootTrigger: {fileID: 114191035625105832}
-  m_rightFootTrigger: {fileID: 114737049880341320}
-  m_currentStep: {fileID: 0}
-  m_FootstepTimer: 0.1
-  m_FootstepThreshold: 0
 --- !u!114 &3255776655029733184
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1070,7 +1041,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d3005a58794a74e28bd4e9600cba665f, type: 3}
   m_Name: 
@@ -1129,7 +1100,7 @@ MonoBehaviour:
   m_StartType: 3
   m_StopType: 0
   m_InputNames:
-  - W
+  - Space
   m_SpeedMultiplier: 1
   m_ApplyBuiltinRootMotion: 1
   m_StartAudioClips: []
@@ -1284,7 +1255,7 @@ MonoBehaviour:
   m_StartType: 2
   m_StopType: 0
   m_InputNames:
-  - Space
+  - F
   m_SpeedMultiplier: 1
   m_ApplyBuiltinRootMotion: 1
   m_StartAudioClips: []
@@ -1302,7 +1273,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9f63261ba55984bd9bef1d9b5d24d153, type: 3}
   m_Name: 
@@ -1324,36 +1295,6 @@ MonoBehaviour:
   m_EndEffect: {fileID: 0}
   m_Debug: 0
   m_Hitboxes: []
---- !u!114 &1784387541
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c6b69abf52d14e8186e8a930c05af45, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IsActive: 0
-  m_StateName: HitReaction
-  m_LayerIndex: 0
-  m_ActionID: 0
-  m_TransitionDuration: 0.2
-  m_StartType: 1
-  m_StopType: 1
-  m_InputNames: []
-  m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 0
-  m_StartAudioClips: []
-  m_StopAudioClips: []
-  m_StartEffect: {fileID: 0}
-  m_EndEffect: {fileID: 0}
-  m_Debug: 0
-  m_DamageTypeIndex: 0
-  m_IsDamaged: 0
-  m_MinDamageAmount: 0
 --- !u!114 &5595395500200508759
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1399,7 +1340,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e45ea437e115a4fb6be25b8464e6de7a, type: 3}
   m_Name: 
@@ -1407,69 +1348,6 @@ MonoBehaviour:
   weight: 1
   ik: {fileID: 3255776655029733184}
   bodies: []
---- !u!114 &1013602446450159186
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f62eddceb76e4ce2aab0985c2db98db, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IsActive: 0
-  m_StateName: Slide
-  m_LayerIndex: 0
-  m_ActionID: 0
-  m_TransitionDuration: 0.2
-  m_StartType: 1
-  m_StopType: 0
-  m_InputNames:
-  - Space
-  m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 1
-  m_StartAudioClips: []
-  m_StopAudioClips: []
-  m_StartEffect: {fileID: 0}
-  m_EndEffect: {fileID: 0}
-  m_Debug: 0
-  m_MaxDistance: 5
-  m_StopLayer:
-    serializedVersion: 2
-    m_Bits: 201326592
---- !u!114 &7058910716857372807
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5dcb0e67b11b04af4b61cb44c64d5a63, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IsActive: 0
-  m_StateName: StopMovement
-  m_LayerIndex: 0
-  m_ActionID: 0
-  m_TransitionDuration: 0
-  m_StartType: 0
-  m_StopType: 0
-  m_InputNames: []
-  m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 0
-  m_StartAudioClips: []
-  m_StopAudioClips: []
-  m_StartEffect: {fileID: 0}
-  m_EndEffect: {fileID: 0}
-  m_Debug: 0
-  m_MaxInputCount: 10
-  m_StopThreshold: 0.2
-  m_InputStartCount: 10
-  inputCount: 0
 --- !u!114 &4057125413625104798
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1508,7 +1386,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141768220188808}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: baed9bd3040554f2482260e0e684e139, type: 3}
   m_Name: 
@@ -3785,6 +3663,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3999237624628199482}
+  - component: {fileID: 1033987715}
   m_Layer: 29
   m_Name: Colliders
   m_TagString: Untagged
@@ -3806,6 +3685,20 @@ Transform:
   m_Father: {fileID: 4800368842353962}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &1033987715
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2475952332346862068}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.3
+  m_Height: 1.8
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.9, z: 0}
 --- !u!1 &5082345330856401688
 GameObject:
   m_ObjectHideFlags: 0

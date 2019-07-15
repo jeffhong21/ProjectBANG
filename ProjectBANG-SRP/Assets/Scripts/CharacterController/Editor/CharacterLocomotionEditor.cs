@@ -129,7 +129,7 @@ namespace CharacterController
             //  -----
             //  Character Movement
             //  -----
-            //EditorGUILayout.Space();
+
             displayMovement.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayMovement.boolValue, MotorFoldoutHeader) : InspectorUtility.Foldout(displayMovement.boolValue, MotorFoldoutHeader);
             if(displayMovement.boolValue)
             {
@@ -147,13 +147,12 @@ namespace CharacterController
                 EditorGUILayout.PropertyField(m_SlopeForceDown);
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_StopMovementThreshold"));
 
-
+                EditorGUILayout.Space();
             }
 
             //  -----
             //  Character Physics
             //  -----
-            //EditorGUILayout.Space();
             displayPhysics.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayPhysics.boolValue, PhysicsFoldoutHeader) : InspectorUtility.Foldout(displayPhysics.boolValue, PhysicsFoldoutHeader);
             if(displayPhysics.boolValue)
             {
@@ -171,13 +170,13 @@ namespace CharacterController
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_ColliderLayerMask"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_MaxCollisionCount"));
 
+                EditorGUILayout.Space();
             }
 
 
             //  -----
             //  Character Animation
             //  -----
-            //EditorGUILayout.Space();
             displayAnimations.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayAnimations.boolValue, AnimationFoldoutHeader) : InspectorUtility.Foldout(displayAnimations.boolValue, AnimationFoldoutHeader);
             if (displayAnimations.boolValue)
             {
@@ -187,19 +186,18 @@ namespace CharacterController
                 //EditorGUILayout.PropertyField(serializedObject.FindProperty("m_MaxCollisionCount"));
 
 
-
+                EditorGUILayout.Space();
             }
-
+    
 
 
             //  -----
             //  Character Actions
             //  -----
-            //EditorGUILayout.Space();
+
             displayActions.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayActions.boolValue, ActionsFoldoutHeader) : InspectorUtility.Foldout(displayActions.boolValue, ActionsFoldoutHeader);
             if(displayActions.boolValue)
             {
-                EditorGUILayout.Space();
                 //  Active Action.
                 EditorGUILayout.BeginHorizontal();
                 InspectorUtility.LabelField(serializedObject.FindProperty("m_ActiveAction").displayName, 11, FontStyle.Normal);
@@ -208,10 +206,10 @@ namespace CharacterController
                 GUI.enabled = true;
                 EditorGUILayout.EndHorizontal();
 
-                InspectorUtility.LabelField("Selected Action: " + (m_SelectedAction == null ? "<None>" : m_SelectedAction.name));
-                //  Draw Action Inspector.
-                //EditorGUI.indentLevel++;
-                EditorGUILayout.Space();
+                //InspectorUtility.LabelField("Selected Action: " + (m_SelectedAction == null ? "<None>" : m_SelectedAction.name));
+                ////  Draw Action Inspector.
+                ////EditorGUI.indentLevel++;
+                //EditorGUILayout.Space();
 
                 //GUILayout.BeginVertical("box");
                 DrawReorderableList(m_ActionsList);
@@ -234,6 +232,8 @@ namespace CharacterController
                 }
                 //EditorGUI.indentLevel--;
                 EditorGUI.indentLevel--;
+
+                EditorGUILayout.Space();
             }
 
 
@@ -242,7 +242,7 @@ namespace CharacterController
             //  Debugging
             //  -----
             if(m_Debug.boolValue){
-                EditorGUILayout.Space();
+
                 m_DebugFoldout = m_UseDefaultFoldout ? EditorGUILayout.Foldout(m_DebugFoldout, DebugHeader) : InspectorUtility.Foldout(m_DebugFoldout, DebugHeader);
                 if (m_DebugFoldout)
                 {

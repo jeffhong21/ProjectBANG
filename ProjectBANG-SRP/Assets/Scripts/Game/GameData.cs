@@ -80,17 +80,17 @@ public class GameData : ScriptableObject
 
 
 
-    [MenuItem("Assets/Create/Game/Game Data", false, -110)]
-    private static void CreateGameData()
-    {
-        GameData levelData = CreateInstance<GameData>();
-        string filePath = AssetDatabase.GenerateUniqueAssetPath(PATH + ASSETNAME);
-        //Debug.LogFormat("{0} file path: <b> {1} </b>", gameData.name, filePath);
-        AssetDatabase.CreateAsset(levelData, filePath);
+    //[MenuItem("Assets/Create/Game/Game Data", false, -110)]
+    //private static void CreateGameData()
+    //{
+    //    GameData levelData = CreateInstance<GameData>();
+    //    string filePath = AssetDatabase.GenerateUniqueAssetPath(PATH + ASSETNAME);
+    //    //Debug.LogFormat("{0} file path: <b> {1} </b>", gameData.name, filePath);
+    //    AssetDatabase.CreateAsset(levelData, filePath);
 
 
-        AssetDatabase.Refresh();
-    }
+    //    AssetDatabase.Refresh();
+    //}
 
 
 }
