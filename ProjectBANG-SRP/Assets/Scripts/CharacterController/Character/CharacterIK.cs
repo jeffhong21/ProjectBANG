@@ -160,11 +160,11 @@
             else
             {
                 m_CurrentItem = item;
-                m_RightHandTarget.localPosition = item.PositionOffset;
-                m_RightHandTarget.localEulerAngles = item.RotationOffset;
+                //m_RightHandTarget.localPosition = item.PositionOffset;
+                //m_RightHandTarget.localEulerAngles = item.RotationOffset;
 
-                m_LeftHandTarget.position = item.NonDominantHandPosition.position;
-                m_LeftHandTarget.rotation = item.NonDominantHandPosition.rotation;
+                //m_LeftHandTarget.position = item.NonDominantHandPosition.position;
+                //m_LeftHandTarget.rotation = item.NonDominantHandPosition.rotation;
                 //rightHandTargetRotation = Quaternion.Euler(item.RotationOffset);
             }
         }
@@ -284,15 +284,15 @@
 
         protected virtual void PositionHands()
         {
-            if (m_CurrentItem != null){
-                if (m_CurrentItem.NonDominantHandPosition != null){
-                    m_Animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, m_TargetHandWeight);
-                    m_Animator.SetIKRotation(AvatarIKGoal.LeftHand, m_CurrentItem.NonDominantHandPosition.rotation);
+            //if (m_CurrentItem != null){
+            //    if (m_CurrentItem.NonDominantHandPosition != null){
+            //        m_Animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, m_TargetHandWeight);
+            //        m_Animator.SetIKRotation(AvatarIKGoal.LeftHand, m_CurrentItem.NonDominantHandPosition.rotation);
 
-                    m_Animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, m_TargetHandWeight);
-                    m_Animator.SetIKPosition(AvatarIKGoal.LeftHand, m_CurrentItem.NonDominantHandPosition.position);
-                }
-            }
+            //        m_Animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, m_TargetHandWeight);
+            //        m_Animator.SetIKPosition(AvatarIKGoal.LeftHand, m_CurrentItem.NonDominantHandPosition.position);
+            //    }
+            //}
 
             m_Animator.SetIKRotationWeight(AvatarIKGoal.RightHand, m_TargetHandWeight);
             m_Animator.SetIKRotation(AvatarIKGoal.RightHand, m_RightHandTarget.rotation);

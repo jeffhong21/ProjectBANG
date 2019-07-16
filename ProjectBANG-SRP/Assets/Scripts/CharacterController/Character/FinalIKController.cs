@@ -12,27 +12,47 @@ namespace CharacterController
         private readonly string leftHandEffectorName = "LeftHand Effector";
         private readonly string leftShoulderEffectorName = "LeftShoulder Effector";
         private readonly string bodyEffectorName = "Body Effector";
+        private readonly string lookTargetName = "Look Target";
+
 
         protected Transform rightHandEffector;
         protected Transform rightShoulderEffector;
         protected Transform leftHandEffector;
         protected Transform leftShoulderEffector;
         protected Transform bodyEffector;
+        protected Transform lookTarget;
 
         // Array of IK components that you can assign from the inspector. 
         // IK is abstract, so it does not matter which specific IK component types are used.
         public IK[] components;
-
+        private Animator animator;
 
         private bool updateFrame;
-            
+
+        private void Awake()
+        {
+            animator = GetComponent<Animator>();
+        }
+
         void Start() {
             // Disable all the IK components so they won't update their solvers. Use Disable() instead of enabled = false, the latter does not guarantee solver initiation.
-            foreach (IK component in components) component.Disable();
+            foreach (IK component in components)
+                component.Disable();
+
+            Initialize();
         }
         void FixedUpdate() {
             updateFrame = true;
         }
+
+
+
+        protected void Update()
+        {
+
+        }
+
+
         void LateUpdate() {
             // Do nothing if FixedUpdate has not been called since the last LateUpdate
             if (!updateFrame) return;
@@ -53,6 +73,10 @@ namespace CharacterController
             leftShoulderEffector = CreateEffectors(leftShoulderEffectorName, new Vector3(0, 1.25f, 0), Quaternion.identity);
 
             bodyEffector = CreateEffectors(bodyEffectorName, new Vector3(0, 0.8f, 0), Quaternion.identity);
+
+            lookTarget = CreateEffectors(bodyEffectorName,
+                animator.GetBoneTransform(HumanBodyBones.Head).position + transform.forward,
+                Quaternion.identity);
         }
 
         protected virtual Transform CreateEffectors(string effectorName, Vector3 position, Quaternion rotation)
@@ -68,7 +92,9 @@ namespace CharacterController
 
 
 
-	}
+
+
+    }
 
 
 

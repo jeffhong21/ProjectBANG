@@ -55,7 +55,8 @@
         private Transform followTarget;
         [SerializeField]
         private Transform lookAtTarget;
-        [Header("Virtual Cameras")]
+
+
         [SerializeField]
         private VirtualCameraState[] virtualCameras = { new VirtualCameraState("DEFAULT") };
         private int currentCamera;

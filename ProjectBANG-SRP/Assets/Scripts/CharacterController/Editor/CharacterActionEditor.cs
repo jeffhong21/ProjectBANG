@@ -34,7 +34,7 @@
                 {
                     font = new GUIStyle(EditorStyles.label).font,
                     fontStyle = FontStyle.Bold,
-                    fontSize = 12,
+                    //fontSize = 12,
                 };
             }
         }

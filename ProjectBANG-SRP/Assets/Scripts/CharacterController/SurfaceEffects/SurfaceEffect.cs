@@ -4,7 +4,7 @@
     using System;
     using Random = UnityEngine.Random;
 
-    [CreateAssetMenu(fileName = "Surface Effect", menuName = "Character Controller/Surface Effect", order = -1000)]
+    [CreateAssetMenu(fileName = "Surface Effect", menuName = "Character Controller/Surface Effect", order = 1000)]
     public class SurfaceEffect : ScriptableObject
     {
 
@@ -13,7 +13,7 @@
         {
             public GameObject spawnedObject;
             [Range(0,1)]
-            public float probability;
+            public float probability = 1;
             public bool randomSpin;
 
 

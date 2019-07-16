@@ -350,8 +350,8 @@ MonoBehaviour:
     m_Bias: -14
   m_RecenterToTargetHeading:
     m_enabled: 1
-    m_WaitTime: 3
-    m_RecenteringTime: 5
+    m_WaitTime: 1
+    m_RecenteringTime: 2
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
   m_XAxis:
@@ -388,7 +388,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TrackedObjectOffset: {x: 0, y: 1.6, z: 0}
-  m_LookaheadTime: 0
+  m_LookaheadTime: 0.22
   m_LookaheadSmoothing: 10
   m_LookaheadIgnoreY: 0
   m_HorizontalDamping: 0
@@ -426,7 +426,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1718815361967978978}
-  m_LocalRotation: {x: -0.49608213, y: 0.8047689, z: 0.31370252, w: 0.088545196}
+  m_LocalRotation: {x: -0.49608213, y: 0.8047689, z: 0.31370255, w: 0.088545196}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -551,8 +551,8 @@ MonoBehaviour:
     m_Bias: -14
   m_RecenterToTargetHeading:
     m_enabled: 0
-    m_WaitTime: 3
-    m_RecenteringTime: 5
+    m_WaitTime: 1
+    m_RecenteringTime: 2
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
   m_XAxis:
@@ -627,7 +627,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1718815362388559994}
-  m_LocalRotation: {x: -0.54916143, y: 0.76933664, z: 0.30680168, w: 0.11142555}
+  m_LocalRotation: {x: -0.5491613, y: 0.7693366, z: 0.30680177, w: 0.11142559}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -706,8 +706,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1718815362960522756}
-  m_LocalRotation: {x: 0.016367419, y: 0.983554, z: -0.133302, w: 0.120765194}
-  m_LocalPosition: {x: -1.5365438, y: 3, z: 16.8694}
+  m_LocalRotation: {x: 0.016367426, y: 0.983554, z: -0.13330197, w: 0.12076526}
+  m_LocalPosition: {x: -1.2265439, y: 3, z: 4.9193993}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 5033000927492876682}
@@ -840,7 +840,7 @@ MonoBehaviour:
   m_ShowCameraFrustum: 0
   m_IgnoreTimeScale: 0
   m_WorldUpOverride: {fileID: 0}
-  m_UpdateMethod: 2
+  m_UpdateMethod: 1
   m_DefaultBlend:
     m_Style: 1
     m_Time: 2
@@ -887,7 +887,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1718815363623873241}
   m_LocalRotation: {x: -0.18712825, y: 0.06404661, z: -0.8743219, w: 0.44321826}
-  m_LocalPosition: {x: -1.5365438, y: 3, z: 16.8694}
+  m_LocalPosition: {x: -1.2265439, y: 3, z: 4.9193993}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1718815361967978988}
@@ -979,8 +979,8 @@ MonoBehaviour:
     m_Bias: -14
   m_RecenterToTargetHeading:
     m_enabled: 1
-    m_WaitTime: 3
-    m_RecenteringTime: 5
+    m_WaitTime: 1
+    m_RecenteringTime: 2
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
   m_BindingMode: 4
@@ -1100,8 +1100,8 @@ MonoBehaviour:
     m_Bias: -14
   m_RecenterToTargetHeading:
     m_enabled: 0
-    m_WaitTime: 3
-    m_RecenteringTime: 5
+    m_WaitTime: 1
+    m_RecenteringTime: 2
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
   m_XAxis:
@@ -1176,7 +1176,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1718815363890255673}
-  m_LocalRotation: {x: 0.7823794, y: 0.5304145, z: 0.10398095, w: -0.30940408}
+  m_LocalRotation: {x: 0.78237945, y: 0.5304146, z: 0.103980966, w: -0.3094041}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -2254,7 +2254,7 @@ MonoBehaviour:
     m_InvertInput: 0
     m_MinValue: -180
     m_MaxValue: 180
-    m_Wrap: 0
+    m_Wrap: 1
     m_Recentering:
       m_enabled: 0
       m_WaitTime: 1
@@ -2274,11 +2274,11 @@ MonoBehaviour:
   m_BindingMode: 4
   m_SplineCurvature: 0.049
   m_Orbits:
-  - m_Height: 2.4
+  - m_Height: 3
     m_Radius: 2.8
   - m_Height: 2
     m_Radius: 3
-  - m_Height: 1.4
+  - m_Height: 0.8
     m_Radius: 2.8
   m_LegacyHeadingBias: 3.4028235e+38
   m_Rigs:

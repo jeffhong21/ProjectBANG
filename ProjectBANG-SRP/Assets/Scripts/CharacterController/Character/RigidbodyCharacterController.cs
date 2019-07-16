@@ -67,7 +67,9 @@ namespace CharacterController
 
         //  -- Collision detection
         [SerializeField, HideInInspector]
-        protected bool mDetectHorizontalCollision = true;
+        protected CapsuleCollider m_Collider;
+        [SerializeField, HideInInspector]
+        protected bool m_DetectHorizontalCollision = true;
         [SerializeField, HideInInspector]
         protected int m_HorizontalCollisionCount = 10;      //  Do not need
         [SerializeField, HideInInspector]
@@ -106,7 +108,7 @@ namespace CharacterController
         protected float m_SlopeAngle;
         protected RaycastHit m_GroundHit;
         protected RaycastHit[] m_Collisions;
-        protected CapsuleCollider m_Collider;
+
         protected float m_ColliderHeight, m_ColliderCenterY;
         protected Collider[] m_LinkedColliders = new Collider[0];
         protected PhysicMaterial m_GroundIdleFrictionMaterial, m_GroundedMovingFrictionMaterial, m_AirFrictionMaterial,
@@ -445,6 +447,7 @@ namespace CharacterController
 
                     Vector3 localDir = m_Transform.InverseTransformDirection(LookDirection);
                     m_DeltaYRotation = Mathf.Atan2(localDir.x, localDir.z) * Mathf.Rad2Deg * m_RotationSpeed;
+                    //m_DeltaYRotation = Mathf.SmoothDampAngle(m_DeltaYRotation, targetAngle, ref m_RotationSmoothDamp, 0.15f) * m_RotationSpeed;
 
                     axisSign = Vector3.Cross(LookDirection, m_Transform.forward);
                     turnAngle = Vector3.Angle(m_Transform.forward, LookDirection) * (axisSign.y >= 0 ? -1f : 1f);
@@ -456,6 +459,7 @@ namespace CharacterController
 
 
             Moving = Mathf.Abs((m_Rigidbody.position - m_PreviousPosition).sqrMagnitude) > 0;
+            m_Rigidbody.angularDrag = InputVector.sqrMagnitude > 0 ? 0.05f : m_Mass;
         }
 
 
@@ -548,7 +552,7 @@ namespace CharacterController
 
             float colliderRadius = m_Collider.radius - m_SkinWidth;
             float colliderHeight = m_Collider.height - (colliderRadius * 2);
-            int horizontalRayCount = mDetectHorizontalCollision ? Mathf.RoundToInt(colliderHeight / dstBetweenRays) : 3;
+            int horizontalRayCount = m_DetectHorizontalCollision ? Mathf.RoundToInt(colliderHeight / dstBetweenRays) : 3;
             float horizontalRaySpacing = colliderHeight / (horizontalRayCount - 1);
 
 
@@ -700,18 +704,50 @@ namespace CharacterController
             if (InputVector == Vector3.zero)
                 m_DeltaYRotation *= (1.01f - (Mathf.Abs(m_DeltaYRotation) / 180)) * m_IdleRotationMultiplier;
             m_DeltaYRotation = (float)Math.Round(m_DeltaYRotation, 2);
-
-
             m_DeltaYRotation *= m_RotationSpeed * m_DeltaTime;
             Quaternion targetRotation = Quaternion.AngleAxis(m_DeltaYRotation, m_Transform.up);
+
+            ////q will rotate from our current rotation to desired rotation
+            //Quaternion q = targetRotation; // * Quaternion.Inverse(transform.rotation);
+            ////convert to angle axis representation so we can do math with angular velocity
+            //Vector3 axis;
+            //float axisMagnitude;
+            //q.ToAngleAxis(out axisMagnitude, out axis);
+            //axis.Normalize();
+            ////w is the angular velocity we need to achieve
+            //Vector3 targetAngularVelocity = axis * axisMagnitude * Mathf.Deg2Rad / Time.fixedDeltaTime;
+            //targetAngularVelocity -= m_Rigidbody.angularVelocity;
+            ////to multiply with inertia tensor local then rotationTensor coords
+            //Vector3 wl = transform.InverseTransformDirection(targetAngularVelocity);
+            //Vector3 Tl;
+            //Vector3 wll = wl;
+            //wll = m_Rigidbody.inertiaTensorRotation * wll;
+            //wll.Scale(m_Rigidbody.inertiaTensor);
+            //Tl = Quaternion.Inverse(m_Rigidbody.inertiaTensorRotation) * wll;
+            //Vector3 T = transform.TransformDirection(Tl);
+            //m_Rigidbody.angularVelocity = T;
+            //return;
+
+
+            float angleInDegrees;
+            Vector3 rotationAxis;
+            targetRotation.ToAngleAxis(out angleInDegrees, out rotationAxis);
+            Vector3 angularDisplacement = rotationAxis * angleInDegrees * m_RotationSpeed;
+            float orientationSharpness = 10f;
+            m_Rigidbody.angularVelocity = Vector3.Slerp(m_Rigidbody.angularVelocity, angularDisplacement, 1 - Mathf.Exp(-orientationSharpness * deltaTime));
+            //Vector3 angularVelocity = Vector3.Slerp(m_Rigidbody.angularVelocity, angularDisplacement, 1 - Mathf.Exp(-orientationSharpness * deltaTime));
+
+            //m_Rigidbody.AddTorque(angularVelocity, ForceMode.VelocityChange);
+
             //if (m_Grounded){
             //    Vector3 d = transform.position - m_Animator.pivotPosition;
             //    m_Rigidbody.MovePosition(m_Animator.pivotPosition + m_LookRotation * d);
             //}
-            m_Rigidbody.MoveRotation(targetRotation * m_Transform.rotation);
+            //m_Rigidbody.MoveRotation(targetRotation * m_Transform.rotation);
 
-
-
+            CharacterDebug.Log("angularDisplacement", angularDisplacement);
+            CharacterDebug.Log("angleInDegrees", angleInDegrees);
+            CharacterDebug.Log("rotationAxis", rotationAxis);
 
 
 
@@ -808,7 +844,7 @@ namespace CharacterController
             //m_Animator.SetFloat(HashID.Rotation, (m_DeltaYRotation * Mathf.Deg2Rad));
             //  1 means left foot is up.
             m_Animator.SetFloat(HashID.StartAngle, m_StartAngle);
-            m_Animator.SetFloat(HashID.Rotation, m_DeltaYRotation);
+            m_Animator.SetFloat(HashID.Rotation, m_DeltaYRotation, 0.1f, m_DeltaTime);
             m_Animator.SetFloat(HashID.LegUpIndex, m_Animator.pivotWeight);
             m_Animator.SetBool(HashID.Moving, m_Moving);
 
@@ -1119,7 +1155,7 @@ namespace CharacterController
                 Gizmos.DrawRay(RaycastOrigin, m_MoveDirection);
                 Gizmos.color = Color.green;
                 GizmosUtils.DrawArrow(RaycastOrigin, m_Rigidbody.velocity);
-                GizmosUtils.DrawText(GUI.skin, "Velocity", RaycastOrigin + Velocity, Color.green);
+                GizmosUtils.DrawText(GUI.skin, "Velocity", RaycastOrigin + transform.forward, Color.green);
             }
 
             GizmosUtils.DrawText(GUI.skin, Movement.ToString(), transform.position + Vector3.up * 1.8f, Color.black);

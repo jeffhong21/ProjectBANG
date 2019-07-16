@@ -450,24 +450,22 @@
             //m_DestinationStateName = m_StateName;
             for (int index = 0; index < m_Animator.layerCount; index++)
             {
-                if (string.IsNullOrEmpty(GetDestinationState(index)) == false){
-                    m_DestinationStateName = string.Format("{0}.{1}", m_StateName, GetDestinationState(index));
-                }
-                else{
-                    m_DestinationStateName = m_StateName;
+                if (string.IsNullOrEmpty(GetDestinationState(index)) == false)
+                {
+
+                    if (m_Animator.HasState(index, Animator.StringToHash(GetDestinationState(index) ) ))
+                    {
+                        if (m_TransitionDuration > 0)
+                            m_Animator.CrossFade(m_DestinationStateName, m_TransitionDuration, index);
+                        else
+                            m_Animator.Play(m_DestinationStateName, index);
+                    }
+                    else
+                    {
+                        Debug.LogErrorFormat("Cannot transition to {0} in layer {1}", m_DestinationStateName, index);
+                    }
                 }
 
-                if (m_Animator.HasState(index, Animator.StringToHash(m_DestinationStateName)))
-                {
-                    if (m_TransitionDuration > 0)
-                        m_Animator.CrossFade(m_DestinationStateName, m_TransitionDuration, index);
-                    else
-                        m_Animator.Play(m_DestinationStateName, index);
-                }
-                //else
-                //{
-                //    Debug.LogErrorFormat("Cannot transition to {0} in layer {1}", m_DestinationStateName, index);
-                //}
 
 
                 //if (m_TransitionDuration > 0)

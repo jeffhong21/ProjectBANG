@@ -165,6 +165,7 @@ namespace CharacterController
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_GravityModifier"));
 
                 //  Collisions
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Collider"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_HorizontalCollisionCount"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_VerticalCollisionCount"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_ColliderLayerMask"));
@@ -198,15 +199,15 @@ namespace CharacterController
             displayActions.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayActions.boolValue, ActionsFoldoutHeader) : InspectorUtility.Foldout(displayActions.boolValue, ActionsFoldoutHeader);
             if(displayActions.boolValue)
             {
-                //  Active Action.
-                EditorGUILayout.BeginHorizontal();
-                InspectorUtility.LabelField(serializedObject.FindProperty("m_ActiveAction").displayName, 11, FontStyle.Normal);
-                GUI.enabled = false;
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_ActiveAction"), GUIContent.none);
-                GUI.enabled = true;
-                EditorGUILayout.EndHorizontal();
+                ////  Active Action.
+                //EditorGUILayout.BeginHorizontal();
+                //InspectorUtility.LabelField(serializedObject.FindProperty("m_ActiveAction").displayName, 11, FontStyle.Normal);
+                //GUI.enabled = false;
+                //EditorGUILayout.PropertyField(serializedObject.FindProperty("m_ActiveAction"), GUIContent.none);
+                //GUI.enabled = true;
+                //EditorGUILayout.EndHorizontal();
 
-                //InspectorUtility.LabelField("Selected Action: " + (m_SelectedAction == null ? "<None>" : m_SelectedAction.name));
+                InspectorUtility.LabelField("Selected Action: " + (m_SelectedAction == null ? "<None>" : m_SelectedAction.name));
                 ////  Draw Action Inspector.
                 ////EditorGUI.indentLevel++;
                 //EditorGUILayout.Space();
@@ -246,11 +247,8 @@ namespace CharacterController
                 m_DebugFoldout = m_UseDefaultFoldout ? EditorGUILayout.Foldout(m_DebugFoldout, DebugHeader) : InspectorUtility.Foldout(m_DebugFoldout, DebugHeader);
                 if (m_DebugFoldout)
                 {
-                    DrawPropertiesExcluding(serializedObject, m_DontIncude);
-
-
-                    EditorGUILayout.Space();
-                    InspectorUtility.LabelField("-- Debug Settings--");
+                    //DrawPropertiesExcluding(serializedObject, m_DontIncude);
+                    //InspectorUtility.LabelField("-- Debug Settings--");
                     EditorGUI.indentLevel++;
 
                     InspectorUtility.PropertyField(serializedObject.FindProperty("m_DrawDebugLine"));
@@ -443,15 +441,16 @@ namespace CharacterController
             SerializedProperty listElement = serializedList.GetArrayElementAtIndex(index);
             CharacterAction characterAction = (CharacterAction)listElement.objectReferenceValue;
 
-
-            serializedList.DeleteArrayElementAtIndex(index);
-
-
             DestroyImmediate(characterAction, true);
+            serializedObject.ApplyModifiedProperties();
+            serializedList.DeleteArrayElementAtIndex(index);
+            serializedObject.ApplyModifiedProperties();
+
+
             //serializedObject.Update();
             AssetDatabase.Refresh();
 
-            serializedObject.ApplyModifiedProperties();
+            
         }
 
 

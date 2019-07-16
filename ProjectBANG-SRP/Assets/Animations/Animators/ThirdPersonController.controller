@@ -11908,7 +11908,7 @@ BlendTree:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: CombatLocomotion-BT
+  m_Name: Aim
   m_Childs:
   - serializedVersion: 2
     m_Motion: {fileID: 7400000, guid: ee060afeb667b485f91c1f2b7c75ca75, type: 2}
@@ -12267,7 +12267,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: CombatLocomotion
+  m_Name: Aim
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -13125,7 +13125,7 @@ AnimatorStateMachine:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: CombatLocomotion
+  m_Name: Aim Movement
   m_ChildStates:
   - serializedVersion: 1
     m_State: {fileID: 4341054746573179895}

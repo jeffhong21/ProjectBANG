@@ -16,7 +16,7 @@ namespace CharacterController
         [SerializeField]
         protected float m_MinFallHeight = 2f;
         [SerializeField]
-        protected GameObject m_LandSurfaceImpact;
+        protected SurfaceEffect m_LandSurfaceImpact;
         [SerializeField]
         protected float m_MinSurfaceImpactVelocity = 1f;
 
