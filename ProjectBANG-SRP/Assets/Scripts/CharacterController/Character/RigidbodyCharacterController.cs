@@ -737,6 +737,9 @@ namespace CharacterController
         /// </summary>
         protected virtual void UpdateMovement()
         {
+            // // Drag
+            // currentVelocity *= (1f / (1f + (Drag * deltaTime)));
+
             if (m_UseRootMotion)
             {
                 m_Velocity = RootMotionVelocity / m_DeltaTime;
