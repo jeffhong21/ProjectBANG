@@ -77,7 +77,7 @@ public class LevelManager : SingletonMonoBehaviour<LevelManager>
 
     private void Start()
     {
-        LoadScene(gameData.PrototypeLevel.ActiveScene);
+        //LoadScene(gameData.PrototypeLevel.ActiveScene);
         //  Initialize level.
         InitializeLevel();
 

@@ -155,11 +155,11 @@
 
         private void Initialize()
         {
-            //  Setup state name.
-            if (string.IsNullOrWhiteSpace(m_StateName))
-            {
-                m_StateName = GetType().Name;
-            }
+            ////  Setup state name.
+            //if (string.IsNullOrWhiteSpace(m_StateName))
+            //{
+            //    m_StateName = GetType().Name;
+            //}
 
             //  Translate input name to keycode.
             if (m_StartType != ActionStartType.Automatic || m_StartType != ActionStartType.Manual ||
@@ -452,13 +452,13 @@
             {
                 if (string.IsNullOrEmpty(GetDestinationState(index)) == false)
                 {
-
-                    if (m_Animator.HasState(index, Animator.StringToHash(GetDestinationState(index) ) ))
+                    string destinationState = m_Animator.GetLayerName(index) + "." + GetDestinationState(index);
+                    if (m_Animator.HasState(index, Animator.StringToHash(destinationState) ))
                     {
                         if (m_TransitionDuration > 0)
-                            m_Animator.CrossFade(m_DestinationStateName, m_TransitionDuration, index);
+                            m_Animator.CrossFade(destinationState, m_TransitionDuration, index);
                         else
-                            m_Animator.Play(m_DestinationStateName, index);
+                            m_Animator.Play(destinationState, index);
                     }
                     else
                     {

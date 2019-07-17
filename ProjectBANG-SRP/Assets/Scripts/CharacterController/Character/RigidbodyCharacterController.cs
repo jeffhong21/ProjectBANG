@@ -326,7 +326,7 @@ namespace CharacterController
             {
                 name = "GroundedMovingFrictionMaterial",
                 staticFriction = .25f,
-                dynamicFriction = .25f,
+                dynamicFriction = 0f,
                 frictionCombine = PhysicMaterialCombine.Multiply
             };
 
@@ -415,51 +415,45 @@ namespace CharacterController
                 InputVector.Normalize();
             RelativeInputVector = m_Transform.TransformDirection(InputVector);
 
+            //m_DeltaYRotation = 0;
+
+            m_Velocity = RelativeInputVector;
+            m_MoveDirection = m_Velocity * m_DeltaTime;
 
 
 
             float turnAngle = 0;
+
             switch (m_MovementType)
             {
                 case (MovementType.Adventure):
 
-                    m_Velocity = m_Transform.forward * InputVector.z;
-                    m_MoveDirection = m_Velocity * m_DeltaTime;
+                    var direction = Mathf.Abs(InputVector.z) > 0 ? InputVector.x : -InputVector.x;
+                    float targetAngle = Mathf.Atan2(direction, Mathf.Abs(InputVector.z));
 
-                    //Vector3 localDir = m_Transform.InverseTransformDirection(LookDirection);
-                    float targetAngle = Mathf.Atan2(InputVector.x, Mathf.Abs(InputVector.z)) * Mathf.Rad2Deg;
-                    m_DeltaYRotation = Mathf.SmoothDampAngle(m_DeltaYRotation, targetAngle, ref m_RotationSmoothDamp, 0.15f) * m_RotationSpeed;
-
-                    Vector3 axisSign = Vector3.Cross(LookDirection, m_Transform.forward);
-                    turnAngle = Vector3.Angle(m_Transform.forward, LookDirection) * (axisSign.y >= 0 ? -1f : 1f) * Mathf.Deg2Rad;
-                    CharacterDebug.Log("targetAngle", targetAngle);
+                    targetAngle *= Mathf.Rad2Deg * m_RotationSpeed;
+                    m_DeltaYRotation = Mathf.SmoothDampAngle(m_DeltaYRotation, targetAngle, ref m_RotationSmoothDamp, 0.15f);
+                    //CharacterDebug.Log("targetAngle", targetAngle);
                     break;
 
                 case (MovementType.Combat):
-
-                    m_Velocity = RelativeInputVector;
-                    m_MoveDirection = m_Velocity * m_DeltaTime;
-
-                    //LookDirection = m_LookRotation * m_Transform.forward;
-
-                    //Vector3 axisSign = Vector3.Cross(LookDirection, m_Transform.forward);
-                    //m_DeltaYRotation = Vector3.Angle(m_Transform.forward, LookDirection) * (axisSign.y >= 0 ? -1f : 1f) * m_DeltaTime;
-
                     Vector3 localDir = m_Transform.InverseTransformDirection(LookDirection);
                     m_DeltaYRotation = Mathf.Atan2(localDir.x, localDir.z) * Mathf.Rad2Deg * m_RotationSpeed;
                     //m_DeltaYRotation = Mathf.SmoothDampAngle(m_DeltaYRotation, targetAngle, ref m_RotationSmoothDamp, 0.15f) * m_RotationSpeed;
-
-                    axisSign = Vector3.Cross(LookDirection, m_Transform.forward);
-                    turnAngle = Vector3.Angle(m_Transform.forward, LookDirection) * (axisSign.y >= 0 ? -1f : 1f);
-
                     break;
             }
+
+            Vector3 axisSign = Vector3.Cross(LookDirection, m_Transform.forward);
+            turnAngle = Vector3.Angle(m_Transform.forward, LookDirection) * (axisSign.y >= 0 ? -1f : 1f);
+
             CharacterDebug.Log("m_DeltaYRotation", m_DeltaYRotation);
             CharacterDebug.Log("turnAngle", turnAngle);
 
 
             Moving = Mathf.Abs((m_Rigidbody.position - m_PreviousPosition).sqrMagnitude) > 0;
             m_Rigidbody.angularDrag = InputVector.sqrMagnitude > 0 ? 0.05f : m_Mass;
+
+
         }
 
 
@@ -701,49 +695,30 @@ namespace CharacterController
         protected virtual void UpdateRotation()
         {
 
-            if (InputVector == Vector3.zero)
-                m_DeltaYRotation *= (1.01f - (Mathf.Abs(m_DeltaYRotation) / 180)) * m_IdleRotationMultiplier;
+            //if (InputVector == Vector3.zero)
+            //    m_DeltaYRotation *= (1.01f - (Mathf.Abs(m_DeltaYRotation) / 180)) * m_IdleRotationMultiplier;
             m_DeltaYRotation = (float)Math.Round(m_DeltaYRotation, 2);
             m_DeltaYRotation *= m_RotationSpeed * m_DeltaTime;
             Quaternion targetRotation = Quaternion.AngleAxis(m_DeltaYRotation, m_Transform.up);
-
-            ////q will rotate from our current rotation to desired rotation
-            //Quaternion q = targetRotation; // * Quaternion.Inverse(transform.rotation);
-            ////convert to angle axis representation so we can do math with angular velocity
-            //Vector3 axis;
-            //float axisMagnitude;
-            //q.ToAngleAxis(out axisMagnitude, out axis);
-            //axis.Normalize();
-            ////w is the angular velocity we need to achieve
-            //Vector3 targetAngularVelocity = axis * axisMagnitude * Mathf.Deg2Rad / Time.fixedDeltaTime;
-            //targetAngularVelocity -= m_Rigidbody.angularVelocity;
-            ////to multiply with inertia tensor local then rotationTensor coords
-            //Vector3 wl = transform.InverseTransformDirection(targetAngularVelocity);
-            //Vector3 Tl;
-            //Vector3 wll = wl;
-            //wll = m_Rigidbody.inertiaTensorRotation * wll;
-            //wll.Scale(m_Rigidbody.inertiaTensor);
-            //Tl = Quaternion.Inverse(m_Rigidbody.inertiaTensorRotation) * wll;
-            //Vector3 T = transform.TransformDirection(Tl);
-            //m_Rigidbody.angularVelocity = T;
-            //return;
 
 
             float angleInDegrees;
             Vector3 rotationAxis;
             targetRotation.ToAngleAxis(out angleInDegrees, out rotationAxis);
-            Vector3 angularDisplacement = rotationAxis * angleInDegrees * m_RotationSpeed;
-            float orientationSharpness = 10f;
-            m_Rigidbody.angularVelocity = Vector3.Slerp(m_Rigidbody.angularVelocity, angularDisplacement, 1 - Mathf.Exp(-orientationSharpness * deltaTime));
-            //Vector3 angularVelocity = Vector3.Slerp(m_Rigidbody.angularVelocity, angularDisplacement, 1 - Mathf.Exp(-orientationSharpness * deltaTime));
+            rotationAxis.Normalize();
+            Vector3 angularDisplacement = rotationAxis * angleInDegrees * m_RotationSpeed; // (Mathf.Sign(rotationAxis.y * angleInDegrees))  
+            m_Rigidbody.angularVelocity = angularDisplacement;
 
-            //m_Rigidbody.AddTorque(angularVelocity, ForceMode.VelocityChange);
+
 
             //if (m_Grounded){
             //    Vector3 d = transform.position - m_Animator.pivotPosition;
             //    m_Rigidbody.MovePosition(m_Animator.pivotPosition + m_LookRotation * d);
             //}
-            //m_Rigidbody.MoveRotation(targetRotation * m_Transform.rotation);
+            m_Rigidbody.MoveRotation(targetRotation * m_Transform.rotation);
+
+            CharacterDebug.Log("rbAngularVel_spd", m_Rigidbody.angularVelocity.magnitude);
+            CharacterDebug.Log("rbAngularVel", m_Rigidbody.angularVelocity);
 
             CharacterDebug.Log("angularDisplacement", angularDisplacement);
             CharacterDebug.Log("angleInDegrees", angleInDegrees);
@@ -1016,57 +991,6 @@ namespace CharacterController
 
 
 
-        public bool DetectEdge()
-        {
-            if (!m_Grounded)
-                return false;
-
-
-            bool detectEdge = false;
-            Vector3 start = m_Rigidbody.position + (m_Transform.forward * m_Collider.radius);
-            start.y = start.y + m_DetectObjectHeight;
-            //start.y = start.y + 0.05f + (Mathf.Tan(m_SlopeAngle) * start.magnitude);
-
-            Vector3 dir = Vector3.down;
-            float maxDetectEdgeDistance = 1 + m_DetectObjectHeight;
-
-
-
-            if (Physics.Raycast(m_Rigidbody.position + (Vector3.up * m_DetectObjectHeight), m_Transform.forward, 2, m_Layers.SolidLayers) == false)
-            {
-
-                if (Physics.Raycast(start, dir, maxDetectEdgeDistance, m_Layers.SolidLayers) == false)
-                {
-                    detectEdge = true;
-                }
-            }
-
-
-
-            //if (Debug && hitObject == false) Debug.DrawRay(m_Rigidbody.position + (Vector3.up * m_DetectObjectHeight), m_Transform.forward * 2, hitObject ? Color.red : Color.green);
-            if (DebugMode) Debug.DrawRay(start, dir * maxDetectEdgeDistance, detectEdge ? Color.green : Color.gray);
-
-            return detectEdge;
-        }
-
-
-
-        public bool DetectObject(Vector3 dir, out RaycastHit raycastHit, float maxDistance, LayerMask layerMask, int rayCount = 1, float maxAngle = 0)
-        {
-            bool detectObject = false;
-            Vector3 start = m_Rigidbody.position + (Vector3.up * m_DetectObjectHeight);
-
-            if (rayCount < 1) rayCount = 1;
-
-            if (Physics.Raycast(start, dir, out raycastHit, maxDistance, layerMask))
-            {
-                detectObject = true;
-            }
-
-            if (DebugMode) Debug.DrawRay(start, dir * maxDistance, detectObject ? Color.red : Color.green);
-            return detectObject;
-        }
-
 
 
 
@@ -1125,15 +1049,15 @@ namespace CharacterController
         {
 
 
-            CharacterDebug.Log("Moving", Moving);
-            CharacterDebug.Log("Grounded", Grounded);
+            //CharacterDebug.Log("Moving", Moving);
+            //CharacterDebug.Log("Grounded", Grounded);
 
-
+            CharacterDebug.Log("seperator", "----------");
             CharacterDebug.Log("RelativeInputVector", RelativeInputVector);
             CharacterDebug.Log("InputVector", InputVector);
 
-            CharacterDebug.Log("m_Velocity", m_Velocity);
-            CharacterDebug.Log("m_MoveDirection", m_MoveDirection);
+            //CharacterDebug.Log("m_Velocity", m_Velocity);
+            //CharacterDebug.Log("m_MoveDirection", m_MoveDirection);
 
 
             //CharacterDebug.Log("rb_AngularVelocity", m_Rigidbody.angularVelocity);

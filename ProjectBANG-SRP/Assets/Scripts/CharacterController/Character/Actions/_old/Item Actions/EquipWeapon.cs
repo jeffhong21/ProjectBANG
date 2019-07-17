@@ -10,15 +10,6 @@
 
         protected override void ActionStarted()
         {
-            int slotID = m_InputIndex;
-
-            Item item = m_Inventory.GetItem(slotID);
-            if(item != null)
-            {
-                m_Inventory.EquipItem(item.ItemType);
-            }
-            
-
 
         }
 

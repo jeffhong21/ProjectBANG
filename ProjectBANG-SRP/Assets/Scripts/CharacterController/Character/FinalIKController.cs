@@ -14,7 +14,7 @@ namespace CharacterController
         private readonly string bodyEffectorName = "Body Effector";
         private readonly string lookTargetName = "Look Target";
         protected Transform rightHandEffector, leftHandEffector, bodyEffector, lookTarget;
-        
+
         public FullBodyBipedIK fbIK;
         public LookAtIK lookAtIK;
         public AimIK aimIK;
@@ -29,10 +29,11 @@ namespace CharacterController
             animator = GetComponent<Animator>();
         }
 
-        private void Start() {
-            // Disable all the IK components so they won't update their solvers. Use Disable() instead of enabled = false, the latter does not guarantee solver initiation.
-            foreach (IK component in components)
-                component.Disable();
+        private void Start()
+        {
+            //// Disable all the IK components so they won't update their solvers. Use Disable() instead of enabled = false, the latter does not guarantee solver initiation.
+            //foreach (IK component in components)
+            //    component.Disable();
 
             Initialize();
         }
@@ -56,9 +57,9 @@ namespace CharacterController
             // Do nothing if FixedUpdate has not been called since the last LateUpdate
             if (!updateFrame) return;
             updateFrame = false;
-            
-            // Updating the IK solvers in a specific order. 
-            foreach (IK component in components) component.GetIKSolver().Update();
+
+            //// Updating the IK solvers in a specific order. 
+            //foreach (IK component in components) component.GetIKSolver().Update();
         }
 
 
@@ -66,9 +67,9 @@ namespace CharacterController
         protected void Initialize()
         {
             rightHandEffector = CreateEffectors(rightHandEffectorName, new Vector3(0, 1.25f, 0), Quaternion.identity);
-            rightShoulderEffector = CreateEffectors(rightHandEffectorName, new Vector3(0, 1.25f, 0), Quaternion.identity);
+            //rightShoulderEffector = CreateEffectors(rightHandEffectorName, new Vector3(0, 1.25f, 0), Quaternion.identity);
             leftHandEffector = CreateEffectors(leftHandEffectorName, new Vector3(0, 1.25f, 0), Quaternion.identity);
-            leftShoulderEffector = CreateEffectors(leftShoulderEffectorName, new Vector3(0, 1.25f, 0), Quaternion.identity);
+            //leftShoulderEffector = CreateEffectors(leftShoulderEffectorName, new Vector3(0, 1.25f, 0), Quaternion.identity);
             bodyEffector = CreateEffectors(bodyEffectorName, new Vector3(0, 0.8f, 0), Quaternion.identity);
             lookTarget = CreateEffectors(bodyEffectorName,
                 animator.GetBoneTransform(HumanBodyBones.Head).position + transform.forward,
@@ -91,7 +92,7 @@ namespace CharacterController
 
 
     }
-
+}
 
 
 

@@ -22,7 +22,7 @@ namespace CharacterController
             {
                 if(m_NextJump < Time.time)
                 {
-                    if (m_Controller.Grounded && m_Rigidbody.velocity.y > -0.001f)
+                    if (m_Controller.Grounded && m_Rigidbody.velocity.y > -0.01f)
                     {
                         return true;
                     }
@@ -87,14 +87,15 @@ namespace CharacterController
 		public override string GetDestinationState(int layer)
         {
             if (layer == 0){
-                if(m_Controller.Moving){
+                return "Jump.IdleStart";
+                if (m_Controller.Moving){
                     if (m_Animator.pivotWeight >= 0.5f)
                         m_DestinationStateName = "RunStart_LeftUp";
                     else if (m_Animator.pivotWeight < 0.5f)
                         m_DestinationStateName = "RunStart_RightUp";
                 }
                 else{
-                    m_DestinationStateName = "IdleStart";
+                    m_DestinationStateName = "Base Layer.Jump.IdleStart";
                 }
 
                 return m_DestinationStateName;

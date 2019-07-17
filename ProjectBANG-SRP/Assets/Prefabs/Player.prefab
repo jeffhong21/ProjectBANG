@@ -993,10 +993,10 @@ MonoBehaviour:
   - {fileID: 2224475418541791721}
   - {fileID: 3907047660296731877}
   - {fileID: -29659977447482821}
-  - {fileID: 6516965966964063148}
   - {fileID: 4153653085202183914}
   - {fileID: 6728821054375862321}
   - {fileID: 1344037282883110068}
+  - {fileID: 6516965966964063148}
   m_ActiveAction: {fileID: 0}
 --- !u!114 &2761386037598824440
 MonoBehaviour:
@@ -1121,7 +1121,6 @@ MonoBehaviour:
   m_DebugBreakKeyCode: 13
   m_InputVector: {x: 0, y: 0, z: 0}
   m_InputVectorRaw: {x: 0, y: 0, z: 0}
-  m_CameraController: {fileID: 0}
 --- !u!114 &5025384762126923113
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2391,14 +2390,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IsActive: 0
-  m_StateName: 
+  m_StateName: Jump.IdleStart
   m_LayerIndex: 0
   m_ActionID: 0
-  m_TransitionDuration: 0.2
+  m_TransitionDuration: 0
   m_StartType: 2
   m_StopType: 0
   m_InputNames:
-  - F
+  - Space
   m_SpeedMultiplier: 1
   m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
@@ -2415,7 +2414,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2864552554060033022}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d3005a58794a74e28bd4e9600cba665f, type: 3}
   m_Name: 
@@ -2461,7 +2460,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2864552554060033022}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: baed9bd3040554f2482260e0e684e139, type: 3}
   m_Name: 
@@ -2508,10 +2507,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IsActive: 0
-  m_StateName: AimMovement.Aim
+  m_StateName: Aim Movement.Aim
   m_LayerIndex: 0
   m_ActionID: 0
-  m_TransitionDuration: 0.2
+  m_TransitionDuration: 0
   m_StartType: 2
   m_StopType: 3
   m_InputNames:
@@ -2530,7 +2529,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2864552554060033022}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a33cd0f36f52540f39f9a4bf04b5add6, type: 3}
   m_Name: 
@@ -2609,10 +2608,10 @@ MonoBehaviour:
   m_LayerIndex: 0
   m_ActionID: 0
   m_TransitionDuration: 0
-  m_StartType: 3
+  m_StartType: 2
   m_StopType: 0
   m_InputNames:
-  - Space
+  - F
   m_SpeedMultiplier: 1
   m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []

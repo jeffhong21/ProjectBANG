@@ -31,7 +31,7 @@
             private set{ m_Camera = value; }
         }
 
-
+        public bool Recenter { get; set; }
 
 
 

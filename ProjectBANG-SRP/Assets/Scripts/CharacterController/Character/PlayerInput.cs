@@ -45,7 +45,7 @@ namespace CharacterController
 
 
 
-        [SerializeField]
+        //[SerializeField]
         private CameraController m_CameraController;
         private Transform m_Camera;
         private CharacterLocomotion m_Controller;
@@ -167,11 +167,14 @@ namespace CharacterController
                     var targetAngle = Mathf.Atan2(m_Controller.InputVector.x, Mathf.Abs(m_Controller.InputVector.z)) * Mathf.Rad2Deg * m_DeltaTime;
                     targetAngle *= m_InputVector.x;
                     targetAngle += m_Transform.eulerAngles.y;
+
+                    //m_CameraController.Recenter = !(MouseInputVector.x > 0 && MouseInputVector.y > 0);
                     break;
 
 
                 case (MovementType.Combat):
 
+                    //m_CameraController.Recenter = true;
                     break;
             }
 
