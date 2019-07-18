@@ -13,9 +13,10 @@ namespace CharacterController
         public static readonly string OnCharacterActionActive = "OnCharacterActionActive";
         public static readonly string OnAimActionStart = "OnAimActionStart";
 
-        public static readonly string OnInventoryEquip = "OnInventoryEquip";
-        public static readonly string OnInventoryAdd = "OnInventoryAdd";
-        public static readonly string OnItemEquip = "OnItemEquip";
+        public static readonly string OnInventoryEquipItem = "OnInventoryEquipItem";
+        public static readonly string OnInventoryAddItem = "OnInventoryAddItem";
+        public static readonly string OnInventoryPickupItem = "OnInventoryPickupItem";
+
 
         public static readonly string OnAnimatorStartJump = "OnAnimatorStartJump";
         public static readonly string OnAnimatorEndJump = "OnAnimatorEndJump";

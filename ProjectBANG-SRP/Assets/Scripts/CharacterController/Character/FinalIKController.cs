@@ -67,7 +67,7 @@ namespace CharacterController
 
 
 
-        private virtual Transform CreateEffectors(string effectorName, Vector3 position, Quaternion rotation)
+        private Transform CreateEffectors(string effectorName, Vector3 position, Quaternion rotation)
         {
             Transform effector = new GameObject(effectorName).transform;
             effector.position = position;

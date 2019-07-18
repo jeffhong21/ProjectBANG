@@ -43136,13 +43136,8 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2764280750127187888, guid: ed66a286e62f047afba69548498a8ac9,
         type: 3}
-      propertyPath: displayMovement
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2764280750127187888, guid: ed66a286e62f047afba69548498a8ac9,
-        type: 3}
-      propertyPath: m_RootMotionSpeedMultiplier
-      value: 1.5
+      propertyPath: displayActions
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ed66a286e62f047afba69548498a8ac9, type: 3}

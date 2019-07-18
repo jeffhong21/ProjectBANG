@@ -33,13 +33,13 @@
 
             m_DefaultLoadoutList = new ReorderableList(serializedObject, m_DefaultLoadout, true, true, true, true);
 
-            if(m_Inventory.ItemTypeCount != null)
-            {
-                foreach (var item in m_Inventory.ItemTypeCount)
-                {
-                    itemTypeCount += "<b>ItemType:</b> " + item.Key + " | Count:" + item.Value + "\n";
-                }
-            }
+            //if(m_Inventory.ItemTypeCount != null)
+            //{
+            //    foreach (var item in m_Inventory.ItemTypeCount)
+            //    {
+            //        itemTypeCount += "<b>ItemType:</b> " + item.Key + " | Count:" + item.Value + "\n";
+            //    }
+            //}
         }
 
 
@@ -52,12 +52,12 @@
             EditorGUILayout.PropertyField(m_Script);
             GUI.enabled = true;
 
-            SerializedProperty m_InventorySlots = serializedObject.FindProperty("m_InventorySlots");
+            SerializedProperty m_ActiveItems = serializedObject.FindProperty("m_ActiveItems");
 
 
             GUI.enabled = itemTypeCount.Length > 0;
-            m_InventorySlots.isExpanded = EditorGUILayout.Foldout(m_InventorySlots.isExpanded, m_InventorySlots.displayName);
-            if (m_InventorySlots.isExpanded){
+            m_ActiveItems.isExpanded = EditorGUILayout.Foldout(m_ActiveItems.isExpanded, m_ActiveItems.displayName);
+            if (m_ActiveItems.isExpanded){
                 EditorGUILayout.TextArea(itemTypeCount);
             }
             GUI.enabled = true;
