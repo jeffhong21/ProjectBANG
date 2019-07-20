@@ -17,7 +17,13 @@
         [SerializeField, HideInInspector]
         protected CharacterAction m_ActiveAction;
 
-
+        protected bool overrideCheckGround;
+        protected bool overrideCheckMovement;
+        protected bool overrideSetPhysicsMaterial;
+        protected bool overrideUpdateRotation;
+        protected bool overrideUpdateMovement;
+        protected bool overrideUpdateAnimator;
+        protected bool overrideMove;
 
 
 
@@ -32,20 +38,21 @@
 
 
 
-		protected override void OnEnable()
+		protected void OnEnable()
 		{
-            base.OnEnable();
 
             EventHandler.RegisterEvent<CharacterAction, bool>(m_GameObject, EventIDs.OnCharacterActionActive, OnActionActive);
+            EventHandler.RegisterEvent<bool>(m_GameObject, EventIDs.OnAimActionStart, OnAimActionStart);
 
         }
 
 
-		protected override void OnDisable()
+        protected void OnDisable()
 		{
-            base.OnDisable();
 
             EventHandler.UnregisterEvent<CharacterAction, bool>(m_GameObject, EventIDs.OnCharacterActionActive, OnActionActive);
+            EventHandler.UnregisterEvent<bool>(m_GameObject, EventIDs.OnAimActionStart, OnAimActionStart);
+
         }
 
 
@@ -137,12 +144,125 @@
 
 
 
+        #region Character Locomotion
+
+        /// <summary>
+        /// Move charatcer based on input values.
+        /// </summary>
+        protected override void Move()
+        {
+            base.Move();
+        }
+
+
+
+        /// <summary>
+        /// Perform checks to determine if the character is on the ground.
+        /// </summary>
+        protected override void CheckGround()
+        {
+            base.CheckGround();
+        }
+
+
+        /// <summary>
+        /// Ensure the current movement direction is valid.
+        /// </summary>
+        protected override void CheckMovement()
+        {
+            base.CheckMovement();
+        }
+
+
+
+        /// <summary>
+        /// Update the character’s rotation values.
+        /// </summary>
+        protected override void UpdateRotation()
+        {
+            base.UpdateRotation();
+        }
+
+
+
+        /// <summary>
+        /// Apply any movement.
+        /// </summary>
+        protected override void UpdateMovement()
+        {
+            base.UpdateMovement();
+        }
+
+
+
+        /// <summary>
+        /// Updates the animator.
+        /// </summary>
+        protected override void UpdateAnimator()
+        {
+            base.UpdateAnimator();
+        }
+
+
+        /// <summary>
+        /// Anything that should be done in the OnAnimatorMove function.
+        /// </summary>
+        protected override void AnimatorMove()
+        {
+            base.AnimatorMove();
+        }
+
+
+        /// <summary>
+        /// Set the collider's physics material.
+        /// </summary>
+        protected override void SetPhysicsMaterial()
+        {
+            base.SetPhysicsMaterial();
+        }
+
+
+
+        #endregion
 
 
 
 
+        public void Move( float horizontalMovement, float forwardMovement, Quaternion lookRotation )
+        {
+            Vector3 inputVector = Vector3.zero;
+            switch (m_MovementType) {
+                case (MovementType.Adventure):
+
+                    inputVector.x = Mathf.Clamp(horizontalMovement, -1, 1);
+                    inputVector.y = 0;
+                    inputVector.z = Mathf.Clamp(forwardMovement, -1, 1);
+
+                    m_DeltaYRotation = Mathf.Atan2(inputVector.x, inputVector.z);
+                    //m_Velocity.x = turnAmount;
+                    m_LookRotation = lookRotation;
+                    break;
+
+                case (MovementType.Combat):
+
+                    inputVector.x = Mathf.Clamp(horizontalMovement, -1, 1);
+                    inputVector.y = 0;
+                    inputVector.z = Mathf.Clamp(forwardMovement, -1, 1);
+
+                    //float turnAmount = Mathf.Atan2(InputVector.x, InputVector.z);
+                    m_LookRotation = lookRotation;
+                    break;
+            }
+
+            InputVector = inputVector;
 
 
+            //   ---
+        }
+
+
+
+        #region Character Actions
 
         protected void StopStartAction(CharacterAction charAction)
         {
@@ -313,13 +433,11 @@
             TryStopAction(action);
         }
 
+        #endregion
 
 
 
-
-        #region OnAction execute
-
-
+        #region Event Actions
 
 
         protected void OnActionActive(CharacterAction action, bool activated)
@@ -345,7 +463,18 @@
         }
 
 
-        public void ActionStopped()
+        protected void OnAimActionStart( bool aim )
+        {
+            m_Aiming = aim;
+            m_MovementType = m_Aiming ? MovementType.Combat : MovementType.Adventure;
+
+
+            //CameraController.Instance.FreeRotation = aim;
+            //Debug.LogFormat("Camera Free Rotation is {0}", CameraController.Instance.FreeRotation);
+        }
+
+
+        protected void ActionStopped()
         {
 
         }

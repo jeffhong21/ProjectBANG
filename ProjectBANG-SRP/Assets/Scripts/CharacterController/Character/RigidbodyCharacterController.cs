@@ -111,8 +111,7 @@ namespace CharacterController
 
         protected float m_ColliderHeight, m_ColliderCenterY;
         protected Collider[] m_LinkedColliders = new Collider[0];
-        protected PhysicMaterial m_GroundIdleFrictionMaterial, m_GroundedMovingFrictionMaterial, m_AirFrictionMaterial,
-                                 m_StepFrictionMaterial, m_SlopeFrictionMaterial;
+        protected PhysicMaterial m_GroundIdleFrictionMaterial, m_GroundedMovingFrictionMaterial, m_AirFrictionMaterial;
 
 
         protected bool m_CheckGround = true;
@@ -124,11 +123,11 @@ namespace CharacterController
         protected bool m_Move = true;
 
 
-        private float m_StartAngle, m_StartAngleSmooth;
+        protected float m_StartAngle;
 
 
-        private Vector3 m_VelocitySmooth, m_ExternalForceSmooth;
-        private float m_RotationSmoothDamp;
+        protected Vector3 m_VelocitySmooth, m_ExternalForceSmooth;
+        protected float m_RotationSmoothDamp;
 
 
 
@@ -156,7 +155,7 @@ namespace CharacterController
         #endregion
 
 
-
+        
 
 
         #region Properties
@@ -168,8 +167,7 @@ namespace CharacterController
         public bool Aiming { get { return m_Aiming; } set { m_Aiming = value; } }
 
         public bool CanAim {
-            get
-            {
+            get{
                 if(Grounded)
                     return true;
                 return false;
@@ -182,7 +180,7 @@ namespace CharacterController
 
         public Vector3 InputVector { get; set; }
 
-        public Vector3 RelativeInputVector { get; private set; }
+        public Vector3 MoveDirection { get; protected set; }
 
         public Vector3 Velocity { get { return m_Velocity; } set { m_Velocity = value; } }
 
@@ -196,7 +194,7 @@ namespace CharacterController
 
         public bool UseRootMotion { get { return m_UseRootMotion; } set { m_UseRootMotion = value; } }
 
-        public Vector3 Gravity { get; private set; }
+        public Vector3 Gravity { get; protected set; }
 
         public CapsuleCollider Collider
         {
@@ -207,17 +205,13 @@ namespace CharacterController
                     m_Collider = GetComponent<CapsuleCollider>();
                     if (m_Collider == null)
                     {
-                        for (int index = 0; index < transform.childCount; index++)
-                        {
+                        for (int index = 0; index < transform.childCount; index++){
                             GameObject childObject = transform.GetChild(index).gameObject;
-                            if (childObject.layer == LayerManager.CharacterCollider)
-                            {
-                                if (childObject.GetComponent<CapsuleCollider>() != null)
-                                {
+                            if (childObject.layer == LayerManager.CharacterCollider){
+                                if (childObject.GetComponent<CapsuleCollider>() != null){
                                     m_Collider = childObject.GetComponent<CapsuleCollider>();
                                 }
-                                else
-                                {
+                                else{
                                     m_Collider = childObject.AddComponent<CapsuleCollider>();
                                     m_Collider.radius = 0.3f;
                                     m_Collider.height = 1.8f;
@@ -245,7 +239,7 @@ namespace CharacterController
                 }
                 return m_Collider;
             }
-            private set {
+            protected set {
                 m_Collider = value;
             }
         }
@@ -269,7 +263,8 @@ namespace CharacterController
             m_Collider = GetComponent<CapsuleCollider>();
             if (m_Collider == null) m_Collider = Collider;
 
-
+            m_ColliderLayerMask = m_Layers.SolidLayers;
+            m_Collisions = new RaycastHit[m_MaxCollisionCount];
 
             m_GameObject = gameObject;
             m_Transform = transform;
@@ -283,31 +278,13 @@ namespace CharacterController
         }
 
 
-
-        protected virtual void OnEnable()
-        {
-            m_Collider.enabled = true;
-            EventHandler.RegisterEvent<bool>(m_GameObject, EventIDs.OnAimActionStart, OnAimActionStart);
-
-        }
-
-
-        protected virtual void OnDisable()
-        {
-            m_Collider.enabled = false;
-            EventHandler.UnregisterEvent<bool>(m_GameObject, EventIDs.OnAimActionStart, OnAimActionStart);
-        }
-
-
         protected void Start()
         {
             m_LookRotation = m_Transform.rotation;
             m_PreviousPosition = m_Transform.position;
 
             m_Rigidbody.mass = m_Mass;
-            //m_Rigidbody.useGravity = false;
             m_Rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-            //m_Rigidbody.constraints = RigidbodyConstraints.FreezeAll;
 
             m_ColliderHeight = m_Collider.height;
             m_ColliderCenterY = m_Collider.center.y;
@@ -316,8 +293,7 @@ namespace CharacterController
             m_Animator.applyRootMotion = m_UseRootMotion;
 
 
-            m_ColliderLayerMask = m_Layers.SolidLayers;
-            m_Collisions = new RaycastHit[m_MaxCollisionCount];
+
 
 
 
@@ -385,7 +361,7 @@ namespace CharacterController
         }
 
 
-        private void LateUpdate()
+        protected virtual void LateUpdate()
         {
             m_Animator.applyRootMotion = m_UseRootMotion;
             m_PreviousPosition = m_Rigidbody.position;
@@ -413,11 +389,11 @@ namespace CharacterController
         {
             if (InputVector.sqrMagnitude > 1)
                 InputVector.Normalize();
-            RelativeInputVector = m_Transform.TransformDirection(InputVector);
+            MoveDirection = m_Transform.TransformDirection(InputVector);
 
             //m_DeltaYRotation = 0;
 
-            m_Velocity = RelativeInputVector;
+            m_Velocity = MoveDirection;
             m_MoveDirection = m_Velocity * m_DeltaTime;
 
 
@@ -455,9 +431,6 @@ namespace CharacterController
 
 
         }
-
-
-
 
 
 
@@ -607,87 +580,6 @@ namespace CharacterController
         }
 
 
-        private Vector3 GetAverageRaycast(float offsetX, float offsetZ, int rayCount = 2)
-        {
-            int maxRays = 4;
-            offsetX *= 2;
-            offsetZ *= 2;
-            rayCount = Mathf.Clamp(rayCount, 2, maxRays);
-            int totalRays = rayCount * rayCount + 1;
-            Vector3[] combinedCast = new Vector3[totalRays];
-            int average = 0;
-            Vector3 rayOrigin = m_Transform.TransformPoint(0 - offsetX * 0.5f, m_MaxStepHeight + m_SkinWidth, 0 - offsetZ * 0.5f);
-            float rayLength = m_MaxStepHeight * 2;
-
-
-            float xSpacing = offsetX / (rayCount - 1);
-            float zSpacing = offsetZ / (rayCount - 1);
-
-            bool raycastHit = false;
-            Vector3 hitPoint = Vector3.zero;
-            Vector3 raycast = m_Transform.TransformPoint(0, m_MaxStepHeight, 0);
-
-            if (m_DebugCollisions) Debug.DrawRay(raycast, RelativeInputVector.normalized, Color.blue);
-
-            RaycastHit hit;
-            int index = 0;
-            for (int z = 0; z < rayCount; z++)
-            {
-                for (int x = 0; x < rayCount; x++)
-                {
-                    raycastHit = false;
-                    hitPoint = Vector3.zero;
-                    raycast = rayOrigin + (m_Transform.forward * zSpacing * z) + (m_Transform.right * xSpacing * x);
-                    //raycast += RelativeInputVector.normalized * Time.deltaTime;
-                    if (Physics.Raycast(raycast, Vector3.down, out hit, rayLength, m_Layers.SolidLayers))
-                    {
-                        hitPoint = hit.point;
-                        average++;
-                        raycastHit = true;
-                    }
-                    combinedCast[index] = hitPoint;
-                    index++;
-                    if (m_DebugCollisions) Debug.DrawRay(raycast, Vector3.down * rayLength, (raycastHit ? Color.green : Color.red));
-                }
-            }
-
-            
-            hitPoint = Vector3.zero;
-            raycastHit = false;
-            raycast = m_Transform.TransformPoint(0, m_MaxStepHeight, 0);
-            //originRaycast += RelativeInputVector.normalized * Time.deltaTime;
-            if (Physics.Raycast(raycast, Vector3.down, out hit, 0.4f, m_Layers.SolidLayers))
-            {
-                hitPoint = hit.point;
-                average++;
-                raycastHit = true;
-            }
-
-            combinedCast[totalRays - 1] = hitPoint;
-            if (m_DebugCollisions) DebugDraw.Circle(raycast, Vector3.up * rayLength, 0.2f, (raycastHit ? Color.blue : Color.red));
-
-
-
-            average = Mathf.Clamp(average, 1, int.MaxValue);
-
-            Vector3 averageHitPosition = Vector3.zero;
-            float xTotal = 0f, yTotal = 0f, zTotal = 0f;
-            for (int i = 0; i < combinedCast.Length; i++)
-            {
-                xTotal += combinedCast[i].x;
-                yTotal += combinedCast[i].y;
-                zTotal += combinedCast[i].z;
-            }
-            averageHitPosition.Set(xTotal / average, yTotal / average, zTotal / average);
-
-            if (m_DebugCollisions) DebugDraw.DrawMarker(averageHitPosition, 0.2f, Color.blue);
-
-            return averageHitPosition;
-        }
-
-
-
-
 
         /// <summary>
         /// Update the character’s rotation values.
@@ -739,7 +631,6 @@ namespace CharacterController
 
 
         }
-
 
 
 
@@ -807,12 +698,8 @@ namespace CharacterController
 
 
 
-
-
-
-
         /// <summary>
-        /// 
+        /// Updates the animator.
         /// </summary>
         protected virtual void UpdateAnimator()
         {
@@ -833,7 +720,9 @@ namespace CharacterController
         }
 
 
-
+        /// <summary>
+        /// Anything that should be done in the OnAnimatorMove function.
+        /// </summary>
         protected virtual void AnimatorMove()
         {
             if (m_UseRootMotion)
@@ -852,7 +741,9 @@ namespace CharacterController
         }
 
 
-
+        /// <summary>
+        /// Set the collider's physics material.
+        /// </summary>
         protected virtual void SetPhysicsMaterial()
         {
             //change the physics material to very slip when not grounded or maxFriction when is
@@ -870,8 +761,105 @@ namespace CharacterController
         }
 
 
+
+
+
+
+
+
+
+
+        /// <summary>
+        /// Get the average raycast position.
+        /// </summary>
+        /// <param name="offsetX"></param>
+        /// <param name="offsetZ"></param>
+        /// <param name="rayCount"></param>
+        /// <returns></returns>
+        protected Vector3 GetAverageRaycast( float offsetX, float offsetZ, int rayCount = 2 )
+        {
+            int maxRays = 4;
+            offsetX *= 2;
+            offsetZ *= 2;
+            rayCount = Mathf.Clamp(rayCount, 2, maxRays);
+            int totalRays = rayCount * rayCount + 1;
+            Vector3[] combinedCast = new Vector3[totalRays];
+            int average = 0;
+            Vector3 rayOrigin = m_Transform.TransformPoint(0 - offsetX * 0.5f, m_MaxStepHeight + m_SkinWidth, 0 - offsetZ * 0.5f);
+            float rayLength = m_MaxStepHeight * 2;
+
+
+            float xSpacing = offsetX / (rayCount - 1);
+            float zSpacing = offsetZ / (rayCount - 1);
+
+            bool raycastHit = false;
+            Vector3 hitPoint = Vector3.zero;
+            Vector3 raycast = m_Transform.TransformPoint(0, m_MaxStepHeight, 0);
+
+            if (m_DebugCollisions) Debug.DrawRay(raycast, MoveDirection.normalized, Color.blue);
+
+            RaycastHit hit;
+            int index = 0;
+            for (int z = 0; z < rayCount; z++) {
+                for (int x = 0; x < rayCount; x++) {
+                    raycastHit = false;
+                    hitPoint = Vector3.zero;
+                    raycast = rayOrigin + (m_Transform.forward * zSpacing * z) + (m_Transform.right * xSpacing * x);
+                    //raycast += MoveDirection.normalized * Time.deltaTime;
+                    if (Physics.Raycast(raycast, Vector3.down, out hit, rayLength, m_Layers.SolidLayers)) {
+                        hitPoint = hit.point;
+                        average++;
+                        raycastHit = true;
+                    }
+                    combinedCast[index] = hitPoint;
+                    index++;
+                    if (m_DebugCollisions) Debug.DrawRay(raycast, Vector3.down * rayLength, (raycastHit ? Color.green : Color.red));
+                }
+            }
+
+
+            hitPoint = Vector3.zero;
+            raycastHit = false;
+            raycast = m_Transform.TransformPoint(0, m_MaxStepHeight, 0);
+            //originRaycast += MoveDirection.normalized * Time.deltaTime;
+            if (Physics.Raycast(raycast, Vector3.down, out hit, 0.4f, m_Layers.SolidLayers)) {
+                hitPoint = hit.point;
+                average++;
+                raycastHit = true;
+            }
+
+            combinedCast[totalRays - 1] = hitPoint;
+            if (m_DebugCollisions) DebugDraw.Circle(raycast, Vector3.up * rayLength, 0.2f, (raycastHit ? Color.blue : Color.red));
+
+
+
+            average = Mathf.Clamp(average, 1, int.MaxValue);
+
+            Vector3 averageHitPosition = Vector3.zero;
+            float xTotal = 0f, yTotal = 0f, zTotal = 0f;
+            for (int i = 0; i < combinedCast.Length; i++) {
+                xTotal += combinedCast[i].x;
+                yTotal += combinedCast[i].y;
+                zTotal += combinedCast[i].z;
+            }
+            averageHitPosition.Set(xTotal / average, yTotal / average, zTotal / average);
+
+            if (m_DebugCollisions) DebugDraw.DrawMarker(averageHitPosition, 0.2f, Color.blue);
+
+            return averageHitPosition;
+        }
+
+
+
+
+
+
+
+
+        #region Public Functions
+
         // Scale the capsule collider to 'mlp' of the initial value
-        protected void ScaleCapsule(float mlp)
+        protected void ScaleCapsule( float mlp )
         {
             //if (capsule.height != originalHeight * mlp)
             //{
@@ -885,8 +873,6 @@ namespace CharacterController
             return m_Collider.height;
         }
 
-
-        #region Public Functions
 
 
         public void SetMovementType(MovementType movementType)
@@ -908,38 +894,7 @@ namespace CharacterController
 
 
 
-        public virtual void Move(float horizontalMovement, float forwardMovement, Quaternion lookRotation)
-        {
-            Vector3 inputVector = Vector3.zero;
-            switch (m_MovementType)
-            {
-                case (MovementType.Adventure):
 
-                    inputVector.x = Mathf.Clamp(horizontalMovement, -1, 1);
-                    inputVector.y = 0;
-                    inputVector.z = Mathf.Clamp(forwardMovement, -1, 1);
-
-                    m_DeltaYRotation = Mathf.Atan2(inputVector.x, inputVector.z);
-                    //m_Velocity.x = turnAmount;
-                    m_LookRotation = lookRotation;
-                    break;
-
-                case (MovementType.Combat):
-
-                    inputVector.x = Mathf.Clamp(horizontalMovement, -1, 1);
-                    inputVector.y = 0;
-                    inputVector.z = Mathf.Clamp(forwardMovement, -1, 1);
-
-                    //float turnAmount = Mathf.Atan2(InputVector.x, InputVector.z);
-                    m_LookRotation = lookRotation;
-                    break;
-            }
-
-            InputVector = inputVector;
-
-
-            //   ---
-        }
 
 
 
@@ -1022,15 +977,7 @@ namespace CharacterController
 
 
 
-        protected void OnAimActionStart(bool aim)
-        {
-            m_Aiming = aim;
-            m_MovementType = m_Aiming ? MovementType.Combat : MovementType.Adventure;
 
-
-            //CameraController.Instance.FreeRotation = aim;
-            //Debug.LogFormat("Camera Free Rotation is {0}", CameraController.Instance.FreeRotation);
-        }
 
 
 
@@ -1053,7 +1000,7 @@ namespace CharacterController
             //CharacterDebug.Log("Grounded", Grounded);
 
             CharacterDebug.Log("seperator", "----------");
-            CharacterDebug.Log("RelativeInputVector", RelativeInputVector);
+            CharacterDebug.Log("MoveDirection", MoveDirection);
             CharacterDebug.Log("InputVector", InputVector);
 
             //CharacterDebug.Log("m_Velocity", m_Velocity);
@@ -1125,7 +1072,7 @@ namespace CharacterController
 
 
 
-        //private void DescendSlope(Vector3 velocity)
+        //protected void DescendSlope(Vector3 velocity)
         //{
         //    float moveDirection = Mathf.Sign(InputVector.z);
         //    Vector3 rayOrigin = m_Transform.position + Vector3.up * checkHeight;
