@@ -17,17 +17,25 @@
         [SerializeField, HideInInspector]
         protected CharacterAction m_ActiveAction;
 
-        protected bool overrideCheckGround;
-        protected bool overrideCheckMovement;
-        protected bool overrideSetPhysicsMaterial;
-        protected bool overrideUpdateRotation;
-        protected bool overrideUpdateMovement;
-        protected bool overrideUpdateAnimator;
-        protected bool overrideMove;
+        protected bool update_CheckGround;
+        protected bool update_CheckMovement;
+        protected bool update_SetPhysicsMaterial;
+        protected bool update_UpdateRotation;
+        protected bool update_UpdateMovement;
+        protected bool update_UpdateAnimator;
+        protected bool update_Move;
 
 
 
+        public bool Aiming { get; set; }
 
+        public bool CanAim {
+            get {
+                if (Grounded)
+                    return true;
+                return false;
+            }
+        }
 
         public CharacterAction[] CharActions{
             get { return m_Actions; }
@@ -146,6 +154,10 @@
 
         #region Character Locomotion
 
+
+
+
+
         /// <summary>
         /// Move charatcer based on input values.
         /// </summary>
@@ -227,38 +239,34 @@
 
 
 
-
         public void Move( float horizontalMovement, float forwardMovement, Quaternion lookRotation )
         {
-            Vector3 inputVector = Vector3.zero;
+
+            LookRotation = lookRotation;
+            LookDirection = m_LookRotation * mTransform.forward;
+
             switch (m_MovementType) {
                 case (MovementType.Adventure):
-
-                    inputVector.x = Mathf.Clamp(horizontalMovement, -1, 1);
-                    inputVector.y = 0;
-                    inputVector.z = Mathf.Clamp(forwardMovement, -1, 1);
-
-                    m_DeltaYRotation = Mathf.Atan2(inputVector.x, inputVector.z);
-                    //m_Velocity.x = turnAmount;
-                    m_LookRotation = lookRotation;
+                    //  Set input vector
+                    InputVector.Set(0, 0, forwardMovement);
+                    //  
+                    //DeltaYRotation = Mathf.Atan2(horizontalMovement, forwardMovement) * Mathf.Rad2Deg;
+                    //DeltaYRotation -= mTransform.eulerAngles.y;
+                    //var direction = Mathf.Abs(InputVector.z) > 0 ? InputVector.x : -InputVector.x;
+                    //DeltaYRotation = Mathf.Atan2(direction, Mathf.Abs(InputVector.z)) * Mathf.Deg2Rad;
                     break;
 
                 case (MovementType.Combat):
 
-                    inputVector.x = Mathf.Clamp(horizontalMovement, -1, 1);
-                    inputVector.y = 0;
-                    inputVector.z = Mathf.Clamp(forwardMovement, -1, 1);
+                    InputVector.Set(horizontalMovement, 0, forwardMovement);
 
-                    //float turnAmount = Mathf.Atan2(InputVector.x, InputVector.z);
-                    m_LookRotation = lookRotation;
+                    Vector3 lookDir = mTransform.InverseTransformDirection(LookDirection);
+                    //DeltaYRotation = Mathf.Atan2(lookDir.x, lookDir.y) * Mathf.Rad2Deg;
+                    //DeltaYRotation -= mTransform.eulerAngles.y;
                     break;
             }
-
-            InputVector = inputVector;
-
-
-            //   ---
         }
+
 
 
 
@@ -465,12 +473,8 @@
 
         protected void OnAimActionStart( bool aim )
         {
-            m_Aiming = aim;
-            m_MovementType = m_Aiming ? MovementType.Combat : MovementType.Adventure;
-
-
-            //CameraController.Instance.FreeRotation = aim;
-            //Debug.LogFormat("Camera Free Rotation is {0}", CameraController.Instance.FreeRotation);
+            Aiming = aim;
+            m_MovementType = Aiming ? MovementType.Combat : MovementType.Adventure;
         }
 
 
@@ -483,7 +487,10 @@
 
 
 
-
+        public void SetMovementType( MovementType movementType )
+        {
+            m_MovementType = movementType;
+        }
 
 
 

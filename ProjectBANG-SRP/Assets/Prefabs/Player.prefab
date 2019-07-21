@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1172277711370373964}
-  - component: {fileID: 2865662861028421109}
   m_Layer: 29
   m_Name: Colliders
   m_TagString: Untagged
@@ -31,20 +30,6 @@ Transform:
   m_Father: {fileID: 2870460752788072028}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!136 &2865662861028421109
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 403275264417866370}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.3
-  m_Height: 1.8
-  m_Direction: 1
-  m_Center: {x: 0, y: 0.9, z: 0}
 --- !u!1 &1448515290046482515
 GameObject:
   m_ObjectHideFlags: 0
@@ -839,6 +824,7 @@ GameObject:
   - component: {fileID: 2870460752788072028}
   - component: {fileID: 2780584004763941740}
   - component: {fileID: 2811448163926222022}
+  - component: {fileID: 962925064456422461}
   - component: {fileID: 2764280750127187888}
   - component: {fileID: 2761386037598824440}
   - component: {fileID: 2764320986180624436}
@@ -937,6 +923,20 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 80
   m_CollisionDetection: 0
+--- !u!136 &962925064456422461
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2864552554060033022}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.3
+  m_Height: 1.8
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.9, z: 0}
 --- !u!114 &2764280750127187888
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -969,7 +969,7 @@ MonoBehaviour:
   m_ExternalForceDamping: 0.1
   m_GravityModifier: 0.4
   m_GroundStickiness: 6
-  m_Collider: {fileID: 2865662861028421109}
+  m_Collider: {fileID: 0}
   m_DetectHorizontalCollision: 1
   m_HorizontalCollisionCount: 10
   m_VerticalCollisionCount: 10
@@ -1119,8 +1119,6 @@ MonoBehaviour:
   m_SelectPlayerKeyCode: 112
   m_LockCameraRotation: 108
   m_DebugBreakKeyCode: 13
-  m_InputVector: {x: 0, y: 0, z: 0}
-  m_InputVectorRaw: {x: 0, y: 0, z: 0}
 --- !u!114 &5025384762126923113
 MonoBehaviour:
   m_ObjectHideFlags: 0

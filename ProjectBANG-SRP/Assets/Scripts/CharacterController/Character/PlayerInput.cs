@@ -6,25 +6,21 @@ namespace CharacterController
     [DisallowMultipleComponent]
     public class PlayerInput : MonoBehaviour
     {
+        #region Input Names
         private static readonly string m_HorizontalInputName = "Horizontal";
         private static readonly string m_VerticalInputName = "Vertical";
         private static readonly string m_RotateCameraXInput = "Mouse X";
         private static readonly string m_RotateCameraYInput = "Mouse Y";
         private static readonly string m_MouseScrollInput = "Mouse ScrollWheel";
+        #endregion
 
+        
+        [SerializeField] private float m_MoveAxisDeadZone = 0.2f;
+        [SerializeField] private float m_LookDistance = 50f;
+        [SerializeField] private bool m_AxisRaw = true;
+        [SerializeField] private bool m_LockCursor = true;
+        [SerializeField] private bool m_CursorVisible;
 
-        [SerializeField]
-        private float m_MoveAxisDeadZone = 0.2f;
-        [SerializeField]
-        private float m_LookDistance = 50f;
-        //[SerializeField]
-        //private LayerMask m_LayerMask;
-        [SerializeField]
-        private bool m_AxisRaw = true;
-        [SerializeField]
-        private bool m_LockCursor = true;
-        [SerializeField]
-        private bool m_CursorVisible = false;
 
 
         [Header("-- Debug Settings --")]
@@ -36,22 +32,21 @@ namespace CharacterController
         private KeyCode m_DebugBreakKeyCode = KeyCode.Delete;
 
 
-        [SerializeField, DisplayOnly]
-        private Vector3 m_InputVector, m_InputVectorRaw;
-        //[SerializeField, DisplayOnly]
-        private float m_MouseHorizontal, m_MouseVertical;
-        private Vector3 m_MouseInputVector;
-
-
-
+        private float inputHorizontal, inputVertical;
+        private Vector3 inputVector;
+        private float mouseHorizontal, mouseVertical;
+        private Vector3 mouseInputVector;
+        private Vector3 lookDirection;
+        private Quaternion lookRotation;
+        private float rotationVelocitySmooth;
 
         //[SerializeField]
         private CameraController m_CameraController;
         private Transform m_Camera;
         private CharacterLocomotion m_Controller;
         private GameObject m_GameObject;
-        private Transform m_Transform;
-        private float m_DeltaTime;
+        private Transform mTransform;
+
 
 
 
@@ -59,15 +54,15 @@ namespace CharacterController
 
         private Vector3 InputVectorRaw{
             get {
-                m_InputVectorRaw.Set(Input.GetAxisRaw(m_HorizontalInputName), 0f, Input.GetAxisRaw(m_VerticalInputName));
-                return m_InputVectorRaw;
+                inputVector.Set(Input.GetAxisRaw(m_HorizontalInputName), 0f, Input.GetAxisRaw(m_VerticalInputName));
+                return inputVector;
             }
         }
 
         private Vector3 InputVector{
             get {
-                m_InputVector.Set(Input.GetAxis(m_HorizontalInputName), 0f, Input.GetAxis(m_VerticalInputName));
-                return m_InputVector;
+                inputVector.Set(Input.GetAxis(m_HorizontalInputName), 0f, Input.GetAxis(m_VerticalInputName));
+                return inputVector;
             }
         }
 
@@ -75,18 +70,13 @@ namespace CharacterController
             get { return new Vector2(Input.GetAxis(m_RotateCameraXInput), Input.GetAxis(m_RotateCameraYInput)); }
         }
 
-        private Vector2 MouseInputVectorRaw{
+        private Vector2 MouseInputVectorRaw {
             get { return new Vector2(Input.GetAxisRaw(m_RotateCameraXInput), Input.GetAxisRaw(m_RotateCameraYInput)); }
         }
 
-        private float MouseZoomInput{
-            get { return Input.GetAxis(m_MouseScrollInput) ; }
-        }
+        private float MouseZoomInput{ get { return Input.GetAxis(m_MouseScrollInput) ; } }
 
-        private float MouseZoomInputRaw
-        {
-            get { return Input.GetAxisRaw(m_MouseScrollInput); }
-        }
+        private float MouseZoomInputRaw { get { return Input.GetAxisRaw(m_MouseScrollInput); } }
 
 
 
@@ -95,9 +85,8 @@ namespace CharacterController
         {
             m_Controller = GetComponent<CharacterLocomotion>();
             m_GameObject = gameObject;
-            m_Transform = transform;
-            m_DeltaTime = Time.deltaTime;
-            //m_LayerMask = ~(1 << gameObject.layer);
+            mTransform = transform;
+
         }
 
 		private void OnEnable()
@@ -134,51 +123,43 @@ namespace CharacterController
         }
 
 
+        //private float GetDeltaYRotation( float horizontalMovement, float forwardMovement, float cameraHorizontalMovement, float cameraVerticalMovement )
+        //{
+        //    float movementAngle = Mathf.Atan2(horizontalMovement, forwardMovement) * Mathf.Rad2Deg;
+        //    float targetAngle = Mathf.Atan2(cameraHorizontalMovement, cameraVerticalMovement) * Mathf.Rad2Deg;
+
+        //    //float deltaY = Mathf.SmoothDampAngle(fwdAngle, targetAngle, ref rotationVelocitySmooth, 0.1f) * Time.deltaTime;
+        //    return targetAngle - movementAngle;
+        //}
 
 
 
-
-
+        float targetAngle;
+        float rotationAngle;
+        float rotationVelocity;
         private void Update()
 		{
+            inputVector = InputVectorRaw;
+
+            lookDirection = m_CameraController == null ? mTransform.forward : Vector3.Scale(m_Camera.forward, new Vector3(1, 0, 1).normalized);
+            lookRotation = Quaternion.FromToRotation(mTransform.forward, lookDirection);
+
+            //inputVector = m_Camera.right * InputVectorRaw.x + lookDirection * InputVectorRaw.z;
+
+            m_Controller.InputVector = inputVector;
+            m_Controller.LookRotation = lookRotation;
 
 
 
-            //Vector3 lookDirection = m_CameraController == null ? m_Transform.forward : Vector3.Scale(m_Camera.forward, new Vector3(1, 0, 1)).normalized;
-            ////Quaternion lookRotation = Quaternion.LookRotation(lookDirection, Vector3.up);
-            //Quaternion lookRotation = Quaternion.FromToRotation(m_Transform.forward, lookDirection);
-            //m_Controller.Move(InputVectorRaw.x, InputVectorRaw.z, lookRotation);
+
+            //lookDirection = m_CameraController == null ? mTransform.forward : Vector3.Scale(m_Camera.forward, new Vector3(1, 0, 1)).normalized;
+            //lookRotation = Quaternion.FromToRotation(mTransform.forward, lookDirection);
+            //m_Controller.InputVector = InputVectorRaw;
+            //m_Controller.LookRotation = lookRotation;
             //m_Controller.LookDirection = lookDirection;
 
-
-            Vector3 lookDirection = m_CameraController == null ? m_Transform.forward : Vector3.Scale(m_Camera.forward, new Vector3(1, 0, 1)).normalized;
-            Quaternion lookRotation = Quaternion.FromToRotation(m_Transform.forward, lookDirection);
-            m_Controller.InputVector = InputVectorRaw;
-            m_Controller.LookRotation = lookRotation;
-            m_Controller.LookDirection = lookDirection;
-
-            Debug.DrawRay(m_Transform.position + Vector3.up * 1.5f, lookDirection, Color.black);
-
-            switch (m_Controller.Movement)
-            {
-                case (MovementType.Adventure):
-
-
-                    var targetAngle = Mathf.Atan2(m_Controller.InputVector.x, Mathf.Abs(m_Controller.InputVector.z)) * Mathf.Rad2Deg * m_DeltaTime;
-                    targetAngle *= m_InputVector.x;
-                    targetAngle += m_Transform.eulerAngles.y;
-
-                    //m_CameraController.Recenter = !(MouseInputVector.x > 0 && MouseInputVector.y > 0);
-                    break;
-
-
-                case (MovementType.Combat):
-
-                    //m_CameraController.Recenter = true;
-                    break;
-            }
-
-
+            //m_Controller.Move(InputVectorRaw.x, InputVectorRaw.z, lookRotation);
+            Debug.DrawRay(mTransform.position + Vector3.up * 1.5f, lookDirection, Color.black);
             DebugButtonPress();
         }
 
