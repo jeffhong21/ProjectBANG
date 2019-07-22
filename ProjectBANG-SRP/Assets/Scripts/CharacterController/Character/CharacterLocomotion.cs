@@ -212,6 +212,7 @@
         /// </summary>
         protected override void UpdateAnimator()
         {
+
             base.UpdateAnimator();
         }
 
@@ -493,7 +494,23 @@
         }
 
 
+        public void SetPosition( Vector3 position )
+        {
+            m_Rigidbody.MovePosition(position);
+        }
 
+
+        public void SetRotation( Quaternion rotation )
+        {
+            m_Rigidbody.MoveRotation(rotation.normalized);
+        }
+
+
+        public void StopMovement()
+        {
+            m_Rigidbody.velocity = Vector3.zero;
+            m_Moving = false;
+        }
 
 
 

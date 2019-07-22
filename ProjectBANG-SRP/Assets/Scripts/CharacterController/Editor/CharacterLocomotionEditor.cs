@@ -257,11 +257,11 @@ namespace CharacterController
 
                     EditorGUI.indentLevel--;
 
-                    if(GUILayout.Button("Stop All Actions"))
-                    {
-                        m_Controller.TryStopAllActions();
-                        Debug.Log("Stopping all Actions");
-                    }
+                    //if(GUILayout.Button("Stop All Actions"))
+                    //{
+                    //    m_Controller.TryStopAllActions();
+                    //    Debug.Log("Stopping all Actions");
+                    //}
                 }
             }
 

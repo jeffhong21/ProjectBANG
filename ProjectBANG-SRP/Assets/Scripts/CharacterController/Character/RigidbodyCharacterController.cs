@@ -103,7 +103,7 @@ namespace CharacterController
         protected Quaternion m_RootMotionRotation;
 
 
-        protected float m_GroundAngle;
+        //protected float m_GroundAngle;
 
         protected float m_SlopeAngle;
         protected RaycastHit m_GroundHit;
@@ -234,7 +234,7 @@ namespace CharacterController
         public RaycastHit GroundHit { get { return m_GroundHit; } }
 
         public Vector3 RaycastOrigin { get { return mTransform.position + Vector3.up * m_SkinWidth; } }
-
+            
 
 
 
@@ -377,23 +377,24 @@ namespace CharacterController
         /// </summary>
         protected virtual void Move()
         {
-            if (InputVector.sqrMagnitude > 1)
-                InputVector.Normalize();
 
-            float moveAmount = Mathf.Abs(InputVector.z) + Mathf.Abs(InputVector.x);
-            moveAmount = Mathf.Clamp01(moveAmount);
+            if (InputVector.sqrMagnitude > 1) InputVector.Normalize();
 
             LookDirection = m_LookRotation * mTransform.forward;
 
-
+            float moveAmount = Mathf.Abs(InputVector.z) + Mathf.Abs(InputVector.x);
+            moveAmount = Mathf.Clamp01(moveAmount);
             switch (m_MovementType)
             {
                 case (MovementType.Adventure):
                     float direction = Mathf.Abs(InputVector.z) > 0 ? InputVector.x : -InputVector.x;
-                    float targetAngle = Mathf.Atan2(direction, Mathf.Abs(InputVector.z)) * Mathf.Rad2Deg;
-                    m_RotationAngle = Mathf.SmoothDampAngle(m_RotationAngle, targetAngle * 2, ref rotationVelocitySmooth, 0.1f );
+                    float targetAngle = Mathf.Atan2(direction, 1) * Mathf.Rad2Deg; // Mathf.Abs(InputVector.z)
+                    //float targetAngle = Mathf.Atan2(InputVector.x, InputVector.z) * Mathf.Rad2Deg;
+                    m_RotationAngle = Mathf.SmoothDampAngle(m_RotationAngle, targetAngle * 1.5f, ref rotationVelocitySmooth, 0.1f );
+                    if(moveAmount < 0.1f) m_RotationAngle *= InputVector.x;
 
-                    m_MoveDirection = mTransform.forward * InputVector.z;
+                    m_MoveDirection = mTransform.forward * (InputVector.z > 0 ? 1 : 0);
+
                     break; 
 
                 case (MovementType.Combat):
@@ -407,8 +408,8 @@ namespace CharacterController
 
 
             if (m_UseRootMotion) {
-                //m_MoveDirection = Vector3.Project((m_RootMotionVelocity / m_DeltaTime), m_MoveDirection);
-                m_MoveDirection = m_RootMotionVelocity / m_DeltaTime;
+                m_MoveDirection = Vector3.Project((m_RootMotionVelocity / m_DeltaTime), m_MoveDirection);
+                //m_MoveDirection = m_RootMotionVelocity / m_DeltaTime;
             } else {
                 m_MoveDirection *= (Grounded ? m_GroundSpeed : m_AirborneSpeed) * moveAmount;
             }
@@ -416,11 +417,16 @@ namespace CharacterController
             m_RotationAngle *= m_RotationSpeed * m_DeltaTime;
             m_TargetRotation = Quaternion.AngleAxis(m_RotationAngle, mTransform.up);
 
-            m_Moving = moveAmount > 0.2f;
+            m_Moving = moveAmount > 0f || !(InputVector == Vector3.zero);
+
 
             if (m_DrawDebugLine) Debug.DrawRay(mTransform.position + Vector3.up * 0.1f, m_MoveDirection, Color.blue);
             CharacterDebug.Log("m_RotationAngle", (float)Math.Round(m_RotationAngle, 4));
 
+
+
+
+            //m_TargetRotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(InputVector), 0.1f);
 
         }
 
@@ -444,7 +450,7 @@ namespace CharacterController
                 groundDistance = Vector3.Project(mTransform.position - m_GroundHit.point, mTransform.up).magnitude;
             }
 
-            if (DebugMode) Debug.DrawRay(rayOrigin, Vector3.down * m_GroundHit.distance, m_Grounded ? Color.green : Color.red);
+            if (m_DebugCollisions) Debug.DrawRay(rayOrigin, Vector3.down * m_GroundHit.distance, m_Grounded ? Color.green : Color.red);
 
             // Reduce our radius by Tolerance squared to avoid failing the SphereCast due to clipping with walls
             //float smallerRadius = m_Collider.radius - (m_SkinWidth * m_SkinWidth);
@@ -457,7 +463,7 @@ namespace CharacterController
                     groundDistance = (m_GroundHit.distance - m_Collider.radius * 0.1f);
             }
 
-            if (DebugMode) DebugDraw.Sphere(sphereCastOrigin + Vector3.down * m_GroundHit.distance, smallerRadius, m_Grounded ? Color.gray : Color.red);
+            if (m_DebugCollisions) DebugDraw.Sphere(sphereCastOrigin + Vector3.down * m_GroundHit.distance, smallerRadius, m_Grounded ? Color.gray : Color.red);
 
 
 
@@ -468,16 +474,25 @@ namespace CharacterController
                 groundCheckDistance *= 0.5f;
 
             //  Character is grounded.
-            if (groundDistance < 0.05f)
-            {
-                m_GroundAngle = Vector3.Angle(mTransform.forward, m_GroundHit.normal) - 90;
+            if (groundDistance < 0.05f) {
+                //m_GroundAngle = Vector3.Angle(mTransform.forward, m_GroundHit.normal) - 90;
                 m_Grounded = true;
+
+
+                ////  Move the player so he lines up with raised parts of the ground.
+                ////  Prob should go in CheckMovement.
+                //float offset = m_Collider.radius + m_SkinWidth;
+                //Vector3 groundAverage = GetAverageRaycast(offset, offset, 2);
+                //if (groundAverage != m_Rigidbody.position) {
+                //    m_Rigidbody.MovePosition(new Vector3(mTransform.position.x, groundAverage.y + 0.1f, mTransform.position.z));
+                //}
+
+
+
             }
-            else
-            {
-                if(groundDistance >= groundCheckDistance)
-                {
-                    m_GroundAngle = 0;
+            else {
+                if (groundDistance >= groundCheckDistance) {
+                    //m_GroundAngle = 0;
                     m_Grounded = false;
                 }
 
@@ -486,9 +501,6 @@ namespace CharacterController
             }
 
             if (DebugMode) DebugDraw.DrawMarker(m_GroundHit.point, 0.1f, Color.green);
-            m_Animator.SetBool(HashID.Grounded, m_Grounded);
-
-
         }
 
 
@@ -497,9 +509,6 @@ namespace CharacterController
         /// </summary>
         protected virtual void CheckMovement()
         {
-
-
-
             m_Moving = InputVector != Vector3.zero;
             //if (m_Moving == false) return;
 
@@ -585,10 +594,11 @@ namespace CharacterController
             m_TargetRotation.ToAngleAxis(out rotationAngle, out rotationAxis);
             rotationAxis.Normalize();
 
+            //  Update angular velocity.
             m_AngularVelocity = rotationAxis * rotationAngle * m_RotationSpeed;
             m_Rigidbody.angularVelocity = Vector3.Lerp(m_Rigidbody.angularVelocity, m_AngularVelocity, m_DeltaTime * m_RotationSpeed);
 
-
+            //  Update the rotations.
             m_Rigidbody.MoveRotation(m_TargetRotation * mTransform.rotation);
         }
 
@@ -603,14 +613,17 @@ namespace CharacterController
             // // Drag
             // currentVelocity *= (1f / (1f + (Drag * deltaTime)));
 
-            float acceleration;
-            if (m_UseRootMotion)
-                acceleration = 0.1f;
+            //  If not using root motion, determine the velocity smooth.
+            if (m_UseRootMotion) {
+                m_Velocity = Vector3.Lerp(m_Velocity, m_MoveDirection, m_DeltaTime * 10);
+            }
             else {
+                float acceleration;
                 if (Moving) acceleration = Grounded ? m_GroundAcceleration : m_AirborneAcceleration;
                 else acceleration = Grounded ? m_MotorDamping : m_AirborneDamping;
+                m_Velocity = Vector3.SmoothDamp(m_Rigidbody.velocity, m_MoveDirection, ref velocitySmooth, acceleration);
             }
-            m_Velocity = Vector3.SmoothDamp(m_Rigidbody.velocity, m_MoveDirection, ref velocitySmooth, acceleration);
+
 
 
 
@@ -643,15 +656,7 @@ namespace CharacterController
             //m_ExternalForce = Vector3.SmoothDamp(m_ExternalForce, Vector3.zero, ref m_ExternalForceSmooth, m_ExternalForceDamping);
 
 
-            //if (Grounded)
-            //{
-            //    float offset = m_Collider.radius + m_SkinWidth;
-            //    Vector3 groundAverage = GetAverageRaycast(offset, offset, 2);
-            //    if (groundAverage != m_Rigidbody.position)
-            //    {
-            //        m_Rigidbody.MovePosition(new Vector3(mTransform.position.x, groundAverage.y + 0.1f, mTransform.position.z));
-            //    }
-            //}
+
         }
 
 
@@ -661,11 +666,22 @@ namespace CharacterController
         /// </summary>
         protected virtual void UpdateAnimator()
         {
+            m_Animator.SetBool(HashID.Grounded, m_Grounded);
+
             //m_Animator.SetFloat(HashID.Rotation, (mRotationAngle * Mathf.Deg2Rad));
             //  1 means left foot is up.
             m_Animator.SetFloat(HashID.StartAngle, m_StartAngle);
             m_Animator.SetFloat(HashID.Rotation, m_RotationAngle, 0.1f, m_DeltaTime);
+
+            CharacterDebug.Log("m_RotationAngle", m_RotationAngle * Mathf.Rad2Deg);
+
+            //if (m_Animator.pivotWeight < 0.5f || m_Animator.pivotWeight > 0.5f)
+            //    m_Animator.SetFloat(HashID.LegUpIndex, m_Animator.pivotWeight >= 0.5f ? 1 : 0);
+            //else
+            //    m_Animator.SetFloat(HashID.LegUpIndex, 0.5f + 1);
+
             m_Animator.SetFloat(HashID.LegUpIndex, m_Animator.pivotWeight);
+
             m_Animator.SetBool(HashID.Moving, m_Moving);
 
             //  -----------
@@ -673,6 +689,7 @@ namespace CharacterController
             //  -----------
 
             //  Movement Input
+            
             m_AnimationMonitor.SetForwardInputValue(InputVector.z);
             m_AnimationMonitor.SetHorizontalInputValue(InputVector.x);
         }
@@ -705,7 +722,7 @@ namespace CharacterController
         protected virtual void SetPhysicsMaterial()
         {
             //change the physics material to very slip when not grounded or maxFriction when is
-            if(!m_Grounded && Mathf.Abs(m_Rigidbody.velocity.y) > 0)
+            if (!m_Grounded && Mathf.Abs(m_Rigidbody.velocity.y) > 0)
                 m_Collider.material = m_AirFrictionMaterial;
 
             else if (m_Grounded && m_Moving)
@@ -716,6 +733,8 @@ namespace CharacterController
 
             else
                 m_Collider.material = m_GroundIdleFrictionMaterial;
+
+            //m_Collider.material = m_AirFrictionMaterial;
         }
 
 
@@ -898,23 +917,7 @@ namespace CharacterController
 
 
 
-        public void SetPosition(Vector3 position)
-        {
-            m_Rigidbody.MovePosition(position);
-        }
 
-
-        public void SetRotation(Quaternion rotation)
-        {
-            m_Rigidbody.MoveRotation(rotation.normalized);
-        }
-
-
-        public void StopMovement()
-        {
-            m_Rigidbody.velocity = Vector3.zero;
-            m_Moving = false;
-        }
 
 
         #endregion
@@ -940,13 +943,11 @@ namespace CharacterController
         {
 
 
-            //CharacterDebug.Log("Moving", Moving);
-            //CharacterDebug.Log("Grounded", Grounded);
-
-            CharacterDebug.Log("seperator", "----------");
+            CharacterDebug.Log("Moving", Moving);
+            CharacterDebug.Log("Grounded", Grounded);
             CharacterDebug.Log("MoveDirection", MoveDirection);
             CharacterDebug.Log("InputVector", InputVector);
-
+            CharacterDebug.Log("seperator", "----------");
             //CharacterDebug.Log("m_Velocity", m_Velocity);
             //CharacterDebug.Log("m_MoveDirection", m_MoveDirection);
 

@@ -37,8 +37,7 @@ namespace CharacterController
 
         public override bool CanStartAction()
         {
-            if (base.CanStartAction())
-            {
+            if (base.CanStartAction()){
                 return m_CurrentStanima > (m_MaxStanima * 0.1f);
             }
             return false;
@@ -59,6 +58,11 @@ namespace CharacterController
         }
 
 
+        public override bool CanStopAction()
+        {
+            return base.CanStopAction() || (m_CurrentStanima <= 0);
+        }
+
         protected override void ActionStopped()
         {
 
@@ -75,19 +79,19 @@ namespace CharacterController
 		}
 
 
-		public override bool Move()
+		public override bool UpdateMovement()
         {
             m_CurrentStanima = Mathf.Clamp(m_CurrentStanima - m_StaminaDecreaseRate, 0, 100);
 
-            //m_Rigidbody.AddForce(m_Transform.forward * m_SpeedChangeMultiplier * m_DeltaTime, ForceMode.VelocityChange);
+            ////m_Rigidbody.AddForce(m_Transform.forward * m_SpeedChangeMultiplier * m_DeltaTime, ForceMode.VelocityChange);
 
-            var velocity = (m_Animator.deltaPosition / m_DeltaTime);
-            velocity.y = m_Controller.Grounded ? 0 : m_Rigidbody.velocity.y;
-            //m_Rigidbody.velocity = Vector3.SmoothDamp(m_Rigidbody.velocity, m_Velocity, ref m_velocitySmooth, m_Moving ? m_Acceleration : m_MotorDamping);
-            //m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, m_MovementSpeed);
-            m_Rigidbody.velocity = velocity;
+            //var velocity = (m_Animator.deltaPosition / m_DeltaTime);
+            //velocity.y = m_Controller.Grounded ? 0 : m_Rigidbody.velocity.y;
+            ////m_Rigidbody.velocity = Vector3.SmoothDamp(m_Rigidbody.velocity, m_Velocity, ref m_velocitySmooth, m_Moving ? m_Acceleration : m_MotorDamping);
+            ////m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, m_MovementSpeed);
+            //m_Rigidbody.velocity = velocity;
 
-            return false;
+            return true;
         }
 
 
@@ -98,14 +102,9 @@ namespace CharacterController
 
 
 
-        //protected override void DrawOnGUI()
-        //{
-        //    content.text = "";
-        //    content.text += string.Format("Speed: {0}\n", m_SpeedInput);
 
 
-        //    GUILayout.Label(content);
-        //}
+
 	}
 
 }

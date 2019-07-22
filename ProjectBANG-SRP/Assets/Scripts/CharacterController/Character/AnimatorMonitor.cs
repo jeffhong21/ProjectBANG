@@ -170,6 +170,7 @@
 
 
 
+        bool itemActionTriggerActive;
 
         private void LateUpdate()
 		{
@@ -178,6 +179,7 @@
                 var animatorStateInfo = m_Animator.GetCurrentAnimatorStateInfo(layerIndex);
                 var nextAnimatorStateInfo = m_Animator.GetNextAnimatorStateInfo(layerIndex);
                 var transitionStateInfo = m_Animator.GetAnimatorTransitionInfo(layerIndex);
+
                 if(m_Animator.IsInTransition(layerIndex) )
                 {
                     //if (m_DebugStateChanges)

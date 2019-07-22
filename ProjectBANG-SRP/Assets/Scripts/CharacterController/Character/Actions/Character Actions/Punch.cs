@@ -27,29 +27,24 @@ namespace CharacterController
 
         protected override void ActionStarted()
         {
-            ActionIntData = 3;
-            m_Animator.SetInteger(HashID.ActionIntData, ActionIntData);
+
+
         }
 
 
 		public override bool Move()
 		{
-            m_Animator.ApplyBuiltinRootMotion();
-            return false;
+
+
+
+            return true;
 		}
 
 
 		public override bool UpdateAnimator()
 		{
-            if (Input.GetKeyDown(m_KeyCodes[m_InputIndex]) && m_Animator.IsInTransition(0) == false)
-            {
-                if (m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.3f){
-                    m_Animator.SetTrigger(Animator.StringToHash("MeleeAttack"));
-                }
-            }
-            else if (m_Animator.IsInTransition(0) == true){
-                m_Animator.ResetTrigger(Animator.StringToHash("MeleeAttack"));
-            }
+
+
 
             return base.UpdateAnimator();
 		}
@@ -57,13 +52,8 @@ namespace CharacterController
 
 		public override bool CanStopAction()
         {
-            if (m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash("Punch.Exit"))
-            {
-                if (m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f - m_TransitionDuration)
-                {
-                    return true;
-                }
-            }
+
+
 
             return false;
         }
@@ -75,12 +65,11 @@ namespace CharacterController
         }
 
 
-        public override string GetDestinationState(int layer)
-        {
-            if (layer == 0)
-                return m_StateName;
-            return "";
-        }
+        //public override string GetDestinationState(int layer)
+        //{
+
+        //    return "";
+        //}
 
 
 

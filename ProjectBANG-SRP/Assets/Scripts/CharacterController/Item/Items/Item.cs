@@ -13,14 +13,13 @@
         [SerializeField]
         protected int m_SlotID = -1;
         [SerializeField]
+        protected int m_AnimatorItemID;
+        [SerializeField]
+        protected int m_AnimatorMovementSetID;
+        [SerializeField]
         protected GameObject m_DropPrefab;
-        [SerializeField]
-        protected Sprite m_Icon;
-        [SerializeField]
-        protected bool m_ShowCrosshairsOnAim;
 
-        [SerializeField]
-        protected GameObject m_Object;
+
         [SerializeField]
         protected Transform m_HolsterTarget;
         [SerializeField]
@@ -43,6 +42,12 @@
 
         public ItemType ItemType{ get { return m_ItemType; } }
         public int SlotID { get { return m_SlotID; } set { m_SlotID = value; } }
+
+        public int AnimatorItemID { get { return m_AnimatorItemID; } }
+
+        public int AnimatorMovementSetID { get { return m_AnimatorMovementSetID; } }
+
+
         public GameObject DropPrefab { get { return m_DropPrefab; } set { m_DropPrefab = value; }}
 
 
@@ -77,16 +82,7 @@
         }
 
 
-		protected void OnEnable()
-		{
 
-		}
-
-
-		protected void OnDisable()
-		{
-
-		}
 
 
 		public virtual void Initialize(Inventory inventory)
@@ -147,6 +143,11 @@
             
         }
 
+
+        public virtual bool TryUse()
+        {
+            return false;
+        }
     }
 
 }

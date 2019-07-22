@@ -23,34 +23,12 @@ namespace CharacterController.UI
             if (m_Inventory == null){
                 m_Inventory = GameObject.FindGameObjectWithTag("Player").GetComponent<Inventory>();
             }
-		}
+
+            //EventHandler.RegisterEvent<bool>(m_GameObject, EventIDs.OnInventoryEquipItem, OnAimActionStart);
+        }
 
 
-		private void OnEnable()
-		{
-            if (m_Inventory == null)
-                m_Inventory = GameObject.FindGameObjectWithTag("Player").GetComponent<Inventory>();
-            
 
-            //if(m_Inventory != null){
-            //    m_Inventory.InventoryUseItem += UseItem;
-            //    m_Inventory.InventoryEquipItem += EquipItem;
-            //}
-		}
-
-		private void OnDisable()
-		{
-            //if (m_Inventory != null)
-            //{
-            //    m_Inventory.InventoryUseItem -= UseItem;
-            //    m_Inventory.InventoryEquipItem -= EquipItem;
-            //}
-		}
-
-		private void Start()
-		{
-			
-		}
 
 		public void SetInventory(Inventory inventory){
             //m_Inventory = inventory;

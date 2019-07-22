@@ -36,19 +36,21 @@ namespace CharacterController
 		protected override void ActionStarted()
         {
             m_Animator.SetInteger(HashID.ActionID, (int)ActionTypeDefinition.Jump);
+            m_Rigidbody.useGravity = false;
 
             float timeToJumpApex = 0.4f;
             var gravity = -(2 * m_Force) / Mathf.Pow(timeToJumpApex, 2);
-            Vector3 verticalVelocity = Vector3.up * Mathf.Abs(gravity) * timeToJumpApex;
-            //Vector3 verticalVelocity = Vector3.up * (Mathf.Sqrt(m_Force * -2 * Physics.gravity.y));
+            //Vector3 verticalVelocity = Vector3.up * Mathf.Abs(gravity) * timeToJumpApex;
+            Vector3 verticalVelocity = Vector3.up * (Mathf.Sqrt(m_Force * -2 * Physics.gravity.y));
 
 
             //verticalVelocity = Vector3.up * (Mathf.Pow(m_Force, 2) / -2 * Physics.gravity.y);
             //m_Rigidbody.AddForce(verticalVelocity, ForceMode.VelocityChange);
-            //m_Rigidbody.velocity += verticalVelocity;
-            m_Rigidbody.AddForce(Vector3.up * m_Force, ForceMode.VelocityChange);
+            m_Rigidbody.velocity += verticalVelocity;
+            m_Rigidbody.AddForce(verticalVelocity, ForceMode.VelocityChange);
             Debug.Log(verticalVelocity);
         }
+
 
 
         public override bool CanStopAction()
@@ -60,16 +62,14 @@ namespace CharacterController
         protected override void ActionStopped()
         {
             m_NextJump = Time.time + m_RecurrenceDelay;
-
+            m_Rigidbody.useGravity = true;
         }
 
 
 		public override bool CheckGround()
 		{
-            if (m_Rigidbody.velocity.y > -0.01f || m_Rigidbody.velocity.y <= 0f)
-            {
-                m_Controller.Grounded = false;
-            }
+            if (Time.time > m_ActionStartTime + 0.2f)
+                return true;
 
             return false;
 		}
@@ -83,25 +83,25 @@ namespace CharacterController
 		}
 
 
-		//  Returns the state the given layer should be on.
-		public override string GetDestinationState(int layer)
-        {
-            if (layer == 0){
-                return "Jump.IdleStart";
-                if (m_Controller.Moving){
-                    if (m_Animator.pivotWeight >= 0.5f)
-                        m_DestinationStateName = "RunStart_LeftUp";
-                    else if (m_Animator.pivotWeight < 0.5f)
-                        m_DestinationStateName = "RunStart_RightUp";
-                }
-                else{
-                    m_DestinationStateName = "Base Layer.Jump.IdleStart";
-                }
+		////  Returns the state the given layer should be on.
+		//public override string GetDestinationState(int layer)
+  //      {
+  //          if (layer == 0){
+  //              return "Jump.IdleStart";
+  //              if (m_Controller.Moving){
+  //                  if (m_Animator.pivotWeight >= 0.5f)
+  //                      m_DestinationStateName = "RunStart_LeftUp";
+  //                  else if (m_Animator.pivotWeight < 0.5f)
+  //                      m_DestinationStateName = "RunStart_RightUp";
+  //              }
+  //              else{
+  //                  m_DestinationStateName = "Base Layer.Jump.IdleStart";
+  //              }
 
-                return m_DestinationStateName;
-            }
-            return "";
-        }
+  //              return m_DestinationStateName;
+  //          }
+  //          return "";
+  //      }
 
 
 

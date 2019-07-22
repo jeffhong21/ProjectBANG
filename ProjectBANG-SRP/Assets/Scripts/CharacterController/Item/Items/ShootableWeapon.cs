@@ -146,8 +146,11 @@
 
 
 
-		public virtual bool TryUse()
+		public override bool TryUse()
         {
+            Debug.Log("Firing " + gameObject.name);
+            return true;
+
             if (InUse() || IsReloading()) return false;
 
             if (m_CurrentAmmo > 0)

@@ -52,31 +52,32 @@
             EditorGUILayout.PropertyField(m_Script);
             GUI.enabled = true;
 
-            SerializedProperty m_ActiveItems = serializedObject.FindProperty("m_ActiveItems");
+            SerializedProperty m_InventorySlots = serializedObject.FindProperty("m_InventorySlots");
 
 
-            GUI.enabled = itemTypeCount.Length > 0;
-            m_ActiveItems.isExpanded = EditorGUILayout.Foldout(m_ActiveItems.isExpanded, m_ActiveItems.displayName);
-            if (m_ActiveItems.isExpanded){
-                EditorGUILayout.TextArea(itemTypeCount);
-            }
-            GUI.enabled = true;
+            //GUI.enabled = itemTypeCount.Length > 0;
+            //m_InventorySlots.isExpanded = EditorGUILayout.Foldout(m_InventorySlots.isExpanded, m_InventorySlots.displayName);
+            //if (m_InventorySlots.isExpanded){
+            //    for (int i = 0; i < m_InventorySlots.arraySize; i++) {
+            //        EditorGUILayout.PropertyField(m_InventorySlots.GetArrayElementAtIndex(i));
 
+            //    }   
+            //}
+            //GUI.enabled = true;
 
             m_DefaultLoadout.isExpanded = EditorGUILayout.Foldout(m_DefaultLoadout.isExpanded, m_DefaultLoadout.displayName);
             if (m_DefaultLoadout.isExpanded) DrawReorderableList(m_DefaultLoadoutList);
 
-            InspectorUtility.PropertyField(serializedObject.FindProperty("m_SlotCount"));
-            EditorGUI.indentLevel++;
-            InspectorUtility.PropertyField(serializedObject.FindProperty("m_LeftItemSlot"));
-            InspectorUtility.PropertyField(serializedObject.FindProperty("m_RightItemSlot"));
-            EditorGUI.indentLevel--;
+            //InspectorUtility.PropertyField(serializedObject.FindProperty("m_SlotCount"));
+            //EditorGUI.indentLevel++;
+            //InspectorUtility.PropertyField(serializedObject.FindProperty("m_LeftItemSlot"));
+            //InspectorUtility.PropertyField(serializedObject.FindProperty("m_RightItemSlot"));
+            //EditorGUI.indentLevel--;
 
-            //DrawPropertiesExcluding(serializedObject, m_DontIncude);
+            DrawPropertiesExcluding(serializedObject, m_DontIncude);
 
 
 
-            //DrawDefaultInspector();
 
 
 

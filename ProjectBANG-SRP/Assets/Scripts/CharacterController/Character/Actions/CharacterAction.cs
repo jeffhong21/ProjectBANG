@@ -493,6 +493,7 @@
 
             m_Animator.SetInteger(HashID.ActionID, 0);
             m_Animator.SetInteger(HashID.ActionIntData, 0);
+            m_Animator.SetFloat(HashID.ActionFloatData, 0f);
             m_Animator.ResetTrigger(HashID.ActionChange);
             //m_AnimatorMonitor.SetActionID(0);
 
@@ -644,7 +645,7 @@
         //  Returns the state the given layer should be on.
         public virtual string GetDestinationState(int layer)
         {
-            return m_StateName;
+            return "";
         }
 
 

@@ -53,7 +53,7 @@ MonoBehaviour:
     value: 1
   temperature:
     overrideState: 1
-    value: 10
+    value: 24
   tint:
     overrideState: 0
     value: 0
@@ -64,17 +64,17 @@ MonoBehaviour:
     overrideState: 0
     value: 0
   saturation:
-    overrideState: 0
-    value: 0
+    overrideState: 1
+    value: 36
   brightness:
     overrideState: 0
     value: 0
   postExposure:
-    overrideState: 0
-    value: 0.21
+    overrideState: 1
+    value: 0.12
   contrast:
     overrideState: 1
-    value: 5
+    value: 12
   mixerRedOutRedIn:
     overrideState: 0
     value: 100
@@ -104,13 +104,13 @@ MonoBehaviour:
     value: 100
   lift:
     overrideState: 1
-    value: {x: 0.9970936, y: 1, z: 0.95004857, w: 0.05197555}
+    value: {x: 0.9970936, y: 1, z: 0.95004857, w: 0.016451506}
   gamma:
     overrideState: 1
-    value: {x: 0.9948402, y: 0.98968005, z: 1, w: 0.110840395}
+    value: {x: 0.9948402, y: 0.98968005, z: 1, w: 0.37727025}
   gain:
     overrideState: 1
-    value: {x: 0.9628363, y: 1, z: 0.92142785, w: 0.0954202}
+    value: {x: 0.9628363, y: 1, z: 0.92142785, w: -0.15324771}
   masterCurve:
     overrideState: 0
     value:
@@ -1361,6 +1361,32 @@ MonoBehaviour:
   sampleCount:
     overrideState: 1
     value: 10
+--- !u!114 &-4305014262310432860
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6050e2d5de785ce4d931e4dbdbf2d755, type: 3}
+  m_Name: ChromaticAberration
+  m_EditorClassIdentifier: 
+  active: 0
+  enabled:
+    overrideState: 1
+    value: 1
+  spectralLut:
+    overrideState: 0
+    value: {fileID: 0}
+    defaultState: 1
+  intensity:
+    overrideState: 0
+    value: 0
+  fastMode:
+    overrideState: 0
+    value: 1
 --- !u!114 &-26966112024728969
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -1429,6 +1455,7 @@ MonoBehaviour:
   - {fileID: -5117774319541437953}
   - {fileID: -6650046413213043609}
   - {fileID: 6655111437065816656}
+  - {fileID: -4305014262310432860}
 --- !u!114 &3497431102205628829
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -1497,19 +1524,19 @@ MonoBehaviour:
     value: 0
   color:
     overrideState: 1
-    value: {r: 0.07208972, g: 0.3912237, b: 0.5660378, a: 1}
+    value: {r: 0.05286579, g: 0.2886018, b: 0.41509432, a: 1}
   center:
     overrideState: 1
     value: {x: 0.5, y: 0.5}
   intensity:
     overrideState: 1
-    value: 0.591
+    value: 0.578
   smoothness:
     overrideState: 1
     value: 0.404
   roundness:
     overrideState: 1
-    value: 0.494
+    value: 0.538
   rounded:
     overrideState: 0
     value: 0

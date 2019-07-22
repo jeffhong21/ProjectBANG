@@ -14,14 +14,26 @@ namespace CharacterController
         private static readonly string m_MouseScrollInput = "Mouse ScrollWheel";
         #endregion
 
+
+        
+
         
         [SerializeField] private float m_MoveAxisDeadZone = 0.2f;
-        [SerializeField] private float m_LookDistance = 50f;
+        [SerializeField] private float lookDistance = 20;
         [SerializeField] private bool m_AxisRaw = true;
         [SerializeField] private bool m_LockCursor = true;
         [SerializeField] private bool m_CursorVisible;
 
+        [SerializeField]
+        private Transform lookTarget;
 
+        private LayerMask checkLayer = ~0;
+        private Ray lookRay;
+        private RaycastHit hit;
+        [SerializeField]
+        private RaycastHit[] hitBuffer;
+        private float lookHeight = 1.4f;
+        
 
         [Header("-- Debug Settings --")]
         [SerializeField, Tooltip("What key to select player.")]
@@ -50,6 +62,7 @@ namespace CharacterController
 
 
 
+        public Transform LookTarget { get { return lookTarget; } set { lookTarget = value; } }
 
 
         private Vector3 InputVectorRaw{
@@ -87,6 +100,13 @@ namespace CharacterController
             m_GameObject = gameObject;
             mTransform = transform;
 
+            lookTarget = new GameObject("Look Target").transform;
+            lookTarget.parent = transform;
+
+            FinalIKController finalIK = GetComponent<FinalIKController>();
+            if(finalIK != null) {
+                finalIK.LookTarget = lookTarget;
+            }
         }
 
 		private void OnEnable()
@@ -115,7 +135,7 @@ namespace CharacterController
 
             if (m_Camera == null)
                 m_Camera = Camera.main.transform;
-
+            lookRay = new Ray(transform.position + Vector3.up * lookHeight, transform.forward);
 
             //CharacterDebugUI.Instance.Initialize(m_Controller);
             //Debug.Log(Resources.Load<CharacterDebugUI>("CharacterDebugUI"));
@@ -134,32 +154,42 @@ namespace CharacterController
 
 
 
-        float targetAngle;
-        float rotationAngle;
-        float rotationVelocity;
+
         private void Update()
 		{
-            inputVector = InputVectorRaw;
+            inputVector = m_AxisRaw? InputVectorRaw : InputVector;
 
             lookDirection = m_CameraController == null ? mTransform.forward : Vector3.Scale(m_Camera.forward, new Vector3(1, 0, 1).normalized);
             lookRotation = Quaternion.FromToRotation(mTransform.forward, lookDirection);
 
-            //inputVector = m_Camera.right * InputVectorRaw.x + lookDirection * InputVectorRaw.z;
+            //inputVector = m_Camera.right * InputVector.x + lookDirection * InputVector.z;
+            //inputVector = Vector3.ProjectOnPlane(inputVector, transform.up);
+            //inputVector = transform.InverseTransformDirection(inputVector);
 
             m_Controller.InputVector = inputVector;
             m_Controller.LookRotation = lookRotation;
 
 
+            lookDistance = 8;
+            //  Set the look target's position and rotation.
+            lookRay.origin = transform.position + Vector3.up * lookHeight;
+            lookRay.direction = lookDirection;
+            lookTarget.position = lookRay.GetPoint(lookDistance);
+            //if (Physics.Raycast(lookRay, lookDistance, checkLayer)) {
+            //    lookTarget.position = hit.point;
+            //    lookRay.direction = hit.point - lookRay.origin;
+            //} else {
+            //    lookTarget.position = lookRay.GetPoint(lookDistance);
+
+            //}
 
 
-            //lookDirection = m_CameraController == null ? mTransform.forward : Vector3.Scale(m_Camera.forward, new Vector3(1, 0, 1)).normalized;
-            //lookRotation = Quaternion.FromToRotation(mTransform.forward, lookDirection);
-            //m_Controller.InputVector = InputVectorRaw;
-            //m_Controller.LookRotation = lookRotation;
-            //m_Controller.LookDirection = lookDirection;
+            float eulerY = Vector3.Angle(transform.forward, lookRay.direction);
+            Quaternion targetRotation = Quaternion.AngleAxis(eulerY, transform.up);
+            lookTarget.rotation = targetRotation * lookTarget.rotation;
 
-            //m_Controller.Move(InputVectorRaw.x, InputVectorRaw.z, lookRotation);
-            Debug.DrawRay(mTransform.position + Vector3.up * 1.5f, lookDirection, Color.black);
+
+
             DebugButtonPress();
         }
 
@@ -169,15 +199,10 @@ namespace CharacterController
         {
             //  -----------
             //  Camera Input
-            if (m_CameraController != null)
-            {
+            if (m_CameraController != null){
                 m_CameraController.RotateCamera(MouseInputVector.x, MouseInputVector.y);
                 //m_CameraController.ZoomCamera(Input.GetAxisRaw(m_MouseScrollInput));
 
-                if (Input.GetKey(KeyCode.Tab))
-                {
-
-                }
             }
         }
 
@@ -197,9 +222,9 @@ namespace CharacterController
                 Debug.Break();
             }
 
-            if (Input.GetKey(KeyCode.LeftShift))
+            if (Input.GetKey(KeyCode.M))
             {
-
+                CinamachineCameraController.Controller.PlayImpulse();
             }
 
             if (Input.GetKeyDown(KeyCode.Escape))
@@ -214,17 +239,6 @@ namespace CharacterController
 
         private void OnAimActionStart(bool aim)
         {
-            //if (aim == true)
-            //{
-            //    CameraState aimState = CameraController.Instance.GetCameraStateWithName("TPS_Aim");
-            //    CameraController.Instance.ChangeCameraState("TPS_Aim");
-            //}
-            //else
-            //{
-            //    CameraController.Instance.ChangeCameraState("TPS_Default");
-            //}
-  
-
             if (aim)
                 CameraController.Instance.SetCameraState("AIM");
             else
@@ -233,9 +247,23 @@ namespace CharacterController
         }
 
 
+        [SerializeField]
+        bool DebugMode;
+        private void OnDrawGizmosSelected()
+        {
+            if(lookTarget != null && DebugMode) {
+                //UnityEditor.Handles.color = Color.magenta;
+                //UnityEditor.Handles.SphereHandleCap(0, lookTarget.position, lookTarget.rotation, 1, EventType.Layout);
 
 
-	}
+                Gizmos.color = Color.magenta;
+                Gizmos.DrawRay(lookRay.origin, lookRay.direction * lookDistance);
+                Gizmos.DrawSphere(lookTarget.position, 0.15f);
+            }
+        }
+
+
+    }
 }
 
 
