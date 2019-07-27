@@ -32,6 +32,9 @@
             {
                 _characterControllerRect.y = AnimatorMonitorRect.y + AnimatorMonitorRect.height;
                 _characterControllerRect.width = 250;
+                if(Screen.currentResolution.width > 1920)
+                    _characterControllerRect.width += _characterControllerRect.width * ScreenMultiplier;
+
                 _characterControllerRect.height = Screen.height * 0.75f;
                 return _characterControllerRect;
             }
@@ -39,9 +42,21 @@
 
 
 
+        public static float ScreenMultiplier {
+            get {
+                float defaultSize = 1920;
+                return ((float)Screen.currentResolution.width - defaultSize) / defaultSize;
+            }
+        }
+
+
+
         public static int GuiFontSize
         {
-            get { return _guiFontSize; }
+            get {
+                _guiFontSize += Mathf.RoundToInt(_guiFontSize * ScreenMultiplier);
+                return _guiFontSize;
+            }
             set
             {
                 if (value < 11)

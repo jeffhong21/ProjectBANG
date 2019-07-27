@@ -70,7 +70,6 @@
         protected CharacterLocomotion m_Controller;
         protected Rigidbody m_Rigidbody;
         protected CapsuleCollider m_CapsuleCollider;
-        protected CharacterIK m_CharacterIK;
         protected Animator m_Animator;
         protected AnimatorMonitor m_AnimatorMonitor;
         protected LayerManager m_Layers;
@@ -135,31 +134,27 @@
         //
         protected virtual void Awake()
         {
-            m_Controller = GetComponent<CharacterLocomotion>();
-            
+            //m_Controller = GetComponent<CharacterLocomotion>();
             m_Rigidbody = GetComponent<Rigidbody>();
             m_Animator = GetComponent<Animator>();
-            m_CharacterIK = GetComponent<CharacterIK>();
             m_AnimatorMonitor = GetComponent<AnimatorMonitor>();
             m_Layers = GetComponent<LayerManager>();
             m_Inventory = GetComponent<Inventory>();
             m_GameObject = gameObject;
             m_Transform = transform;
-            m_DeltaTime = Time.deltaTime;
+            //m_DeltaTime = Time.deltaTime;
+
             //EventHandler.RegisterEvent<CharacterAction, bool>(m_GameObject, "OnCharacterActionActive", OnActionActive);
 
             //m_CapsuleCollider = GetComponent<CapsuleCollider>();
 
-            Initialize();
+            //Initialize();
         }
 
-        private void Initialize()
+        public void Initialize(CharacterLocomotion characterController, float deltaTime)
         {
-            ////  Setup state name.
-            //if (string.IsNullOrWhiteSpace(m_StateName))
-            //{
-            //    m_StateName = GetType().Name;
-            //}
+            m_Controller = characterController;
+            m_DeltaTime = deltaTime;
 
             //  Translate input name to keycode.
             if (m_StartType != ActionStartType.Automatic || m_StartType != ActionStartType.Manual ||
@@ -174,20 +169,21 @@
                 }
             }
 
-        }
-
-
-        protected void OnEnable()
-        {
             m_CapsuleCollider = m_Controller.Collider;
             m_ColliderHeight = m_CapsuleCollider.height;
             m_ColliderCenter = m_CapsuleCollider.center;
         }
 
-        protected void OnDisable()
-        {
 
-        }
+        //protected void OnEnable()
+        //{
+
+        //}
+
+        //protected void OnDisable()
+        //{
+
+        //}
 
 
 

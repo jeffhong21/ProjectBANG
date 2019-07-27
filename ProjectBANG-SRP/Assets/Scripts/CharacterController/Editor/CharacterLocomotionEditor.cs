@@ -251,8 +251,9 @@ namespace CharacterController
                     //InspectorUtility.LabelField("-- Debug Settings--");
                     EditorGUI.indentLevel++;
 
-                    InspectorUtility.PropertyField(serializedObject.FindProperty("m_DrawDebugLine"));
-                    InspectorUtility.PropertyField(serializedObject.FindProperty("m_DebugCollisions"));
+                    InspectorUtility.PropertyField(serializedObject.FindProperty("DrawDebugLine"));
+                    InspectorUtility.PropertyField(serializedObject.FindProperty("DebugGroundCheck"));
+                    InspectorUtility.PropertyField(serializedObject.FindProperty("DebugCollisions"));
 
 
                     EditorGUI.indentLevel--;

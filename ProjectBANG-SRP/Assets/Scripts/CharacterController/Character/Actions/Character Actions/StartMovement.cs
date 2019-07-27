@@ -45,10 +45,10 @@ namespace CharacterController
             }
             
 
-            CharacterDebug.Log("--- StartMovement --- ", isMoving);
-            CharacterDebug.Log("detectionCount", detectionCount);
-            CharacterDebug.Log("lastMoveAmount", lastMoveAmount);
-            CharacterDebug.Log("currentMoveAmount", currentMoveAmount);
+            //CharacterDebug.Log("--- StartMovement --- ", isMoving);
+            //CharacterDebug.Log("detectionCount", detectionCount);
+            //CharacterDebug.Log("lastMoveAmount", lastMoveAmount);
+            //CharacterDebug.Log("currentMoveAmount", currentMoveAmount);
 
             return false;
 		}
@@ -58,7 +58,7 @@ namespace CharacterController
             Vector3 lookDirection = m_Controller.LookRotation * m_Transform.forward;
             ////  Start walk angle
             Vector3 axisSign = Vector3.Cross(lookDirection, m_Transform.forward);
-            startAngle = Vector3.Angle(m_Transform.forward, m_Controller.LookDirection) * (axisSign.y >= 0 ? -1f : 1f);
+            startAngle = Vector3.Angle(m_Transform.forward, lookDirection) * (axisSign.y >= 0 ? -1f : 1f);
             startAngle = (float)Math.Round(startAngle, 2);
             startAngle = Mathf.Approximately(startAngle, 0) ? 0 : (float)Math.Round(startAngle, 2);
 

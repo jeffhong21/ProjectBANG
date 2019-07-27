@@ -46,6 +46,7 @@ namespace CharacterController
 
         private float inputHorizontal, inputVertical;
         private Vector3 inputVector;
+        private Vector3 cameraFwd = new Vector3(1, 0, 1);
         private float mouseHorizontal, mouseVertical;
         private Vector3 mouseInputVector;
         private Vector3 lookDirection;
@@ -143,28 +144,41 @@ namespace CharacterController
         }
 
 
-        //private float GetDeltaYRotation( float horizontalMovement, float forwardMovement, float cameraHorizontalMovement, float cameraVerticalMovement )
-        //{
-        //    float movementAngle = Mathf.Atan2(horizontalMovement, forwardMovement) * Mathf.Rad2Deg;
-        //    float targetAngle = Mathf.Atan2(cameraHorizontalMovement, cameraVerticalMovement) * Mathf.Rad2Deg;
-
-        //    //float deltaY = Mathf.SmoothDampAngle(fwdAngle, targetAngle, ref rotationVelocitySmooth, 0.1f) * Time.deltaTime;
-        //    return targetAngle - movementAngle;
-        //}
-
 
 
 
         private void Update()
 		{
             inputVector = m_AxisRaw? InputVectorRaw : InputVector;
+            cameraFwd.Set(1, 0, 1);
 
-            lookDirection = m_CameraController == null ? mTransform.forward : Vector3.Scale(m_Camera.forward, new Vector3(1, 0, 1).normalized);
-            lookRotation = Quaternion.FromToRotation(mTransform.forward, lookDirection);
+            lookDirection = m_CameraController == null ? mTransform.forward : Vector3.Scale(m_Camera.forward, cameraFwd).normalized;
 
-            //inputVector = m_Camera.right * InputVector.x + lookDirection * InputVector.z;
-            //inputVector = Vector3.ProjectOnPlane(inputVector, transform.up);
-            //inputVector = transform.InverseTransformDirection(inputVector);
+            switch (m_Controller.Movement) {
+                case (MovementType.Adventure):
+
+                    inputVector = m_Camera.right * InputVector.x + lookDirection * InputVector.z;
+                    //inputVector = Vector3.ProjectOnPlane(inputVector, transform.forward);
+
+                    float turnAmount = Mathf.Atan2(inputVector.x, inputVector.z) * Mathf.Rad2Deg;
+                    //float turnAmount = Mathf.SmoothDampAngle(m_Controller.transform.rotation.y, Mathf.Atan2(inputVector.x, inputVector.z) * Mathf.Rad2Deg, ref rotationVelocitySmooth, 0.1f);
+                    lookRotation = Quaternion.AngleAxis(turnAmount, transform.up);
+                    break;
+
+                case (MovementType.Combat):
+                    //inputVector = InputVector;
+                    //turnAmount = Mathf.Atan2(lookDirection.x, lookDirection.z);
+                    //lookRotation = Quaternion.AngleAxis(turnAmount, transform.up);
+                    lookRotation = Quaternion.FromToRotation(mTransform.forward, lookDirection);
+                    break;
+                default:
+                    Debug.Log("<b><i>• PlayerInput</i></b> movement type is default");
+                    inputVector = m_AxisRaw ? InputVectorRaw : InputVector;
+                    lookRotation = Quaternion.FromToRotation(mTransform.forward, lookDirection);
+                    break;
+            }
+
+
 
             m_Controller.InputVector = inputVector;
             m_Controller.LookRotation = lookRotation;
@@ -174,14 +188,13 @@ namespace CharacterController
             //  Set the look target's position and rotation.
             lookRay.origin = transform.position + Vector3.up * lookHeight;
             lookRay.direction = lookDirection;
-            lookTarget.position = lookRay.GetPoint(lookDistance);
-            //if (Physics.Raycast(lookRay, lookDistance, checkLayer)) {
-            //    lookTarget.position = hit.point;
-            //    lookRay.direction = hit.point - lookRay.origin;
-            //} else {
-            //    lookTarget.position = lookRay.GetPoint(lookDistance);
+            //lookTarget.position = lookRay.GetPoint(lookDistance);
+            if (Physics.Raycast(lookRay, lookDistance, checkLayer)) {
+                lookTarget.position = hit.point;
+            } else {
+                lookTarget.position = lookRay.GetPoint(lookDistance);
 
-            //}
+            }
 
 
             float eulerY = Vector3.Angle(transform.forward, lookRay.direction);

@@ -43,10 +43,17 @@
         }
 
 
+        protected override void Awake()
+        {
+            base.Awake();
+
+            for (int i = 0; i < m_Actions.Length; i++) {
+                m_Actions[i].Initialize(this, fixedDeltaTime);
+            }
+        }
 
 
-
-		protected void OnEnable()
+        protected void OnEnable()
 		{
 
             EventHandler.RegisterEvent<CharacterAction, bool>(m_GameObject, EventIDs.OnCharacterActionActive, OnActionActive);
@@ -66,16 +73,10 @@
 
         protected override void Update()
 		{
-            m_TimeScale = Time.timeScale;
-            if (Math.Abs(m_TimeScale) < float.Epsilon) return;
-            m_DeltaTime = deltaTime;
+            base.Update();
 
-            //m_CheckGround = true;
-            //m_CheckMovement = true;
-            //m_SetPhysicsMaterial = true;
-            //m_Move = true;
-            //m_UpdateAnimator = true;
 
+            m_Move = true;
 
             ////  Start Stop Actions.
             for (int i = 0; i < m_Actions.Length; i++)
@@ -83,20 +84,31 @@
                 if (m_Actions[i].enabled == false)
                     continue;
                 CharacterAction charAction = m_Actions[i];
+                //  If action was started, move onto next action.
                 StopStartAction(charAction);
+                //if (StopStartAction(charAction)) continue;
 
+                if (charAction.IsActive) {
+                    //  Move charatcer based on input values.
+                    if (m_Move) m_Move = charAction.Move();
+
+                    //// Update the Animator.
+                    //if (m_UpdateAnimator) m_UpdateAnimator = charAction.UpdateAnimator();
+                }
                 //  Call Action Update.
                 charAction.UpdateAction();
             }
+
+            //  Moves the character according to the input.
+            if (m_Move) Move();
         }
 
 
         protected override void FixedUpdate()
 		{
-            if (m_TimeScale == 0) return;
-            m_DeltaTime = fixedDeltaTime;
+            base.FixedUpdate();
 
-            m_Move = true;
+            //m_Move = true;
             m_CheckGround = true;
             m_CheckMovement = true;
             m_SetPhysicsMaterial = true;
@@ -113,8 +125,7 @@
 
                 if (charAction.IsActive)
                 {
-                    //  Move charatcer based on input values.
-                    if (m_Move) m_Move = charAction.Move();
+
                     //  Perform checks to determine if the character is on the ground.
                     if (m_CheckGround) m_CheckGround = charAction.CheckGround();
                     //  Ensure the current movement direction is valid.
@@ -131,8 +142,7 @@
                 }
             }  //  end of for loop
 
-            //  Moves the character according to the input.
-            if (m_Move) Move();
+
             //  Perform checks to determine if the character is on the ground.
             if (m_CheckGround) CheckGround();
             //  Ensure the current movement direction is valid.
@@ -145,8 +155,14 @@
             if (m_UpdateRotation) UpdateRotation();
             //  Apply any movement.
             if (m_UpdateMovement) UpdateMovement();
+
             // Update the Animator.
-            if (m_UpdateAnimator) UpdateAnimator();
+            if (m_UpdateAnimator)
+                UpdateAnimator();
+            //if (m_Animator.pivotWeight < 0.5f || m_Animator.pivotWeight > 0.5f)
+            //    m_Animator.SetFloat(HashID.LegUpIndex, m_Animator.pivotWeight >= 0.5f ? 1 : 0);
+            //else m_Animator.SetFloat(HashID.LegUpIndex, 0.5f + 1);
+            m_Animator.SetFloat(HashID.LegUpIndex, m_Animator.pivotWeight);
 
         }
 
@@ -242,30 +258,7 @@
 
         public void Move( float horizontalMovement, float forwardMovement, Quaternion lookRotation )
         {
-
-            LookRotation = lookRotation;
-            LookDirection = m_LookRotation * mTransform.forward;
-
-            switch (m_MovementType) {
-                case (MovementType.Adventure):
-                    //  Set input vector
-                    InputVector.Set(0, 0, forwardMovement);
-                    //  
-                    //DeltaYRotation = Mathf.Atan2(horizontalMovement, forwardMovement) * Mathf.Rad2Deg;
-                    //DeltaYRotation -= mTransform.eulerAngles.y;
-                    //var direction = Mathf.Abs(InputVector.z) > 0 ? InputVector.x : -InputVector.x;
-                    //DeltaYRotation = Mathf.Atan2(direction, Mathf.Abs(InputVector.z)) * Mathf.Deg2Rad;
-                    break;
-
-                case (MovementType.Combat):
-
-                    InputVector.Set(horizontalMovement, 0, forwardMovement);
-
-                    Vector3 lookDir = mTransform.InverseTransformDirection(LookDirection);
-                    //DeltaYRotation = Mathf.Atan2(lookDir.x, lookDir.y) * Mathf.Rad2Deg;
-                    //DeltaYRotation -= mTransform.eulerAngles.y;
-                    break;
-            }
+            throw new NotImplementedException();
         }
 
 
@@ -273,7 +266,13 @@
 
         #region Character Actions
 
-        protected void StopStartAction(CharacterAction charAction)
+
+        /// <summary>
+        /// Starts and Stops the Action.
+        /// </summary>
+        /// <param name="charAction"></param>
+        /// <returns>Returns true if action was started.</returns>
+        protected bool StopStartAction(CharacterAction charAction)
         {
             //  First, check if current Action can Start or Stop.
 
@@ -291,7 +290,7 @@
                         if (m_ActiveAction = charAction)
                             m_ActiveAction = null;
                         //  Move on to the next Action.
-                        return;
+                        return false;
                     }
                 }
             }
@@ -312,7 +311,7 @@
                             if (charAction.IsConcurrentAction() == false)
                                 m_ActiveAction = charAction;
                             //  Move onto the next Action.
-                            return;
+                            return true;
                         }
                     }
                     else if (charAction.IsConcurrentAction())
@@ -323,17 +322,17 @@
                             charAction.StartAction();
                             //charAction.UpdateAnimator();
                             //  Move onto the next Action.
-                            return;
+                            return true;
                         }
                     }
                     else
                     {
-                        return;
+                        return false;
                     }
                 }
             }
 
-
+            return false;
         }
 
 

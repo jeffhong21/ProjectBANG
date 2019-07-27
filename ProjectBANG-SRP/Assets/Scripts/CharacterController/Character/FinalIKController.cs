@@ -103,7 +103,7 @@ namespace CharacterController
             if (lookAtIK.solver.IKPositionWeight >= 0.999f) lookAtIK.solver.IKPositionWeight = 1f;
             if (lookAtIK.solver.IKPositionWeight <= 0.001f) lookAtIK.solver.IKPositionWeight = 0f;
 
-            CharacterDebug.Log("Look Target Angle difference", angleDif);
+            //CharacterDebug.Log("Look Target Angle difference", angleDif);
 
 
 
