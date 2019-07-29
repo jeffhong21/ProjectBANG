@@ -123,7 +123,7 @@
 
         protected override void ActionStarted()
         {
-            m_Animator.SetInteger(HashID.ActionID, (int)ActionTypeDefinition.Vault);
+            m_Animator.SetInteger(HashID.ActionID, ActionTypeID.Vault);
 
             m_EndPosition = m_EndPositionHit.point;
             m_StartPosition = m_MoveToVaultDistanceHit.point + (m_Transform.position - m_MoveToVaultDistanceHit.point);

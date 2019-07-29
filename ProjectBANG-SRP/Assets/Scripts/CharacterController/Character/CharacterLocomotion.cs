@@ -131,11 +131,11 @@
                     //  Ensure the current movement direction is valid.
                     if (m_CheckMovement) m_CheckMovement = charAction.CheckMovement();
 
-
+                    //  Apply any movement.
+                    if (m_UpdateMovement) m_UpdateMovement = charAction.UpdateMovement();
                     //  Update the rotation forces.
                     if (m_UpdateRotation)m_UpdateRotation = charAction.UpdateRotation();
-                    //  Apply any movement.
-                    if (m_UpdateMovement)m_UpdateMovement = charAction.UpdateMovement();
+
                     // Update the Animator.
                     if (m_UpdateAnimator)m_UpdateAnimator = charAction.UpdateAnimator();
 
@@ -150,11 +150,11 @@
             //  Set the physic material based on the grounded and stepping state
             if (m_SetPhysicsMaterial) SetPhysicsMaterial();
 
-
-            //  Update the rotation forces.
-            if (m_UpdateRotation) UpdateRotation();
             //  Apply any movement.
             if (m_UpdateMovement) UpdateMovement();
+            //  Update the rotation forces.
+            if (m_UpdateRotation) UpdateRotation();
+
 
             // Update the Animator.
             if (m_UpdateAnimator)
@@ -272,7 +272,7 @@
         /// </summary>
         /// <param name="charAction"></param>
         /// <returns>Returns true if action was started.</returns>
-        protected bool StopStartAction(CharacterAction charAction)
+        protected void StopStartAction(CharacterAction charAction)
         {
             //  First, check if current Action can Start or Stop.
 
@@ -290,7 +290,7 @@
                         if (m_ActiveAction = charAction)
                             m_ActiveAction = null;
                         //  Move on to the next Action.
-                        return false;
+                        return;
                     }
                 }
             }
@@ -311,7 +311,7 @@
                             if (charAction.IsConcurrentAction() == false)
                                 m_ActiveAction = charAction;
                             //  Move onto the next Action.
-                            return true;
+                            return;
                         }
                     }
                     else if (charAction.IsConcurrentAction())
@@ -322,17 +322,17 @@
                             charAction.StartAction();
                             //charAction.UpdateAnimator();
                             //  Move onto the next Action.
-                            return true;
+                            return;
                         }
                     }
                     else
                     {
-                        return false;
+
                     }
                 }
             }
 
-            return false;
+            return;
         }
 
 
@@ -485,6 +485,25 @@
 
         #endregion
 
+
+        /// <summary>
+        /// Returns which foot is planted.  0 is left, 1 is right.
+        /// </summary>
+        /// <param name="pivotWeightThreshold"></param>
+        /// <returns>Returns -1 if neither foot is planted.</returns>
+        public int GetPlantedPivotFoot( float pivotWeightThreshold = 0.5f)
+        {
+            pivotWeightThreshold = Mathf.Clamp(pivotWeightThreshold, 0, 0.5f);
+            int pivotFoot = 2;
+            if (m_Animator.pivotWeight >= 1 - pivotWeightThreshold) {
+                pivotFoot = 1;
+            } else if (m_Animator.pivotWeight < 0 + pivotWeightThreshold) {
+                pivotFoot = 0;
+            } else
+                pivotFoot = -1;
+
+            return pivotFoot;
+        }
 
 
         public void SetMovementType( MovementType movementType )

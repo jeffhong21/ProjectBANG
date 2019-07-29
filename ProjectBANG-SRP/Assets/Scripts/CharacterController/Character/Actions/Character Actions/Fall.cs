@@ -50,7 +50,7 @@ namespace CharacterController
 
 		protected override void ActionStarted()
         {
-            m_Animator.SetInteger(HashID.ActionID, (int)ActionTypeDefinition.Fall);
+            m_Animator.SetInteger(HashID.ActionID, ActionTypeID.Fall);
             m_ActionStartTime = Time.time;
 
         }

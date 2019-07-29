@@ -6,10 +6,10 @@ namespace CharacterController
 
     public class Idle : CharacterAction
     {
-
-        protected float m_IdleTimeout = 3f;
-        protected float m_StartIdleTime;
-        protected float m_NextIdleTime;
+        [Tooltip("How long before the idle action plays.")]
+        protected float idleTimeout = 3f;
+        protected float idleStartTime;
+        protected float nextIdleTime;
 
         public override bool CanStartAction()
         {
@@ -74,10 +74,10 @@ namespace CharacterController
         //}
 
 
-		public override bool IsConcurrentAction()
-		{
-            return true;
-		}
+		//public override bool IsConcurrentAction()
+		//{
+  //          return true;
+		//}
 
 		////  Returns the state the given layer should be on.
 		//public override string GetDestinationState(int layer)

@@ -305,7 +305,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!64 &1040994269
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -528,6 +528,10 @@ PrefabInstance:
     - target: {fileID: 100050, guid: 9eb1cb64650814445b93f4b540858545, type: 3}
       propertyPath: m_Name
       value: Characters_Frontier
+      objectReference: {fileID: 0}
+    - target: {fileID: 100050, guid: 9eb1cb64650814445b93f4b540858545, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 100008, guid: 9eb1cb64650814445b93f4b540858545, type: 3}
       propertyPath: m_IsActive

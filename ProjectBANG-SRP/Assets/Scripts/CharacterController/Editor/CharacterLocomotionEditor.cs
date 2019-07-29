@@ -168,8 +168,10 @@ namespace CharacterController
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Collider"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_HorizontalCollisionCount"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_VerticalCollisionCount"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_ColliderLayerMask"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_CollisionsLayerMask"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_MaxCollisionCount"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Collisions"), true);
+
 
                 EditorGUILayout.Space();
             }
@@ -392,6 +394,7 @@ namespace CharacterController
                         menu.AddItem(new GUIContent("Add"), false, () => TestContextMenu(action.GetType().Name));
                         menu.AddItem(new GUIContent("Remove"), false, () => TestContextMenu(action.GetType().Name));
                         menu.ShowAsContext();
+                        //ChangeStateName(stateName, action.GetType().Name);
                     }
                 }
                 //else {
@@ -405,9 +408,42 @@ namespace CharacterController
         }
 
 
+        private void ChangeStateName( SerializedProperty property, string actionType)
+        {
+            Animator animator = m_Controller.GetComponent<Animator>();
+            var states = AnimatorUtil.GetStateMachineChildren.GetChildren(animator, actionType);
+
+            var menu = new GenericMenu();
+
+            for (int i = 0; i < states.Count; i++) {
+                var state = states[i];
+                menu.AddItem(new GUIContent(state), false, () =>
+                {
+                    property.stringValue = state;
+                    serializedObject.Update();
+                });
+            }
+            menu.ShowAsContext();
+        }
+
         private void TestContextMenu(string actionName)
         {
-            Debug.LogFormat("Right clicked {0}.", actionName);
+            //Debug.LogFormat("Right clicked {0}.", actionName);
+
+            Animator animator = m_Controller.GetComponent<Animator>();
+            if (animator == null) {
+                Debug.Log("No Animator");
+                    return;
+            }
+
+            var states = AnimatorUtil.GetStateMachineChildren.GetChildren(animator, actionName);
+            string debugStateInfo = "";
+            debugStateInfo += "<b>" + actionName + " </b>\n";
+
+            for (int i = 0; i < states.Count; i++) {
+                debugStateInfo += "<b> " + states[i] + " </b> \n";
+            }
+            Debug.Log(debugStateInfo);
         }
 
 

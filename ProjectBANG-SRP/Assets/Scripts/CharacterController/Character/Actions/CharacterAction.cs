@@ -96,7 +96,7 @@
             set { m_IsActive = value; }
         }
 
-        public int ActionID
+        public virtual int ActionID
         {
             get { return m_ActionID; }
             set { m_ActionID = value; }
@@ -190,10 +190,10 @@
 
 
 
-        //protected virtual void OnValidate()
-        //{
-        //    if (string.IsNullOrEmpty(m_StateName)) m_StateName = GetType().Name;
-        //}
+        protected virtual void OnValidate()
+        {
+            if (ActionID > 0) m_ActionID = ActionID;
+        }
 
 
         protected void MoveToTarget(Vector3 targetPosition, Quaternion targetRotation, float minMoveSpeed, Action onComplete)
@@ -448,17 +448,22 @@
             {
                 if (string.IsNullOrEmpty(GetDestinationState(index)) == false)
                 {
-                    string destinationState = m_Animator.GetLayerName(index) + "." + GetDestinationState(index);
-                    if (m_Animator.HasState(index, Animator.StringToHash(destinationState) ))
+                    string destinationState = GetDestinationState(index);
+                    if(destinationState.Contains(".") == false) {
+                        Debug.Log(this.GetType());
+                    }
+                    string fullStateName = m_Animator.GetLayerName(index) + "." + destinationState;
+                    if (m_Animator.HasState(index, Animator.StringToHash(fullStateName) ))
                     {
                         if (m_TransitionDuration > 0)
-                            m_Animator.CrossFade(destinationState, m_TransitionDuration, index);
+                            m_Animator.CrossFade(fullStateName, m_TransitionDuration, index);
                         else
-                            m_Animator.Play(destinationState, index);
+                            m_Animator.Play(fullStateName, index);
+
                     }
                     else
                     {
-                        Debug.LogErrorFormat("Cannot transition to {0} in layer {1}", m_DestinationStateName, index);
+                        Debug.LogErrorFormat("There is no state {0} in layer {1}", fullStateName, index);
                     }
                 }
 
@@ -473,6 +478,14 @@
             if(Time.time > m_StartEffectStartTime + m_EffectCooldown)
                 PlayEffect(m_StartEffect, ref m_StartEffectStartTime);
 
+
+            //m_Animator.SetFloat(Animator.StringToHash("AnimationSpeed"), m_SpeedMultiplier);
+
+//            Debug.LogFormat("{2} \nCurrent State:{0}\nNext State:{1} ||",
+//m_AnimatorMonitor.GetStateName(m_Animator.GetCurrentAnimatorStateInfo(0).fullPathHash),
+//m_AnimatorMonitor.GetStateName(m_Animator.GetNextAnimatorStateInfo(0).fullPathHash),
+//GetType());
+             
         }
 
 
@@ -499,7 +512,7 @@
 
             ActionStopped();
 
-
+            m_Animator.SetFloat(Animator.StringToHash("AnimationSpeed"), 1);
         }
 
 
@@ -641,6 +654,14 @@
         //  Returns the state the given layer should be on.
         public virtual string GetDestinationState(int layer)
         {
+            if (string.IsNullOrWhiteSpace(m_StateName))
+                return "";
+            var layerName = m_Animator.GetLayerName(layer);
+            var destinationState = layerName + "." + m_StateName;
+
+            if(m_Animator.HasState(layer, Animator.StringToHash(destinationState)))
+                return destinationState;
+
             return "";
         }
 

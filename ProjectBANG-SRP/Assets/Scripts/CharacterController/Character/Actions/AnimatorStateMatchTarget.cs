@@ -7,6 +7,8 @@ namespace CharacterController
     [Serializable]
     public class AnimatorStateMatchTarget
     {
+        public bool enableMatchTarget = true;
+
         public string stateName;
 
         public Vector3 matchTargetOffset = new Vector3(0.1f, 0, 0);
@@ -18,7 +20,11 @@ namespace CharacterController
         //public Vector2 matchTargetRange = new Vector2(0.1f, 0.2f);
 
         public AvatarTarget avatarTarget = AvatarTarget.Root;
+        public Vector3 positionXYZWeight = Vector3.one;
+        [Range(0f, 1f)]
+        public float rotationWeight = 1;
 
+        public MatchTargetWeightMask weightMask = new MatchTargetWeightMask(Vector3.one, 1);
 
         //
         //  Properties
@@ -54,28 +60,7 @@ namespace CharacterController
 
 
 
-        //
-        //  Methods
-        //
 
-        public static HumanBodyBones GetHumanBodyBone(AvatarTarget target)
-        {
-            switch (target)
-            {
-                case AvatarTarget.LeftHand:
-                    return HumanBodyBones.LeftHand;
-                case AvatarTarget.RightHand:
-                    return HumanBodyBones.RightHand;
-                case AvatarTarget.LeftFoot:
-                    return HumanBodyBones.LeftFoot;
-                case AvatarTarget.RightFoot:
-                    return HumanBodyBones.RightFoot;
-                case AvatarTarget.Body:
-                    return HumanBodyBones.Hips;
-                default:
-                    return HumanBodyBones.Hips;
-            }
-        }
     }
 
 }

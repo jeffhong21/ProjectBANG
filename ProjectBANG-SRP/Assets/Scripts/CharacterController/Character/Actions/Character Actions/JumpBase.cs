@@ -81,7 +81,7 @@
 
         protected override void ActionStarted()
         {
-            m_Animator.SetInteger(HashID.ActionID, (int)ActionTypeDefinition.Jump);
+            m_Animator.SetInteger(HashID.ActionID, ActionTypeID.Jump);
 
             if (m_Controller.Moving)
             {

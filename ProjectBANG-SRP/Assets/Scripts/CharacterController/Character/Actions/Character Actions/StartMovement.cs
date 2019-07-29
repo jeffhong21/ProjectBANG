@@ -6,19 +6,20 @@ namespace CharacterController
 
     public class StartMovement : CharacterAction
     {
-        protected int maxInputCount = 4;
+        public override int ActionID {
+            get { return m_ActionID = ActionTypeID.StartMovement; }
+            set { m_ActionID = value; }
+        }
+
+
+        [SerializeField] protected int maxInputCount = 4;
 
 
         protected int detectionCount;
-
-        private float startAngle;
-
-        //protected bool currentFrameMoving;
-        //protected bool previousFrameMoving;
-
+        protected float startAngle;
         protected float lastMoveAmount;
         protected float currentMoveAmount;
-        protected bool isMoving;
+        protected bool isStartingToMove;
         protected float moveAmount;
 		//
 		// Methods
@@ -29,11 +30,13 @@ namespace CharacterController
             currentMoveAmount = Mathf.Clamp01(Mathf.Abs(m_Controller.InputVector.x) + Mathf.Abs(m_Controller.InputVector.z));
 
             if (lastMoveAmount < currentMoveAmount) 
-                isMoving = true;
+                isStartingToMove = true;
             
 
-            if (isMoving){
+            if (isStartingToMove){
                 if (detectionCount >= maxInputCount) {
+                    detectionCount = 0;
+                    isStartingToMove = false;
                     return true;
                 }
                 detectionCount++;
@@ -41,11 +44,10 @@ namespace CharacterController
 
             if(currentMoveAmount >= 1) {
                 detectionCount = 0;
-                isMoving = false;
+                isStartingToMove = false;
             }
-            
 
-            //CharacterDebug.Log("--- StartMovement --- ", isMoving);
+
             //CharacterDebug.Log("detectionCount", detectionCount);
             //CharacterDebug.Log("lastMoveAmount", lastMoveAmount);
             //CharacterDebug.Log("currentMoveAmount", currentMoveAmount);
@@ -62,8 +64,22 @@ namespace CharacterController
             startAngle = (float)Math.Round(startAngle, 2);
             startAngle = Mathf.Approximately(startAngle, 0) ? 0 : (float)Math.Round(startAngle, 2);
 
-            Debug.LogFormat("Starting to move.  Start angle is {0}", startAngle);
+
+
+            if (m_StateName.Length == 0) m_Animator.SetInteger(HashID.ActionID, m_ActionID);
             m_Animator.SetFloat(HashID.ActionFloatData, startAngle);
+
+            float angle = Mathf.Abs(startAngle);
+            int actionIntData = 0;
+            if (angle > 0) {
+                if (angle > 0 && angle <= 45) actionIntData = 2;
+                else if (angle > 45 && angle <= 90) actionIntData = 2;
+                else if (angle > 90 && angle <= 135) actionIntData = 3;
+                else if (angle > 135 && angle <= 180) actionIntData = 4;
+                else actionIntData = 0;
+            }
+            actionIntData *= -(int)Mathf.Sign(startAngle);
+            m_Animator.SetInteger(HashID.ActionIntData, actionIntData);
         }
 
 
@@ -83,11 +99,31 @@ namespace CharacterController
         //    return true;
         //}
 
+        public override bool UpdateRotation()
+        {
+            if (m_ApplyBuiltinRootMotion) {
+                m_Controller.RootMotionRotation.ToAngleAxis(out float angleInDegrees, out Vector3 rotationAxis);
+
+                //  Update angular velocity.
+                m_Rigidbody.angularVelocity = Vector3.Lerp(m_Rigidbody.angularVelocity, rotationAxis.normalized * angleInDegrees, m_DeltaTime * m_Controller.RotationSpeed);
+
+                //  Update the rotations.
+                var targetRotation = Quaternion.Slerp(m_Transform.rotation, Quaternion.AngleAxis(angleInDegrees, rotationAxis.normalized), m_DeltaTime * m_Controller.RotationSpeed);
+                m_Rigidbody.MoveRotation(targetRotation * m_Transform.rotation);
+                return false;
+            }
+
+            return true;
 
 
 
 
-		public override bool CanStopAction()
+            
+        }
+
+
+
+        public override bool CanStopAction()
         {
             if (m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(m_StateName))
             {
@@ -102,7 +138,7 @@ namespace CharacterController
                     return true;
                 }
             }
-            if (Time.time > m_ActionStartTime + 0.5f)
+            if (Time.time > m_ActionStartTime +1f)
                 return true;
             return false;
         }
@@ -110,8 +146,6 @@ namespace CharacterController
 
         protected override void ActionStopped(){
             //m_Animator.CrossFade("LocomotionFwd", 0.2f, 0);
-            detectionCount = 0;
-            isMoving = false;
             startAngle = 0;
         }
 
@@ -131,6 +165,11 @@ namespace CharacterController
 
             }
 		}
+
+
+
+
+
 
 	}
 

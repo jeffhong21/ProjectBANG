@@ -7,7 +7,6 @@
 
     public class Cover : CharacterAction
     {
-        public const int ACTION_ID = (int)ActionTypeDefinition.Cover;
         private readonly bool hideflags = true;
 
 

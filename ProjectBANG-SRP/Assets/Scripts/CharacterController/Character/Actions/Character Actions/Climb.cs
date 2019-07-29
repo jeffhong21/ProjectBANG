@@ -17,6 +17,8 @@ namespace CharacterController
         [SerializeField] protected float maxHeight = 2f;
         [Tooltip("Layers to check against.")]
         [SerializeField] protected LayerMask collisionLayers;
+        [Tooltip("Layers to check against.")]
+        [SerializeField] protected AnimatorStateMatchTarget matchTarget;
 
 
         protected float reachOffset;
@@ -24,14 +26,14 @@ namespace CharacterController
         protected RaycastHit objectHit, heightHit;
         protected Vector3 objectNormal;
         protected Vector3 endEdgeOffset, endEdge;
-
+        protected bool cachedIsKinamatic;
 
         //  Where to start the vertical raycast.
         protected Vector3 heightCheck;
         //  Height of the platform
         protected float height;
 
-        protected float jumpForce;
+        protected float initialVelocity;
         protected float timeToApex = 0.4f;
         protected float verticalVelocity;
 
@@ -69,6 +71,11 @@ namespace CharacterController
 
         protected override void ActionStarted()
         {
+            if (string.IsNullOrWhiteSpace(matchTarget.stateName) && string.IsNullOrWhiteSpace(m_StateName) == false)
+                matchTarget.stateName = m_StateName;
+            matchTarget.weightMask.positionXYZWeight = matchTarget.positionXYZWeight;
+            matchTarget.weightMask.rotationWeight = matchTarget.rotationWeight;
+
             reachOffset = m_CapsuleCollider.radius + 0.1f;
             objectNormal = objectHit.normal;
             DeterminePositions();
@@ -79,12 +86,14 @@ namespace CharacterController
             m_ColliderHeight = m_CapsuleCollider.height;
             m_ColliderCenter = m_CapsuleCollider.center;
 
-
-            //jumpForce = -(2 * height) / Mathf.Pow(0.4f, 2);
-            //verticalVelocity = Mathf.Abs(jumpForce) * timeToApex;
+            cachedIsKinamatic = m_Rigidbody.isKinematic;
+            m_Rigidbody.isKinematic = true;
+            initialVelocity = (2 * height) / Mathf.Pow(0.4f, 2);
+            verticalVelocity = Mathf.Abs(initialVelocity) * timeToApex;
             Vector3 velocity = CalculateVelocity(endPosition, startPosition, timeToApex);
-            //velocity.y = verticalVelocity;
-            m_Rigidbody.velocity = velocity;
+            velocity.y = verticalVelocity;
+            //m_Rigidbody.velocity = velocity;
+
         }
 
 
@@ -95,12 +104,15 @@ namespace CharacterController
         }
 
 
-        //  Move over the vault object based off of the root motion forces.
         public override bool UpdateMovement()
         {
-            Vector3 targetPosition = Vector3.Lerp(startPosition, endEdgeOffset, m_DeltaTime * 10);
+            var heightDistance = endEdgeOffset.y - m_Transform.position.y;
+            Vector3 targetPosition = Vector3.MoveTowards(m_Transform.position, heightDistance >= 0f ? endEdgeOffset : endPosition, m_DeltaTime * 8);
 
             m_Rigidbody.MovePosition(targetPosition);
+
+            if (matchTarget.enableMatchTarget)
+                m_Animator.MatchTarget(targetPosition, Quaternion.identity, matchTarget.avatarTarget, matchTarget.weightMask, matchTarget.startMatchTarget, matchTarget.endMatchTarget);
 
             return false;
         }
@@ -108,7 +120,7 @@ namespace CharacterController
 
         public override bool Move()
         {
-            return false;
+            return true;
         }
 
 
@@ -129,12 +141,27 @@ namespace CharacterController
                 }
             }
 
+            //if( (endPosition - m_Transform.position).sqrMagnitude <= 0.1f) {
+
+            //}
             return Time.time > m_ActionStartTime + 2;
         }
 
         protected override void ActionStopped()
         {
+            m_Rigidbody.isKinematic = cachedIsKinamatic;
+            m_Rigidbody.velocity = m_Controller.Velocity;
+        }
 
+
+
+        public override string GetDestinationState( int layer )
+        {
+            if (layer == 0) {
+                return m_StateName;
+            }
+
+            return "";
         }
 
 
@@ -142,18 +169,11 @@ namespace CharacterController
         #endregion
 
 
-        protected float HeightPercentage(Vector3 targetPosition, float distance)
-        {
-            float remainingDistance = targetPosition.y - m_Transform.position.y;
-            float percent = (distance - remainingDistance) / distance;
-            return percent;
-        }
+
 
 
         protected void DeterminePositions()
         {
-
-
             startPosition = m_Transform.position;
 
             endEdgeOffset = endEdge + objectNormal * reachOffset;
@@ -173,13 +193,7 @@ namespace CharacterController
         }
 
 
-        protected Vector3 DetermineNormal(RaycastHit hit)
-        {
-            Vector3 normal = hit.normal;
 
-
-            return normal;
-        }
 
 
         /// <summary>
@@ -246,13 +260,13 @@ namespace CharacterController
                 //Gizmos.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance);
 
                 Gizmos.color = Color.magenta;
-                Gizmos.DrawWireSphere(startPosition, 0.2f);
+                Gizmos.DrawWireSphere(startPosition, 0.15f);
 
                 Gizmos.color = Color.cyan;
-                Gizmos.DrawWireSphere(endEdgeOffset, 0.2f);
-
+                GizmosUtils.DrawMarker(endEdgeOffset, 0.15f, Color.cyan);
+                
                 Gizmos.color = Color.yellow;
-                Gizmos.DrawWireSphere(endPosition, 0.2f);
+                Gizmos.DrawWireSphere(endPosition, 0.15f);
 
 
             }

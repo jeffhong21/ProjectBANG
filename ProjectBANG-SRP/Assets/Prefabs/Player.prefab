@@ -707,6 +707,8 @@ GameObject:
   - component: {fileID: 241837901}
   - component: {fileID: 1333040329}
   - component: {fileID: 4309599875131230348}
+  - component: {fileID: 645630507}
+  - component: {fileID: 645630508}
   m_Layer: 31
   m_Name: Player
   m_TagString: Player
@@ -793,21 +795,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_UseRootMotion: 1
-  m_RootMotionSpeedMultiplier: 1.25
+  m_RootMotionSpeedMultiplier: 1
   m_GroundAcceleration: 0.18
   m_AirborneAcceleration: 0.2
   m_MotorDamping: 0.27
   m_AirborneDamping: 0.3
   m_GroundSpeed: 4
   m_AirborneSpeed: 0.5
-  m_RotationSpeed: 3
+  m_RotationSpeed: 4
   m_SlopeForceUp: 1
   m_SlopeForceDown: 1.25
   m_StopMovementThreshold: 0.5
   m_DetectObjectHeight: 0.4
   m_Mass: 100
   m_SkinWidth: 0.08
-  m_SlopeLimit: 60
+  m_SlopeLimit: 45
   m_MaxStepHeight: 0.4
   m_ExternalForceDamping: 0.1
   m_GravityModifier: 0.4
@@ -816,26 +818,30 @@ MonoBehaviour:
   m_DetectHorizontalCollision: 1
   m_HorizontalCollisionCount: 10
   m_VerticalCollisionCount: 10
-  m_ColliderLayerMask:
+  m_CollisionsLayerMask:
     serializedVersion: 2
     m_Bits: 134217728
-  m_MaxCollisionCount: 50
-  m_IdleRotationMultiplier: 1.5
-  m_MovingStateName: Movement
+  m_MaxCollisionCount: 100
+  m_IdleRotationMultiplier: 2
+  m_MovingStateName: Locomotion
   m_AirborneStateName: Falling
+  m_Collisions: []
   m_Debug: 1
-  m_DebugCollisions: 0
-  m_DrawDebugLine: 0
+  DebugGroundCheck: 0
+  DebugCollisions: 0
+  DrawDebugLine: 1
   displayMovement: 0
   displayPhysics: 0
   displayAnimations: 0
-  displayActions: 1
+  displayActions: 0
   m_Actions:
   - {fileID: 4309599875131230348}
   - {fileID: 8880050838561965227}
   - {fileID: 3907047660296731877}
   - {fileID: -29659977447482821}
   - {fileID: 6728821054375862321}
+  - {fileID: 645630507}
+  - {fileID: 645630508}
   - {fileID: 1344037282883110068}
   - {fileID: 241837900}
   - {fileID: 4153653085202183914}
@@ -962,7 +968,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_MoveAxisDeadZone: 0.2
-  lookDistance: 20
+  lookDistance: 12
   m_AxisRaw: 1
   m_LockCursor: 1
   m_CursorVisible: 0
@@ -970,7 +976,7 @@ MonoBehaviour:
   m_SelectPlayerKeyCode: 112
   m_LockCameraRotation: 108
   m_DebugBreakKeyCode: 13
-  DebugMode: 0
+  DebugMode: 1
 --- !u!114 &5220774159141849524
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1033,7 +1039,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a70e525c82ce9413fa4d940ad7fcf1db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fixTransforms: 0
+  fixTransforms: 1
   references:
     root: {fileID: 2870460752788072028}
     pelvis: {fileID: 2867262105409435488}
@@ -1698,16 +1704,22 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 218103808
   m_MatchTargetStates:
-  - stateName: Climb1M
+  - enableMatchTarget: 1
+    stateName: Climb1M
     matchTargetOffset: {x: -0.2, y: 0, z: 0}
     startMatchTarget: 0.1
     endMatchTarget: 0.2
     avatarTarget: 4
-  - stateName: Climb2M
+    positionXYZWeight: {x: 1, y: 1, z: 1}
+    rotationWeight: 1
+  - enableMatchTarget: 1
+    stateName: Climb2M
     matchTargetOffset: {x: 0.1, y: 0, z: 0}
     startMatchTarget: 0.1
     endMatchTarget: 0.5
     avatarTarget: 5
+    positionXYZWeight: {x: 1, y: 1, z: 1}
+    rotationWeight: 1
   isMatchingTarget: 0
   normalizeTime: 0
 --- !u!114 &2865662861179281384
@@ -1725,7 +1737,7 @@ MonoBehaviour:
   m_IsActive: 0
   m_StateName: Jump
   m_LayerIndex: 0
-  m_ActionID: 0
+  m_ActionID: 21
   m_TransitionDuration: 0
   m_StartType: 2
   m_StopType: 0
@@ -1741,6 +1753,7 @@ MonoBehaviour:
   m_Debug: 0
   m_Force: 5
   m_RecurrenceDelay: 0.2
+  jumpHeight: 5
 --- !u!114 &2865662860256215401
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1937,11 +1950,14 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 201326592
   matchTarget:
+    enableMatchTarget: 1
     stateName: 
     matchTargetOffset: {x: 0.1, y: 0, z: 0}
     startMatchTarget: 0.1
     endMatchTarget: 0.2
     avatarTarget: 4
+    positionXYZWeight: {x: 1, y: 1, z: 1}
+    rotationWeight: 1
 --- !u!114 &7211672966236177136
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2259,9 +2275,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IsActive: 0
-  m_StateName: Jump
+  m_StateName: 
   m_LayerIndex: 0
-  m_ActionID: 0
+  m_ActionID: 21
   m_TransitionDuration: 0
   m_StartType: 2
   m_StopType: 0
@@ -2276,6 +2292,7 @@ MonoBehaviour:
   m_Debug: 0
   m_Force: 10
   m_RecurrenceDelay: 0.2
+  jumpHeight: 2
 --- !u!114 &8880050838561965227
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2335,7 +2352,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IsActive: 0
-  m_StateName: Aim Movement.Idle
+  m_StateName: Aim Locomotion
   m_LayerIndex: 0
   m_ActionID: 0
   m_TransitionDuration: 0
@@ -2531,6 +2548,72 @@ MonoBehaviour:
   collisionLayers:
     serializedVersion: 2
     m_Bits: 134217728
+  matchTarget:
+    enableMatchTarget: 0
+    stateName: 
+    matchTargetOffset: {x: 0, y: 0, z: 0}
+    startMatchTarget: 0.3
+    endMatchTarget: 0.4
+    avatarTarget: 0
+    positionXYZWeight: {x: 1, y: 1, z: 1}
+    rotationWeight: 0
+--- !u!114 &645630507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2864552554060033022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dcb0e67b11b04af4b61cb44c64d5a63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: 
+  m_LayerIndex: 0
+  m_ActionID: 2
+  m_TransitionDuration: 0.1
+  m_StartType: 0
+  m_StopType: 0
+  m_InputNames: []
+  m_SpeedMultiplier: 1
+  m_ApplyBuiltinRootMotion: 0
+  m_StartAudioClips: []
+  m_StopAudioClips: []
+  m_StartEffect: {fileID: 0}
+  m_EndEffect: {fileID: 0}
+  m_Debug: 0
+  maxInputCount: 6
+  stopThreshold: 0.8
+--- !u!114 &645630508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2864552554060033022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb969d52822a24d8dbd0b8c198a14803, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: 
+  m_LayerIndex: 0
+  m_ActionID: 1
+  m_TransitionDuration: 0
+  m_StartType: 0
+  m_StopType: 0
+  m_InputNames: []
+  m_SpeedMultiplier: 1.2
+  m_ApplyBuiltinRootMotion: 0
+  m_StartAudioClips: []
+  m_StopAudioClips: []
+  m_StartEffect: {fileID: 0}
+  m_EndEffect: {fileID: 0}
+  m_Debug: 0
+  maxInputCount: 4
 --- !u!1 &2864573851192578744
 GameObject:
   m_ObjectHideFlags: 0

@@ -2,13 +2,18 @@
 {
     public enum ActionTypeDefinition
     {
-        Death = -1,
+        
         Idle = 0,
-        Sprint = 1,
-        Fall = 3,
+        StartMovement = 1,
+        StopMovement = 2,
+        QuickTurn = 3,
+        Fall = 4,
+        Crouch = 5,
+        Pickup = 6,
         HitReaction = 7,
         Knockdown = 8,
         GetUp = 9,
+        Die = 10,
 
         Punch = 11,
 

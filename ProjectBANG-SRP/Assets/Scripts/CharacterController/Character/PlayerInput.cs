@@ -166,7 +166,7 @@ namespace CharacterController
                     break;
 
                 case (MovementType.Combat):
-                    //inputVector = InputVector;
+                    inputVector = InputVector;
                     //turnAmount = Mathf.Atan2(lookDirection.x, lookDirection.z);
                     //lookRotation = Quaternion.AngleAxis(turnAmount, transform.up);
                     lookRotation = Quaternion.FromToRotation(mTransform.forward, lookDirection);
@@ -188,18 +188,18 @@ namespace CharacterController
             //  Set the look target's position and rotation.
             lookRay.origin = transform.position + Vector3.up * lookHeight;
             lookRay.direction = lookDirection;
-            //lookTarget.position = lookRay.GetPoint(lookDistance);
-            if (Physics.Raycast(lookRay, lookDistance, checkLayer)) {
-                lookTarget.position = hit.point;
-            } else {
-                lookTarget.position = lookRay.GetPoint(lookDistance);
+            lookTarget.position = lookRay.GetPoint(lookDistance);
+            //if (Physics.Raycast(lookRay, lookDistance, checkLayer)) {
+            //    lookTarget.position = Vector3.Lerp(lookTarget.position, hit.point, Time.deltaTime * 8);
+            //} else {
+            //    lookTarget.position = lookRay.GetPoint(lookDistance);
 
-            }
+            //}
 
 
             float eulerY = Vector3.Angle(transform.forward, lookRay.direction);
             Quaternion targetRotation = Quaternion.AngleAxis(eulerY, transform.up);
-            lookTarget.rotation = targetRotation * lookTarget.rotation;
+            lookTarget.rotation = targetRotation;
 
 
 

@@ -30,11 +30,14 @@
 
 
         ////  Returns the state the given layer should be on.
-        //public override string GetDestinationState(int layer)
-        //{
-        //    return "Crouch.Crouch";
-        //    //return "Crouch.Crouch";
-        //}
+        public override string GetDestinationState( int layer )
+        {
+            if (layer == 0) {
+                return m_StateName;
+            }
+
+            return "";
+        }
 
         public override bool IsConcurrentAction()
         {

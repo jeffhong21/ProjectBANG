@@ -56,13 +56,13 @@
             get { return Input.GetAxis("Vertical"); }
         }
 
+        public Vector3 MatchTargetPosition { get; set; }
+        public Quaternion MatchTargetRotation { get; set; }
 
-
-
-		//
-		// Methods
-		//
-		private void Awake()
+        //
+        // Methods
+        //
+        private void Awake()
 		{
             m_Animator = GetComponent<Animator>();
             m_AnimatorController = m_Animator.runtimeAnimatorController as AnimatorController;
@@ -95,11 +95,14 @@
                 string stateName = defaultState.name;
 
                 m_AnimatorStateData[i] = new AnimatorStateData(defaultState.nameHash, stateName, 0.2f);
-            }
-
-
-
+            }   
             RegisterAllAnimatorStateIDs();
+
+
+            StateBehavior[] stateBehaviors = m_Animator.GetBehaviours<StateBehavior>();
+            for (int i = 0; i < stateBehaviors.Length; i++) {
+                stateBehaviors[i].Initialize(this);
+            }
         }
 
 
@@ -113,16 +116,24 @@
                 RegisterAnimatorStates(layer.stateMachine, layer.name);
             }
 
+            //m_StateNameHash.Keys.OrderBy(k => k).ToDictionary(k =>k, k => m_StateNameHash[k]);
+
+            //m_StateNameHash.OrderByDescending(r => r.Value).ThenBy(r => r.Key);
+            m_StateNameHash.OrderByDescending(r => r.Value);
 
             if (debugMsg)
             {
-                string debugStateInfo = "";
+                var sortedList = m_StateNameHash.ToList();
+                sortedList.Sort(( x, y ) => string.Compare(x.Value, y.Value, StringComparison.CurrentCulture));
 
+                string debugStateInfo = "";
                 debugStateInfo += "<b>State Name Hash: </b>\n";
-                foreach (var stateName in m_StateNameHash){
-                    debugStateInfo += "<b>StateName:</b> " + stateName.Value + " | <b>HashID:</b> " + stateName.Key + "\n";
+
+                for (int i = 0; i < sortedList.Count; i++) {
+                    debugStateInfo += "<b>StateName:</b> " + sortedList[i].Value + " | <b>HashID:</b> " + sortedList[i].Key + "\n";
                 }
 
+                    
                 debugStateInfo += "\n<b>Total State Count: " + stateCount + " </b>\n";
 
                 stateCount = 0;
