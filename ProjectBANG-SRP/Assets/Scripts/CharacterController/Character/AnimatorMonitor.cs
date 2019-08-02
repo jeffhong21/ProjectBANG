@@ -17,6 +17,9 @@
         private readonly Dictionary<int, AnimatorState> m_AnimatorStates = new Dictionary<int, AnimatorState>();
 
 
+        protected AnimatorStateData[] animatorStateData = new AnimatorStateData[0];
+
+
         //
         // Fields
         //
@@ -181,7 +184,6 @@
 
 
 
-        bool itemActionTriggerActive;
 
         private void LateUpdate()
 		{
