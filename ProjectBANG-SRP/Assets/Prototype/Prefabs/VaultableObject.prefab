@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 64791896582030955}
   - component: {fileID: 8304459561754085275}
   - component: {fileID: 4925389849844355782}
-  - component: {fileID: 7475785886306664066}
-  m_Layer: 25
+  - component: {fileID: 1429385279}
+  m_Layer: 27
   m_Name: VaultableObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -542,8 +542,8 @@ MonoBehaviour:
   - a: 4
     b: 5
   m_SelectedVertices: 08000000090000000c0000000d00000000000000010000000400000005000000
---- !u!65 &7475785886306664066
-BoxCollider:
+--- !u!64 &1429385279
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -552,6 +552,7 @@ BoxCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 4, y: 1.0001, z: 1}
-  m_Center: {x: 0, y: -0.000050008297, z: 0}
+  serializedVersion: 3
+  m_Convex: 1
+  m_CookingOptions: 14
+  m_Mesh: {fileID: 0}

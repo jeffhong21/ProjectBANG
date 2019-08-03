@@ -58,9 +58,10 @@ namespace CharacterController
 		protected override void ActionStarted()
         {
             Vector3 lookDirection = m_Controller.LookRotation * m_Transform.forward;
+            Vector3 moveDirection = m_Transform.InverseTransformDirection(m_Controller.InputVector);
             ////  Start walk angle
-            Vector3 axisSign = Vector3.Cross(lookDirection, m_Transform.forward);
-            startAngle = Vector3.Angle(m_Transform.forward, lookDirection) * (axisSign.y >= 0 ? -1f : 1f);
+            Vector3 axisSign = Vector3.Cross(moveDirection, m_Transform.forward);
+            startAngle = Vector3.Angle(m_Transform.forward, moveDirection) * (axisSign.y >= 0 ? -1f : 1f);
             startAngle = (float)Math.Round(startAngle, 2);
             startAngle = Mathf.Approximately(startAngle, 0) ? 0 : (float)Math.Round(startAngle, 2);
 
@@ -69,17 +70,18 @@ namespace CharacterController
             if (m_StateName.Length == 0) m_Animator.SetInteger(HashID.ActionID, m_ActionID);
             m_Animator.SetFloat(HashID.ActionFloatData, startAngle);
 
-            float angle = Mathf.Abs(startAngle);
-            int actionIntData = 0;
-            if (angle > 0) {
-                if (angle > 0 && angle <= 45) actionIntData = 2;
-                else if (angle > 45 && angle <= 90) actionIntData = 2;
-                else if (angle > 90 && angle <= 135) actionIntData = 3;
-                else if (angle > 135 && angle <= 180) actionIntData = 4;
-                else actionIntData = 0;
-            }
-            actionIntData *= -(int)Mathf.Sign(startAngle);
-            m_Animator.SetInteger(HashID.ActionIntData, actionIntData);
+
+            //float angle = Mathf.Abs(startAngle);
+            //int actionIntData = 0;
+            //if (angle > 0) {
+            //    if (angle > 0 && angle <= 45) actionIntData = 2;
+            //    else if (angle > 45 && angle <= 90) actionIntData = 2;
+            //    else if (angle > 90 && angle <= 135) actionIntData = 3;
+            //    else if (angle > 135 && angle <= 180) actionIntData = 4;
+            //    else actionIntData = 0;
+            //}
+            //actionIntData *= -(int)Mathf.Sign(startAngle);
+            //m_Animator.SetInteger(HashID.ActionIntData, actionIntData);
         }
 
 
@@ -138,7 +140,7 @@ namespace CharacterController
                     return true;
                 }
             }
-            if (Time.time > m_ActionStartTime +1f)
+            if (Time.time > m_ActionStartTime +0.75f)
                 return true;
             return false;
         }

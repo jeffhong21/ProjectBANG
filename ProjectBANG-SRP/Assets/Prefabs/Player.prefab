@@ -699,16 +699,15 @@ GameObject:
   - component: {fileID: 2984740713927345993}
   - component: {fileID: 1344037282883110068}
   - component: {fileID: 6728821054375862321}
-  - component: {fileID: 8880050838561965227}
   - component: {fileID: 4153653085202183914}
   - component: {fileID: 3907047660296731877}
   - component: {fileID: -29659977447482821}
   - component: {fileID: 241837900}
   - component: {fileID: 241837901}
   - component: {fileID: 1333040329}
-  - component: {fileID: 4309599875131230348}
   - component: {fileID: 645630507}
   - component: {fileID: 645630508}
+  - component: {fileID: 1656598469}
   m_Layer: 31
   m_Name: Player
   m_TagString: Player
@@ -824,19 +823,18 @@ MonoBehaviour:
   m_MaxCollisionCount: 100
   m_IdleRotationMultiplier: 2
   m_MovingStateName: Locomotion
-  m_AirborneStateName: Falling
+  m_AirborneStateName: Airborne
   m_Collisions: []
-  m_Debug: 1
+  m_Debug: 0
   DebugGroundCheck: 0
   DebugCollisions: 0
   DrawDebugLine: 1
   displayMovement: 0
   displayPhysics: 0
   displayAnimations: 0
-  displayActions: 0
+  displayActions: 1
   m_Actions:
-  - {fileID: 4309599875131230348}
-  - {fileID: 8880050838561965227}
+  - {fileID: 1656598469}
   - {fileID: 3907047660296731877}
   - {fileID: -29659977447482821}
   - {fileID: 6728821054375862321}
@@ -860,28 +858,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b5b38972af4340e8a362154d8c837df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_DebugStateChanges: 0
-  m_HorizontalInputDampTime: 0.1
-  m_ForwardInputDampTime: 0.1
-  m_AnimatorStateData:
-  - stateName: 
-    transitionDuration: 0
-    speedMultiplier: 0
-    nameHash: 0
-  - stateName: 
-    transitionDuration: 0
-    speedMultiplier: 0
-    nameHash: 0
-  State_1:
-    stateName: 
-    transitionDuration: 0
-    speedMultiplier: 1
-    nameHash: 0
-  State_2:
-    stateName: 
-    transitionDuration: 0
-    speedMultiplier: 1
-    nameHash: 0
+  debugStateChanges: 0
+  horizontalInputDampTime: 0.1
+  forwardInputDampTime: 0.1
+  animatorStateData: []
+  hasMatchTarget: 0
 --- !u!114 &2764320986180624436
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -976,7 +957,7 @@ MonoBehaviour:
   m_SelectPlayerKeyCode: 112
   m_LockCameraRotation: 108
   m_DebugBreakKeyCode: 13
-  DebugMode: 1
+  DebugMode: 0
 --- !u!114 &5220774159141849524
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1622,17 +1603,14 @@ MonoBehaviour:
   m_StartEffect: {fileID: 0}
   m_EndEffect: {fileID: 0}
   m_Debug: 1
-  m_MoveToVaultDistance: 2
-  m_VaultLayers:
+  angleThreshold: 30
+  checkHeight: 0.4
+  startDistance: 2
+  minHeight: 0.4
+  maxHeight: 2
+  detectLayers:
     serializedVersion: 2
-    m_Bits: 33554432
-  m_MaxHeight: 2
-  m_MaxVaultDepth: 1
-  m_MinMoveSpeed: 0.5
-  m_HorizontalOffset: 0.1
-  m_VerticalOffset: 0
-  m_StartMatchTarget: 0.16
-  m_StopMatchTarget: 0.3
+    m_Bits: 0
 --- !u!114 &377158178582756262
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2101,17 +2079,14 @@ MonoBehaviour:
   m_StartEffect: {fileID: 0}
   m_EndEffect: {fileID: 0}
   m_Debug: 0
-  m_MoveToVaultDistance: 1
-  m_VaultLayers:
+  angleThreshold: 30
+  checkHeight: 0.4
+  startDistance: 2
+  minHeight: 0.4
+  maxHeight: 2
+  detectLayers:
     serializedVersion: 2
-    m_Bits: 33554432
-  m_MaxHeight: 2
-  m_MaxVaultDepth: 1
-  m_MinMoveSpeed: 0.5
-  m_HorizontalOffset: 0.1
-  m_VerticalOffset: 0
-  m_StartMatchTarget: 0.28
-  m_StopMatchTarget: 0.32
+    m_Bits: 0
 --- !u!114 &8866226260200197213
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2293,52 +2268,6 @@ MonoBehaviour:
   m_Force: 10
   m_RecurrenceDelay: 0.2
   jumpHeight: 2
---- !u!114 &8880050838561965227
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2864552554060033022}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d3005a58794a74e28bd4e9600cba665f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IsActive: 0
-  m_StateName: 
-  m_LayerIndex: 0
-  m_ActionID: 0
-  m_TransitionDuration: 0.2
-  m_StartType: 2
-  m_StopType: 3
-  m_InputNames:
-  - Space
-  m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 0
-  m_StartAudioClips: []
-  m_StopAudioClips: []
-  m_StartEffect: {fileID: 0}
-  m_EndEffect: {fileID: 0}
-  m_Debug: 0
-  m_TakeCoverDistance: 2
-  m_CoverLayer:
-    serializedVersion: 2
-    m_Bits: 201326592
-  m_CoverMovementSpeed: 1
-  m_TakeCoverRotationSpeed: 4
-  m_ObjectDetectorHeight: 0.5
-  m_HighCoverHeight: 1.35
-  m_SideCoverDistance: 0.5
-  alignmentAngle: 0
-  rotationCheckPosition: {x: 0, y: 0, z: 0}
-  m_DebugSettings:
-    m_GizmoSize: 0.1
-    m_CubeSize: {x: 0.1, y: 0.1, z: 0.1}
-    m_CenterColor: {r: 0, g: 1, b: 1, a: 1}
-    m_LeftColor: {r: 0, g: 1, b: 0, a: 1}
-    m_RightColor: {r: 1, g: 0, b: 0, a: 1}
-    m_ChangeStateColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!114 &4153653085202183914
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2374,7 +2303,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2864552554060033022}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 24f4915bd11574121a2a533c85cb7cc1, type: 3}
   m_Name: 
@@ -2498,7 +2427,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IsActive: 0
-  m_StateName: 
+  m_StateName: Crouch.Crouch
   m_LayerIndex: 0
   m_ActionID: 0
   m_TransitionDuration: 0.2
@@ -2507,56 +2436,12 @@ MonoBehaviour:
   m_InputNames:
   - C
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 0
-  m_StartAudioClips: []
-  m_StopAudioClips: []
-  m_StartEffect: {fileID: 0}
-  m_EndEffect: {fileID: 0}
-  m_Debug: 0
---- !u!114 &4309599875131230348
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2864552554060033022}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 959d45370f7bd410aac9022cb244abdc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IsActive: 0
-  m_StateName: Climb.Climb1M
-  m_LayerIndex: 0
-  m_ActionID: 0
-  m_TransitionDuration: 0.2
-  m_StartType: 2
-  m_StopType: 0
-  m_InputNames:
-  - Space
-  m_SpeedMultiplier: 1
   m_ApplyBuiltinRootMotion: 1
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
   m_EndEffect: {fileID: 0}
-  m_Debug: 1
-  checkHeight: 0.4
-  startDistance: 2
-  minHeight: 0.4
-  maxHeight: 2
-  collisionLayers:
-    serializedVersion: 2
-    m_Bits: 134217728
-  matchTarget:
-    enableMatchTarget: 0
-    stateName: 
-    matchTargetOffset: {x: 0, y: 0, z: 0}
-    startMatchTarget: 0.3
-    endMatchTarget: 0.4
-    avatarTarget: 0
-    positionXYZWeight: {x: 1, y: 1, z: 1}
-    rotationWeight: 0
+  m_Debug: 0
 --- !u!114 &645630507
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2614,6 +2499,42 @@ MonoBehaviour:
   m_EndEffect: {fileID: 0}
   m_Debug: 0
   maxInputCount: 4
+--- !u!114 &1656598469
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2864552554060033022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a33cd0f36f52540f39f9a4bf04b5add6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: 
+  m_LayerIndex: 0
+  m_ActionID: 0
+  m_TransitionDuration: 0.2
+  m_StartType: 2
+  m_StopType: 0
+  m_InputNames:
+  - Space
+  m_SpeedMultiplier: 1
+  m_ApplyBuiltinRootMotion: 1
+  m_StartAudioClips: []
+  m_StopAudioClips: []
+  m_StartEffect: {fileID: 0}
+  m_EndEffect: {fileID: 0}
+  m_Debug: 1
+  angleThreshold: 30
+  checkHeight: 0.4
+  startDistance: 2
+  minHeight: 0.4
+  maxHeight: 2
+  detectLayers:
+    serializedVersion: 2
+    m_Bits: 234881024
 --- !u!1 &2864573851192578744
 GameObject:
   m_ObjectHideFlags: 0
@@ -3285,7 +3206,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 7f9aeef99258148af944d6a2080b5913, type: 2}
+  - {fileID: 2100000, guid: d12f86255b2214c06b1516cd94c3c825, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

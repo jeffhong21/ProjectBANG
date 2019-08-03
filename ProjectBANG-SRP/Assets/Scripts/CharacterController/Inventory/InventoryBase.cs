@@ -194,6 +194,7 @@
 
         public abstract Item RemoveItemType( ItemType itemType, int slotIndex );
 
+
         protected Item InternalRemoveItemType( ItemType itemType )
         {
             float existingAmount;
@@ -301,6 +302,8 @@
 
         public void UseItem( ItemType itemType, float count )
         {
+            InternalUseItem(itemType, count);
+
             float existingAmount;
             if (!m_ItemTypeCount.TryGetValue(itemType, out existingAmount)) {
                 Debug.LogError("Error: Trying top use " + itemType.name + " when ItemType does not exist.");
@@ -308,6 +311,12 @@
             }
 
             m_ItemTypeCount[itemType] = Mathf.Clamp(existingAmount + count, 0, itemType.Capacity);
+        }
+
+
+        protected void InternalUseItem( ItemType itemType, float count )
+        {
+            EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnInventoryUseItem, itemType, count);
         }
 
 
@@ -319,7 +328,17 @@
 
 
 
+        protected void InternalEquipItem(Item item)
+        {
+            //  Execute the equip event.
+            EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnInventoryEquipItem, item);
+        }
 
+
+        protected void InternalUnequipCurrentItem(Item lastEquippedItem)
+        {
+            EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnInventoryUnequipItem, lastEquippedItem);
+        }
 
 
 

@@ -167,7 +167,7 @@
                 m_EquipedItem.SetActive(true);
 
                 //  Execute the equip event.
-                EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnInventoryEquipItem, item);
+                InternalEquipItem(item);
             }
             return item;
         }
@@ -209,8 +209,10 @@
                 m_LastEquipedItem = m_EquipedItem;
                 m_EquipedItem = null;
 
+
                 //  Execute the equip event.
-                EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnInventoryUnequipItem, m_LastEquipedItem);
+                InternalUnequipCurrentItem(m_LastEquipedItem);
+
             }
         }
 

@@ -49,7 +49,6 @@ namespace CharacterController
         protected virtual void Start()
         {
             collisionLayers = m_Layers.SolidLayers;
-            rayOrigin = m_Transform.position + (Vector3.up * checkHeight) + (m_Transform.forward * (m_CapsuleCollider.radius - 0.1f));
         }
 
 
@@ -59,7 +58,8 @@ namespace CharacterController
                 return false;
             }
 
-            rayOrigin = m_Transform.position + (Vector3.up * checkHeight) + (m_Transform.forward * (m_CapsuleCollider.radius - 0.1f));
+            //rayOrigin = m_Transform.position + (Vector3.up * checkHeight) + (m_Transform.forward * (m_CapsuleCollider.radius - 0.1f));
+            rayOrigin = m_Transform.position + (Vector3.up * checkHeight);
 
             if (Physics.Raycast(rayOrigin, m_Transform.forward, out objectHit, startDistance, collisionLayers)) {
                 return CheckHeightRequirement(objectHit.point);
@@ -78,28 +78,32 @@ namespace CharacterController
 
             reachOffset = m_CapsuleCollider.radius + 0.1f;
             objectNormal = objectHit.normal;
-            DeterminePositions();
+
+            startPosition = m_Transform.position;
+            endEdgeOffset = endEdge + objectNormal * reachOffset;
+            endPosition = endEdge - objectNormal * m_CapsuleCollider.radius;
 
 
 
             //  Cache variables
-            m_ColliderHeight = m_CapsuleCollider.height;
-            m_ColliderCenter = m_CapsuleCollider.center;
-
             cachedIsKinamatic = m_Rigidbody.isKinematic;
             m_Rigidbody.isKinematic = true;
-            initialVelocity = (2 * height) / Mathf.Pow(0.4f, 2);
-            verticalVelocity = Mathf.Abs(initialVelocity) * timeToApex;
-            Vector3 velocity = CalculateVelocity(endPosition, startPosition, timeToApex);
-            velocity.y = verticalVelocity;
+
+            //// Set velocity.
+            //initialVelocity = (2 * height) / Mathf.Pow(0.4f, 2);
+            //verticalVelocity = Mathf.Abs(initialVelocity) * timeToApex;
+            //Vector3 velocity = CalculateVelocity(endPosition, startPosition, timeToApex);
+            //velocity.y = verticalVelocity;
             //m_Rigidbody.velocity = velocity;
 
+            EventHandler.ExecuteEvent(gameObject, "OnSetMatchTarget", endPosition, Quaternion.identity);
         }
 
 
         public override bool UpdateRotation()
         {
-
+            Quaternion rotation = Quaternion.FromToRotation(m_Transform.forward, -objectNormal) * m_Transform.rotation;
+            m_Rigidbody.MoveRotation(Quaternion.Slerp(rotation, m_Transform.rotation, m_DeltaTime * m_Controller.RotationSpeed));
             return false;
         }
 
@@ -107,12 +111,20 @@ namespace CharacterController
         public override bool UpdateMovement()
         {
             var heightDistance = endEdgeOffset.y - m_Transform.position.y;
-            Vector3 targetPosition = Vector3.MoveTowards(m_Transform.position, heightDistance >= 0f ? endEdgeOffset : endPosition, m_DeltaTime * 8);
+
+            Vector3 targetPosition = Vector3.MoveTowards(m_Transform.position, heightDistance >= 0f ? endEdgeOffset : endPosition, m_DeltaTime * 10);
 
             m_Rigidbody.MovePosition(targetPosition);
 
-            if (matchTarget.enableMatchTarget)
-                m_Animator.MatchTarget(targetPosition, Quaternion.identity, matchTarget.avatarTarget, matchTarget.weightMask, matchTarget.startMatchTarget, matchTarget.endMatchTarget);
+
+
+            //if (matchTarget.enableMatchTarget)
+            //    m_Animator.MatchTarget(targetPosition, Quaternion.identity, matchTarget.avatarTarget, matchTarget.weightMask, matchTarget.startMatchTarget, matchTarget.endMatchTarget);
+
+
+            if ((endPosition - m_Transform.position).sqrMagnitude < 0.1f){
+                m_Rigidbody.isKinematic = cachedIsKinamatic;
+            }
 
             return false;
         }
@@ -135,15 +147,8 @@ namespace CharacterController
                 return true;
             }
 
-            if (m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(m_StateName + "." + m_DestinationStateName)) {
-                if (m_Animator.IsInTransition(0)) {
-                    return true;
-                }
-            }
 
-            //if( (endPosition - m_Transform.position).sqrMagnitude <= 0.1f) {
 
-            //}
             return Time.time > m_ActionStartTime + 2;
         }
 
@@ -167,30 +172,6 @@ namespace CharacterController
 
 
         #endregion
-
-
-
-
-
-        protected void DeterminePositions()
-        {
-            startPosition = m_Transform.position;
-
-            endEdgeOffset = endEdge + objectNormal * reachOffset;
-            endPosition = endEdge - objectNormal * m_CapsuleCollider.radius;
-        }
-
-
-
-
-
-        protected Vector3 DetermineReachOffsets(Vector3 edge)
-        {
-            reachOffset = m_CapsuleCollider.radius + 0.1f;
-            objectNormal = objectHit.normal;
-
-             return edge + objectNormal * reachOffset;
-        }
 
 
 
@@ -224,31 +205,31 @@ namespace CharacterController
 
 
 
-        protected Vector3 CalculateVelocity(Vector3 target, Vector3 origin, float time)
-        {
-            //  Define the distance x and y first.
-            Vector3 distance = target - origin;
-            Vector3 distanceXZ = distance;
-            distanceXZ.y = 0;
+        //protected Vector3 CalculateVelocity( Vector3 target, Vector3 origin, float time )
+        //{
+        //    //  Define the distance x and y first.
+        //    Vector3 distance = target - origin;
+        //    Vector3 distanceXZ = distance;
+        //    distanceXZ.y = 0;
 
 
-            //  Create a float that repsents our distance
-            float verticalDistance = distance.y;              //  vertical distance
-            float horizontalDistance = distanceXZ.magnitude;   //  horizontal distance
+        //    //  Create a float that repsents our distance
+        //    float verticalDistance = distance.y;              //  vertical distance
+        //    float horizontalDistance = distanceXZ.magnitude;   //  horizontal distance
 
 
-            //  Calculate the initial velocity.  This is distance / time.
-            float velocityXZ = horizontalDistance / time;
-            float velocityY = (verticalDistance / time) + 0.5f * Mathf.Abs(Physics.gravity.y) * time;
+        //    //  Calculate the initial velocity.  This is distance / time.
+        //    float velocityXZ = horizontalDistance / time;
+        //    float velocityY = (verticalDistance / time) + 0.5f * Mathf.Abs(Physics.gravity.y) * time;
 
 
 
-            Vector3 result = distanceXZ.normalized;
-            result *= velocityXZ;
-            result.y = velocityY;
+        //    Vector3 result = distanceXZ.normalized;
+        //    result *= velocityXZ;
+        //    result.y = velocityY;
 
-            return result;
-        }
+        //    return result;
+        //}
 
 
 

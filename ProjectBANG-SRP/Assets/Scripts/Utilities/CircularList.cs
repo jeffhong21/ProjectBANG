@@ -3,8 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CircularList<T>
+public class CircularList<T> : IEnumerator<T>
 {
+    int m_First;
+    int m_Count;
+    T[] m_Elements;
+    T m_Current;
+    int index = -1;
+
     public CircularList(int capacity)
     {
         m_Elements = new T[capacity];
@@ -20,10 +26,17 @@ public class CircularList<T>
         get { return m_Count; }
     }
 
+    public T Current => m_Current;
+
+    object IEnumerator.Current => m_Current;
+
+
+
+
     public void Add(T item)
     {
-        var index = (m_First + m_Count) % m_Elements.Length;
-        m_Elements[index] = item;
+        var i = (m_First + m_Count) % m_Elements.Length;
+        m_Elements[i] = item;
 
         if (m_Count == m_Elements.Length)
             m_First = (m_First + 1) % m_Elements.Length;
@@ -61,13 +74,37 @@ public class CircularList<T>
         get { return m_First; }
     }
 
+
+
     public void Reset(int headIndex, int count)
     {
         m_First = headIndex;
         m_Count = count;
+        
     }
 
-    int m_First;
-    int m_Count;
-    T[] m_Elements;
+    public bool MoveNext()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Reset()
+    {
+        index = -1;
+    }
+
+    public void Dispose()
+    {
+        throw new NotImplementedException();
+    }
+
+    public T NextOrFirst()
+    {
+        return m_Elements[(index + 1) % m_Elements.Length];
+    }
+
+    public T PreviousOrLast()
+    {
+        return m_Elements[(index + m_Elements.Length - 1) % m_Elements.Length];
+    }
 }

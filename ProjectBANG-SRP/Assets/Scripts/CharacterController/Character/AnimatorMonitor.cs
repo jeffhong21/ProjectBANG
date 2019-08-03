@@ -12,32 +12,34 @@
     [RequireComponent(typeof(Animator))]
     public class AnimatorMonitor : MonoBehaviour
     {
-
-        private readonly Dictionary<int, string> m_StateNameHash = new Dictionary<int, string>();
-        private readonly Dictionary<int, AnimatorState> m_AnimatorStates = new Dictionary<int, AnimatorState>();
+        public event Action<Vector3, Quaternion> OnMatchTarget;
 
 
-        protected AnimatorStateData[] animatorStateData = new AnimatorStateData[0];
+        private readonly Dictionary<int, string> allStateNameHash = new Dictionary<int, string>();
+        private readonly Dictionary<int, AnimatorState> allAnimatorStateHash = new Dictionary<int, AnimatorState>();
+
+
+
 
 
         //
         // Fields
         //
         [SerializeField]
-        protected bool m_DebugStateChanges;
+        protected bool debugStateChanges;
         [SerializeField]
-        protected float m_HorizontalInputDampTime = 0.1f;
+        protected float horizontalInputDampTime = 0.1f;
         [SerializeField]
-        protected float m_ForwardInputDampTime = 0.1f;
+        protected float forwardInputDampTime = 0.1f;
         [SerializeField]
-        protected AnimatorStateData[] m_AnimatorStateData = new AnimatorStateData[0];
+        protected AnimatorStateData[] animatorStateData = new AnimatorStateData[0];
 
-
-        [SerializeField, HideInInspector]
-        private AnimatorStateData State_1 = new AnimatorStateData("", 0);
-        [SerializeField, HideInInspector]
-        private AnimatorStateData State_2 = new AnimatorStateData("", 0);
-
+        [Header("Match Target Attributes")]
+        [SerializeField]
+        private bool hasMatchTarget;
+        private Vector3 matchPosition;
+        private Quaternion matchRotation;
+        private bool applyRootMotion;
 
         protected Animator m_Animator;
         protected AnimatorController m_AnimatorController;
@@ -59,34 +61,49 @@
             get { return Input.GetAxis("Vertical"); }
         }
 
-        public Vector3 MatchTargetPosition { get; set; }
-        public Quaternion MatchTargetRotation { get; set; }
+
+
+        public bool HasMatchTarget {  get { return hasMatchTarget; } }
+
 
         //
         // Methods
         //
         private void Awake()
 		{
+            UnityEditor.AssetDatabase.Refresh();
+
+            EventHandler.RegisterEvent<Vector3, Quaternion>(gameObject, "OnSetMatchTarget", SetMatchTarget);
+
+
             m_Animator = GetComponent<Animator>();
             m_AnimatorController = m_Animator.runtimeAnimatorController as AnimatorController;
             m_Controller = GetComponent<CharacterLocomotion>();
+
+
+            StateBehavior[] stateBehaviors = m_Animator.GetBehaviours<StateBehavior>();
+            if(stateBehaviors.Length > 0) {
+                for (int i = 0; i < stateBehaviors.Length; i++) {
+                    stateBehaviors[i].Initialize(this);
+                }
+            } else {
+                Debug.Log("Animator has no state behaviors.");
+            }
+
+
         }
 
+        private void OnDestroy()
+        {
+            EventHandler.UnregisterEvent<Vector3, Quaternion>(gameObject, "OnSetMatchTarget", SetMatchTarget);
+        }
 
 
         private void Start()
         {
-            m_AnimatorStateData = new AnimatorStateData[m_Animator.layerCount];
+            animatorStateData = new AnimatorStateData[m_Animator.layerCount];
             for (int i = 0; i < m_AnimatorController.layers.Length; i++)
             {
-                //if (m_DebugStateChanges)
-                //{
-                //    Debug.LogFormat("({2}) Animator Layer name: <b>{0}</b> | AnimatorController layer name: <b>{1}</b>",
-                //                    m_Animator.GetLayerName(i),
-                //                    m_AnimatorController.layers[i].name,
-                //                    i);
-                //}
-
                 AnimatorStateMachine stateMachine = m_AnimatorController.layers[i].stateMachine;
                 AnimatorState defaultState = stateMachine.defaultState;
                 if (defaultState == null)
@@ -97,53 +114,21 @@
                 //string stateName = stateMachine.name + "." + defaultState.name;
                 string stateName = defaultState.name;
 
-                m_AnimatorStateData[i] = new AnimatorStateData(defaultState.nameHash, stateName, 0.2f);
-            }   
-            RegisterAllAnimatorStateIDs();
-
-
-            StateBehavior[] stateBehaviors = m_Animator.GetBehaviours<StateBehavior>();
-            for (int i = 0; i < stateBehaviors.Length; i++) {
-                stateBehaviors[i].Initialize(this);
+                animatorStateData[i] = new AnimatorStateData(defaultState.nameHash, stateName, 0.2f);
             }
-        }
 
 
-        public void RegisterAllAnimatorStateIDs(bool debugMsg = false)
-        {
-            if(m_Animator == null) m_Animator = GetComponent<Animator>();
             AnimatorController animatorController = m_Animator.runtimeAnimatorController as AnimatorController;
-
-
-            foreach (AnimatorControllerLayer layer in animatorController.layers){
+            foreach (AnimatorControllerLayer layer in animatorController.layers) {
                 RegisterAnimatorStates(layer.stateMachine, layer.name);
             }
 
-            //m_StateNameHash.Keys.OrderBy(k => k).ToDictionary(k =>k, k => m_StateNameHash[k]);
 
-            //m_StateNameHash.OrderByDescending(r => r.Value).ThenBy(r => r.Key);
-            m_StateNameHash.OrderByDescending(r => r.Value);
-
-            if (debugMsg)
-            {
-                var sortedList = m_StateNameHash.ToList();
-                sortedList.Sort(( x, y ) => string.Compare(x.Value, y.Value, StringComparison.CurrentCulture));
-
-                string debugStateInfo = "";
-                debugStateInfo += "<b>State Name Hash: </b>\n";
-
-                for (int i = 0; i < sortedList.Count; i++) {
-                    debugStateInfo += "<b>StateName:</b> " + sortedList[i].Value + " | <b>HashID:</b> " + sortedList[i].Key + "\n";
-                }
-
-                    
-                debugStateInfo += "\n<b>Total State Count: " + stateCount + " </b>\n";
-
-                stateCount = 0;
-                Debug.Log(debugStateInfo);
-            }
 
         }
+
+
+
 
 
         private void RegisterAnimatorStates(AnimatorStateMachine stateMachine, string parentState)
@@ -155,18 +140,18 @@
                 int shortNameHash = Animator.StringToHash(stateName);
                 int fullPathHash = Animator.StringToHash(fullPathName);
 
-                if (m_StateNameHash.ContainsKey(shortNameHash) == false)
+                if (allStateNameHash.ContainsKey(shortNameHash) == false)
                 {
-                    m_StateNameHash.Add(shortNameHash, stateName);
+                    allStateNameHash.Add(shortNameHash, stateName);
                 }
-                if (m_StateNameHash.ContainsKey(fullPathHash) == false)
+                if (allStateNameHash.ContainsKey(fullPathHash) == false)
                 {
-                    m_StateNameHash.Add(fullPathHash, fullPathName);
+                    allStateNameHash.Add(fullPathHash, fullPathName);
                 }
 
-                if (m_StateNameHash.ContainsKey(fullPathHash) == false)
+                if (allStateNameHash.ContainsKey(fullPathHash) == false)
                 {
-                    m_AnimatorStates.Add(fullPathHash, childState.state);
+                    allAnimatorStateHash.Add(fullPathHash, childState.state);
                 }
 
 
@@ -195,12 +180,12 @@
 
                 if(m_Animator.IsInTransition(layerIndex) )
                 {
-                    //if (m_DebugStateChanges)
+                    //if (debugStateChanges)
                         //Debug.LogFormat("{0} -> {1}", GetShortPathName(animatorStateInfo.shortNameHash), GetShortPathName(nextAnimatorStateInfo.shortNameHash));
 
-                    if(GetStateName(nextAnimatorStateInfo.shortNameHash) == m_AnimatorStateData[layerIndex].StateName)
+                    if(GetStateName(nextAnimatorStateInfo.shortNameHash) == animatorStateData[layerIndex].StateName)
                     {
-                        //if(m_DebugStateChanges)
+                        //if(debugStateChanges)
                             //Debug.LogFormat("<color=yellow> {0} </color> is exiting state", GetStateName(animatorStateInfo.fullPathHash) );
                     }
                 }
@@ -216,11 +201,53 @@
 
         public string GetStateName(int hash)
         {
-            if (m_StateNameHash.ContainsKey(hash)){
-                return m_StateNameHash[hash];
+            if (allStateNameHash.ContainsKey(hash)){
+                return allStateNameHash[hash];
             }
             return null;
         }
+
+
+        protected void SetMatchTarget( Vector3 position, Quaternion rotation )
+        {
+            hasMatchTarget = true;
+            matchPosition = position;
+            matchRotation = rotation;
+            applyRootMotion = m_Animator.applyRootMotion;
+        }
+
+
+        public void ResetMatchTarget()
+        {
+            hasMatchTarget = false;
+            m_Animator.applyRootMotion = applyRootMotion;
+            matchPosition = Vector3.zero;
+            matchRotation = Quaternion.identity;
+        }
+
+
+        public bool MatchTarget(Vector3 position, Quaternion rotation,  AvatarTarget targetBodyPart, MatchTargetWeightMask weightMask, float startTime, float endTime, bool force = false )
+        {
+            SetMatchTarget(position, rotation);
+            return MatchTarget(matchPosition, matchRotation, targetBodyPart, weightMask, startTime, endTime, force);
+        }
+
+
+        public bool MatchTarget( AvatarTarget targetBodyPart, MatchTargetWeightMask weightMask, float startTime, float endTime,  bool force = false)
+        {
+            if (hasMatchTarget == false) return false;
+
+            if (!m_Animator.isMatchingTarget || force) {
+                m_Animator.MatchTarget(matchPosition, matchRotation, targetBodyPart, weightMask, startTime, endTime);
+                return true;
+            }
+            return false;
+        }
+
+
+
+
+
 
 
         public virtual bool DetermineState(int layer, AnimatorStateData defaultState, bool checkAbilities, bool baseStart)
@@ -250,13 +277,13 @@
 
         public void SetHorizontalInputValue(float value)
         {
-            m_Animator.SetFloat(HashID.HorizontalInput, value, m_HorizontalInputDampTime,  Time.deltaTime);
+            m_Animator.SetFloat(HashID.HorizontalInput, value, horizontalInputDampTime,  Time.deltaTime);
         }
 
 
         public void SetForwardInputValue(float value)
         {
-            m_Animator.SetFloat(HashID.ForwardInput, value, m_ForwardInputDampTime,  Time.deltaTime);
+            m_Animator.SetFloat(HashID.ForwardInput, value, forwardInputDampTime,  Time.deltaTime);
         }
 
         public void SetActionID(int value)
@@ -287,20 +314,58 @@
 
 
 
-
-
-
-
-
-
-
         #region Debug
+
+
+        public void RegisterAllAnimatorStateIDs( bool debugMsg = false )
+        {
+            if (m_Animator == null) m_Animator = GetComponent<Animator>();
+            AnimatorController animatorController = m_Animator.runtimeAnimatorController as AnimatorController;
+
+
+            foreach (AnimatorControllerLayer layer in animatorController.layers) {
+                RegisterAnimatorStates(layer.stateMachine, layer.name);
+            }
+
+            if (debugMsg) DebugLogAnimatorStates();
+
+        }
+
+        protected void DebugLogAnimatorStates()
+        {
+            //allStateNameHash.Keys.OrderBy(k => k).ToDictionary(k =>k, k => allStateNameHash[k]);
+
+            //allStateNameHash.OrderByDescending(r => r.Value).ThenBy(r => r.Key);
+            allStateNameHash.OrderByDescending(r => r.Value);
+
+            var sortedList = allStateNameHash.ToList();
+            sortedList.Sort(( x, y ) => string.Compare(x.Value, y.Value, StringComparison.CurrentCulture));
+
+            string debugStateInfo = "";
+            debugStateInfo += "<b>State Name Hash: </b>\n";
+
+            for (int i = 0; i < sortedList.Count; i++) {
+                debugStateInfo += "<b>StateName:</b> " + sortedList[i].Value + " | <b>HashID:</b> " + sortedList[i].Key + "\n";
+            }
+
+
+            debugStateInfo += "\n<b>Total State Count: " + stateCount + " </b>\n";
+
+            stateCount = 0;
+            Debug.Log(debugStateInfo);
+        }
+
+
+
+
+
+        
         GUIStyle guiStyle;
         GUIContent guiContent;
         private void OnGUI()
         {
             if (!Application.isPlaying) return;
-            if (m_DebugStateChanges == false) return;
+            if (debugStateChanges == false) return;
 
             if (guiStyle == null){
                 guiStyle = CharacterControllerUtility.GuiStyle;
@@ -324,7 +389,7 @@
             if (m_Animator.IsInTransition(layerIndex))
             {
                 var transitionStateInfo = m_Animator.GetAnimatorTransitionInfo(layerIndex);
-                //string nextState = m_StateNameHash[m_Animator.GetAnimatorTransitionInfo(layerIndex).fullPathHash];
+                //string nextState = allStateNameHash[m_Animator.GetAnimatorTransitionInfo(layerIndex).fullPathHash];
                 string nextState = GetStateName(m_Animator.GetNextAnimatorStateInfo(layerIndex).fullPathHash);
                 line++;
 
@@ -365,9 +430,9 @@
             string fullPathHash = animatorStateInfo.fullPathHash.ToString();
             string shortPathHash = animatorStateInfo.shortNameHash.ToString();
 
-            if (m_StateNameHash.ContainsKey(animatorStateInfo.fullPathHash))
+            if (allStateNameHash.ContainsKey(animatorStateInfo.fullPathHash))
             {
-                string stateName = m_StateNameHash[m_Animator.GetCurrentAnimatorStateInfo(layerIndex).shortNameHash];
+                string stateName = allStateNameHash[m_Animator.GetCurrentAnimatorStateInfo(layerIndex).shortNameHash];
                 //stateInfo = layerName + " | State Name: " + stateName + "  | fullPathHash <" + fullPathHash + ">, shortPathHash <" + shortPathHash + ">";
                 stateInfo = " °State Name: " + stateName + 
                             "  | Duration: " + animatorStateInfo.length + 

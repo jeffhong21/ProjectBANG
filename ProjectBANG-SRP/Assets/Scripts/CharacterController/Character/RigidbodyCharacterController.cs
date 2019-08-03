@@ -361,28 +361,33 @@ namespace CharacterController
         protected virtual void Move()
         {
 
+            //  Set the input vector, move direction and rotation angle based on the movement type.
             switch (m_MovementType) {
                 case (MovementType.Adventure):
 
                     m_InputVector = m_Transform.InverseTransformDirection(m_InputVector);
+
                     //m_MoveDirection = m_Transform.forward * m_InputVector.z;
                     m_MoveDirection = Vector3.SmoothDamp(m_MoveDirection, m_Transform.forward * m_InputVector.z, ref moveDirectionSmooth, 0.1f);
 
-                    m_RotationAngle = Mathf.Atan2(m_InputVector.x, m_InputVector.z) * Mathf.Rad2Deg;
+                    m_RotationAngle = Mathf.Atan2(m_InputVector.x, m_InputVector.z);
+                    m_RotationAngle = (float)Math.Round(m_RotationAngle, 2);
 
                     m_InputVector.z = Mathf.Abs(m_MoveDirection.x) + Mathf.Abs(m_MoveDirection.z);
+                    if(Mathf.Abs(m_RotationAngle) > 0.1f) m_InputVector.z = m_InputVector.z + Mathf.Abs(m_RotationAngle);
                     m_InputVector.x = 0;
 
+                    m_RotationAngle *= Mathf.Rad2Deg;
                     m_Speed = 1;
                     break;
 
                 case (MovementType.Combat):
 
-                    //m_MoveDirection = m_Transform.TransformDirection(m_InputVector);
-                    m_MoveDirection = Vector3.SmoothDamp(m_MoveDirection, m_Transform.TransformDirection(m_InputVector), ref moveDirectionSmooth, 0.1f);
-
                     Vector3 localDir = m_Transform.InverseTransformDirection(m_LookRotation * m_Transform.forward);
                     m_RotationAngle = Mathf.Atan2(localDir.x, localDir.z) * Mathf.Rad2Deg;
+
+                    //m_MoveDirection = m_Transform.TransformDirection(m_InputVector);
+                    m_MoveDirection = Vector3.SmoothDamp(m_MoveDirection, m_Transform.TransformDirection(m_InputVector), ref moveDirectionSmooth, 0.1f);
 
                     m_Speed = 0;
                     break;
@@ -609,6 +614,10 @@ namespace CharacterController
         /// </summary>
         protected virtual void UpdateRotation()
         {
+            if(Vector3.Angle(m_Transform.forward, m_LookRotation * m_Transform.forward) < 0 || Vector3.Angle(m_Transform.forward, m_LookRotation * m_Transform.forward) > 0) {
+                CharacterDebug.Log("<b><color=magenta>** Look Angle</color></b>", Vector3.Angle(m_Transform.forward, m_LookRotation * m_Transform.forward));
+            }
+
             float moveAmount = Mathf.Clamp01(Mathf.Abs(m_MoveDirection.x) + Mathf.Abs(m_MoveDirection.z));
             moveAmount = (float)Math.Round(moveAmount, 2);
             float rotationSpeed = Mathf.Lerp(m_RotationSpeed * m_IdleRotationMultiplier, m_RotationSpeed, moveAmount);
@@ -642,8 +651,7 @@ namespace CharacterController
 
 
 
-            float dot = Vector3.Dot(m_Transform.forward, m_MoveDirection.normalized);
-            CharacterDebug.Log("•dot", dot);
+
 
         }
 
@@ -696,9 +704,9 @@ namespace CharacterController
             {
                 m_Velocity -= Vector3.Project(m_MoveDirection, m_Transform.forward);
                 m_Velocity += (Gravity * m_GravityModifier) * m_DeltaTime;
-                Vector3 verticalVelocity = (m_Velocity - m_PreviousPosition) * m_DeltaTime;
-                verticalVelocity = Vector3.Project(verticalVelocity, Gravity);
-                m_Velocity += verticalVelocity;
+                //Vector3 verticalVelocity = (m_Velocity - m_PreviousPosition) * m_DeltaTime;
+                //verticalVelocity = Vector3.Project(verticalVelocity, Gravity);
+                //m_Velocity += verticalVelocity;
             }
 
             
@@ -721,15 +729,13 @@ namespace CharacterController
 
             m_Animator.SetFloat(HashID.Speed, Speed);
 
-            CharacterDebug.Log("•RotationAngle", m_RotationAngle);
-
             m_Animator.SetFloat(HashID.Rotation, Mathf.Clamp(m_RotationAngle, -2, 2), 0.1f, m_DeltaTime);
 
             m_Animator.SetBool(HashID.Moving, Moving);
 
             
-            m_AnimationMonitor.SetForwardInputValue(InputVector.z);
-            m_AnimationMonitor.SetHorizontalInputValue(InputVector.x);
+            m_AnimationMonitor.SetForwardInputValue(m_InputVector.z);
+            m_AnimationMonitor.SetHorizontalInputValue(m_InputVector.x);
         }
 
 
