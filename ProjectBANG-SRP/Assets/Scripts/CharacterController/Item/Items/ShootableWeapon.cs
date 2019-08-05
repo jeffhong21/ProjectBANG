@@ -3,57 +3,58 @@
     using UnityEngine;
     using System.Collections;
 
-    public class ShootableWeapon : Item, IUseableItem, IReloadableItem
+    [RequireComponent(typeof(Item))]
+    public class ShootableWeapon : MonoBehaviour, IUseableItem, IReloadableItem
     {
         //
         // Fields
         //
-        [Header("--  Shootable Weapon Settings --")]
-        [SerializeField]
-        protected Transform m_FirePoint;
-        [SerializeField]
-        protected float m_FireRate = 1;                 //  The number of shots per second
-        [SerializeField]
-        protected int m_FireCount = 1;
-        [SerializeField]
-        protected int m_CurrentAmmo = 30;
-        [SerializeField]
-        protected int m_MaxAmmo = 30;
-        [SerializeField]
-        protected bool m_AutoReload;
-        [SerializeField, Range(0, 1)]
-        protected float m_RecoilAmount = 0.1f;
-        [SerializeField, Range(0, 30)]
-        protected float m_RotationRecoilAmount = 4f;
-        [SerializeField, Range(0,1)]
-        protected float m_Spread = 0.01f;
-        [SerializeField]
-        protected GameObject m_Smoke;
-        [SerializeField]
-        protected GameObject m_MuzzleFlash;
-        [SerializeField]
-        protected Transform m_SmokeLocation;
-        [SerializeField]
-        protected AudioClip[] m_FireSounds = new AudioClip[0];
-        [SerializeField]
-        protected float m_FireSoundDelay = 0.1f;
-        [SerializeField]
-        protected float m_DamageAmount = 10;
-        [SerializeField]
-        protected float m_ImpactForce = 5;
-        [SerializeField]
-        protected float m_FireRange = float.MaxValue;
-        [SerializeField]
-        protected LayerMask m_ImpactLayers = -1;
-        [SerializeField]
-        protected GameObject m_Tracer;
-        [SerializeField]
-        protected GameObject m_Projectile;
+        //[Header("--  Shootable Weapon Settings --")]
+        [Tooltip(" ")]
+        [SerializeField] protected Transform m_FirePoint;
+        [Tooltip("Tooltip")]
+        [SerializeField] protected float m_FireRate = 1;                 //  The number of shots per second
+        [Tooltip("The number of rounds to fire in a single shot.")]
+        [SerializeField] protected int m_FireCount = 1;
+
+        [SerializeField] protected int m_CurrentAmmo = 30;
+        [Tooltip("Tooltip")]
+        [SerializeField] protected int m_MaxAmmo = 30;
+
+        [SerializeField] protected bool m_AutoReload;
+        [Range(0, 1)]
+        [SerializeField] protected float m_RecoilAmount = 0.1f;              //  REMOVE
+        [Range(0, 30)]
+        [SerializeField] protected float m_RotationRecoilAmount = 4f;        //  REMOVE
+        [Range(0,1)]
+        [SerializeField] protected float m_Spread = 0.01f;               //  REMOVE
+
+        [SerializeField] protected GameObject m_Smoke;
+
+        [SerializeField] protected GameObject m_MuzzleFlash;
+
+        [SerializeField] protected Transform m_SmokeLocation;
+
+        [SerializeField] protected AudioClip[] m_FireSounds = new AudioClip[0];
+
+        [SerializeField] protected float m_FireSoundDelay = 0.1f;
+
+        [SerializeField] protected float m_DamageAmount = 10;
+
+        [SerializeField] protected float m_ImpactForce = 5;
+
+        [SerializeField] protected float m_FireRange = float.MaxValue;
+        [Tooltip("A LayerMask of the layers that can be hit when fired at.")]
+        [SerializeField] protected LayerMask m_ImpactLayers = -1;
+
+        [SerializeField] protected GameObject m_Tracer;
+
+        [SerializeField] protected GameObject m_Projectile;
 
         [Header("-- Decals --")]
-        [SerializeField]
+        
         protected GameObject m_DefaultDecal;
-        [SerializeField]
+        
         protected GameObject m_DefaultDust;
 
 
@@ -77,7 +78,7 @@
         private Vector3 m_LookSourceDirection;
         private Vector3 m_TargetDirection;
 
-
+        protected GameObject m_Character;
 
         public int CurrentAmmo{
             get { return m_CurrentAmmo; }
@@ -93,60 +94,61 @@
         //
         // Methods
         //
-        protected override void Awake()
+        protected void Awake()
         {
-            base.Awake();
+            m_Character = gameObject;
+
             if (m_CurrentAmmo > m_MaxAmmo)
                 m_CurrentAmmo = m_MaxAmmo;
 
 
 
-            if (m_Smoke != null){
-                m_Smoke = Instantiate(m_Smoke, m_Transform);
-                m_Smoke.transform.localPosition = m_SmokeLocation.localPosition;
-                m_Smoke.transform.localRotation = m_SmokeLocation.localRotation;
-                m_Smoke.SetActive(false);
-            }
-            if (m_MuzzleFlash != null){
-                m_MuzzleFlash = Instantiate(m_MuzzleFlash, m_Transform);
-                m_MuzzleFlash.transform.localPosition = m_FirePoint.localPosition;
-                m_MuzzleFlash.transform.localRotation = m_FirePoint.localRotation;
-                m_MuzzleFlash.SetActive(false);
-            }
+            //if (m_Smoke != null){
+            //    m_Smoke = Instantiate(m_Smoke, m_Transform);
+            //    m_Smoke.transform.localPosition = m_SmokeLocation.localPosition;
+            //    m_Smoke.transform.localRotation = m_SmokeLocation.localRotation;
+            //    m_Smoke.SetActive(false);
+            //}
+            //if (m_MuzzleFlash != null){
+            //    m_MuzzleFlash = Instantiate(m_MuzzleFlash, m_Transform);
+            //    m_MuzzleFlash.transform.localPosition = m_FirePoint.localPosition;
+            //    m_MuzzleFlash.transform.localRotation = m_FirePoint.localRotation;
+            //    m_MuzzleFlash.SetActive(false);
+            //}
 
             m_fireSoundSecondsDelay = new WaitForSeconds(m_FireSoundDelay);
         }
 
-        public override void Initialize(Inventory inventory)
-        {
-            base.Initialize(inventory);
+        //public override void Initialize(InventoryBase inventory)
+        //{
+        //    base.Initialize(inventory);
 
-            m_Rotation = m_Transform.parent.localRotation;
-        }
-
-
-		private void LateUpdate()
-		{
-            if(m_Transform.localPosition != Vector3.zero){
-                m_RecoilTargetPosition = Vector3.SmoothDamp(m_Transform.localPosition, Vector3.zero, ref m_RecoilSmoothDampVelocity, 0.12f);
-                m_Transform.localPosition = Vector3.Lerp(m_RecoilTargetPosition, Vector3.zero, Time.deltaTime * 2f);
-            }
-
-            if(m_RecoilAngle > 0 && m_RecoilAmount < 0){
-                m_RecoilAngle = Mathf.SmoothDamp(m_RecoilAngle, 0, ref m_RecoilRotSmoothDampVelocity, 0.12f);
-                m_RecoilTargetRotation = Quaternion.Lerp(m_Transform.localRotation, Quaternion.Euler(m_RecoilAngle, 0, 0), Time.deltaTime * 2f);
-                m_Transform.localRotation = m_RecoilTargetRotation;
-            }
+        //    m_Rotation = m_Transform.parent.localRotation;
+        //}
 
 
-            //Debug.Log(m_RecoilAngle);
-		}
+		//private void LateUpdate()
+		//{
+  //          if(m_Transform.localPosition != Vector3.zero){
+  //              m_RecoilTargetPosition = Vector3.SmoothDamp(m_Transform.localPosition, Vector3.zero, ref m_RecoilSmoothDampVelocity, 0.12f);
+  //              m_Transform.localPosition = Vector3.Lerp(m_RecoilTargetPosition, Vector3.zero, Time.deltaTime * 2f);
+  //          }
+
+  //          if(m_RecoilAngle > 0 && m_RecoilAmount < 0){
+  //              m_RecoilAngle = Mathf.SmoothDamp(m_RecoilAngle, 0, ref m_RecoilRotSmoothDampVelocity, 0.12f);
+  //              m_RecoilTargetRotation = Quaternion.Lerp(m_Transform.localRotation, Quaternion.Euler(m_RecoilAngle, 0, 0), Time.deltaTime * 2f);
+  //              m_Transform.localRotation = m_RecoilTargetRotation;
+  //          }
 
 
+  //          //Debug.Log(m_RecoilAngle);
+		//}
 
 
 
-		public override bool TryUse()
+
+
+		public bool TryUse()
         {
             Debug.Log("Firing " + gameObject.name);
             return true;
@@ -207,17 +209,17 @@
 
 
 
-        protected override void ItemActivated()
-        {
-            if (m_Smoke) m_Smoke.SetActive(true);
-            if (m_MuzzleFlash) m_MuzzleFlash.SetActive(true);
-        }
+        //protected override void ItemActivated()
+        //{
+        //    if (m_Smoke) m_Smoke.SetActive(true);
+        //    if (m_MuzzleFlash) m_MuzzleFlash.SetActive(true);
+        //}
 
-        protected override void ItemDeactivated()
-        {
-            if (m_Smoke) m_Smoke.SetActive(false);
-            if (m_MuzzleFlash) m_MuzzleFlash.SetActive(false);
-        }
+        //protected override void ItemDeactivated()
+        //{
+        //    if (m_Smoke) m_Smoke.SetActive(false);
+        //    if (m_MuzzleFlash) m_MuzzleFlash.SetActive(false);
+        //}
 
 
 
@@ -240,9 +242,9 @@
                 }
             }
             ////  Recoil
-            m_Transform.localPosition -= Vector3.forward * m_RecoilAmount;
+            transform.localPosition -= Vector3.forward * m_RecoilAmount;
             m_RecoilAngle += Mathf.Clamp( m_RotationRecoilAmount, 0, 30);
-            m_Transform.localEulerAngles += Vector3.left * m_RecoilAngle;
+            transform.localEulerAngles += Vector3.left * m_RecoilAngle;
 
             //  Play Particle Shoot Effects.
             if(m_Smoke){
@@ -263,7 +265,7 @@
 
             if (m_AutoReload && m_CurrentAmmo <= 0){
                 TryStartReload();
-                Debug.LogFormat("{0} is auto reloading.", m_GameObject.name);
+                Debug.LogFormat("{0} is auto reloading.", gameObject.name);
             }
 
             m_TargetDirection = m_FirePoint.forward;
@@ -342,13 +344,13 @@
 
 
 
-        protected override void OnStartAim()
+        protected void OnStartAim()
         {
             
         }
 
 
-        protected override void OnAim(bool aim)
+        protected void OnAim(bool aim)
         {
             ////Debug.Log("Weapon Starting to aim");
             //if(aim){

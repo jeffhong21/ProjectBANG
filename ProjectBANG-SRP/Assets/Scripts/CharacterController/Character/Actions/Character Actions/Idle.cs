@@ -11,6 +11,12 @@ namespace CharacterController
         protected float idleStartTime;
         protected float nextIdleTime;
 
+
+
+
+
+
+
         public override bool CanStartAction()
         {
             throw new System.NotImplementedException();
@@ -31,8 +37,8 @@ namespace CharacterController
 
         //public override bool CanStartAction()
         //{
-        //    if(!m_Controller.Moving){
-        //        if(Time.time > m_NextIdleTime){
+        //    if (!m_Controller.Moving) {
+        //        if (Time.time > m_NextIdleTime) {
         //            m_NextIdleTime = Time.time + m_IdleTimeout;
         //            return true;
         //        }
@@ -74,22 +80,22 @@ namespace CharacterController
         //}
 
 
-		//public override bool IsConcurrentAction()
-		//{
-  //          return true;
-		//}
+        //public override bool IsConcurrentAction()
+        //{
+        //          return true;
+        //}
 
-		////  Returns the state the given layer should be on.
-		//public override string GetDestinationState(int layer)
-		//{
-		//    return "Idle";
-		//}
-
-
+        ////  Returns the state the given layer should be on.
+        //public override string GetDestinationState(int layer)
+        //{
+        //    return "Idle";
+        //}
 
 
 
-	}
+
+
+    }
 
 }
 

@@ -141,7 +141,7 @@ namespace CharacterController
             velocity = m_Controller.Velocity;
             velocity.y += verticalVelocity;
 
-            Debug.Log(velocity);
+            //Debug.Log(velocity);
             return velocity;
         }
 

@@ -63,9 +63,8 @@
 
             if (Physics.Raycast(rayOrigin, m_Transform.forward, out objectHit, startDistance, detectLayers))
             {
-                
+              
                 float angle = Vector3.Angle(m_Transform.forward, -objectHit.normal);
-                
                 if (Mathf.Abs(angle) < angleThreshold)
                     return CheckHeightRequirement(objectHit.point);
             }

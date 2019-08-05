@@ -159,11 +159,12 @@
             if (slotIndex < 0) return null;
 
             Item item = m_InventorySlots[slotIndex].item;
-            if (item != null) {
-                m_LastEquipedItem = m_EquipedItem;
+            if (item != null)
+            {
+                UnequipCurrentItem();
                 m_EquipedItem = item;
 
-                if(m_LastEquipedItem != null) m_LastEquipedItem.SetActive(false);
+                //if(m_LastEquipedItem != null) m_LastEquipedItem.SetActive(false);
                 m_EquipedItem.SetActive(true);
 
                 //  Execute the equip event.
@@ -203,11 +204,14 @@
 
         public void UnequipCurrentItem()
         {
+
+            m_LastEquipedItem = m_EquipedItem;
+            m_EquipedItem = null;
+
             if (m_EquipedItem != null)
             {
                 m_EquipedItem.SetActive(false);
-                m_LastEquipedItem = m_EquipedItem;
-                m_EquipedItem = null;
+
 
 
                 //  Execute the equip event.

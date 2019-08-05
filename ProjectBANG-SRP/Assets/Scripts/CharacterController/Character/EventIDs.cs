@@ -13,13 +13,38 @@ namespace CharacterController
         public static readonly string OnCharacterActionActive = "OnCharacterActionActive";
         public static readonly string OnAimActionStart = "OnAimActionStart";
 
-
+        //
+        //  Inventory events
+        //
         public static readonly string OnInventoryUseItem = "OnInventoryUseItem";
         public static readonly string OnInventoryEquipItem = "OnInventoryEquipItem";
         public static readonly string OnInventoryUnequipItem = "OnInventoryUnequipItem";
+        public static readonly string OnInventoryDropItem = "OnInventoryDropItem";
         public static readonly string OnInventoryAddItem = "OnInventoryAddItem";
         public static readonly string OnInventoryRemoveItem = "OnInventoryRemoveItem";
         public static readonly string OnInventoryPickupItem = "OnInventoryPickupItem";
+
+        //
+        //  Item events.
+        //
+        public static readonly string OnUseItem = "OnUseItem";
+        public static readonly string OnEquipItem = "OnEquipItem";
+        public static readonly string OnUnequipItem = "OnUnequipItem";
+        public static readonly string OnDropItem = "OnDropItem";
+        public static readonly string OnPickupItem = "OnPickupItem";
+
+        //
+        //  Animator events.
+        //  
+        public static readonly string OnAnimatorUseItem = "OnAnimatorUseItem";
+        public static readonly string OnAnimatorEquipItem = "OnAnimatorEquipItem";
+        public static readonly string OnAnimatorEquipItemComplete = "OnAnimatorEquipItemComplete";
+        public static readonly string OnAnimatorUnequipItem = "OnAnimatorUnequipItem";
+        public static readonly string OnAnimatorUnequipItemComplete = "OnAnimatorUnequipItemComplete";
+        public static readonly string OnAnimatorDropItem = "OnAnimatorDropItem";
+        public static readonly string OnAnimatorAddItem = "OnAnimatorAddItem";
+        public static readonly string OnAnimatorRemoveItem = "OnAnimatorRemoveItem";
+        public static readonly string OnAnimatorPickupItem = "OnAnimatorPickupItem";
 
 
         public static readonly string OnAnimatorStartJump = "OnAnimatorStartJump";

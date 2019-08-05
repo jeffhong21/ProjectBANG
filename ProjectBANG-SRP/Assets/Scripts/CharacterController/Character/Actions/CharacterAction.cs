@@ -504,6 +504,9 @@
             m_Animator.SetInteger(HashID.ActionIntData, 0);
             m_Animator.SetFloat(HashID.ActionFloatData, 0f);
             m_Animator.ResetTrigger(HashID.ActionChange);
+
+            m_Animator.SetInteger(HashID.ItemStateIndex, 0);
+            m_Animator.ResetTrigger(HashID.ItemStateIndexChange);
             //m_AnimatorMonitor.SetActionID(0);
 
             m_ExitingAction = false;
@@ -512,7 +515,6 @@
 
             ActionStopped();
 
-            m_Animator.SetFloat(Animator.StringToHash("AnimationSpeed"), 1);
         }
 
 

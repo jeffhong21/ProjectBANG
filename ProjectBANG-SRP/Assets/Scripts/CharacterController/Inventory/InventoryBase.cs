@@ -43,20 +43,17 @@
         [Tooltip("The max amount of inventory slots.")]
         [SerializeField] protected int m_SlotCount = 6;
 
+        [SerializeField] ItemEquipSlot[] itemEquipSlots = new ItemEquipSlot[0];
 
         //  When ever an item is added, the item will be mapped here.
         protected Dictionary<ItemType, Item> m_ItemTypeItemMap = new Dictionary<ItemType, Item>();
         protected Dictionary<ItemType, float> m_ItemTypeCount = new Dictionary<ItemType, float>();
 
-
-
-
         [SerializeField, DisplayOnly]
         protected InventorySlot[] m_InventorySlots;
 
 
-        [SerializeField]
-        protected Transform m_LeftItemSlot, m_RightItemSlot;
+
 
 
         protected Animator m_Animator;
@@ -70,7 +67,7 @@
 
         public bool IsSwitching { get; protected set; }
 
-
+        public ItemEquipSlot[] EquipSlots { get { return itemEquipSlots; } }
 
 
 
@@ -89,16 +86,16 @@
             m_Animator = GetComponent<Animator>();
 
 
+            itemEquipSlots = GetComponentsInChildren<ItemEquipSlot>(true);
 
             GetComponentsInChildren<Item>(true, m_AllItems);
             for (int i = 0; i < m_AllItems.Count; i++) {
                 AddItem(m_AllItems[i], false);
-
-                m_AllItems[i].transform.parent = m_RightItemSlot;
+                if(m_AllItems[i].SlotID != -1)
+                    m_AllItems[i].transform.parent = GetItemEquipSlot(m_AllItems[i].SlotID);
+                
             }
 
-            m_LeftItemSlot = m_Animator.GetBoneTransform(HumanBodyBones.LeftHand);
-            m_RightItemSlot = m_Animator.GetBoneTransform(HumanBodyBones.RightHand);
 
 
             m_InventorySlots = new InventorySlot[SlotCount];
@@ -123,8 +120,7 @@
         private void OnValidate()
         {
             m_Animator = GetComponent<Animator>();
-            if (m_LeftItemSlot == null) m_LeftItemSlot = m_Animator.GetBoneTransform(HumanBodyBones.LeftHand);
-            if (m_RightItemSlot == null) m_RightItemSlot = m_Animator.GetBoneTransform(HumanBodyBones.RightHand);
+            itemEquipSlots = GetComponentsInChildren<ItemEquipSlot>(true);
         }
 
 
@@ -244,6 +240,7 @@
 
             //  Add the item to the list of items.
             m_AllItems.Add(item);
+            item.Initialize(this);
             //  Notify others that an item has been added to the inventory.
             EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnInventoryAddItem, item);
 
@@ -343,7 +340,17 @@
 
 
 
+        public Transform GetItemEquipSlot(int slotID)
+        {
+            if (slotID < 0) return null;
+            for (int i = 0; i < itemEquipSlots.Length; i++) {
+                if((int)itemEquipSlots[i].SlotID == slotID) {
+                    return itemEquipSlots[i].transform;
+                }
+            }
 
+            return null;
+        }
 
 
         /// <summary>
@@ -368,22 +375,22 @@
 
 
 
-        [Serializable]
-        public class EquipItemSlots
-        {
-            [SerializeField] protected Transform m_LeftHandSlot;
-            [SerializeField] protected Transform m_RightHandSlot;
+        //[Serializable]
+        //public class ItemEquipSlots
+        //{
+        //    [SerializeField] protected Transform m_LeftHandSlot;
+        //    [SerializeField] protected Transform m_RightHandSlot;
 
-            public Transform LeftHandSlot {
-                get { return m_LeftHandSlot; }
-                set { m_LeftHandSlot = value; }
-            }
+        //    public Transform LeftHandSlot {
+        //        get { return m_LeftHandSlot; }
+        //        set { m_LeftHandSlot = value; }
+        //    }
 
-            public Transform RightHandSlot {
-                get { return m_RightHandSlot; }
-                set { m_RightHandSlot = value; }
-            }
-        }
+        //    public Transform RightHandSlot {
+        //        get { return m_RightHandSlot; }
+        //        set { m_RightHandSlot = value; }
+        //    }
+        //}
 
 
 

@@ -13,7 +13,7 @@
 
         [SerializeField] protected int maxInputCount = 4;
         [SerializeField, Range(0, 1)]
-        protected float stopThreshold = 0.8f;
+        protected float stopThreshold = 0.5f;
         
         protected float pivotWeightThreshold = 0.18f;
 
@@ -27,12 +27,21 @@
 
         protected int pivotFoot;
 
+        protected int successfulStarts;
+
 
         //
         // Methods
         //
         public override bool CanStartAction()
         {
+            if(successfulStarts >= 5) {
+                successfulStarts = 0;
+                detectionCount = 0;
+                isStopMoving = false;
+                return true;
+            }
+
             lastMoveAmount = currentMoveAmount;
             currentMoveAmount = Mathf.Clamp01(Mathf.Abs(m_Controller.InputVector.x) + Mathf.Abs(m_Controller.InputVector.z));
 
@@ -42,10 +51,10 @@
 
             if (isStopMoving) {
                 if (detectionCount >= maxInputCount && currentMoveAmount < stopThreshold) {
-                    detectionCount = 0;
-                    isStopMoving = false;
-
-                    return true;
+                    //detectionCount = 0;
+                    //isStopMoving = false;
+                    successfulStarts++;
+                    return false;
                 }
                 detectionCount++;
             }
@@ -125,6 +134,13 @@
 
         public override bool CanStopAction()
         {
+
+            int layerIndex = 0;
+            if (m_Animator.GetNextAnimatorStateInfo(layerIndex).fullPathHash == 0 && m_Animator.IsInTransition(layerIndex)) {
+                Debug.LogFormat("{1} is exiting. | {0} is the next state.", m_AnimatorMonitor.GetStateName(m_Animator.GetNextAnimatorStateInfo(layerIndex).fullPathHash), this.GetType());
+                Debug.Log(Mathf.Abs(m_Rigidbody.velocity.x) + Mathf.Abs(m_Rigidbody.velocity.z));
+                return true;
+            }
             //if (m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(m_DestinationStateName))
             //{
             //    if (m_Animator.GetNextAnimatorStateInfo(0).shortNameHash != 0 && m_Animator.IsInTransition(0))
@@ -143,7 +159,7 @@
 
             //if (m_Animator.pivotWeight == 0.5f) return true;
 
-            if (Time.time > m_ActionStartTime + 1.5f)
+            if (Time.time > m_ActionStartTime + .5f)
                 return true;
             return false;
         }

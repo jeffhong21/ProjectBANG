@@ -57,14 +57,22 @@ namespace CharacterController
 
 		protected override void ActionStarted()
         {
-            Vector3 lookDirection = m_Controller.LookRotation * m_Transform.forward;
-            Vector3 moveDirection = m_Transform.InverseTransformDirection(m_Controller.InputVector);
+
             ////  Start walk angle
-            Vector3 axisSign = Vector3.Cross(moveDirection, m_Transform.forward);
-            startAngle = Vector3.Angle(m_Transform.forward, moveDirection) * (axisSign.y >= 0 ? -1f : 1f);
+            switch (m_Controller.Movement) {
+                case (RigidbodyCharacterController.MovementType.Adventure):
+                    Vector3 moveDirection = m_Transform.InverseTransformDirection(m_Controller.InputVector);
+                    Vector3 axisSign = Vector3.Cross(moveDirection, m_Transform.forward);
+                    startAngle = Vector3.Angle(m_Transform.forward, moveDirection) * (axisSign.y >= 0 ? 1f : -1f);
+                    break;
+                case (RigidbodyCharacterController.MovementType.Combat):
+                    moveDirection = m_Transform.rotation * m_Controller.InputVector;
+                    startAngle = Vector3.Angle(m_Transform.forward, moveDirection) * m_Controller.InputVector.x;
+                    break;
+            }
+
             startAngle = (float)Math.Round(startAngle, 2);
             startAngle = Mathf.Approximately(startAngle, 0) ? 0 : (float)Math.Round(startAngle, 2);
-
 
 
             if (m_StateName.Length == 0) m_Animator.SetInteger(HashID.ActionID, m_ActionID);

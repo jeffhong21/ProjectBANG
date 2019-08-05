@@ -4,25 +4,31 @@
     using System.Collections.Generic;
     using UnityEngine;
 
-    public class MeleeWeapon : Item, IUseableItem
+
+    [RequireComponent(typeof(Item))]
+    public class MeleeWeapon : MonoBehaviour, IUseableItem
     {
-        protected int m_MaxCollisionCount = 30;
-
-
-        protected Collider m_AttackHitbox;
-
-        protected LayerMask m_ImpactLayers;
-        protected float m_DamageAmount;
-        protected float m_ImpactForce = 5;
+        [Tooltip(" ")]
+        [SerializeField] protected int m_MaxCollisionCount = 30;
+        [Tooltip(" ")]
+        [SerializeField] protected Collider m_AttackHitbox;
+        [Tooltip(" ")]
+        [SerializeField] protected LayerMask m_ImpactLayers;
+        [Tooltip(" ")]
+        [SerializeField] protected float m_DamageAmount;
+        [Tooltip(" ")]
+        [SerializeField] protected float m_ImpactForce = 5;
 
 
         public bool InUse()
-        {
+        { 
             throw new System.NotImplementedException();
         }
 
-
-
+        public bool TryUse()
+        {
+            throw new System.NotImplementedException();
+        }
 
         protected void OnCollisionEnter( Collision collision )
         {
@@ -30,7 +36,7 @@
         }
 
 
-
+         
 
         protected void OnDrawGizmos()
         {
@@ -38,6 +44,6 @@
         }
 
 
-    }
 
+    }
 }

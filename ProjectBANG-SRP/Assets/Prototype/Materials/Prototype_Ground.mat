@@ -36,8 +36,8 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Diffuse:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
+        m_Texture: {fileID: 2800000, guid: b4c2f36e7cc2f4ce589e98efc09abcbc, type: 3}
+        m_Scale: {x: 0.5, y: 0.5}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
         m_Texture: {fileID: 0}
@@ -60,7 +60,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ToonRamp:
-        m_Texture: {fileID: 2800000, guid: eff65d2c2a8254e49b6fe32f391e0a55, type: 3}
+        m_Texture: {fileID: 2800000, guid: 4d4fab2d94d3d489cb5be02f0988146a, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _texcoord:
@@ -76,12 +76,12 @@ Material:
     - _GlossMapScale: 0.415
     - _Glossiness: 0.3
     - _GlossyReflections: 1
-    - _Metallic: 0.526
+    - _Metallic: 0.04
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _RimOffset: 0.24
-    - _RimPower: 0.5
+    - _RimOffset: 0.7
+    - _RimPower: 8.48
     - _SmoothnessTextureChannel: 1
     - _SpecularHighlights: 1
     - _SrcBlend: 1
@@ -92,4 +92,4 @@ Material:
     - _ASEOutlineColor: {r: 0, g: 0, b: 0, a: 0}
     - _Color: {r: 0.48215556, g: 0.50054944, b: 0.5188679, a: 1}
     - _EmissionColor: {r: 0.12478355, g: 0.13032949, b: 0.14142136, a: 1}
-    - _RimColor: {r: 0, g: 1, b: 0.8758622, a: 0}
+    - _RimColor: {r: 0, g: 0.43382958, b: 0.6603774, a: 0}

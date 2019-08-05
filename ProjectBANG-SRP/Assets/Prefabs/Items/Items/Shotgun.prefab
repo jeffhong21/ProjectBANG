@@ -39,6 +39,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7004017372246459980}
+  - component: {fileID: -6815851410408183615}
   - component: {fileID: -7113790188769086120}
   m_Layer: 0
   m_Name: Shotgun
@@ -64,6 +65,29 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-6815851410408183615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4358617258634594047}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb4f2bdf3625d4e94973778b81397e11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemType: {fileID: 11400000, guid: d8d6f5d76eee24134ae731f3374e26e2, type: 2}
+  slotID: 0
+  animatorItemID: 2
+  animatorMovementSetID: 0
+  dropPrefab: {fileID: 0}
+  holsterTarget: {fileID: 0}
+  m_NonDominantHandIKTarget: {fileID: 0}
+  m_NonDominantHandIKTargetHint: {fileID: 0}
+  localSpawnPosition: {x: 0, y: 0, z: 0}
+  localSpawnRotation: {x: 0, y: 0, z: 0}
+  m_Character: {fileID: 0}
 --- !u!114 &-7113790188769086120
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -76,19 +100,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61dbdf289aad34e608b9aebae0a464a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ItemType: {fileID: 11400000, guid: d8d6f5d76eee24134ae731f3374e26e2, type: 2}
-  m_SlotID: 0
-  m_AnimatorItemID: 1
-  m_AnimatorMovementSetID: 1
-  m_DropPrefab: {fileID: 4358617258634594047}
-  m_HolsterTarget: {fileID: 0}
-  m_HolsterID: -1
-  m_NonDominantHandIKTarget: {fileID: 708657531759224593}
-  m_NonDominantHandIKTargetHint: {fileID: 0}
-  m_LocalSpawnPosition: {x: 0, y: 0, z: 0}
-  m_LocalSpawnRotation: {x: 0, y: 0, z: 0}
-  m_Character: {fileID: 0}
-  m_Controller: {fileID: 0}
   m_FirePoint: {fileID: 7629249125592641113}
   m_FireRate: 1
   m_FireCount: 1
@@ -111,8 +122,6 @@ MonoBehaviour:
     m_Bits: 4294967295
   m_Tracer: {fileID: 0}
   m_Projectile: {fileID: 0}
-  m_DefaultDecal: {fileID: 0}
-  m_DefaultDust: {fileID: 0}
   m_DrawAimLine: 0
 --- !u!1 &7480610665811238232
 GameObject:
