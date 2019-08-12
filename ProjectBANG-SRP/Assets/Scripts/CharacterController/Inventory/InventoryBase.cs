@@ -43,14 +43,13 @@
         [Tooltip("The max amount of inventory slots.")]
         [SerializeField] protected int m_SlotCount = 6;
 
-        [SerializeField] ItemEquipSlot[] itemEquipSlots = new ItemEquipSlot[0];
+        [SerializeField] protected ItemEquipSlot[] itemEquipSlots = new ItemEquipSlot[0];
 
         //  When ever an item is added, the item will be mapped here.
         protected Dictionary<ItemType, Item> m_ItemTypeItemMap = new Dictionary<ItemType, Item>();
         protected Dictionary<ItemType, float> m_ItemTypeCount = new Dictionary<ItemType, float>();
 
-        [SerializeField, DisplayOnly]
-        protected InventorySlot[] m_InventorySlots;
+
 
 
 
@@ -74,72 +73,6 @@
 
 
 
-
-
-
-        //
-        // Methods
-        //
-        protected virtual void Awake()
-        {
-            m_GameObject = gameObject;
-            m_Animator = GetComponent<Animator>();
-
-
-            itemEquipSlots = GetComponentsInChildren<ItemEquipSlot>(true);
-
-            GetComponentsInChildren<Item>(true, m_AllItems);
-            for (int i = 0; i < m_AllItems.Count; i++) {
-                AddItem(m_AllItems[i], false);
-                if(m_AllItems[i].SlotID != -1)
-                    m_AllItems[i].transform.parent = GetItemEquipSlot(m_AllItems[i].SlotID);
-                
-            }
-
-
-
-            m_InventorySlots = new InventorySlot[SlotCount];
-        }
-
-
-        private void OnDestroy()
-        {
-
-        }
-
-
-        private void Start()
-        {
-            //  REgister for OnDeath and OnRespawn.
-
-            //  Load default items.
-            LoadDefaultLoadout();
-        }
-
-
-        private void OnValidate()
-        {
-            m_Animator = GetComponent<Animator>();
-            itemEquipSlots = GetComponentsInChildren<ItemEquipSlot>(true);
-        }
-
-
-
-        /// <summary>
-        /// Loads up each itemType in thje DefaultLoadout.
-        /// </summary>
-		public void LoadDefaultLoadout()
-        {
-            if (m_DefaultLoadout != null) {
-                for (int i = 0; i < m_DefaultLoadout.Length; i++) {
-                    PickupItemType(
-                        m_DefaultLoadout[i].ItemType,
-                        m_DefaultLoadout[i].Amount,
-                        true, m_DefaultLoadout[i].Equip, false );
-                }
-            }
-
-        }
 
 
         /// <summary>
@@ -211,36 +144,15 @@
         }
 
 
-
+        public abstract bool AddItem( Item item, bool immediatelyEquip );
 
         /// <summary>
         /// Add the item to the inventory.  Does not add the actual ItemType.  PickupItem does that.
         /// </summary>
         /// <param name="item">Item to add to the inventory.</param>
         /// <returns>True if the item was added to the inventory.</returns>
-        public bool AddItem( Item item, bool immediatelyEquip )
+        protected bool InternalAddItem( Item item, bool immediatelyEquip )
         {
-            if (item.ItemType == null) {
-                Debug.LogError("Error: Item " + item + "has no ItemType");
-                return false;
-            }
-
-            //  Check if inventory already contains the items type.  There should only be 1 item type.
-            if (m_ItemTypeItemMap.ContainsKey(item.ItemType))
-                return false;
-
-            //  The itemType doesn't exist in the inventory.
-            m_ItemTypeItemMap.Add(item.ItemType, item);
-
-            //  Item can be added without being pickedup up yet.  Add to the ItemTypeCount
-            if (!m_ItemTypeCount.ContainsKey(item.ItemType))
-                m_ItemTypeCount.Add(item.ItemType, 0);
-
-
-
-            //  Add the item to the list of items.
-            m_AllItems.Add(item);
-            item.Initialize(this);
             //  Notify others that an item has been added to the inventory.
             EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnInventoryAddItem, item);
 
@@ -294,21 +206,10 @@
 
 
 
+        public abstract void UseItem( ItemType itemType, float count );
 
 
 
-        public void UseItem( ItemType itemType, float count )
-        {
-            InternalUseItem(itemType, count);
-
-            float existingAmount;
-            if (!m_ItemTypeCount.TryGetValue(itemType, out existingAmount)) {
-                Debug.LogError("Error: Trying top use " + itemType.name + " when ItemType does not exist.");
-                return;
-            }
-
-            m_ItemTypeCount[itemType] = Mathf.Clamp(existingAmount + count, 0, itemType.Capacity);
-        }
 
 
         protected void InternalUseItem( ItemType itemType, float count )
@@ -317,12 +218,13 @@
         }
 
 
-        public void Reload( ItemType itemType, float amount )
+        public abstract void Reload( ItemType itemType, float amount );
+
+
+        protected void InternalReload( ItemType itemType, float amount )
         {
             throw new NotImplementedException();
         }
-
-
 
 
         protected void InternalEquipItem(Item item)

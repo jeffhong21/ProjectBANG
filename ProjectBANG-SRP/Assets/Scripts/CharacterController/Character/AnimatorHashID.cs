@@ -23,7 +23,7 @@
         public static readonly int ItemID = Animator.StringToHash("ItemID");
         public static readonly int ItemStateIndex = Animator.StringToHash("ItemStateIndex");
         public static readonly int ItemStateIndexChange = Animator.StringToHash("ItemStateIndexChange");
-        //public static readonly int ItemSubstateIndex = Animator.StringToHash("ItemSubstateIndex");
+        public static readonly int ItemSubstateIndex = Animator.StringToHash("ItemSubstateIndex");
 
         public static readonly int Moving = Animator.StringToHash("Moving");
         public static readonly int Aiming = Animator.StringToHash("Aiming");

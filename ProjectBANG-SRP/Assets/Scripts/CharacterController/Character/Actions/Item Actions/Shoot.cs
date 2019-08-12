@@ -21,7 +21,7 @@
 
         protected override void ActionStarted()
         {
-            m_Inventory.CurrentlyEquippedItem.TryUse();
+            //m_Inventory.CurrentlyEquippedItem.TryUse();
             //if (CameraController.Instance != null) {
             //    m_ShootableWeapon = (ShootableWeapon)m_Inventory.GetCurrentItem(m_Inventory.EquippedItemType);
             //    Ray ray = CameraController.Instance.Camera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));

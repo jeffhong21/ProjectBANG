@@ -25,14 +25,16 @@
         //
         // Fields
         //
-        [SerializeField]
-        protected bool debugStateChanges;
+
         [SerializeField]
         protected float horizontalInputDampTime = 0.1f;
         [SerializeField]
         protected float forwardInputDampTime = 0.1f;
         [SerializeField]
         protected AnimatorStateData[] animatorStateData = new AnimatorStateData[0];
+
+        [SerializeField] protected bool debugStateChanges;
+        [SerializeField] protected bool logEvents;
 
         [Header("Match Target Attributes")]
         [SerializeField]
@@ -46,7 +48,7 @@
         protected CharacterLocomotion m_Controller;
 
         private int stateCount;
-
+        private float deltaTime;
 
 
 
@@ -90,7 +92,7 @@
                 Debug.Log("Animator has no state behaviors.");
             }
 
-
+            deltaTime = m_Animator.updateMode == AnimatorUpdateMode.AnimatePhysics ? Time.fixedDeltaTime : Time.deltaTime;
         }
 
         private void OnDestroy()
@@ -275,15 +277,22 @@
         }
 
 
-        public void SetHorizontalInputValue(float value)
-        {
-            m_Animator.SetFloat(HashID.HorizontalInput, value, horizontalInputDampTime,  Time.deltaTime);
+
+
+        public void SetHorizontalInputValue(float value){
+            m_Animator.SetFloat(HashID.HorizontalInput, value, horizontalInputDampTime,  deltaTime);
         }
 
+        public void SetHorizontalInputValue( float value, float dampTime){
+            m_Animator.SetFloat(HashID.HorizontalInput, value, dampTime, deltaTime);
+        }
 
-        public void SetForwardInputValue(float value)
-        {
-            m_Animator.SetFloat(HashID.ForwardInput, value, forwardInputDampTime,  Time.deltaTime);
+        public void SetForwardInputValue(float value){
+            m_Animator.SetFloat(HashID.ForwardInput, value, forwardInputDampTime, deltaTime);
+        }
+
+        public void SetForwardInputValue( float value, float dampTime ){
+            m_Animator.SetFloat(HashID.ForwardInput, value, dampTime, deltaTime);
         }
 
         public void SetActionID(int value)
@@ -305,18 +314,45 @@
 
         public void ExecuteEvent(string eventName)
         {
-            Debug.Log(eventName);
+            if(logEvents) Debug.Log(eventName);
             EventHandler.ExecuteEvent(gameObject, eventName);
+        }
+
+
+        public void ItemUsed(int itemTypeIndex)
+        {
+
         }
 
 
 
 
 
+        //private void OnActionActive( CharacterAction action, bool activated )
+        //{
+        //    int index = Array.IndexOf(m_Actions, action);
+        //    if (action == m_Actions[index]) {
+        //        if (m_Actions[index].enabled) {
+        //            if (activated) {
+        //                //Debug.LogFormat(" {0} is starting.", action.GetType().Name);
+        //                CharacterDebug.Log(action.GetType().Name, action.GetType());
+
+        //            } else {
+        //                CharacterDebug.Remove(action.GetType().Name);
+        //            }
+        //        }
+        //    }
+
+        //}
+
+
 
         #region Debug
 
-
+        /// <summary>
+        /// Register all animator state ids and print the names.
+        /// </summary>
+        /// <param name="debugMsg"></param>
         public void RegisterAllAnimatorStateIDs( bool debugMsg = false )
         {
             if (m_Animator == null) m_Animator = GetComponent<Animator>();

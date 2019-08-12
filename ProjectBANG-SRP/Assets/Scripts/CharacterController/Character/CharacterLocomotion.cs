@@ -474,7 +474,7 @@
         protected void OnAimActionStart( bool aim )
         {
             Aiming = aim;
-            m_MovementType = Aiming ? MovementType.Combat : MovementType.Adventure;
+            m_MovementType = Aiming ? MovementTypes.Combat : MovementTypes.Adventure;
         }
 
 
@@ -506,7 +506,7 @@
         }
 
 
-        public void SetMovementType( MovementType movementType )
+        public void SetMovementType( MovementTypes movementType )
         {
             m_MovementType = movementType;
         }

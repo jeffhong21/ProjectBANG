@@ -60,14 +60,15 @@ namespace CharacterController
 
             ////  Start walk angle
             switch (m_Controller.Movement) {
-                case (RigidbodyCharacterController.MovementType.Adventure):
+                case (RigidbodyCharacterController.MovementTypes.Adventure):
                     Vector3 moveDirection = m_Transform.InverseTransformDirection(m_Controller.InputVector);
                     Vector3 axisSign = Vector3.Cross(moveDirection, m_Transform.forward);
                     startAngle = Vector3.Angle(m_Transform.forward, moveDirection) * (axisSign.y >= 0 ? 1f : -1f);
                     break;
-                case (RigidbodyCharacterController.MovementType.Combat):
-                    moveDirection = m_Transform.rotation * m_Controller.InputVector;
-                    startAngle = Vector3.Angle(m_Transform.forward, moveDirection) * m_Controller.InputVector.x;
+                case (RigidbodyCharacterController.MovementTypes.Combat):
+                    //moveDirection = m_Transform.rotation * m_Controller.InputVector;
+                    //startAngle = Vector3.Angle(m_Transform.forward, moveDirection) * m_Controller.InputVector.x;
+                    startAngle = Mathf.Atan2(m_Controller.InputVector.x, m_Controller.InputVector.z) * Mathf.Rad2Deg;
                     break;
             }
 
@@ -78,36 +79,10 @@ namespace CharacterController
             if (m_StateName.Length == 0) m_Animator.SetInteger(HashID.ActionID, m_ActionID);
             m_Animator.SetFloat(HashID.ActionFloatData, startAngle);
 
-
-            //float angle = Mathf.Abs(startAngle);
-            //int actionIntData = 0;
-            //if (angle > 0) {
-            //    if (angle > 0 && angle <= 45) actionIntData = 2;
-            //    else if (angle > 45 && angle <= 90) actionIntData = 2;
-            //    else if (angle > 90 && angle <= 135) actionIntData = 3;
-            //    else if (angle > 135 && angle <= 180) actionIntData = 4;
-            //    else actionIntData = 0;
-            //}
-            //actionIntData *= -(int)Mathf.Sign(startAngle);
-            //m_Animator.SetInteger(HashID.ActionIntData, actionIntData);
+            actionStarted = true;
         }
 
 
-
-        //float angleInDegrees;
-        //Vector3 rotationAxis;
-        //public override bool UpdateMovement()
-        //{
-
-        //    m_Animator.deltaRotation.ToAngleAxis(out angleInDegrees, out rotationAxis);
-        //    Vector3 angularDisplacement = rotationAxis * angleInDegrees * Mathf.Deg2Rad;// * m_Controller.RotationSpeed;
-        //    m_Rigidbody.angularVelocity = angularDisplacement;
-
-        //    Vector3 velocity = (m_Animator.deltaPosition / m_DeltaTime);
-        //    velocity.y = m_Controller.Grounded ? 0 : m_Rigidbody.velocity.y;
-        //    m_Rigidbody.velocity = velocity;
-        //    return true;
-        //}
 
         public override bool UpdateRotation()
         {
@@ -132,9 +107,22 @@ namespace CharacterController
         }
 
 
-
+        bool actionStarted;
         public override bool CanStopAction()
         {
+            //if (m_Animator.GetAnimatorTransitionInfo(0).anyState) {
+            //    var state = m_AnimatorMonitor.GetStateName(m_Animator.GetCurrentAnimatorStateInfo(0).fullPathHash);
+            //    var clip = m_Animator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
+            //    Debug.LogFormat("Current State is <color=blue>{0}</color>.  Current clip is <color=blue>{1}</color>", state, clip);
+            //}
+
+            //if (actionStarted) {
+            //    var state = m_AnimatorMonitor.GetStateName(m_Animator.GetCurrentAnimatorStateInfo(0).fullPathHash);
+            //    var clip = m_Animator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
+            //    Debug.LogFormat("Current State is <color=red>{0}</color>.  Current clip is <color=red>{1}</color>", state, clip);
+            //    actionStarted = false;
+            //}
+
             if (m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(m_StateName))
             {
                 if (m_Animator.GetNextAnimatorStateInfo(0).shortNameHash != 0 && m_Animator.IsInTransition(0))
@@ -148,7 +136,7 @@ namespace CharacterController
                     return true;
                 }
             }
-            if (Time.time > m_ActionStartTime +0.75f)
+            if (Time.time > m_ActionStartTime +1.25f)
                 return true;
             return false;
         }

@@ -7,7 +7,7 @@ namespace CharacterController
     [RequireComponent(typeof(Rigidbody), typeof(LayerManager))]
     public abstract class RigidbodyCharacterController : MonoBehaviour
     {
-        public enum MovementType { Adventure, Combat };
+        public enum MovementTypes { Adventure, Combat };
 
 
 
@@ -96,7 +96,7 @@ namespace CharacterController
 
         protected float m_TimeScale = 1;
 
-        protected MovementType m_MovementType = MovementType.Adventure;
+        protected MovementTypes m_MovementType = MovementTypes.Adventure;
         protected bool m_Moving, m_Grounded = true;
         protected float m_RotationAngle;
         protected Vector3 m_InputVector;
@@ -168,7 +168,7 @@ namespace CharacterController
 
         #region Properties
 
-        public MovementType Movement { get { return m_MovementType; } }
+        public MovementTypes Movement { get { return m_MovementType; } }
 
         public bool Moving { get { return m_Moving; } set { m_Moving = value; } }
 
@@ -363,7 +363,7 @@ namespace CharacterController
 
             //  Set the input vector, move direction and rotation angle based on the movement type.
             switch (m_MovementType) {
-                case (MovementType.Adventure):
+                case (MovementTypes.Adventure):
 
                     m_InputVector = m_Transform.InverseTransformDirection(m_InputVector);
 
@@ -381,7 +381,7 @@ namespace CharacterController
                     m_Speed = 1;
                     break;
 
-                case (MovementType.Combat):
+                case (MovementTypes.Combat):
 
                     Vector3 localDir = m_Transform.InverseTransformDirection(m_LookRotation * m_Transform.forward);
                     m_RotationAngle = Mathf.Atan2(localDir.x, localDir.z) * Mathf.Rad2Deg;
@@ -653,6 +653,16 @@ namespace CharacterController
 
 
 
+
+            //
+            //  AddRelativeTorque adds torque according to its Inertia Tensors. Therefore, the desired angular
+            //  velocity must be transformed according to the Inertia Tensor, to get the required Torque.
+            //
+
+            //// Rotate about Y principal axis
+            //Vector3 desiredAngularVelInY = new Vector3(0, Mathf.PI, 0); //  1/2 revs per second 
+            //Vector3 torque = rigidbodyCached.inertiaTensorRotation * Vector3.Scale(rigidbodyCached.inertiaTensor, desiredAngularVelInY);
+            //rigidbody.AddRelativeTorque(torque, ForceMode.Impulse);
         }
 
 

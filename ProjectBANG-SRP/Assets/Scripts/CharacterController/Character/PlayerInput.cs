@@ -155,7 +155,7 @@ namespace CharacterController
             lookDirection = m_CameraController == null ? mTransform.forward : Vector3.Scale(m_Camera.forward, cameraFwd).normalized;
 
             switch (m_Controller.Movement) {
-                case (MovementType.Adventure):
+                case (MovementTypes.Adventure):
 
                     inputVector = m_Camera.right * InputVector.x + lookDirection * InputVector.z;
                     //inputVector = Vector3.ProjectOnPlane(inputVector, transform.forward);
@@ -165,7 +165,7 @@ namespace CharacterController
                     lookRotation = Quaternion.AngleAxis(turnAmount, transform.up);
                     break;
 
-                case (MovementType.Combat):
+                case (MovementTypes.Combat):
                     inputVector = InputVector;
                     //turnAmount = Mathf.Atan2(lookDirection.x, lookDirection.z);
                     //lookRotation = Quaternion.AngleAxis(turnAmount, transform.up);

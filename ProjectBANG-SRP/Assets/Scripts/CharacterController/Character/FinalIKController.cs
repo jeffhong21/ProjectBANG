@@ -141,6 +141,12 @@ namespace CharacterController
 
             rightHandTarget.hideFlags = hideFlags;
         }
+
+
+
+
+
+
     }
 }
 

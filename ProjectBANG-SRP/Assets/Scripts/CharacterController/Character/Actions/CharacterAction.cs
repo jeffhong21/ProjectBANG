@@ -506,6 +506,7 @@
             m_Animator.ResetTrigger(HashID.ActionChange);
 
             m_Animator.SetInteger(HashID.ItemStateIndex, 0);
+            m_Animator.SetInteger(HashID.ItemSubstateIndex, 0);
             m_Animator.ResetTrigger(HashID.ItemStateIndexChange);
             //m_AnimatorMonitor.SetActionID(0);
 

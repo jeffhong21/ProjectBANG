@@ -6,29 +6,41 @@
 
 
     [RequireComponent(typeof(Item))]
-    public class MeleeWeapon : MonoBehaviour, IUseableItem
+    public class MeleeWeapon : UseableItem
     {
+        [Header("Melee Weapon Properties")]
         [Tooltip(" ")]
-        [SerializeField] protected int m_MaxCollisionCount = 30;
+        [SerializeField] protected Hitbox[] attackHitboxes;
         [Tooltip(" ")]
-        [SerializeField] protected Collider m_AttackHitbox;
-        [Tooltip(" ")]
-        [SerializeField] protected LayerMask m_ImpactLayers;
-        [Tooltip(" ")]
-        [SerializeField] protected float m_DamageAmount;
-        [Tooltip(" ")]
-        [SerializeField] protected float m_ImpactForce = 5;
+        [SerializeField] protected LayerMask impactLayers;
+        [Tooltip("Amount of damage when item when in collision.")]
+        [SerializeField] protected float damageAmount;
+        [Tooltip("Max force applied when in collision.")]
+        [SerializeField] protected float impactForce = 5;
+        [Tooltip("Max amount of possible collision hits.")]
+        [SerializeField] protected int maxCollisionCount = 30;
 
 
-        public bool InUse()
-        { 
-            throw new System.NotImplementedException();
-        }
+        protected Collider[] collisionBuffer;
 
-        public bool TryUse()
+
+
+
+        protected override void Awake()
         {
-            throw new System.NotImplementedException();
+            base.Awake();
+
+            collisionBuffer = new Collider[maxCollisionCount];
+
+
+            //if(attackHitboxes == null || attackHitboxes.Length == 0) {
+            //    attackHitboxes =  new Hitbox[1] { m_GameObject.AddComponent<BoxCollider>() };
+                
+            //}
         }
+
+
+
 
         protected void OnCollisionEnter( Collision collision )
         {
@@ -38,9 +50,11 @@
 
          
 
-        protected void OnDrawGizmos()
+        protected virtual void OnDrawGizmos()
         {
+
             
+
         }
 
 

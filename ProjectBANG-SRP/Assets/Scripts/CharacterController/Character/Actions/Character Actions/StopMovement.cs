@@ -134,6 +134,11 @@
 
         public override bool CanStopAction()
         {
+            //if (m_Animator.pivotWeight == 0.5f) {
+            //    Debug.LogFormat("Stopping {0} by pivotWeight");
+            //    return true;
+            //}
+                
 
             int layerIndex = 0;
             if (m_Animator.GetNextAnimatorStateInfo(layerIndex).fullPathHash == 0 && m_Animator.IsInTransition(layerIndex)) {

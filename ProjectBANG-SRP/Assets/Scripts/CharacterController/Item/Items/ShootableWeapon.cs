@@ -148,7 +148,7 @@
 
 
 
-		public bool TryUse()
+		public bool UseItem()
         {
             Debug.Log("Firing " + gameObject.name);
             return true;

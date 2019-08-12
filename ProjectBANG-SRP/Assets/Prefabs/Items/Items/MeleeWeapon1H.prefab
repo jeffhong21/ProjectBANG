@@ -55,6 +55,16 @@ MonoBehaviour:
   m_NonDominantHandIKTargetHint: {fileID: 0}
   localSpawnPosition: {x: 0, y: 0, z: 0}
   localSpawnRotation: {x: 0, y: 0, z: 0}
+  equipEvent:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: CharacterController.Item+EquipItemEvent, Assembly-CSharp, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  unequipEvent:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: CharacterController.Item+UnequipItemEvent, Assembly-CSharp, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   m_Character: {fileID: 0}
 --- !u!114 &7929380129503683455
 MonoBehaviour:
@@ -68,6 +78,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4d8a6c1967a541939ed75ad806ae2a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useCooldown: 0.1
+  faceTarget: 0
+  stopUseDelay: 0
+  useEvent:
+    waitForAnimationEvent: 1
+    duration: 0
+  useCompleteEvent:
+    waitForAnimationEvent: 1
+    duration: 0
+  attackHitboxes: []
+  impactLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  damageAmount: 0
+  impactForce: 5
+  maxCollisionCount: 30
 --- !u!1001 &3881660237879758507
 PrefabInstance:
   m_ObjectHideFlags: 0

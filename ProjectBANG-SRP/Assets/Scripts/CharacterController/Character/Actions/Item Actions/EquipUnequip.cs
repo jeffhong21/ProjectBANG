@@ -36,7 +36,9 @@
                 if (m_Inventory != null) {
                     for (int number = 0; number < m_Inventory.SlotCount; number++) {
                         if (Input.GetKeyDown(number.ToString())) {
+                            //itemSlotIndex = Mathf.Clamp(number - 1, 0, m_Inventory.SlotCount);
                             itemSlotIndex = number;
+                            Debug.Log("inventory slot " + itemSlotIndex);
                             return true;
                         }
                     }
@@ -60,17 +62,17 @@
 
                 //  Toggleing current item on and off.  
                 if (currentItem == nextItem) {
-                    Debug.LogFormat("Item slot {0} is currently equipped item.", itemSlotIndex);
+                    if (m_Debug) Debug.LogFormat("Item slot {0} is currently equipped item.", itemSlotIndex);
                     nextItem = null;
                     m_Inventory.UnequipCurrentItem();
                 }
                 //  If next item is null, do nothing.
                 else if (nextItem == null) {
-                    Debug.LogFormat("Item slot {0} contains nothing.", itemSlotIndex);
+                    if (m_Debug) Debug.LogFormat("Item slot {0} contains nothing.", itemSlotIndex);
                 }
                 //  Equip the item.
                 else {
-                    Debug.LogFormat("Equipping {0} at slot index {1} | Current: {2}", nextItem, itemSlotIndex, currentItem);
+                    if(m_Debug) Debug.LogFormat("Equipping {0} at slot index {1} | Current: {2}", nextItem, itemSlotIndex, currentItem);
                     nextItem = m_Inventory.EquipItem(itemSlotIndex);
                 }
 

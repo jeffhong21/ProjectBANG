@@ -23,13 +23,16 @@
         protected int m_NextActiveSlot;
 
 
+        [SerializeField, DisplayOnly]
+        protected InventorySlot[] m_InventorySlots;
+
         public Item CurrentlyEquippedItem {
             get { return m_EquipedItem; }
         }
 
         protected int NextActiveSlot {
             get {
-                for (int i = 0; i < m_InventorySlots.Length; i++) {
+                for (int i = 0; i < m_InventorySlots.Length + 0; i++) {
                     if (m_InventorySlots[i].item == null) {
                         m_NextActiveSlot = i;
                         return m_NextActiveSlot;
@@ -42,6 +45,71 @@
 
 
 
+
+
+
+
+
+        protected virtual void Awake()
+        {
+            m_GameObject = gameObject;
+            m_Animator = GetComponent<Animator>();
+
+
+            itemEquipSlots = GetComponentsInChildren<ItemEquipSlot>(true);
+
+            GetComponentsInChildren<Item>(true, m_AllItems);
+            for (int i = 0; i < m_AllItems.Count; i++) {
+                AddItem(m_AllItems[i], false);
+                if (m_AllItems[i].SlotID > -1)
+                    m_AllItems[i].transform.parent = GetItemEquipSlot(m_AllItems[i].SlotID);
+
+            }
+
+
+
+            m_InventorySlots = new InventorySlot[SlotCount];
+        }
+
+
+        private void OnDestroy()
+        {
+
+        }
+
+
+        private void Start()
+        {
+            //  REgister for OnDeath and OnRespawn.
+
+            //  Load default items.
+            LoadDefaultLoadout();
+        }
+
+
+        private void OnValidate()
+        {
+            m_Animator = GetComponent<Animator>();
+            itemEquipSlots = GetComponentsInChildren<ItemEquipSlot>(true);
+        }
+
+
+        /// <summary>
+        /// Loads up each itemType in thje DefaultLoadout.
+        /// </summary>
+        public void LoadDefaultLoadout()
+        {
+            if (m_DefaultLoadout != null) {
+                for (int index = 0; index < m_DefaultLoadout.Length; index++) {
+                    var itemType = m_DefaultLoadout[index].ItemType;
+                    var amount = m_DefaultLoadout[index].Amount;
+                    var equipItem = m_DefaultLoadout[index].Equip;
+                    PickupItemType(itemType, amount, true, equipItem, false);
+
+                }
+            }
+
+        }
 
 
         /// <summary>
@@ -107,6 +175,43 @@
         }
 
 
+
+        /// <summary>
+        /// Add the item to the inventory.  Does not add the actual ItemType.  PickupItem does that.
+        /// </summary>
+        /// <param name="item">Item to add to the inventory.</param>
+        /// <returns>True if the item was added to the inventory.</returns>
+        public override bool AddItem( Item item, bool immediatelyEquip )
+        {
+            if (item.ItemType == null) {
+                Debug.LogError("Error: Item " + item + "has no ItemType");
+                return false;
+            }
+
+            //  Check if inventory already contains the items type.  There should only be 1 item type.
+            if (m_ItemTypeItemMap.ContainsKey(item.ItemType))
+                return false;
+
+            //  The itemType doesn't exist in the inventory.
+            m_ItemTypeItemMap.Add(item.ItemType, item);
+
+            //  Item can be added without being pickedup up yet.  Add to the ItemTypeCount
+            if (!m_ItemTypeCount.ContainsKey(item.ItemType))
+                m_ItemTypeCount.Add(item.ItemType, 0);
+
+
+
+            //  Add the item to the list of items.
+            m_AllItems.Add(item);
+            item.Initialize(this);
+
+            InternalAddItem(item, immediatelyEquip);
+
+            return true;
+        }
+
+
+
         /// <summary>
         /// GEt item from the inventory.
         /// </summary>
@@ -165,7 +270,7 @@
                 m_EquipedItem = item;
 
                 //if(m_LastEquipedItem != null) m_LastEquipedItem.SetActive(false);
-                m_EquipedItem.SetActive(true);
+                //m_EquipedItem.SetActive(true);
 
                 //  Execute the equip event.
                 InternalEquipItem(item);
@@ -210,9 +315,7 @@
 
             if (m_EquipedItem != null)
             {
-                m_EquipedItem.SetActive(false);
-
-
+                //m_EquipedItem.SetActive(false);
 
                 //  Execute the equip event.
                 InternalUnequipCurrentItem(m_LastEquipedItem);
@@ -220,6 +323,27 @@
             }
         }
 
+
+
+
+        public override void UseItem( ItemType itemType, float count )
+        {
+            InternalUseItem(itemType, count);
+
+            float existingAmount;
+            if (!m_ItemTypeCount.TryGetValue(itemType, out existingAmount)) {
+                Debug.LogError("Error: Trying top use " + itemType.name + " when ItemType does not exist.");
+                return;
+            }
+
+            m_ItemTypeCount[itemType] = Mathf.Clamp(existingAmount + count, 0, itemType.Capacity);
+        }
+
+
+        public override void Reload( ItemType itemType, float amount )
+        {
+            throw new NotImplementedException();
+        }
 
 
 

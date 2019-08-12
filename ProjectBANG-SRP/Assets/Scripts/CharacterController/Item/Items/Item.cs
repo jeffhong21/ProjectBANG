@@ -1,10 +1,16 @@
 ﻿namespace CharacterController
 {
+    using System;
     using UnityEngine;
-
+    using UnityEngine.Events;
 
     public class Item : MonoBehaviour
     {
+
+        [Serializable] public class EquipItemEvent : UnityEvent<bool> { }
+        [Serializable] public class UnequipItemEvent : UnityEvent<bool> { }
+        [Serializable] public class PickupItemEvent : UnityEvent { }
+        [Serializable] public class DropItemEvent : UnityEvent { }
         //
         // Fields
         //
@@ -36,8 +42,9 @@
         [SerializeField]
         protected Vector3 localSpawnRotation;
 
-
-
+        [Space()]
+        public EquipItemEvent OnEquipEvent = new EquipItemEvent();
+        public UnequipItemEvent OnUnequipEvent = new UnequipItemEvent();
 
 
         public ItemType ItemType{ get { return itemType; } }
@@ -53,13 +60,13 @@
 
 
 
-        protected Animator m_Animator;
+        protected Animator animator;
         [SerializeField, DisplayOnly]
-        protected GameObject m_Character;
-        protected CharacterLocomotion m_Controller;
-        protected InventoryBase m_Inventory;
-        protected GameObject m_GameObject;
-        protected Transform m_Transform;
+        protected GameObject character;
+        protected CharacterLocomotion charLocomotion;
+        protected Inventory inventory;
+        protected GameObject mGameObject;
+        protected Transform mTransform;
 
 
         //
@@ -67,49 +74,71 @@
         //
         protected virtual void Awake()
         {
+            //character = transform.root.gameObject;
+            //if (character != null) {
+            //    inventory = character.GetComponent<Inventory>();
+            //}
 
+
+            OnEquipEvent.AddListener(SetActive);
+            OnUnequipEvent.AddListener(SetActive);
+        }
+
+        protected virtual void OnDestroy()
+        {
+
+            if (character != null)
+            {
+                EventHandler.UnregisterEvent(character, EventIDs.OnAnimatorEquipItem, () => SetActive(true));
+                EventHandler.UnregisterEvent(character, EventIDs.OnAnimatorUnequipItem, () => SetActive(false));
+                //EventHandler.UnregisterEvent(character, EventIDs.OnAnimatorDropItem, ItemDeactivated);
+                //EventHandler.UnregisterEvent(character, EventIDs.OnAnimatorPickupItem, ItemActivated);
+            }
+
+            OnEquipEvent.RemoveAllListeners();
+            OnUnequipEvent.RemoveAllListeners();
         }
 
 
-        //protected void OnEnable()
-        //{
-        //    //Debug.LogFormat("Character: {0}");
-
-        //    EventHandler.RegisterEvent(m_Character, EventIDs.OnAnimatorEquipItem, () => SetActive(true));
-        //    EventHandler.RegisterEvent(m_Character, EventIDs.OnAnimatorUnequipItem, () => SetActive(false));
-        //    EventHandler.RegisterEvent(m_Character, EventIDs.OnAnimatorDropItem, ItemDeactivated);
-        //    EventHandler.RegisterEvent(m_Character, EventIDs.OnAnimatorPickupItem, ItemActivated);
-        //}
-
-        //protected void OnDisable()
-        //{
-        //    EventHandler.UnregisterEvent(m_Character, EventIDs.OnAnimatorEquipItem, () => SetActive(true));
-        //    EventHandler.UnregisterEvent(m_Character, EventIDs.OnAnimatorUnequipItem, () => SetActive(false));
-        //    EventHandler.UnregisterEvent(m_Character, EventIDs.OnAnimatorDropItem, ItemDeactivated);
-        //    EventHandler.UnregisterEvent(m_Character, EventIDs.OnAnimatorPickupItem, ItemActivated);
-        //}
 
 
-        public virtual void Initialize(InventoryBase inventory)
+        public virtual void Initialize( Inventory _inventory )
         {
-            m_Controller = inventory.GetComponent<CharacterLocomotion>();
-            m_Character = inventory.gameObject;
-            m_Inventory = inventory;
-            m_Animator = m_Controller.GetComponent<Animator>();
+            charLocomotion = _inventory.GetComponent<CharacterLocomotion>();
+            character = _inventory.gameObject;
+            inventory = _inventory;
+            animator = charLocomotion.GetComponent<Animator>();
 
-            m_GameObject = gameObject;
-            m_Transform = transform;
+            mGameObject = gameObject;
+            mTransform = transform;
+
+            //if (slotID > -1) {
+            //    //  Parent the item to a item equip slot.
+            //    Transform parent = inventory.GetItemEquipSlot(slotID);
+            //    if (parent != null) {
+            //        mGameObject.transform.parent = parent;
+            //        mGameObject.transform.localPosition = localSpawnPosition;
+            //        mGameObject.transform.localEulerAngles = localSpawnRotation;
+            //    }
+            //}
+
+            if (character != null) {
+                EventHandler.RegisterEvent(character, EventIDs.OnAnimatorEquipItem, () => SetActive(true));
+                EventHandler.RegisterEvent(character, EventIDs.OnAnimatorUnequipItem, () => SetActive(false));
+                //EventHandler.RegisterEvent(character, EventIDs.OnAnimatorDropItem, ItemDeactivated);
+                //EventHandler.RegisterEvent(character, EventIDs.OnAnimatorPickupItem, ItemActivated);
+                //Debug.LogFormat("Registering event equip event for {0}", itemType.name);
+            }
 
 
             if (m_NonDominantHandIKTarget == null) {
                 m_NonDominantHandIKTarget = new GameObject("NonDominantHandIKTarget").transform;
-                m_NonDominantHandIKTarget.parent = transform;
+                m_NonDominantHandIKTarget.parent = mTransform;
                 m_NonDominantHandIKTarget.localPosition = Vector3.zero;
                 m_NonDominantHandIKTarget.localEulerAngles = new Vector3(3, 50, 180);
             }
 
-            localSpawnPosition += transform.localPosition;
-            localSpawnRotation += transform.localEulerAngles;
+
 
 
 
@@ -122,48 +151,70 @@
         /// <param name="active"></param>
         public virtual void SetActive(bool active)
         {
-            Debug.LogFormat("{0} is now {1}", itemType.name, active);
+            Debug.LogFormat("<b><color=red>{0}</color> is now {1}</b>", itemType.name, active);
+
             if (active) {
-                if (holsterTarget) {
-                    var parent = m_Inventory.GetItemEquipSlot(slotID);
-                    if (parent != null) {
-                        m_GameObject.transform.parent = parent;
-                        m_GameObject.transform.localPosition = localSpawnPosition;
-                        m_GameObject.transform.localEulerAngles = localSpawnRotation;
-                        
+                if (holsterTarget)
+                {
+                    if(slotID > -1) {
+                        //  Parent the item to a item equip slot.
+                        Transform parent = inventory.GetItemEquipSlot(slotID);
+                        if (parent != null) {
+                            mGameObject.transform.parent = parent;
+                            //mGameObject.transform.localPosition = Vector3.zero;
+                            //mGameObject.transform.localEulerAngles = Vector3.zero;
+                        }
                     }
+
                 }
-                m_GameObject.SetActive(true);
+
+                //  Activate item.
+                ItemActivated();
+                //  Fire off events.
+                //OnEquipEvent.Invoke(active);
 
             } else {
-                if (holsterTarget) {
-                    m_GameObject.transform.parent = holsterTarget;
-                    m_GameObject.transform.localPosition = Vector3.zero;
-                    m_GameObject.transform.localEulerAngles = Vector3.zero;
+                if (holsterTarget){
+                    //  Parent the object to the holster and reset position and rotation values.
+                    mGameObject.transform.parent = holsterTarget;
+                    mGameObject.transform.localPosition = Vector3.zero;
+                    mGameObject.transform.localEulerAngles = Vector3.zero;
                 }
-                m_GameObject.SetActive(false);
-            }
 
+                //  Deactivate the item.
+                ItemDeactivated();
+                //  Fire off events.
+                //OnEquipEvent.Invoke(active);
+            }
         }
 
 
         /// <summary>
-        /// Prepare item for use.
+        /// Prepare item for use. 
         /// </summary>
         protected virtual void ItemActivated()
         {
-            m_GameObject.transform.localPosition = localSpawnPosition;
-            m_GameObject.transform.localEulerAngles = localSpawnRotation;
+            mGameObject.transform.localPosition = localSpawnPosition;
+            mGameObject.transform.localEulerAngles = localSpawnRotation;
+
+            mGameObject.SetActive(true);
+
+
+
+            //  Update the inventory.
+            var slotIndex = inventory.GetItemSlotIndex(itemType);
+            inventory.EquipItem(slotIndex);
 
         }
 
         /// <summary>
-        /// Item is no longer equipped.
+        /// Item is no longer equipped. 
         /// </summary>
         protected virtual void ItemDeactivated()
         {
-
-
+            mGameObject.SetActive(false);
+            //  Update the inventory.
+            inventory.UnequipCurrentItem();
             //Debug.LogFormat("Setting {0} active as Deactivated", gameObject.name);
         }
 
@@ -173,29 +224,7 @@
 
 
 
-        /// <summary>
-        /// Callback from the controller when the item starts to aim.
-        /// </summary>
-        protected virtual void OnStartAim()
-        {
-            
-        }
 
-
-        /// <summary>
-        /// Callback from the controller when the item is aimed or no longer aimed.
-        /// </summary>
-        /// <param name="aim">If set to <c>true</c> aim.</param>
-        protected virtual void OnAim(bool aim)
-        {
-            
-        }
-
-
-        public virtual bool TryUse()
-        {
-            return false;
-        }
     }
 
 }
