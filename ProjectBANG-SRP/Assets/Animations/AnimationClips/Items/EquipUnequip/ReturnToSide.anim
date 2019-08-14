@@ -35765,7 +35765,7 @@ AnimationClip:
   m_Events:
   - time: 0.73333335
     functionName: ExecuteEvent
-    data: OnAnimatorUnequipItem
+    data: OnAnimatorEquipItemComplete
     objectReferenceParameter: {fileID: 11500000, guid: 4b5b38972af4340e8a362154d8c837df,
       type: 3}
     floatParameter: 0

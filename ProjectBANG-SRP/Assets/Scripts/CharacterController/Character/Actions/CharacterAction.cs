@@ -19,7 +19,7 @@
         [SerializeField, HideInInspector]
         protected int m_LayerIndex = 0;
         [SerializeField, HideInInspector]
-        protected int m_ActionID;
+        protected int m_ActionID = -1;
 
         [SerializeField, HideInInspector]
         protected float m_TransitionDuration = 0.2f;
@@ -90,24 +90,11 @@
         //
         // Properties
         //
-        public bool IsActive
-        {
-            get { return m_IsActive; }
-            set { m_IsActive = value; }
-        }
+        public bool IsActive { get { return m_IsActive; } set { m_IsActive = value; } }
 
-        public virtual int ActionID
-        {
-            get { return m_ActionID; }
-            set { m_ActionID = value; }
-        }
+        public virtual int ActionID { get { return m_ActionID; } set { m_ActionID = Mathf.Clamp(value, -1, int.MaxValue); } }
 
-
-        public float SpeedMultiplier
-        {
-            get { return m_SpeedMultiplier; }
-            set { m_SpeedMultiplier = value; }
-        }
+        public float SpeedMultiplier { get { return m_SpeedMultiplier; } set { m_SpeedMultiplier = value; } }
 
 
         public ActionStartType StartType
@@ -175,24 +162,13 @@
         }
 
 
-        //protected void OnEnable()
-        //{
-
-        //}
-
-        //protected void OnDisable()
-        //{
-
-        //}
-
-
 
 
 
 
         protected virtual void OnValidate()
         {
-            if (ActionID > 0) m_ActionID = ActionID;
+            m_ActionID = ActionID >= 0 ? ActionID : -1;
         }
 
 
@@ -272,44 +248,12 @@
                                 m_InputIndex = i;
                                 return true;
                             }
-                            /*
-                            //if (Input.GetKeyDown(m_KeyCodes[i]) && m_ButtonDownPressed == m_KeyCodes[i])
-                            //{
-                            //    if (Time.time - m_ButtonDownPressedTime < 0.25f)
-                            //    {
-                            //        m_ButtonDownPressed = KeyCode.F12;
-                            //        if (m_StopType == ActionStopType.ButtonToggle)
-                            //            m_ActionStopToggle = true;
-                            //        m_InputIndex = i;
-                            //        return true;
-                            //    }
-                            //}
-                            if (Time.time - m_ButtonDownPressedTime < 0.25f && m_ButtonDownPressed == m_KeyCodes[i])
-                            {
-                                m_ButtonDownPressed = KeyCode.F12;
-                                if (m_StopType == ActionStopType.ButtonToggle)
-                                    m_ActionStopToggle = true;
-                                m_InputIndex = i;
-                                return true;
-                            }
-                            if (Input.GetKeyDown(m_KeyCodes[i]) && m_ButtonDownPressed != m_KeyCodes[i])
-                            {
-                                m_ButtonDownPressed = m_KeyCodes[i];
-                                m_ButtonDownPressedTime = Time.time;
-                                return false;
-                            }
-                            */
                         }
                         break;
                     case ActionStartType.DoublePress:
 
                         for (int i = 0; i < m_KeyCodes.Length; i++)
                         {
-                            //if (CheckDoubleTap(m_KeyCodes[i]))
-                            //{
-                            //    return true;
-                            //}
-
                             if (Input.GetKeyDown(m_KeyCodes[i]) && m_FirstButtonPressed == m_KeyCodes[i])
                             {
                                 m_FirstButtonPressed = KeyCode.F12;
@@ -478,14 +422,6 @@
             if(Time.time > m_StartEffectStartTime + m_EffectCooldown)
                 PlayEffect(m_StartEffect, ref m_StartEffectStartTime);
 
-
-            //m_Animator.SetFloat(Animator.StringToHash("AnimationSpeed"), m_SpeedMultiplier);
-
-//            Debug.LogFormat("{2} \nCurrent State:{0}\nNext State:{1} ||",
-//m_AnimatorMonitor.GetStateName(m_Animator.GetCurrentAnimatorStateInfo(0).fullPathHash),
-//m_AnimatorMonitor.GetStateName(m_Animator.GetNextAnimatorStateInfo(0).fullPathHash),
-//GetType());
-             
         }
 
 
@@ -505,9 +441,11 @@
             m_Animator.SetFloat(HashID.ActionFloatData, 0f);
             m_Animator.ResetTrigger(HashID.ActionChange);
 
-            m_Animator.SetInteger(HashID.ItemStateIndex, 0);
-            m_Animator.SetInteger(HashID.ItemSubstateIndex, 0);
-            m_Animator.ResetTrigger(HashID.ItemStateIndexChange);
+            if(this is ItemAction) {
+                m_AnimatorMonitor.SetItemID(0);
+                m_AnimatorMonitor.SetItemStateIndex(0);
+            }
+
             //m_AnimatorMonitor.SetActionID(0);
 
             m_ExitingAction = false;

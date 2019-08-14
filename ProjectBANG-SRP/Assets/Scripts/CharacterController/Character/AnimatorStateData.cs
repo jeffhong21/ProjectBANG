@@ -7,7 +7,7 @@
     public class AnimatorStateData
     {
         [SerializeField]
-        private string stateName = "Idle";
+        private string stateName = "Empty";
         [SerializeField]
         private float transitionDuration = 0.2f;
         [SerializeField]

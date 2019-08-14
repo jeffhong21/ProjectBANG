@@ -38,12 +38,11 @@
     public static class ItemActionID
     {
         public static readonly int Aim = 1;
-        public static readonly int Shoot = 2;
-        public static readonly int MeleeAttack = 3;
-        public static readonly int Reload = 4;
-        public static readonly int Equip = 5;
-        public static readonly int Unequip = 6;
-        public static readonly int Drop = 7;
-        public static readonly int Throw = 8;
+        public static readonly int Use = 2;
+        public static readonly int Reload = 3;
+        public static readonly int Equip = 4;
+        public static readonly int Unequip = 5;
+        public static readonly int Drop = 6;
+        public static readonly int Throw = 7;
     }
 }

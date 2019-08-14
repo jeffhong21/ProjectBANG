@@ -14,7 +14,7 @@
         [SerializeField] protected int maxInputCount = 4;
         [SerializeField, Range(0, 1)]
         protected float stopThreshold = 0.5f;
-        
+        [SerializeField, Range(0.01f, 0.49f)]
         protected float pivotWeightThreshold = 0.18f;
 
         protected int detectionCount;

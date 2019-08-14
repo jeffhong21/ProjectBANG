@@ -17,10 +17,10 @@
             m_CharacterRagdoll = (CharacterRagdoll)target;
             DrawDefaultInspector();
 
-            GUILayout.Space(8);
-            if(GUILayout.Button("Update Character Joint Settings")){
-                m_CharacterRagdoll.UpdateCharacterJoints();
-            }
+            //GUILayout.Space(8);
+            //if(GUILayout.Button("Update Character Joint Settings")){
+            //    m_CharacterRagdoll.UpdateCharacterJoints();
+            //}
         }
 
 

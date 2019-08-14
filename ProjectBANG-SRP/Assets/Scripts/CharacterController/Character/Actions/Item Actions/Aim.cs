@@ -3,10 +3,10 @@
     using UnityEngine;
 
 
-    public class Aim : CharacterAction
+    public class Aim : ItemAction
     {
 
-
+        protected int movementsetID;
 
 
 
@@ -25,9 +25,15 @@
 
         protected override void ActionStarted()
         {
+            movementsetID = m_Inventory.CurrentlyEquippedItem == null ? 0 : m_Inventory.CurrentlyEquippedItem.AnimatorMovementSetID;
             //m_AnimatorMonitor.SetItemID(GetItemID(), m_ItemStateID);
             m_Controller.Aiming = true;
             m_Animator.SetBool(HashID.Aiming, m_Controller.Aiming);
+
+            m_AnimatorMonitor.SetActionID(m_ActionID);
+            m_AnimatorMonitor.SetMovementSetID(movementsetID);
+
+
             EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnAimActionStart, m_Controller.Aiming);
 
         }

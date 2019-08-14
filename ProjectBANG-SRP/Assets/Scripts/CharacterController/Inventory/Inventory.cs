@@ -9,33 +9,33 @@
      * */
     using UnityEngine;
     using System;
-    using System.Collections.Generic;
+    using System.Collections;
 
 
     public class Inventory : InventoryBase
     {
 
         [SerializeField, DisplayOnly]
-        protected Item m_EquipedItem;
+        protected Item currentlyEquippedItem;
         [SerializeField, DisplayOnly]
-        protected Item m_LastEquipedItem;
+        protected Item previouslyEquippedItem;
         [SerializeField, DisplayOnly]
-        protected int m_NextActiveSlot;
+        protected int nextActiveSlot;
 
 
         [SerializeField, DisplayOnly]
         protected InventorySlot[] m_InventorySlots;
 
         public Item CurrentlyEquippedItem {
-            get { return m_EquipedItem; }
+            get { return currentlyEquippedItem; }
         }
 
         protected int NextActiveSlot {
             get {
                 for (int i = 0; i < m_InventorySlots.Length + 0; i++) {
                     if (m_InventorySlots[i].item == null) {
-                        m_NextActiveSlot = i;
-                        return m_NextActiveSlot;
+                        nextActiveSlot = i;
+                        return nextActiveSlot;
                     }
                         
                 }
@@ -66,14 +66,16 @@
 
             }
 
-
-
             m_InventorySlots = new InventorySlot[SlotCount];
+
+            EventHandler.RegisterEvent<ItemAction, bool>(m_GameObject, EventIDs.OnItemActionActive, OnItemActionActive);
+        
         }
 
 
         private void OnDestroy()
         {
+            EventHandler.UnregisterEvent<ItemAction, bool>(m_GameObject, EventIDs.OnItemActionActive, OnItemActionActive);
 
         }
 
@@ -255,27 +257,36 @@
 
 
         /// <summary>
-        /// Equip the item at slot index.
+        /// Equip the item at slot index.  We can only transition from Unequip => Equip or Unequip only.
+        /// We cannot transition from Equip => Unequip
         /// </summary>
         /// <param name="slotIndex"></param>
         /// <returns></returns>
         public Item EquipItem( int slotIndex )
         {
-            if (slotIndex < 0) return null;
+            if (slotIndex < 0) {
+                IsSwitching = false;
+                return null;
+            }
 
             Item item = m_InventorySlots[slotIndex].item;
             if (item != null)
             {
-                UnequipCurrentItem();
-                m_EquipedItem = item;
-
-                //if(m_LastEquipedItem != null) m_LastEquipedItem.SetActive(false);
-                //m_EquipedItem.SetActive(true);
+                previouslyEquippedItem = currentlyEquippedItem;
+                currentlyEquippedItem = item;
 
                 //  Execute the equip event.
                 InternalEquipItem(item);
             }
+
+            IsSwitching = false;
             return item;
+        }
+
+
+        public void EquipItem( ItemType itemType )
+        {
+            EquipItem(GetItemSlotIndex(itemType));
         }
 
         /// <summary>
@@ -307,20 +318,20 @@
 
 
 
+
+
         public void UnequipCurrentItem()
         {
-
-            m_LastEquipedItem = m_EquipedItem;
-            m_EquipedItem = null;
-
-            if (m_EquipedItem != null)
-            {
-                //m_EquipedItem.SetActive(false);
-
+            if (currentlyEquippedItem != null) {
+                IsSwitching = true;
                 //  Execute the equip event.
-                InternalUnequipCurrentItem(m_LastEquipedItem);
-
+                InternalUnequipCurrentItem(previouslyEquippedItem);
             }
+
+            previouslyEquippedItem = currentlyEquippedItem;
+            currentlyEquippedItem = null;
+
+
         }
 
 
@@ -354,6 +365,23 @@
             m_InventorySlots[slot1] = tempSlot;
         }
 
+
+
+
+
+        private void OnItemActionActive(ItemAction action, bool activated )
+        {
+            if(activated)
+            {
+
+            } 
+            else
+            {
+                if (IsSwitching) {
+                    IsSwitching = false;
+                }
+            }
+        }
 
 
 

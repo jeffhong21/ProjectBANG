@@ -17,25 +17,20 @@
         [SerializeField, HideInInspector]
         protected CharacterAction m_ActiveAction;
 
-        protected bool update_CheckGround;
-        protected bool update_CheckMovement;
-        protected bool update_SetPhysicsMaterial;
-        protected bool update_UpdateRotation;
-        protected bool update_UpdateMovement;
-        protected bool update_UpdateAnimator;
-        protected bool update_Move;
+        protected bool canCheckGround;
+        protected bool canCheckMovement;
+        protected bool canSetPhysicsMaterial;
+        protected bool canUpdateRotation;
+        protected bool canUpdateMovement;
+        protected bool canUpdateAnimator;
+        protected bool canMove;
 
 
 
         public bool Aiming { get; set; }
 
-        public bool CanAim {
-            get {
-                if (Grounded)
-                    return true;
-                return false;
-            }
-        }
+        public bool CanAim { get => Grounded; }
+        
 
         public CharacterAction[] CharActions{
             get { return m_Actions; }
@@ -50,37 +45,35 @@
             for (int i = 0; i < m_Actions.Length; i++) {
                 m_Actions[i].Initialize(this, fixedDeltaTime);
             }
-        }
-
-
-        protected void OnEnable()
-		{
 
             EventHandler.RegisterEvent<CharacterAction, bool>(m_GameObject, EventIDs.OnCharacterActionActive, OnActionActive);
+            EventHandler.RegisterEvent<ItemAction, bool>(m_GameObject, EventIDs.OnItemActionActive, OnItemActionActive);
             EventHandler.RegisterEvent<bool>(m_GameObject, EventIDs.OnAimActionStart, OnAimActionStart);
 
         }
 
 
-        protected void OnDisable()
+        protected void OnDestroy()
 		{
-
             EventHandler.UnregisterEvent<CharacterAction, bool>(m_GameObject, EventIDs.OnCharacterActionActive, OnActionActive);
+            EventHandler.UnregisterEvent<ItemAction, bool>(m_GameObject, EventIDs.OnItemActionActive, OnItemActionActive);
             EventHandler.UnregisterEvent<bool>(m_GameObject, EventIDs.OnAimActionStart, OnAimActionStart);
+
 
         }
 
 
+
+
         protected override void Update()
-		{
+        {
             base.Update();
 
 
-            m_Move = true;
+            canMove = true;
 
             ////  Start Stop Actions.
-            for (int i = 0; i < m_Actions.Length; i++)
-            {
+            for (int i = 0; i < m_Actions.Length; i++) {
                 if (m_Actions[i].enabled == false)
                     continue;
                 CharacterAction charAction = m_Actions[i];
@@ -90,7 +83,7 @@
 
                 if (charAction.IsActive) {
                     //  Move charatcer based on input values.
-                    if (m_Move) m_Move = charAction.Move();
+                    if (canMove) canMove = charAction.Move();
 
                     //// Update the Animator.
                     //if (m_UpdateAnimator) m_UpdateAnimator = charAction.UpdateAnimator();
@@ -100,7 +93,7 @@
             }
 
             //  Moves the character according to the input.
-            if (m_Move) Move();
+            if (canMove) Move();
         }
 
 
@@ -108,56 +101,67 @@
 		{
             base.FixedUpdate();
 
-            //m_Move = true;
-            m_CheckGround = true;
-            m_CheckMovement = true;
-            m_SetPhysicsMaterial = true;
-            m_UpdateRotation = true;
-            m_UpdateMovement = true;
-            m_UpdateAnimator = true;
+            //canMove = true;
+
+            canCheckGround = true;
+            canCheckMovement = true;
+            canSetPhysicsMaterial = true;
+            canUpdateRotation = true;
+            canUpdateMovement = true;
+            canUpdateAnimator = true;
 
 
             for (int i = 0; i < m_Actions.Length; i++)
             {
-                if (m_Actions[i].enabled == false)
+                if (m_Actions[i].enabled == false) {
+                    //  Call Action Update.
+                    m_Actions[i].UpdateAction();
                     continue;
+                }
                 CharacterAction charAction = m_Actions[i];
-
                 if (charAction.IsActive)
                 {
+                    ////  Move charatcer based on input values.
+                    //if (canMove) canMove = charAction.Move();
 
                     //  Perform checks to determine if the character is on the ground.
-                    if (m_CheckGround) m_CheckGround = charAction.CheckGround();
+                    if (canCheckGround) canCheckGround = charAction.CheckGround();
                     //  Ensure the current movement direction is valid.
-                    if (m_CheckMovement) m_CheckMovement = charAction.CheckMovement();
+                    if (canCheckMovement) canCheckMovement = charAction.CheckMovement();
 
                     //  Apply any movement.
-                    if (m_UpdateMovement) m_UpdateMovement = charAction.UpdateMovement();
+                    if (canUpdateMovement) canUpdateMovement = charAction.UpdateMovement();
                     //  Update the rotation forces.
-                    if (m_UpdateRotation)m_UpdateRotation = charAction.UpdateRotation();
+                    if (canUpdateRotation) canUpdateRotation = charAction.UpdateRotation();
 
                     // Update the Animator.
-                    if (m_UpdateAnimator)m_UpdateAnimator = charAction.UpdateAnimator();
+                    if (canUpdateAnimator) canUpdateAnimator = charAction.UpdateAnimator();
 
                 }
+                //  Call Action Update.
+                charAction.UpdateAction();
             }  //  end of for loop
 
 
+            ////  Moves the character according to the input.
+            //if (canMove) Move();
+
+
             //  Perform checks to determine if the character is on the ground.
-            if (m_CheckGround) CheckGround();
+            if (canCheckGround) CheckGround();
             //  Ensure the current movement direction is valid.
-            if (m_CheckMovement) CheckMovement();
+            if (canCheckMovement) CheckMovement();
             //  Set the physic material based on the grounded and stepping state
-            if (m_SetPhysicsMaterial) SetPhysicsMaterial();
+            if (canSetPhysicsMaterial) SetPhysicsMaterial();
 
             //  Apply any movement.
-            if (m_UpdateMovement) UpdateMovement();
+            if (canUpdateMovement) UpdateMovement();
             //  Update the rotation forces.
-            if (m_UpdateRotation) UpdateRotation();
+            if (canUpdateRotation) UpdateRotation();
 
 
             // Update the Animator.
-            if (m_UpdateAnimator)
+            if (canUpdateAnimator)
                 UpdateAnimator();
             //if (m_Animator.pivotWeight < 0.5f || m_Animator.pivotWeight > 0.5f)
             //    m_Animator.SetFloat(HashID.LegUpIndex, m_Animator.pivotWeight >= 0.5f ? 1 : 0);
@@ -268,7 +272,35 @@
 
 
         /// <summary>
-        /// Starts and Stops the Action.
+        /// Try to stop the characterAction.
+        /// </summary>
+        /// <param name="charAction"></param>
+        /// <returns></returns>
+        protected bool StopAction(CharacterAction charAction)
+        {
+            //  Current Action is Active.
+            if (charAction.enabled && charAction.IsActive) {
+                //  Check if can stop Action is StopType is NOT Manual.
+                if (charAction.StopType != ActionStopType.Manual) {
+                    if (charAction.CanStopAction()) {
+                        //  Start the Action and update the animator.
+                        charAction.StopAction();
+                        //  Reset Active Action.
+                        if (m_ActiveAction = charAction)
+                            m_ActiveAction = null;
+                        //  Move on to the next Action.
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+
+
+        /// <summary>
+        /// Starts and Stops the Action internally.
         /// </summary>
         /// <param name="charAction"></param>
         /// <returns>Returns true if action was started.</returns>
@@ -467,6 +499,12 @@
                     }
                 }
             }
+
+        }
+
+
+        private void OnItemActionActive( ItemAction action, bool activated )
+        {
 
         }
 

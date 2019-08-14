@@ -75,17 +75,9 @@
 
 
 
-        /// <summary>
-        /// Adds the item to the inventory and adds the specified amount of ItemType.
-        /// It should be assumed that the itemType has already been mapped internally.
-        /// </summary>
-        /// <param name="itemType"> The ItemType to add. </param>
-        /// <param name="count"> The amount of itemType to add. </param>
-        /// <param name="immediatePickup"> Should the item be picked up immediately. If false, item will be added with an animation. </param>
-        /// <param name="forceEquip"> Should the item be forced to equip. </param>
-        /// <param name="notifyOnPickup"> Should other objects be notified the itemType was pickedup? </param>
-        /// <returns> Returns true if the ItemType was pickedup.</returns>
-        public abstract bool PickupItemType( ItemType itemType, float count, bool immediatePickup, bool forceEquip, bool notifyOnPickup = true );
+
+
+
 
 
         /// <summary>
@@ -121,9 +113,6 @@
         }
 
 
-        public abstract Item RemoveItemType( ItemType itemType, int slotIndex );
-
-
         protected Item InternalRemoveItemType( ItemType itemType )
         {
             float existingAmount;
@@ -143,8 +132,6 @@
             return item;
         }
 
-
-        public abstract bool AddItem( Item item, bool immediatelyEquip );
 
         /// <summary>
         /// Add the item to the inventory.  Does not add the actual ItemType.  PickupItem does that.
@@ -169,56 +156,10 @@
         }
 
 
-
-
-        /// <summary>
-        /// Gets the item from item map.
-        /// </summary>
-        /// <param name="itemType"></param>
-        /// <returns></returns>
-        public Item GetItem( ItemType itemType )
-        {
-            Item item;
-            m_ItemTypeItemMap.TryGetValue(itemType, out item);
-            return item;
-        }
-
-        public abstract Item GetItem( int index ); // { return m_ActiveItems[slotID]; }
-
-
-        /// <summary>
-        /// Get the amount of ItemType from the inventory.
-        /// </summary>
-        /// <param name="itemType"></param>
-        /// <returns></returns>
-        public float GetItemTypeCount( ItemType itemType )
-        {
-            float count;
-            m_ItemTypeCount.TryGetValue(itemType, out count);
-            return count;
-        }
-
-
-
-
-
-
-
-
-
-        public abstract void UseItem( ItemType itemType, float count );
-
-
-
-
-
         protected void InternalUseItem( ItemType itemType, float count )
         {
             EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnInventoryUseItem, itemType, count);
         }
-
-
-        public abstract void Reload( ItemType itemType, float amount );
 
 
         protected void InternalReload( ItemType itemType, float amount )
@@ -240,6 +181,34 @@
         }
 
 
+
+
+        /// <summary>
+        /// Gets the item from item map.
+        /// </summary>
+        /// <param name="itemType"></param>
+        /// <returns></returns>
+        public Item GetItem( ItemType itemType )
+        {
+            Item item;
+            m_ItemTypeItemMap.TryGetValue(itemType, out item);
+            return item;
+        }
+
+
+
+
+        /// <summary>
+        /// Get the amount of ItemType from the inventory.
+        /// </summary>
+        /// <param name="itemType"></param>
+        /// <returns></returns>
+        public float GetItemTypeCount( ItemType itemType )
+        {
+            float count;
+            m_ItemTypeCount.TryGetValue(itemType, out count);
+            return count;
+        }
 
 
         public Transform GetItemEquipSlot(int slotID)
@@ -271,28 +240,26 @@
 
 
 
+        /// <summary>
+        /// Adds the item to the inventory and adds the specified amount of ItemType.
+        /// It should be assumed that the itemType has already been mapped internally.
+        /// </summary>
+        /// <param name="itemType"> The ItemType to add. </param>
+        /// <param name="count"> The amount of itemType to add. </param>
+        /// <param name="immediatePickup"> Should the item be picked up immediately. If false, item will be added with an animation. </param>
+        /// <param name="forceEquip"> Should the item be forced to equip. </param>
+        /// <param name="notifyOnPickup"> Should other objects be notified the itemType was pickedup? </param>
+        /// <returns> Returns true if the ItemType was pickedup.</returns>
+        public abstract bool PickupItemType( ItemType itemType, float count, bool immediatePickup, bool forceEquip, bool notifyOnPickup = true );
+        public abstract Item RemoveItemType( ItemType itemType, int slotIndex );
+        public abstract bool AddItem( Item item, bool immediatelyEquip );
+        public abstract Item GetItem( int index ); // { return m_ActiveItems[slotID]; }
+        public abstract void Reload( ItemType itemType, float amount );
+        public abstract void UseItem( ItemType itemType, float count );
 
 
 
 
-
-
-        //[Serializable]
-        //public class ItemEquipSlots
-        //{
-        //    [SerializeField] protected Transform m_LeftHandSlot;
-        //    [SerializeField] protected Transform m_RightHandSlot;
-
-        //    public Transform LeftHandSlot {
-        //        get { return m_LeftHandSlot; }
-        //        set { m_LeftHandSlot = value; }
-        //    }
-
-        //    public Transform RightHandSlot {
-        //        get { return m_RightHandSlot; }
-        //        set { m_RightHandSlot = value; }
-        //    }
-        //}
 
 
 

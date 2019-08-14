@@ -136,7 +136,7 @@ namespace CharacterController
                     return true;
                 }
             }
-            if (Time.time > m_ActionStartTime +1.25f)
+            if (Time.time > m_ActionStartTime + 1)
                 return true;
             return false;
         }

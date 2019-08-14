@@ -100,7 +100,7 @@ namespace CharacterController
         protected bool m_Moving, m_Grounded = true;
         protected float m_RotationAngle;
         protected Vector3 m_InputVector;
-        protected Vector3 m_MoveDirection, m_PreviousPosition, m_ExternalForce, m_Velocity, m_AngularVelocity;
+        protected Vector3 m_MoveDirection, m_PreviousPosition, m_Velocity, m_AngularVelocity;
         protected Quaternion m_LookRotation = Quaternion.identity, m_TargetRotation = Quaternion.identity;
         protected Vector3 m_RootMotionVelocity;
         protected Quaternion m_RootMotionRotation;
@@ -109,9 +109,8 @@ namespace CharacterController
         protected float m_GroundAngle;
         protected Vector3 m_GroundSlopeDir;
 
-        protected float m_SlopeAngle;
+
         protected RaycastHit m_GroundHit;
-        [SerializeField]
         protected Collider[] m_Collisions;
 
         protected Vector3 m_ColliderCenter;
@@ -120,13 +119,7 @@ namespace CharacterController
         protected PhysicMaterial m_GroundIdleFrictionMaterial, m_GroundedMovingFrictionMaterial, m_AirFrictionMaterial;
 
 
-        protected bool m_CheckGround = true;
-        protected bool m_CheckMovement = true;
-        protected bool m_SetPhysicsMaterial = true;
-        protected bool m_UpdateRotation = true;
-        protected bool m_UpdateMovement = true;
-        protected bool m_UpdateAnimator = true;
-        protected bool m_Move = true;
+
 
 
         protected float m_Speed;
@@ -232,8 +225,6 @@ namespace CharacterController
                             m_Collider.height = 1.8f;
                             m_Collider.center = new Vector3(0, m_Collider.height / 2, 0);
                         }
-
-                        Debug.Log("Found ");
                         break;
                     }
                 }
@@ -327,8 +318,11 @@ namespace CharacterController
 
         protected virtual void FixedUpdate()
         {
+
             if (Math.Abs(m_TimeScale) < float.Epsilon) return;
             m_DeltaTime = fixedDeltaTime;
+
+            m_PreviousPosition = m_Rigidbody.position;
 
         }
 
@@ -372,6 +366,7 @@ namespace CharacterController
 
                     m_RotationAngle = Mathf.Atan2(m_InputVector.x, m_InputVector.z);
                     m_RotationAngle = (float)Math.Round(m_RotationAngle, 2);
+
 
                     m_InputVector.z = Mathf.Abs(m_MoveDirection.x) + Mathf.Abs(m_MoveDirection.z);
                     if(Mathf.Abs(m_RotationAngle) > 0.1f) m_InputVector.z = m_InputVector.z + Mathf.Abs(m_RotationAngle);
@@ -724,7 +719,8 @@ namespace CharacterController
 
             //m_Rigidbody.MovePosition(m_MoveDirection + m_Rigidbody.position);
 
-
+            DebugDraw.Sphere(m_Transform.position + m_Velocity, 0.08f, Color.black);
+            Debug.DrawRay(m_Transform.position, m_Velocity, Color.black);
 
         }
 
@@ -757,7 +753,10 @@ namespace CharacterController
             if (m_UseRootMotion)
             {
                 m_RootMotionVelocity = m_Animator.deltaPosition * m_RootMotionSpeedMultiplier;
-                if(m_Animator.hasRootMotion) m_Rigidbody.MovePosition(m_Animator.rootPosition);
+
+
+
+                if (m_Animator.hasRootMotion) m_Rigidbody.MovePosition(m_Animator.rootPosition);
             }
             if(m_UseRootMotionRotation) {
                 //float angleInDegrees;
@@ -769,7 +768,7 @@ namespace CharacterController
                 if (m_Animator.hasRootMotion) m_Rigidbody.MoveRotation(m_Animator.rootRotation);
             }
 
-
+            
         }
 
 

@@ -199,7 +199,7 @@
 
             if (apexReached == false) apexReached = heightDistance <= 0f;
 
-
+            Debug.LogFormat("heightDistance: {0}, apexReached: {1}, rootMotion: {2}", heightDistance, apexReached, m_Animator.applyRootMotion);
             if (heightDistance >= 0f && !apexReached) {
                 //verticalPosition = Vector3.Lerp(m_Transform.position, startReach, m_DeltaTime * 10);
                 verticalPosition = Vector3.MoveTowards(m_Transform.position, startReach, m_DeltaTime * 10);
@@ -211,7 +211,7 @@
             m_Rigidbody.MovePosition((verticalPosition + fwdPosition));
 
 
-
+            if (m_Debug) DebugDraw.Sphere(verticalPosition + fwdPosition, 0.1f, Color.black);
 
             if ((endReach - m_Transform.position).sqrMagnitude < 0.1f) {
                 m_Rigidbody.isKinematic = cachedIsKinamatic;
@@ -291,13 +291,13 @@
                 //Gizmos.DrawRay(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward * m_MoveToVaultDistance);
 
                 Gizmos.color = Color.magenta;
-                Gizmos.DrawWireSphere(startPosition, 0.15f);
+                Gizmos.DrawWireSphere(startPosition, 0.08f);
 
                 Gizmos.color = Color.cyan;
-                GizmosUtils.DrawMarker(startReach, 0.15f, Color.cyan);
+                GizmosUtils.DrawMarker(startReach, 0.08f, Color.cyan);
 
                 Gizmos.color = Color.cyan;
-                GizmosUtils.DrawMarker(endReach, 0.15f, Color.cyan);
+                GizmosUtils.DrawMarker(endReach, 0.08f, Color.cyan);
 
                 Gizmos.color = Color.yellow;
                 Gizmos.DrawWireSphere(endPosition,m_CapsuleCollider.radius);

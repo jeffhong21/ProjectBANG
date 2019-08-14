@@ -54,6 +54,7 @@
 
             InspectorUtility.PropertyField(serializedObject.FindProperty("m_TransitionDuration"));
             InspectorUtility.PropertyField(serializedObject.FindProperty("m_SpeedMultiplier"));
+            InspectorUtility.PropertyField(serializedObject.FindProperty("m_ActionID"));
             InspectorUtility.PropertyField(serializedObject.FindProperty("m_StartType"));
             InspectorUtility.PropertyField(serializedObject.FindProperty("m_StopType"));
 

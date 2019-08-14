@@ -12,7 +12,7 @@ namespace CharacterController
 
         public static readonly string OnCharacterActionActive = "OnCharacterActionActive";
         public static readonly string OnAimActionStart = "OnAimActionStart";
-
+        public static readonly string OnItemActionActive = "OnItemActionActive";
         //
         //  Inventory events
         //
