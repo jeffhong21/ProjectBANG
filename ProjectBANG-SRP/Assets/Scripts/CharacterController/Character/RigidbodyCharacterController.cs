@@ -116,10 +116,13 @@ namespace CharacterController
         protected Vector3 m_ColliderCenter;
         protected float m_ColliderHeight;
         protected Collider[] m_LinkedColliders = new Collider[0];
-        protected PhysicMaterial m_GroundIdleFrictionMaterial, m_GroundedMovingFrictionMaterial, m_AirFrictionMaterial;
+        protected PhysicMaterial m_PhysicsMaterial = new PhysicMaterial();
 
 
-
+        protected Vector3 previousPosition, currentPosition, targetPosition;
+        protected Vector3 previousVelocity, currentVelocity, targetVelocity;
+        protected int motionTrajectoryResolution;
+        protected Vector3[] motionTrajectory;
 
 
         protected float m_Speed;
@@ -274,35 +277,6 @@ namespace CharacterController
 
 
 
-
-
-
-            // slides the character through walls and edges
-            m_GroundedMovingFrictionMaterial = new PhysicMaterial
-            {
-                name = "GroundedMovingFrictionMaterial",
-                staticFriction = .25f,
-                dynamicFriction = 0f,
-                frictionCombine = PhysicMaterialCombine.Multiply
-            };
-
-            // prevents the collider from slipping on ramps
-            m_GroundIdleFrictionMaterial = new PhysicMaterial
-            {
-                name = "GroundIdleFrictionMaterial",
-                staticFriction = 1f,
-                dynamicFriction = 1f,
-                frictionCombine = PhysicMaterialCombine.Maximum
-            };
-
-            // air physics 
-            m_AirFrictionMaterial = new PhysicMaterial
-            {
-                name = "AirFrictionMaterial",
-                staticFriction = 0f,
-                dynamicFriction = 0f,
-                frictionCombine = PhysicMaterialCombine.Minimum
-            };
         }
 
 
@@ -318,7 +292,6 @@ namespace CharacterController
 
         protected virtual void FixedUpdate()
         {
-
             if (Math.Abs(m_TimeScale) < float.Epsilon) return;
             m_DeltaTime = fixedDeltaTime;
 
@@ -398,7 +371,6 @@ namespace CharacterController
         }
 
 
-
         /// <summary>
         /// Perform checks to determine if the character is on the ground.
         /// </summary>
@@ -451,8 +423,6 @@ namespace CharacterController
         }
 
 
-
-        Quaternion m_CollisionRotation;
         /// <summary>
         /// Ensure the current movement direction is valid.
         /// </summary>
@@ -603,7 +573,6 @@ namespace CharacterController
         }
 
 
-
         /// <summary>
         /// Update the character’s rotation values.
         /// </summary>
@@ -659,7 +628,6 @@ namespace CharacterController
             //Vector3 torque = rigidbodyCached.inertiaTensorRotation * Vector3.Scale(rigidbodyCached.inertiaTensor, desiredAngularVelInY);
             //rigidbody.AddRelativeTorque(torque, ForceMode.Impulse);
         }
-
 
 
         /// <summary>
@@ -725,12 +693,14 @@ namespace CharacterController
         }
 
 
-
         /// <summary>
         /// Updates the animator.
         /// </summary>
         protected virtual void UpdateAnimator()
         {
+            //var speed = m_Velocity.magnitude;
+
+
             m_Animator.SetBool(HashID.Grounded, Grounded);
 
             m_Animator.SetFloat(HashID.Speed, Speed);
@@ -778,20 +748,37 @@ namespace CharacterController
         protected virtual void SetPhysicsMaterial()
         {
             //change the physics material to very slip when not grounded or maxFriction when is
-            if (!m_Grounded && Mathf.Abs(m_Rigidbody.velocity.y) > 0)
-                m_Collider.material = m_AirFrictionMaterial;
 
-            else if (m_Grounded && m_Moving)
-                m_Collider.material = m_GroundedMovingFrictionMaterial;
+            //  Airborne.
+            if (!m_Grounded && Mathf.Abs(m_Rigidbody.velocity.y) > 0) {
+                m_Collider.material.staticFriction = 0f;
+                m_Collider.material.dynamicFriction = 0f;
+                m_Collider.material.frictionCombine = PhysicMaterialCombine.Minimum;
+            }
+            //  Grounded and is moving.
+            else if (m_Grounded && m_Moving) {
+                m_Collider.material.staticFriction = 0.25f;
+                m_Collider.material.dynamicFriction = 0f;
+                m_Collider.material.frictionCombine = PhysicMaterialCombine.Multiply;
+            }
+            //  Grounded but not moving.
+            else if (m_Grounded && !m_Moving) {
+                m_Collider.material.staticFriction = 1f;
+                m_Collider.material.dynamicFriction = 1f;
+                m_Collider.material.frictionCombine = PhysicMaterialCombine.Maximum;
+            }
 
-            else if (m_Grounded && !m_Moving)
-                m_Collider.material = m_GroundIdleFrictionMaterial;
-
-            else
-                m_Collider.material = m_GroundIdleFrictionMaterial;
+            else {
+                m_Collider.material.staticFriction = 1f;
+                m_Collider.material.dynamicFriction = 1f;
+                m_Collider.material.frictionCombine = PhysicMaterialCombine.Maximum;
+            }
 
             //m_Collider.material = m_AirFrictionMaterial;
         }
+
+
+
 
 
 
