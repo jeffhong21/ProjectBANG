@@ -64,7 +64,8 @@ public class LevelManager : SingletonMonoBehaviour<LevelManager>
         gameData.InitializeGameData();
 
         //  Instantiate the UI.
-        inGameMenu = Instantiate(gameData.InGameMenu);
+        if (gameData.InGameMenu) inGameMenu = Instantiate(gameData.InGameMenu);
+        else Debug.Log("No IngameMenu.");
 
 
         //  Spawn Player.

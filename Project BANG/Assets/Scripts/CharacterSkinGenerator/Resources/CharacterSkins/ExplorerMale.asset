@@ -15,12 +15,9 @@ MonoBehaviour:
   setId: Explorer
   characterMesh: {fileID: -4664452718743379222, guid: 44f9a9ed866ce470bbfdcea2f501f0c5,
     type: 3}
-  hairMesh: {fileID: 8100663979635834954, guid: 44f9a9ed866ce470bbfdcea2f501f0c5,
-    type: 3}
-  hatHairMesh: {fileID: 3979134635940797025, guid: 44f9a9ed866ce470bbfdcea2f501f0c5,
-    type: 3}
-  facialHairMesh: {fileID: 6868231182847244967, guid: 44f9a9ed866ce470bbfdcea2f501f0c5,
-    type: 3}
+  hairMesh: {fileID: 0}
+  hatHairMesh: {fileID: 0}
+  facialHairMesh: {fileID: 0}
   textureSetData: {fileID: 11400000, guid: 82386e69aad934faebff3e6cbecb5fd8, type: 2}
-  skinMaterial: {fileID: 2100000, guid: 12bf96c5f9e25425badfd93934d68774, type: 2}
+  skinMaterial: {fileID: 2100000, guid: 69452b0419f804ecc93c01de44986f57, type: 2}
   shaderProperty: _BaseColorRGBOutlineWidthA

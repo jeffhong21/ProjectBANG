@@ -12,11 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47038c9de20f14039ad7577604af58f9, type: 3}
   m_Name: GameData
   m_EditorClassIdentifier: 
-  objectPool: {fileID: 0}
+  objectPool: {fileID: 2573523295947640292, guid: 58e3a611ddb12437884241e301e8b2dc,
+    type: 3}
   cameraPrefab: {fileID: 2670088491078827618, guid: 3cc50fa214435479187990c24ae81295,
     type: 3}
-  playerPrefab: {fileID: 2864552554060033022, guid: ed66a286e62f047afba69548498a8ac9,
-    type: 3}
-  inGameMenu: {fileID: 1963739879739996759, guid: f8bf0cd6d13a94ec4bf43805e8a7f182,
-    type: 3}
+  playerPrefab: {fileID: 0}
+  inGameMenu: {fileID: 0}
   prototypeLevel: {fileID: 11400000, guid: 8cad15a73544442cabfe94afd1c93a7e, type: 2}

@@ -170,7 +170,7 @@ namespace CharacterController
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_VerticalCollisionCount"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_CollisionsLayerMask"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_MaxCollisionCount"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Collisions"), true);
+                //EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Collisions"), true);
 
 
                 EditorGUILayout.Space();
@@ -240,33 +240,38 @@ namespace CharacterController
             }
 
 
-
             //  -----
             //  Debugging
             //  -----
-            if(m_Debug.boolValue){
+            EditorGUILayout.Space();
+            InspectorUtility.PropertyField(serializedObject.FindProperty("Debugger"), true);
 
-                m_DebugFoldout = m_UseDefaultFoldout ? EditorGUILayout.Foldout(m_DebugFoldout, DebugHeader) : InspectorUtility.Foldout(m_DebugFoldout, DebugHeader);
-                if (m_DebugFoldout)
-                {
-                    //DrawPropertiesExcluding(serializedObject, m_DontIncude);
-                    //InspectorUtility.LabelField("-- Debug Settings--");
-                    EditorGUI.indentLevel++;
+            //if (m_Debug.boolValue){
 
-                    InspectorUtility.PropertyField(serializedObject.FindProperty("DrawDebugLine"));
-                    InspectorUtility.PropertyField(serializedObject.FindProperty("DebugGroundCheck"));
-                    InspectorUtility.PropertyField(serializedObject.FindProperty("DebugCollisions"));
+            //    m_DebugFoldout = m_UseDefaultFoldout ? EditorGUILayout.Foldout(m_DebugFoldout, DebugHeader) : InspectorUtility.Foldout(m_DebugFoldout, DebugHeader);
+            //    if (m_DebugFoldout)
+            //    {
+            //        //DrawPropertiesExcluding(serializedObject, m_DontIncude);
+            //        //InspectorUtility.LabelField("-- Debug Settings--");
+            //        EditorGUI.indentLevel++;
+            //        InspectorUtility.PropertyField(serializedObject.FindProperty("Debugger"), true);
+            //        InspectorUtility.PropertyField(serializedObject.FindProperty("DrawDebugLine"));
+            //        InspectorUtility.PropertyField(serializedObject.FindProperty("DebugGroundCheck"));
+            //        InspectorUtility.PropertyField(serializedObject.FindProperty("DebugCollisions"));
 
 
-                    EditorGUI.indentLevel--;
+            //        EditorGUI.indentLevel--;
 
-                    //if(GUILayout.Button("Stop All Actions"))
-                    //{
-                    //    m_Controller.TryStopAllActions();
-                    //    Debug.Log("Stopping all Actions");
-                    //}
-                }
-            }
+            //        //if(GUILayout.Button("Stop All Actions"))
+            //        //{
+            //        //    m_Controller.TryStopAllActions();
+            //        //    Debug.Log("Stopping all Actions");
+            //        //}
+            //    }
+            //}
+
+
+
 
             EditorGUILayout.Space();
             serializedObject.ApplyModifiedProperties();

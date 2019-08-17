@@ -2,7 +2,7 @@ namespace CharacterController
 {
     using UnityEngine;
     using RootMotion.FinalIK;
-
+    using System.Collections.Generic;
 
     [DisallowMultipleComponent]
     public class FinalIKController : MonoBehaviour
@@ -12,6 +12,8 @@ namespace CharacterController
 
         [SerializeField]
         protected Transform rightHandTarget, leftHandTarget, bodyEffectorTarget, lookTarget;
+        [Header("GrounderIK")]
+        public GrounderFBBIK grounderIK;
 
         [Header("LookAtIK")]
         public LookAtIK lookAtIK;
@@ -19,6 +21,8 @@ namespace CharacterController
         [Header("AimIK")]
         public AimIK aimIK;
 
+        [Header("Debug")]
+        [SerializeField] private bool hideInInspector;
 
         private Animator animator;
         private bool updateFrame;
@@ -68,7 +72,24 @@ namespace CharacterController
         }
 
 
+        private void OnValidate()
+        {
+            var ikComponents = new List<IK>();
+            if (fbIK != null) ikComponents.Add(fbIK);
+            //if (grounderIK != null) ikComponents.Add(grounderIK);
+            if (lookAtIK != null) ikComponents.Add(lookAtIK);
+            if (aimIK != null) ikComponents.Add(aimIK);
 
+
+            for (int i = 0; i < ikComponents.Count; i++)
+            {
+                ikComponents[i].hideFlags = hideInInspector ? HideFlags.HideInInspector : HideFlags.None;
+            }
+            if (grounderIK != null) grounderIK.hideFlags = hideInInspector ? HideFlags.HideInInspector : HideFlags.None;
+
+
+            //iks = GetComponent<IK>();
+        }
 
         //private void FixedUpdate()
         //{

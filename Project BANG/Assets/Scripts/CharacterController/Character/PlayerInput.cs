@@ -149,7 +149,7 @@ namespace CharacterController
 
         private void Update()
 		{
-            inputVector = m_AxisRaw? InputVectorRaw : InputVector;
+            inputVector = m_AxisRaw ? InputVectorRaw : InputVector;
             cameraFwd.Set(1, 0, 1);
 
             lookDirection = m_CameraController == null ? mTransform.forward : Vector3.Scale(m_Camera.forward, cameraFwd).normalized;
@@ -160,7 +160,7 @@ namespace CharacterController
                     inputVector = m_Camera.right * InputVector.x + lookDirection * InputVector.z;
                     //inputVector = Vector3.ProjectOnPlane(inputVector, transform.forward);
 
-                    float turnAmount = Mathf.Atan2(inputVector.x, inputVector.z) * Mathf.Rad2Deg;
+                    float turnAmount = Mathf.Atan2(lookDirection.x, lookDirection.z) * Mathf.Rad2Deg;
                     //float turnAmount = Mathf.SmoothDampAngle(m_Controller.transform.rotation.y, Mathf.Atan2(inputVector.x, inputVector.z) * Mathf.Rad2Deg, ref rotationVelocitySmooth, 0.1f);
                     lookRotation = Quaternion.AngleAxis(turnAmount, transform.up);
                     break;

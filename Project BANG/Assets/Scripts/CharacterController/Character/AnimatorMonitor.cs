@@ -38,7 +38,7 @@
         // Fields
         //
 
-        [Foldout("Damp Options", true)]
+        //[Foldout("Damp Options", true)]
         public float horizontalInputDampTime = 0.1f;
         public float forwardInputDampTime = 0.1f;
 
