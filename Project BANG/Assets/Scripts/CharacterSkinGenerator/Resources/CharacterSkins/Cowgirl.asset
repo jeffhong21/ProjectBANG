@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5cc0ee30f22748dd93ac13b5637600b, type: 3}
+  m_Name: Cowgirl
+  m_EditorClassIdentifier: 
+  setId: Western
+  characterMesh: {fileID: 5339903641125903434, guid: 04a279f1da7ac40788cc8749effd50c3,
+    type: 3}
+  hairMesh: {fileID: 0}
+  hatHairMesh: {fileID: 0}
+  facialHairMesh: {fileID: 0}
+  textureSetData: {fileID: 11400000, guid: c088f3c22fb814adfa19ec69eb6635ff, type: 2}
+  skinMaterial: {fileID: 2100000, guid: 7f9aeef99258148af944d6a2080b5913, type: 2}
+  shaderProperty: _BaseColorRGBOutlineWidthA
