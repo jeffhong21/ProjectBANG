@@ -434,7 +434,7 @@ GameObject:
   - component: {fileID: 3558082288662322614}
   m_Layer: 31
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -519,7 +519,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_UseRootMotion: 1
   m_RootMotionSpeedMultiplier: 1.2
-  m_GroundAcceleration: 0.12
+  m_RootMotionRotationMultiplier: 1.2
+  m_GroundAcceleration: {x: 0.18, y: 0.18, z: 0.18}
+  m_Acceleration: 0.12
   m_AirborneAcceleration: 0.2
   m_MotorDamping: 0.3
   m_AirborneDamping: 0.3
@@ -528,27 +530,19 @@ MonoBehaviour:
   m_RotationSpeed: 10
   m_SlopeForceUp: 1
   m_SlopeForceDown: 1.25
-  m_StopMovementThreshold: 0.5
   m_DetectObjectHeight: 0.4
   m_Mass: 100
   m_SkinWidth: 0.08
   m_SlopeLimit: 45
   m_MaxStepHeight: 0.4
-  m_ExternalForceDamping: 0.1
   m_GravityModifier: 0.4
   m_GroundStickiness: 6
-  m_Collider: {fileID: 8140073959955325728}
-  m_DetectHorizontalCollision: 1
-  m_HorizontalCollisionCount: 10
-  m_VerticalCollisionCount: 10
   m_CollisionsLayerMask:
     serializedVersion: 2
-    m_Bits: 134217728
+    m_Bits: 0
   m_MaxCollisionCount: 100
-  m_IdleRotationMultiplier: 2
-  m_MovingStateName: Movement.Movement
-  m_AirborneStateName: Fall.Fall
-  Debugger:
+  m_IdleRotationMultiplier: 1
+  debugger:
     debugMode: 1
     states:
       showGroundCheck: 0
@@ -558,8 +552,9 @@ MonoBehaviour:
       moveDirectionColor: {r: 0, g: 0, b: 1, a: 1}
       velocityColor: {r: 0, g: 1, b: 0, a: 1}
       magenta: {r: 0.75, g: 0, b: 0.75, a: 0.9}
+      animatorColor: {r: 0, g: 0.7, b: 1, a: 1}
+      yellow1: {r: 1, g: 0.92, b: 0.16, a: 1}
     heightOffset: 0.05
-  m_Debug: 1
   displayMovement: 0
   displayPhysics: 0
   displayAnimations: 0
@@ -624,13 +619,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92019d84070ab4ad6939a5a7011333a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_MoveAxisDeadZone: 0.1
+  lookSensitivity: {x: 3, y: 3}
+  moveAxisDeadZone: 0.1
   lookDistance: 20
-  m_AxisRaw: 1
-  m_LockCursor: 1
-  m_CursorVisible: 0
+  axisRaw: 1
+  lockCursor: 1
+  cursorVisible: 0
+  rotateCharacterKeyCode: 0
   lookTarget: {fileID: 0}
-  m_SelectPlayerKeyCode: 48
+  m_SelectPlayerKeyCode: 112
   m_LockCameraRotation: 108
   m_DebugBreakKeyCode: 13
   DebugMode: 0
@@ -1153,7 +1150,7 @@ MonoBehaviour:
     layers:
       serializedVersion: 2
       m_Bits: 134217728
-    maxStep: 0.5
+    maxStep: 0.4
     heightOffset: 0
     footSpeed: 2.5
     footRadius: 0.15
@@ -1243,7 +1240,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5013856973b27429d937d256dc082f2e, type: 3}
   m_Name: 
@@ -1302,7 +1299,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eb969d52822a24d8dbd0b8c198a14803, type: 3}
   m_Name: 
@@ -1330,7 +1327,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5dcb0e67b11b04af4b61cb44c64d5a63, type: 3}
   m_Name: 

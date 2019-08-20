@@ -33,7 +33,7 @@
 
         public bool Recenter { get; set; }
 
-
+        public Vector2 RotationSensitivity { get; set; } = new Vector2(3, 3);
 
         //
         //  Methods

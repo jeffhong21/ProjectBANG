@@ -29,8 +29,12 @@ namespace CharacterController
             lastMoveAmount = currentMoveAmount;
             currentMoveAmount = Mathf.Clamp01(Mathf.Abs(m_Controller.InputVector.x) + Mathf.Abs(m_Controller.InputVector.z));
 
-            if (lastMoveAmount < currentMoveAmount) 
+
+            if (Math.Abs(lastMoveAmount) < float.Epsilon && currentMoveAmount > 0)
                 isStartingToMove = true;
+
+            //if (lastMoveAmount < currentMoveAmount) 
+            //    isStartingToMove = true;
             
 
             if (isStartingToMove){

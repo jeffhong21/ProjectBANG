@@ -7,7 +7,7 @@ using System;
 
 
 [CustomEditor(typeof(ObjectPool))]
-public class ObjectPoolManagerEditor : Editor   
+public class ObjectPoolManagerEditor : Editor
 {
 
     private ObjectPool objectPool;

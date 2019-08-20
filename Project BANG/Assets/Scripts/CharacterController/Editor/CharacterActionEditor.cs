@@ -9,6 +9,8 @@
     [CustomEditor(typeof(CharacterAction), true)]
     public class CharacterActionEditor : Editor
     {
+
+
         private static readonly string[] m_DontIncude = { "m_Script" };
 
         private CharacterAction m_Action;

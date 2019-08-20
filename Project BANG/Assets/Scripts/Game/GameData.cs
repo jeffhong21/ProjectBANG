@@ -15,8 +15,10 @@ public class GameData : ScriptableObject
     const string PREFAB_PATH = "Prefabs/";
     const string CINEMACHINE_PATH = "Cinemachine/";
 
+
     [SerializeField]
     private ObjectPool objectPool;
+    private ObjectPool objectPoolInstance;
     [SerializeField]
     private CameraController cameraPrefab;
     [SerializeField]
@@ -27,6 +29,7 @@ public class GameData : ScriptableObject
 
     [SerializeField]
     private SceneData prototypeLevel;
+
 
 
     public CameraController CameraPrefab
@@ -63,7 +66,7 @@ public class GameData : ScriptableObject
         if(objectPool == null)
             objectPool = Resources.Load<ObjectPool>(PREFAB_PATH + "ObjectPool");
         if (objectPool != null)
-            objectPool = Instantiate(objectPool);
+            objectPoolInstance = Instantiate(objectPool);
         else
             Debug.LogWarningFormat("<color=yellow><b>{0}</b>{1}</color>","•[Warning] ", "No object pool to load.");
 

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 //using Primitives;
 //using CollisionLib;
+using UnityEngine;
 using Unity.Mathematics;
 using static Unity.Mathematics.math;
 
@@ -49,6 +50,10 @@ public class DebugDraw
 
         Cylinder(center, dir, radius, cylinderHeight * 0.5f, color, duration);
     }
+
+
+
+
 
     //public static void Prim(capsule capsule, Color color, float duration = 0)
     //{
@@ -221,6 +226,98 @@ public class DebugDraw
         Debug.DrawLine(corner2, corner3, color, duration, depthTest);
         Debug.DrawLine(corner3, corner0, color, duration, depthTest);
         Debug.DrawRay(position, normal * size, color, duration, depthTest);
+    }
+
+
+
+
+
+    //public static Color RandomColor()
+    //{
+    //    return new Color(Random.value, Random.value, Random.value);
+    //}
+
+
+
+
+
+
+
+
+
+    public static void DrawCapsule(Vector3 start, Vector3 end, float radius, Color color, float duration = .001f, bool depthTest = true)
+    {
+        Vector3 up = (end - start).normalized * radius;
+        if (up == Vector3.zero) up = Vector3.up; //This can happen when the capsule is actually a sphere, so the start and end are right on eachother
+        Vector3 forward = Vector3.Slerp(up, -up, 0.5f);
+        Vector3 right = Vector3.Cross(up, forward).normalized * radius;
+
+        //Radial circles
+        DrawCircle(start, up, color, radius, duration, depthTest);
+        DrawCircle(end, -up, color, radius, duration, depthTest);
+
+        //Side lines
+        Debug.DrawLine(start + right, end + right, color, duration, depthTest);
+        Debug.DrawLine(start - right, end - right, color, duration, depthTest);
+
+        Debug.DrawLine(start + forward, end + forward, color, duration, depthTest);
+        Debug.DrawLine(start - forward, end - forward, color, duration, depthTest);
+
+        for (int i = 1; i < 26; i++)
+        {
+
+            //Start endcap
+            Debug.DrawLine(Vector3.Slerp(right, -up, i / 25.0f) + start, Vector3.Slerp(right, -up, (i - 1) / 25.0f) + start, color, duration, depthTest);
+            Debug.DrawLine(Vector3.Slerp(-right, -up, i / 25.0f) + start, Vector3.Slerp(-right, -up, (i - 1) / 25.0f) + start, color, duration, depthTest);
+            Debug.DrawLine(Vector3.Slerp(forward, -up, i / 25.0f) + start, Vector3.Slerp(forward, -up, (i - 1) / 25.0f) + start, color, duration, depthTest);
+            Debug.DrawLine(Vector3.Slerp(-forward, -up, i / 25.0f) + start, Vector3.Slerp(-forward, -up, (i - 1) / 25.0f) + start, color, duration, depthTest);
+
+            //End endcap
+            Debug.DrawLine(Vector3.Slerp(right, up, i / 25.0f) + end, Vector3.Slerp(right, up, (i - 1) / 25.0f) + end, color, duration, depthTest);
+            Debug.DrawLine(Vector3.Slerp(-right, up, i / 25.0f) + end, Vector3.Slerp(-right, up, (i - 1) / 25.0f) + end, color, duration, depthTest);
+            Debug.DrawLine(Vector3.Slerp(forward, up, i / 25.0f) + end, Vector3.Slerp(forward, up, (i - 1) / 25.0f) + end, color, duration, depthTest);
+            Debug.DrawLine(Vector3.Slerp(-forward, up, i / 25.0f) + end, Vector3.Slerp(-forward, up, (i - 1) / 25.0f) + end, color, duration, depthTest);
+        }
+    }
+
+
+
+    public static void DrawCircle(Vector3 position, Vector3 up, Color color, float radius = 1.0f, float duration = .001f, bool depthTest = true)
+    {
+        Vector3 _up = up.normalized * radius;
+        Vector3 _forward = Vector3.Slerp(_up, -_up, 0.5f);
+        Vector3 _right = Vector3.Cross(_up, _forward).normalized * radius;
+
+        Matrix4x4 matrix = new Matrix4x4();
+
+        matrix[0] = _right.x;
+        matrix[1] = _right.y;
+        matrix[2] = _right.z;
+
+        matrix[4] = _up.x;
+        matrix[5] = _up.y;
+        matrix[6] = _up.z;
+
+        matrix[8] = _forward.x;
+        matrix[9] = _forward.y;
+        matrix[10] = _forward.z;
+
+        Vector3 _lastPoint = position + matrix.MultiplyPoint3x4(new Vector3(Mathf.Cos(0), 0, Mathf.Sin(0)));
+        Vector3 _nextPoint = Vector3.zero;
+
+        color = (color == default(Color)) ? Color.white : color;
+
+        for (var i = 0; i < 91; i++)
+        {
+            _nextPoint.x = Mathf.Cos((i * 4) * Mathf.Deg2Rad);
+            _nextPoint.z = Mathf.Sin((i * 4) * Mathf.Deg2Rad);
+            _nextPoint.y = 0;
+
+            _nextPoint = position + matrix.MultiplyPoint3x4(_nextPoint);
+
+            Debug.DrawLine(_lastPoint, _nextPoint, color, duration, depthTest);
+            _lastPoint = _nextPoint;
+        }
     }
 
 }

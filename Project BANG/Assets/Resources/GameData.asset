@@ -16,6 +16,8 @@ MonoBehaviour:
     type: 3}
   cameraPrefab: {fileID: 2670088491078827618, guid: 3cc50fa214435479187990c24ae81295,
     type: 3}
-  playerPrefab: {fileID: 0}
-  inGameMenu: {fileID: 0}
+  playerPrefab: {fileID: 2247134470855319462, guid: 19d6fb4b2a32a41cd9d251fe0a5d7851,
+    type: 3}
+  inGameMenu: {fileID: 2030868795812142390, guid: f8bf0cd6d13a94ec4bf43805e8a7f182,
+    type: 3}
   prototypeLevel: {fileID: 11400000, guid: 8cad15a73544442cabfe94afd1c93a7e, type: 2}

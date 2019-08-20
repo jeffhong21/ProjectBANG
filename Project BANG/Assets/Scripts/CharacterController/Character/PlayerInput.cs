@@ -2,6 +2,7 @@ namespace CharacterController
 {
     using UnityEngine;
     using static CharacterController.RigidbodyCharacterController;
+    using MathUtil = MathUtilities;
 
     [DisallowMultipleComponent]
     public class PlayerInput : MonoBehaviour
@@ -15,14 +16,15 @@ namespace CharacterController
         #endregion
 
 
-        
+        private enum MouseButtonKeyCode { LMB = 0, RMB = 1, Middle = 2 }
 
-        
-        [SerializeField] private float m_MoveAxisDeadZone = 0.2f;
+        [SerializeField] private Vector2 lookSensitivity = new Vector2(3, 3);
+        [SerializeField] private float moveAxisDeadZone = 0.1f;
         [SerializeField] private float lookDistance = 20;
-        [SerializeField] private bool m_AxisRaw = true;
-        [SerializeField] private bool m_LockCursor = true;
-        [SerializeField] private bool m_CursorVisible;
+        [SerializeField] private bool axisRaw = true;
+        [SerializeField] private bool lockCursor = true;
+        [SerializeField] private bool cursorVisible;
+        [SerializeField] private MouseButtonKeyCode rotateCharacterKeyCode = MouseButtonKeyCode.LMB;
 
         [SerializeField]
         private Transform lookTarget;
@@ -37,14 +39,14 @@ namespace CharacterController
 
         [Header("-- Debug Settings --")]
         [SerializeField, Tooltip("What key to select player.")]
-        private KeyCode m_SelectPlayerKeyCode = KeyCode.Alpha0;
+        private KeyCode m_SelectPlayerKeyCode = KeyCode.P;
         [SerializeField, Tooltip("Locks camera's rotation.")]
         private KeyCode m_LockCameraRotation = KeyCode.L;
         [SerializeField, Tooltip("What key to debug.break.")]
-        private KeyCode m_DebugBreakKeyCode = KeyCode.Delete;
+        private KeyCode m_DebugBreakKeyCode = KeyCode.Return;
 
 
-        private float inputHorizontal, inputVertical;
+
         private Vector3 inputVector;
         private Vector3 cameraFwd = new Vector3(1, 0, 1);
         private float mouseHorizontal, mouseVertical;
@@ -62,6 +64,7 @@ namespace CharacterController
 
 
 
+        public Vector2 LookSensitivity { get { return lookSensitivity; } set { lookSensitivity = value; } }
 
         public Transform LookTarget { get { return lookTarget; } set { lookTarget = value; } }
 
@@ -75,22 +78,28 @@ namespace CharacterController
 
         private Vector3 InputVector{
             get {
-                inputVector.Set(Input.GetAxis(m_HorizontalInputName), 0f, Input.GetAxis(m_VerticalInputName));
+                var inputX = Input.GetAxis(m_HorizontalInputName);
+                var inputZ = Input.GetAxis(m_VerticalInputName);
+                inputVector.Set(Mathf.Abs(inputX) < moveAxisDeadZone ? 0 : inputX, 0f, Mathf.Abs(inputZ) < moveAxisDeadZone ? 0 : inputZ);
                 return inputVector;
             }
         }
 
         private Vector2 MouseInputVector{
-            get { return new Vector2(Input.GetAxis(m_RotateCameraXInput), Input.GetAxis(m_RotateCameraYInput)); }
+            get { return new Vector2(Input.GetAxis(m_RotateCameraXInput) * lookSensitivity.x, Input.GetAxis(m_RotateCameraYInput) * lookSensitivity.y); }
         }
 
         private Vector2 MouseInputVectorRaw {
-            get { return new Vector2(Input.GetAxisRaw(m_RotateCameraXInput), Input.GetAxisRaw(m_RotateCameraYInput)); }
+            get { return new Vector2(Input.GetAxisRaw(m_RotateCameraXInput) * lookSensitivity.x, Input.GetAxisRaw(m_RotateCameraYInput) * lookSensitivity.y); }
         }
 
         private float MouseZoomInput{ get { return Input.GetAxis(m_MouseScrollInput) ; } }
 
         private float MouseZoomInputRaw { get { return Input.GetAxisRaw(m_MouseScrollInput); } }
+
+
+
+
 
 
 
@@ -128,8 +137,8 @@ namespace CharacterController
 
 		private void Start()
 		{
-            Cursor.lockState = m_LockCursor ? CursorLockMode.Locked : CursorLockMode.Confined;
-            Cursor.visible = m_CursorVisible;
+            Cursor.lockState = lockCursor ? CursorLockMode.Locked : CursorLockMode.Confined;
+            Cursor.visible = cursorVisible;
 
             m_CameraController = CameraController.Instance;
             m_Camera = CameraController.Instance.Camera.transform;
@@ -149,7 +158,8 @@ namespace CharacterController
 
         private void Update()
 		{
-            inputVector = m_AxisRaw ? InputVectorRaw : InputVector;
+            //inputVector = axisRaw ? InputVectorRaw : InputVector;
+            inputVector = InputVectorRaw;
             cameraFwd.Set(1, 0, 1);
 
             lookDirection = m_CameraController == null ? mTransform.forward : Vector3.Scale(m_Camera.forward, cameraFwd).normalized;
@@ -157,12 +167,34 @@ namespace CharacterController
             switch (m_Controller.Movement) {
                 case (MovementTypes.Adventure):
 
-                    inputVector = m_Camera.right * InputVector.x + lookDirection * InputVector.z;
-                    //inputVector = Vector3.ProjectOnPlane(inputVector, transform.forward);
+                    Vector3 fwd = Vector3.ProjectOnPlane(m_Camera.forward, transform.up);
+                    Vector3 right = Vector3.Cross(fwd, Vector3.up);
+                    Quaternion referentialShift = Quaternion.FromToRotation(Vector3.forward, fwd);
+                    inputVector = referentialShift * inputVector;
+                    //inputVector = m_Camera.right * inputVector.x + fwd * inputVector.z;
+                    
 
-                    float turnAmount = Mathf.Atan2(lookDirection.x, lookDirection.z) * Mathf.Rad2Deg;
-                    //float turnAmount = Mathf.SmoothDampAngle(m_Controller.transform.rotation.y, Mathf.Atan2(inputVector.x, inputVector.z) * Mathf.Rad2Deg, ref rotationVelocitySmooth, 0.1f);
-                    lookRotation = Quaternion.AngleAxis(turnAmount, transform.up);
+                    //inputVector = m_Camera.right * InputVector.x + lookDirection * InputVector.z;
+                    
+                    //inputVector = Vector3.Project(inputVector, fwd);
+                    //if(lookDirection != Vector3.zero)
+                    //{
+                    //    var fwd = Vector3.ProjectOnPlane(m_Camera.forward, transform.up);
+                    //}
+                    Debug.DrawRay(transform.position + Vector3.up * 0.5f, inputVector, Color.black);
+
+                    //if (Input.GetMouseButton((int)rotateCharacterKeyCode))
+                    //{
+                    //    //var mouseInput = Mathf.Atan2(MouseInputVector.x, MouseInputVector.y);
+                    //    //mouseInput = MathUtil.Round(mouseInput, 6);
+                    //    //inputVector.x = Mathf.Clamp(mouseInput + inputVector.x, -1, 1);
+                    //    inputVector = m_Camera.right * InputVector.x + lookDirection * InputVector.z;
+                    //    float turnAmount = Mathf.Atan2(lookDirection.x, lookDirection.z) * Mathf.Rad2Deg;
+                    //    //float turnAmount = Mathf.SmoothDampAngle(m_Controller.transform.rotation.y, Mathf.Atan2(inputVector.x, inputVector.z) * Mathf.Rad2Deg, ref rotationVelocitySmooth, 0.1f);
+                    //    lookRotation = Quaternion.AngleAxis(turnAmount, transform.up);
+                    //}
+                    //float turnAmount = Mathf.Atan2(lookDirection.x, lookDirection.z) * Mathf.Rad2Deg;
+                    //lookRotation = Quaternion.AngleAxis(turnAmount, transform.up);
                     break;
 
                 case (MovementTypes.Combat):
@@ -173,7 +205,7 @@ namespace CharacterController
                     break;
                 default:
                     Debug.Log("<b><i>• PlayerInput</i></b> movement type is default");
-                    inputVector = m_AxisRaw ? InputVectorRaw : InputVector;
+                    inputVector = axisRaw ? InputVectorRaw : InputVector;
                     lookRotation = Quaternion.FromToRotation(mTransform.forward, lookDirection);
                     break;
             }

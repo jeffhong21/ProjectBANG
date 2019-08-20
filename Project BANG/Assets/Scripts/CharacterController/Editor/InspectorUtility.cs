@@ -26,7 +26,7 @@ public static class InspectorUtility
             fontSize = 11,
         };
 
-        foldoutStyle = new GUIStyle("ShurikenModuleTitle")
+        foldoutStyle = new GUIStyle("ShurikenModuleTitle") // ShurikenModuleTitle
         {
             font = new GUIStyle(EditorStyles.label).font,
             fontStyle = FontStyle.Bold,
@@ -60,7 +60,13 @@ public static class InspectorUtility
             EditorGUILayout.HelpBox("Property " + property.name + " does not exist", MessageType.Error);
             return;
         }
-        if(property.isArray && includeChildren){
+        
+        if(property.isArray && includeChildren)
+        {
+            if(property.propertyType == SerializedPropertyType.String){
+                EditorGUILayout.PropertyField(property, false);
+                return;
+            }
             property.isExpanded = EditorGUILayout.Foldout(property.isExpanded, property.displayName);
             if (property.isExpanded)
             {
@@ -73,6 +79,7 @@ public static class InspectorUtility
                 EditorGUI.indentLevel--;
                 EditorGUILayout.Space();
             }
+            return;
         }
         else{
             EditorGUILayout.PropertyField(property, includeChildren);

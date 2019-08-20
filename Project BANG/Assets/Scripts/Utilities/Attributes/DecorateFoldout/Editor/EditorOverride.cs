@@ -11,7 +11,7 @@
 
     [CustomEditor(typeof(Object), true, isFallback = true)]
     [CanEditMultipleObjects]
-    public class EditorOverride : Editor
+    public class EditorOverride : UnityEditor.Editor
     {
         //===============================//
         // Members

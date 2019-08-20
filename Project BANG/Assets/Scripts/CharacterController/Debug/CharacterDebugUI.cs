@@ -144,7 +144,7 @@
         {
             if(CharacterDebug.ActiveCharacter != null)
             {
-                if (CharacterDebug.ActiveCharacter.DebugMode)
+                if (CharacterDebug.ActiveCharacter.Debugger.debugMode)
                 {
                     if (charProperties != null)
                     {

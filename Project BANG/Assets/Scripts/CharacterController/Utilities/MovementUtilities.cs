@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using MathUtil = MathUtilities;
 
 public class MovementUtilities : MonoBehaviour
 {
@@ -35,14 +36,17 @@ public class MovementUtilities : MonoBehaviour
         //  (1-t)2 P0 + 2*(1-t)tP1 + t2 * P2
         //    u             u          tt
         //    uu * P0 + 2 * u * t * P1 + tt * P2
-
+        
         float u = 1 - t;
-        float tt = t * t;
-        float uu = u * u;
-        Vector3 p = uu * p0;
-        p += 2 * u * t * p1;
-        p += tt * p2;
-        return p;
+        //float tt = t * t;
+        //float uu = u * u;
+        //Vector3 p = uu * p0;
+        //p += 2 * u * t * p1;
+        //p += tt * p2;
+
+        
+        Vector3 point = (u.Squared() * p0) + (2 * u * t * p1) + (t.Squared() * p2);
+        return point;
     }
 
 

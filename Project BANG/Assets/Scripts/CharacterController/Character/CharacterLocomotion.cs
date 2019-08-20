@@ -27,15 +27,28 @@
 
 
 
+        #region Properties
+
         public bool Aiming { get; set; }
 
         public bool CanAim { get => Grounded; }
-        
 
-        public CharacterAction[] CharActions{
+        public Vector3 CenterOfMass { get { return m_Animator.bodyPosition; } }
+
+        public Vector3 BalanceVector {  get { return m_Animator.bodyPosition - m_Transform.position; } }
+
+        public CharacterAction[] CharActions
+        {
             get { return m_Actions; }
             set { m_Actions = value; }
         }
+
+        #endregion
+
+
+
+
+
 
 
         protected override void Awake()
@@ -68,6 +81,7 @@
         protected override void Update()
         {
             base.Update();
+
 
 
             canMove = true;
@@ -170,7 +184,10 @@
 
         }
 
-
+        protected override void LateUpdate()
+        {
+            base.LateUpdate();
+        }
 
         #region Character Locomotion
 
@@ -185,7 +202,6 @@
         {
             base.Move();
         }
-
 
 
         /// <summary>
@@ -206,7 +222,6 @@
         }
 
 
-
         /// <summary>
         /// Update the character’s rotation values.
         /// </summary>
@@ -214,7 +229,6 @@
         {
             base.UpdateRotation();
         }
-
 
 
         /// <summary>
@@ -226,13 +240,11 @@
         }
 
 
-
         /// <summary>
         /// Updates the animator.
         /// </summary>
         protected override void UpdateAnimator()
         {
-
             base.UpdateAnimator();
         }
 
@@ -255,8 +267,22 @@
         }
 
 
+        protected override void ApplyMovement()
+        {
+            base.ApplyMovement();
+        }
+
+        protected override void ApplyRotation()
+        {
+            base.ApplyRotation();
+
+
+
+        }
+
 
         #endregion
+
 
 
 
@@ -550,28 +576,61 @@
         }
 
 
-        public void SetPosition( Vector3 position )
-        {
-            m_Rigidbody.MovePosition(position);
-        }
 
-
-        public void SetRotation( Quaternion rotation )
-        {
-            m_Rigidbody.MoveRotation(rotation.normalized);
-        }
-
-
-        public void StopMovement()
-        {
-            m_Rigidbody.velocity = Vector3.zero;
-            m_Moving = false;
-        }
 
 
 
 
 
         //------
+
+        Vector3 leftFootPos;
+        Vector3 rightFootPos;
+        protected override void DebugAttributes()
+        {
+            base.DebugAttributes();
+
+
+            CharacterDebug.Log("seperator", "----------");
+            CharacterDebug.Log("<color=cyan> leftFootPos </color>", leftFootPos);
+            CharacterDebug.Log("<color=cyan> rightFootPos </color>", rightFootPos);
+            CharacterDebug.Log("seperator", "----------");
+
+
+        }
+
+
+
+        protected override void DrawGizmos()
+        {
+
+            Gizmos.color = Debugger.colors.animatorColor;
+            Gizmos.DrawRay(m_Transform.position, m_Animator.bodyPosition - m_Transform.position);
+            Gizmos.DrawSphere(m_Animator.bodyPosition, 0.05f);
+
+
+            Gizmos.color = Debugger.colors.yellow1;
+            Vector3 leftFootT = m_Animator.GetIKPosition(AvatarIKGoal.LeftFoot);
+            Quaternion leftFootQ = m_Animator.GetIKRotation(AvatarIKGoal.LeftFoot);
+
+            Vector3 leftFootH = new Vector3(0, -m_Animator.leftFeetBottomHeight, 0);
+
+            leftFootPos = leftFootT + leftFootQ * leftFootH;
+            Gizmos.DrawWireSphere(leftFootPos, 0.05f);
+
+
+
+            Vector3 rightFootT = m_Animator.GetIKPosition(AvatarIKGoal.RightFoot);
+            Quaternion rightFootQ = m_Animator.GetIKRotation(AvatarIKGoal.RightFoot);
+
+            Vector3 rightFootH = new Vector3(0, -m_Animator.rightFeetBottomHeight, 0);
+
+            rightFootPos = rightFootT + rightFootQ * rightFootH;
+            Gizmos.DrawWireSphere(rightFootPos, 0.05f);
+        }
+
+
+
+
     }
 }

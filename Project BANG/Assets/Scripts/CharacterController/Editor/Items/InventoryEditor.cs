@@ -10,7 +10,7 @@
     [CustomEditor(typeof(Inventory))]
     public class InventoryEditor : Editor
     {
-        private static readonly string[] m_DontIncude = new string[] { "m_Script", "m_DefaultLoadout" };
+        private static readonly string[] m_DontIncude = { "m_Script", "m_DefaultLoadout" };
 
 
 

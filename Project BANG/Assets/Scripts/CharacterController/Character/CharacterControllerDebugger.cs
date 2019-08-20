@@ -24,6 +24,9 @@
             public Color moveDirectionColor = Color.blue;
             public Color velocityColor = Color.green;
             public Color magenta = new Color(0.75f, 0, 0.75f, 0.9f);
+
+            public Color animatorColor = new Color(0, 0.7f, 1f, 1);
+            public Color yellow1 = new Color(1, 0.92f, 0.16f, 1);
         }
 
 
@@ -75,11 +78,16 @@
         }
 
 
-        public void OnDrawGizmos()
+        public void DrawGizmos()
         {
             if (!debugMode) return;
         }
 
+
+        public void DrawSceneGUI()
+        {
+
+        }
     }
 }
 

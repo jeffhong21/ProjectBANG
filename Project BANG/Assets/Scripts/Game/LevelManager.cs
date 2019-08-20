@@ -170,14 +170,14 @@ public class LevelManager : SingletonMonoBehaviour<LevelManager>
                 playerInstance = player;
         }
 
-        if (playerInstance == null)
+        if (playerInstance == null && gameData.PlayerPrefab != null)
         {
             playerInstance = Instantiate(gameData.PlayerPrefab);
 
             playerInstance.transform.position = SpawnPointManager.GetSpawnPoint(0).Position;
             playerInstance.transform.rotation = SpawnPointManager.GetSpawnPoint(0).Rotation;
         }
-
+        
 
 		//  Select Player on creation.
 		if (selectOnCreation) UnityEditor.Selection.activeGameObject = playerInstance;
