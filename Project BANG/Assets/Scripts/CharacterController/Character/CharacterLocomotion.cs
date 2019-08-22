@@ -4,10 +4,12 @@
     using System;
     using System.Collections;
     using System.Text;
-
+    using MathUtil = MathUtilities;
 
     public class CharacterLocomotion : RigidbodyCharacterController
     {
+        
+
         public event Action<bool> OnAim = delegate {};
 
 
@@ -180,16 +182,29 @@
             //if (m_Animator.pivotWeight < 0.5f || m_Animator.pivotWeight > 0.5f)
             //    m_Animator.SetFloat(HashID.LegUpIndex, m_Animator.pivotWeight >= 0.5f ? 1 : 0);
             //else m_Animator.SetFloat(HashID.LegUpIndex, 0.5f + 1);
-            m_Animator.SetFloat(HashID.LegUpIndex, m_Animator.pivotWeight);
+
 
         }
+
 
         protected override void LateUpdate()
         {
             base.LateUpdate();
+
+            //for (int i = 0; i < colliderBuffer.Length; i++) {
+            //    colliderBuffer[i] = null;
+            //}
+            GetPivotPosition();
+
+            //DebugDraw.Circle(m_Animator.pivotPosition, transform.up, 0.1f, Color.yellow);
         }
 
+
+
+
         #region Character Locomotion
+
+
 
 
 
@@ -245,6 +260,13 @@
         /// </summary>
         protected override void UpdateAnimator()
         {
+            //m_Animator.SetFloat(HashID.LegUpIndex, )
+
+            Vector3 leftFootPos = GetFootPosition(AvatarIKGoal.LeftFoot);
+            Vector3 rightFootPos = GetFootPosition(AvatarIKGoal.RightFoot);
+
+            float legFwdIndex = leftFootPos.normalized.z > rightFootPos.normalized.z ? 0 : 1;
+            m_Animator.SetFloat(HashID.LegFwdIndex, legFwdIndex);
             base.UpdateAnimator();
         }
 
@@ -255,6 +277,11 @@
         protected override void AnimatorMove()
         {
             base.AnimatorMove();
+
+            if (m_Animator.isHuman)
+            {
+
+            }
         }
 
 
@@ -271,6 +298,7 @@
         {
             base.ApplyMovement();
         }
+
 
         protected override void ApplyRotation()
         {
@@ -576,7 +604,57 @@
         }
 
 
+        float feetPivotActive;
+        private Vector3 GetPivotPosition()
+        {
+            m_Animator.stabilizeFeet = true;
 
+            float pivotDifference = Mathf.Abs(0.5f - m_Animator.pivotWeight);
+            float t = Mathf.Clamp(pivotDifference, 0, 0.5f) / 0.5f;
+            t = t * t * t * (t * (6f * t - 15f) + 10f);
+            feetPivotActive = Mathf.Lerp(0f, 1f, t);
+
+            Vector3 leftFootPos = GetFootPosition(AvatarIKGoal.LeftFoot);
+            Vector3 rightFootPos = GetFootPosition(AvatarIKGoal.RightFoot);
+            float leftHeight = MathUtil.Round(Mathf.Abs(leftFootPos.y));
+            float rightHeight = MathUtil.Round(Mathf.Abs(rightFootPos.y));
+
+            Vector3 pivotPosition = m_Animator.pivotPosition;
+
+            //if (leftHeight + rightHeight > float.Epsilon)
+            //{
+            //    pivotPosition = m_Transform.position;
+            //}
+            if ((leftHeight < tinyOffset && rightHeight > 0) || rightHeight < tinyOffset && leftHeight > 0)
+            {
+                m_Animator.feetPivotActive = feetPivotActive;
+                pivotPosition = m_Animator.pivotPosition;
+            }
+
+
+
+            pivotPosition.y = m_Transform.position.y;
+            return pivotPosition;
+        }
+
+
+        private Vector3 GetFootPosition(AvatarIKGoal foot, bool worldPos = false)
+        {
+            if (foot == AvatarIKGoal.LeftFoot || foot == AvatarIKGoal.RightFoot)
+            {
+                Vector3 footPos = m_Animator.GetIKPosition(foot);
+                Quaternion footRot = m_Animator.GetIKRotation(foot);
+                float botFootHeight = foot == AvatarIKGoal.LeftFoot ? m_Animator.leftFeetBottomHeight : m_Animator.rightFeetBottomHeight;
+                Vector3 footHeight = new Vector3(0, -botFootHeight, 0);
+
+
+                footPos += footRot * footHeight;
+
+                return !worldPos ? footPos : m_Transform.InverseTransformPoint(footPos);
+            }
+
+            return Vector3.zero;
+        }
 
 
 
@@ -584,16 +662,29 @@
 
         //------
 
-        Vector3 leftFootPos;
-        Vector3 rightFootPos;
+
         protected override void DebugAttributes()
         {
             base.DebugAttributes();
 
 
             CharacterDebug.Log("seperator", "----------");
-            CharacterDebug.Log("<color=cyan> leftFootPos </color>", leftFootPos);
-            CharacterDebug.Log("<color=cyan> rightFootPos </color>", rightFootPos);
+            CharacterDebug.Log("<color=blue>* FeetPivotWeight *</color>", MathUtil.Round(feetPivotActive));
+            CharacterDebug.Log("<color=cyan>* PivotWeight *</color>", m_Animator.pivotWeight);
+            CharacterDebug.Log("<color=cyan>* PivotPos *</color>", m_Transform.InverseTransformPoint(m_Animator.pivotPosition));
+
+            //CharacterDebug.Log("<color=yellow> leftFootPos </color>", GetFootPosition(0, true));
+            //CharacterDebug.Log("<color=yellow> rightFootPos </color>", GetFootPosition(1, true));
+            //CharacterDebug.Log("<color=green> leftFootPos Y </color>", MathUtil.Round(GetFootPosition(AvatarIKGoal.LeftFoot, true).normalized.y));
+            //CharacterDebug.Log("<color=green> rightFootPos Y</color>", MathUtil.Round(GetFootPosition(AvatarIKGoal.RightFoot, true).normalized.y));
+            CharacterDebug.Log("<color=yellow> leftFootPos Z </color>", MathUtil.Round(GetFootPosition(AvatarIKGoal.LeftFoot).normalized.z));
+            CharacterDebug.Log("<color=yellow> rightFootPos Z</color>", MathUtil.Round(GetFootPosition(AvatarIKGoal.RightFoot).normalized.z));
+
+            CharacterDebug.Log("<color=green> leftFootPos Y </color>", MathUtil.Round(GetFootPosition(AvatarIKGoal.LeftFoot).y));
+            CharacterDebug.Log("<color=green> rightFootPos Y</color>", MathUtil.Round(GetFootPosition(AvatarIKGoal.RightFoot).y));
+            //CharacterDebug.Log("<color=yellow> leftFootPos Z </color>", MathUtil.Round(GetFootPosition(AvatarIKGoal.LeftFoot, true).z));
+            //CharacterDebug.Log("<color=yellow> rightFootPos Z</color>", MathUtil.Round(GetFootPosition(AvatarIKGoal.RightFoot, true).z));
+
             CharacterDebug.Log("seperator", "----------");
 
 
@@ -605,28 +696,21 @@
         {
 
             Gizmos.color = Debugger.colors.animatorColor;
+            Gizmos.DrawRay(m_Transform.position, Vector3.up);
             Gizmos.DrawRay(m_Transform.position, m_Animator.bodyPosition - m_Transform.position);
             Gizmos.DrawSphere(m_Animator.bodyPosition, 0.05f);
+            Gizmos.DrawSphere(GetPivotPosition(), 0.05f);
 
 
             Gizmos.color = Debugger.colors.yellow1;
-            Vector3 leftFootT = m_Animator.GetIKPosition(AvatarIKGoal.LeftFoot);
-            Quaternion leftFootQ = m_Animator.GetIKRotation(AvatarIKGoal.LeftFoot);
-
-            Vector3 leftFootH = new Vector3(0, -m_Animator.leftFeetBottomHeight, 0);
-
-            leftFootPos = leftFootT + leftFootQ * leftFootH;
-            Gizmos.DrawWireSphere(leftFootPos, 0.05f);
+            Gizmos.DrawWireSphere(GetFootPosition(AvatarIKGoal.RightFoot), 0.05f);
+            //Gizmos.matrix = Matrix4x4.TRS(m_Animator.GetIKPosition(AvatarIKGoal.LeftFoot), m_Animator.GetIKRotation(AvatarIKGoal.LeftFoot), Vector3.one);
+            Gizmos.DrawWireSphere(GetFootPosition(AvatarIKGoal.LeftFoot), 0.05f);
+            //Gizmos.DrawWireSphere(Vector3.zero, 0.05f);
 
 
-
-            Vector3 rightFootT = m_Animator.GetIKPosition(AvatarIKGoal.RightFoot);
-            Quaternion rightFootQ = m_Animator.GetIKRotation(AvatarIKGoal.RightFoot);
-
-            Vector3 rightFootH = new Vector3(0, -m_Animator.rightFeetBottomHeight, 0);
-
-            rightFootPos = rightFootT + rightFootQ * rightFootH;
-            Gizmos.DrawWireSphere(rightFootPos, 0.05f);
+            //Gizmos.DrawWireSphere(GetFootPosition(0), 0.05f);
+            //Gizmos.DrawWireSphere(GetFootPosition(1), 0.05f);
         }
 
 

@@ -34,4 +34,15 @@ public static class MathUtilities
         return value * value;
     }
 
+
+    public static float ClampAngle(float angle)
+    {
+        if (angle < -360F)
+            angle += 360F;
+        if (angle > 360F)
+            angle -= 360F;
+        return angle;
+    }
+
+
 }

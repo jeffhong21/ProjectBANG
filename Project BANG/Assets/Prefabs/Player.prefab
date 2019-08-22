@@ -518,9 +518,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_UseRootMotion: 1
-  m_RootMotionSpeedMultiplier: 1.2
+  m_RootMotionSpeedMultiplier: 1
   m_RootMotionRotationMultiplier: 1.2
-  m_GroundAcceleration: {x: 0.18, y: 0.18, z: 0.18}
+  m_GroundAcceleration: {x: 0.18, y: 0, z: 0.18}
   m_Acceleration: 0.12
   m_AirborneAcceleration: 0.2
   m_MotorDamping: 0.3
@@ -536,16 +536,16 @@ MonoBehaviour:
   m_SlopeLimit: 45
   m_MaxStepHeight: 0.4
   m_GravityModifier: 0.4
-  m_GroundStickiness: 6
+  m_GroundStickiness: 2
   m_CollisionsLayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 134217728
   m_MaxCollisionCount: 100
   m_IdleRotationMultiplier: 1
   debugger:
     debugMode: 1
     states:
-      showGroundCheck: 0
+      showGroundCheck: 1
       showCollisions: 0
       showMotion: 1
     colors:
@@ -674,10 +674,10 @@ MonoBehaviour:
   grounderIK: {fileID: 2629031370626121552}
   lookAtIK: {fileID: 8862121799659265725}
   aimIK: {fileID: 7912098401397699587}
-  hideInInspector: 1
+  hideInInspector: 0
 --- !u!114 &3255356862830679799
 MonoBehaviour:
-  m_ObjectHideFlags: 2
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -1135,7 +1135,7 @@ MonoBehaviour:
     pullBodyHorizontal: 0
 --- !u!114 &2629031370626121552
 MonoBehaviour:
-  m_ObjectHideFlags: 2
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -1173,12 +1173,12 @@ MonoBehaviour:
   spine: []
 --- !u!114 &8862121799659265725
 MonoBehaviour:
-  m_ObjectHideFlags: 2
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 776adaaacdc5c4e8ab0395120a6e972b, type: 3}
   m_Name: 
@@ -1235,7 +1235,7 @@ MonoBehaviour:
     spineTargetOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &7912098401397699587
 MonoBehaviour:
-  m_ObjectHideFlags: 2
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -1299,7 +1299,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eb969d52822a24d8dbd0b8c198a14803, type: 3}
   m_Name: 
@@ -1327,7 +1327,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5dcb0e67b11b04af4b61cb44c64d5a63, type: 3}
   m_Name: 

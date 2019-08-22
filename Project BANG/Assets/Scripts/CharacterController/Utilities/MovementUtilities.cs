@@ -51,6 +51,16 @@ public class MovementUtilities : MonoBehaviour
 
 
 
+    /// <summary>
+    /// Calculate the jump speed.
+    /// </summary>
+    /// <param name="jumpHeight">Height of the jump.</param>
+    /// <param name="gravity">Downward force applied</param>
+    /// <returns></returns>
+    public static float CalculateJumpSpeed(float jumpHeight, float gravity)
+    {
+        return Mathf.Sqrt(2 * jumpHeight * gravity);
+    }
 
 
     /// <summary>
