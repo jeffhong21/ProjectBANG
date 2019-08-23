@@ -522,6 +522,7 @@ namespace CharacterController
         {
             Grounded = false;
             Vector3 origin = RaycastOrigin;
+            Vector3 sphereCastOrigin = origin + Vector3.down * radius;
             groundAngle = 0;
 
             float groundDistance = 0;
@@ -541,7 +542,7 @@ namespace CharacterController
                 groundDistance = Vector3.Project(m_Transform.position - groundHit.point, transform.up).magnitude;
                 groundAngle = Vector3.Angle(groundHit.normal, Vector3.up);
 
-                if (Physics.SphereCast(origin, radius, Vector3.down, out groundHit, castDistance, m_LayerManager.SolidLayers)) {
+                if (Physics.SphereCast(sphereCastOrigin, radius, Vector3.down, out groundHit, castDistance, m_LayerManager.SolidLayers)) {
 
                     groundAngle = Vector3.Angle(groundHit.normal, m_Transform.up);
 
@@ -1237,6 +1238,14 @@ namespace CharacterController
         {
             var pointsDist = ColliderHeight - (ColliderRadius * 2f);
             return origin + (direction * (pointsDist * .5f));
+        }
+
+
+        protected void GetAcceleration(Vector3 finalVelocity, Vector3 initialVelocity, Vector3 distance)
+        {
+            var vf = finalVelocity * finalVelocity;
+            var vi = initialVelocity * initialVelocity;
+            Vector3 a = (vf - vi) / (2 * distance);
         }
 
 

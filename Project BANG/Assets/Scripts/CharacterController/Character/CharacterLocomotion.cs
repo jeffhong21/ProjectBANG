@@ -604,36 +604,45 @@
         }
 
 
-        float feetPivotActive;
+
         private Vector3 GetPivotPosition()
         {
             m_Animator.stabilizeFeet = true;
 
-            float pivotDifference = Mathf.Abs(0.5f - m_Animator.pivotWeight);
-            float t = Mathf.Clamp(pivotDifference, 0, 0.5f) / 0.5f;
-            t = t * t * t * (t * (6f * t - 15f) + 10f);
-            feetPivotActive = Mathf.Lerp(0f, 1f, t);
+            Vector3 pivotPosition = m_Animator.pivotPosition;
 
             Vector3 leftFootPos = GetFootPosition(AvatarIKGoal.LeftFoot);
             Vector3 rightFootPos = GetFootPosition(AvatarIKGoal.RightFoot);
             float leftHeight = MathUtil.Round(Mathf.Abs(leftFootPos.y));
             float rightHeight = MathUtil.Round(Mathf.Abs(rightFootPos.y));
 
-            Vector3 pivotPosition = m_Animator.pivotPosition;
+            float threshold = 0.1f;
+            float pivotDifference = Mathf.Abs(0.5f - m_Animator.pivotWeight);
+            float t = Mathf.Clamp(pivotDifference, 0, 0.5f) / 0.5f;
+            //  1 means feet are not pivot.
+            float feetPivotActive = 1;  
 
-            //if (leftHeight + rightHeight > float.Epsilon)
-            //{
-            //    pivotPosition = m_Transform.position;
-            //}
-            if ((leftHeight < tinyOffset && rightHeight > 0) || rightHeight < tinyOffset && leftHeight > 0)
+            //  Both feet are grouned.
+            if( (leftHeight < threshold && rightHeight < threshold) || (leftHeight > threshold && rightHeight > threshold ) && pivotDifference < 5f){
+                t = Time.deltaTime;
+                feetPivotActive = MathF.Clamp01(feetPivotActive + t);
+                pivotPosition = m_Transform.position;  
+            }
+            //  If one leg is raised and one is planted.
+            else if ((leftHeight < tinyOffset && rightHeight > 0) || rightHeight < tinyOffset && leftHeight > 0)
             {
+                t = t * t * t * (t * (6f * t - 15f) + 10f);
+                feetPivotActive = Mathf.Lerp(0f, 1f, t);
+
                 m_Animator.feetPivotActive = feetPivotActive;
                 pivotPosition = m_Animator.pivotPosition;
             }
 
-
-
+            
             pivotPosition.y = m_Transform.position.y;
+
+
+            CharacterDebug.Log("<color=blue>* FeetPivotWeight *</color>", MathUtil.Round(feetPivotActive));
             return pivotPosition;
         }
 
@@ -669,7 +678,7 @@
 
 
             CharacterDebug.Log("seperator", "----------");
-            CharacterDebug.Log("<color=blue>* FeetPivotWeight *</color>", MathUtil.Round(feetPivotActive));
+            //CharacterDebug.Log("<color=blue>* FeetPivotWeight *</color>", MathUtil.Round(feetPivotActive));
             CharacterDebug.Log("<color=cyan>* PivotWeight *</color>", m_Animator.pivotWeight);
             CharacterDebug.Log("<color=cyan>* PivotPos *</color>", m_Transform.InverseTransformPoint(m_Animator.pivotPosition));
 
