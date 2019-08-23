@@ -6,6 +6,11 @@
 
     public class Vault : CharacterAction
     {
+        public override int ActionID
+        {
+            get { return m_ActionID = ActionTypeID.Vault; }
+            set { m_ActionID = value; }
+        }
 
         [Tooltip("Maximum height."), Range(0, 90)]
         [SerializeField] protected float angleThreshold = 30f;

@@ -399,10 +399,11 @@
                     string fullStateName = m_Animator.GetLayerName(index) + "." + destinationState;
                     if (m_Animator.HasState(index, Animator.StringToHash(fullStateName) ))
                     {
+
                         if (m_TransitionDuration > 0)
                             m_Animator.CrossFade(fullStateName, m_TransitionDuration, index);
                         else
-                            m_Animator.Play(fullStateName, index);
+                            m_Animator.CrossFade(fullStateName, 0.01f, index);
 
                     }
                     else

@@ -35,18 +35,18 @@ namespace CharacterController
             {
                 var checkDistance = m_MaxDistance + 2 * m_CapsuleCollider.radius;
 
-                if (Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out m_CheckDistanceHit, checkDistance, m_Layers.SolidLayers | m_StopLayer))
-                {
-                    var action = m_Controller.GetAction<Slide>();
-                    if(action != null){
-                        if (CanStartAction(action)){
-                            action.SetMaxDistance(m_MaxDistance);
-                            action.StartAction();
-                            return false;
-                        }
-                    }
+                //if (Physics.Raycast(m_Transform.position + (Vector3.up * m_CheckHeight), m_Transform.forward, out m_CheckDistanceHit, checkDistance, m_Layers.SolidLayers | m_StopLayer))
+                //{
+                //    var action = m_Controller.GetAction<Slide>();
+                //    if(action != null){
+                //        if (CanStartAction(action)){
+                //            action.SetMaxDistance(m_MaxDistance);
+                //            action.StartAction();
+                //            return false;
+                //        }
+                //    }
 
-                }
+                //}
 
                 if (m_Debug)
                     Debug.DrawRay(m_Transform.position + Vector3.up * 0.12f, m_Transform.forward * checkDistance, Color.white, 2);

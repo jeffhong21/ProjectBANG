@@ -6,6 +6,12 @@ namespace CharacterController
 
     public class Climb : CharacterAction
     {
+        public override int ActionID
+        {
+            get { return m_ActionID = ActionTypeID.Climb1M; }
+            set { m_ActionID = value; }
+        }
+
 
         [Tooltip("Where does the detection raycast height start at.")]
         [SerializeField] protected float checkHeight = 0.4f;

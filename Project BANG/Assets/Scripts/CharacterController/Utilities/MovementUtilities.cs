@@ -2,35 +2,72 @@
 using System.Collections;
 using MathUtil = MathUtilities;
 
-public class MovementUtilities : MonoBehaviour
+public static class MovementUtilities
 {
-    [SerializeField] LineRenderer lineRenderer;
-    [SerializeField] Transform point0, point1, point2;
-    [SerializeField] int numberPoints = 25;
+    //[SerializeField] LineRenderer lineRenderer;
+    //[SerializeField] Transform point0, point1, point2;
+    //[SerializeField] int numberPoints = 25;
 
 
-    private void Start()
-    {
+    //private void Start()
+    //{
         
-    }
+    //}
 
-    private void Update()
+    //private void Update()
+    //{
+    //    DrawQuadraticCurve(numberPoints, point0, point1, point2);
+    //}
+
+
+    public static class MotionPath
     {
-        DrawQuadraticCurve(numberPoints, point0, point1, point2);
+        public static Transform transform;
+        public static Vector3[] points;
+
+
+        public static Vector3 GetPoint(Vector3 p0, Vector3 p1, Vector3 p2, float t)
+        {
+            t = Mathf.Clamp01(t);
+            float oneMinusT = 1f - t;
+            return
+                oneMinusT * oneMinusT * p0 +
+                2f * oneMinusT * t * p1 +
+                t * t * p2;
+        }
+
+        public static Vector3 GetFirstDerivative(Vector3 p0, Vector3 p1, Vector3 p2, float t)
+        {
+            return
+                2f * (1f - t) * (p1 - p0) +
+                2f * t * (p2 - p1);
+        }
+
+        public static Vector3 GetVelocity(float t)
+        {
+            return transform.TransformPoint(GetFirstDerivative(points[0], points[1], points[2], t)) -
+                transform.position;
+        }
     }
 
-    public void DrawQuadraticCurve(int numPoints, Transform point0, Transform point1, Transform point2 )
+
+
+
+
+    #region Quadratic Bezier Curve
+
+    public static void DrawQuadraticCurve(int numPoints, Transform point0, Transform point1, Transform point2 )
     {
         Vector3[] positions = new Vector3[numPoints];
         for (int i = 1; i < numPoints + 1; i++) {
             float t = i / (float)numPoints;
             positions[i - 1] = CalculateQuadraticBezierPoint(point0.position, point1.position, point2.position, t);
         }
-        lineRenderer.positionCount = numPoints;
-        lineRenderer.SetPositions(positions);
+        //lineRenderer.positionCount = numPoints;
+        //lineRenderer.SetPositions(positions);
     }
 
-    private Vector3 CalculateQuadraticBezierPoint(Vector3 p0, Vector3 p1, Vector3 p2, float t)
+    private static Vector3 CalculateQuadraticBezierPoint(Vector3 p0, Vector3 p1, Vector3 p2, float t)
     {
         //  Formula:  P0 = vector parameter points.
         //  (1-t)2 P0 + 2*(1-t)tP1 + t2 * P2
@@ -49,7 +86,7 @@ public class MovementUtilities : MonoBehaviour
         return point;
     }
 
-
+    #endregion
 
     /// <summary>
     /// Calculate the jump speed.
@@ -70,7 +107,7 @@ public class MovementUtilities : MonoBehaviour
     /// <param name="origin"></param>
     /// <param name="time"> time is how long per second</param>
     /// <returns></returns>
-    public Vector3 CalculateVelocity( Vector3 target, Vector3 origin, float time )
+    public static Vector3 CalculateVelocity( Vector3 target, Vector3 origin, float time )
     {
         //  Define the distance x and y first.
         Vector3 distance = target - origin;
@@ -97,10 +134,10 @@ public class MovementUtilities : MonoBehaviour
     }
 
 
-    public Vector3 ComputeTorque(Rigidbody rb, Quaternion desiredRotation )
+    public static Vector3 ComputeTorque(Rigidbody rb, Quaternion desiredRotation )
     {
         //q will rotate from our current rotation to desired rotation
-        Quaternion q = desiredRotation * Quaternion.Inverse(transform.rotation);
+        Quaternion q = desiredRotation * Quaternion.Inverse(rb.transform.rotation);
         //convert to angle axis representation so we can do math with angular velocity
         Vector3 axis;
         float axisMagnitude;
@@ -110,13 +147,13 @@ public class MovementUtilities : MonoBehaviour
         Vector3 targetAngularVelocity = axis * axisMagnitude * Mathf.Deg2Rad / Time.fixedDeltaTime;
         targetAngularVelocity -= rb.angularVelocity;
         //to multiply with inertia tensor local then rotationTensor coords
-        Vector3 wl = transform.InverseTransformDirection(targetAngularVelocity);
+        Vector3 wl = rb.transform.InverseTransformDirection(targetAngularVelocity);
         Vector3 Tl;
         Vector3 wll = wl;
         wll = rb.inertiaTensorRotation * wll;
         wll.Scale(rb.inertiaTensor);
         Tl = Quaternion.Inverse(rb.inertiaTensorRotation) * wll;
-        Vector3 T = transform.TransformDirection(Tl);
+        Vector3 T = rb.transform.TransformDirection(Tl);
         return T;
     }
 

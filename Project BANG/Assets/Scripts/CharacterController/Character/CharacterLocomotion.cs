@@ -29,6 +29,10 @@
 
 
 
+        private Vector3 leftFootPosition, rightFootPosition;
+
+
+
         #region Properties
 
         public bool Aiming { get; set; }
@@ -201,7 +205,6 @@
 
 
 
-
         #region Character Locomotion
 
 
@@ -260,13 +263,20 @@
         /// </summary>
         protected override void UpdateAnimator()
         {
-            //m_Animator.SetFloat(HashID.LegUpIndex, )
 
-            Vector3 leftFootPos = GetFootPosition(AvatarIKGoal.LeftFoot);
-            Vector3 rightFootPos = GetFootPosition(AvatarIKGoal.RightFoot);
+            if (Moving)
+            {
+                leftFootPosition = GetFootPosition(AvatarIKGoal.LeftFoot);
+                rightFootPosition = GetFootPosition(AvatarIKGoal.RightFoot);
 
-            float legFwdIndex = leftFootPos.normalized.z > rightFootPos.normalized.z ? 0 : 1;
-            m_Animator.SetFloat(HashID.LegFwdIndex, legFwdIndex);
+                float legFwdIndex = leftFootPosition.normalized.z > rightFootPosition.normalized.z ? 0 : 1;
+                m_Animator.SetFloat(HashID.LegFwdIndex, legFwdIndex);
+            }
+            else
+            {
+                m_Animator.SetFloat(HashID.LegFwdIndex, 0.5f);
+            }
+
             base.UpdateAnimator();
         }
 
@@ -578,24 +588,7 @@
         #endregion
 
 
-        /// <summary>
-        /// Returns which foot is planted.  0 is left, 1 is right.
-        /// </summary>
-        /// <param name="pivotWeightThreshold"></param>
-        /// <returns>Returns -1 if neither foot is planted.</returns>
-        public int GetPlantedPivotFoot( float pivotWeightThreshold = 0.5f)
-        {
-            pivotWeightThreshold = Mathf.Clamp(pivotWeightThreshold, 0, 0.5f);
-            int pivotFoot = 2;
-            if (m_Animator.pivotWeight >= 1 - pivotWeightThreshold) {
-                pivotFoot = 1;
-            } else if (m_Animator.pivotWeight < 0 + pivotWeightThreshold) {
-                pivotFoot = 0;
-            } else
-                pivotFoot = -1;
 
-            return pivotFoot;
-        }
 
 
         public void SetMovementType( MovementTypes movementType )
@@ -611,10 +604,10 @@
 
             Vector3 pivotPosition = m_Animator.pivotPosition;
 
-            Vector3 leftFootPos = GetFootPosition(AvatarIKGoal.LeftFoot);
-            Vector3 rightFootPos = GetFootPosition(AvatarIKGoal.RightFoot);
-            float leftHeight = MathUtil.Round(Mathf.Abs(leftFootPos.y));
-            float rightHeight = MathUtil.Round(Mathf.Abs(rightFootPos.y));
+            leftFootPosition = GetFootPosition(AvatarIKGoal.LeftFoot);
+            rightFootPosition = GetFootPosition(AvatarIKGoal.RightFoot);
+            float leftHeight = MathUtil.Round(Mathf.Abs(leftFootPosition.y));
+            float rightHeight = MathUtil.Round(Mathf.Abs(rightFootPosition.y));
 
             float threshold = 0.1f;
             float pivotDifference = Mathf.Abs(0.5f - m_Animator.pivotWeight);
@@ -625,7 +618,7 @@
             //  Both feet are grouned.
             if( (leftHeight < threshold && rightHeight < threshold) || (leftHeight > threshold && rightHeight > threshold ) && pivotDifference < 5f){
                 t = Time.deltaTime;
-                feetPivotActive = MathF.Clamp01(feetPivotActive + t);
+                feetPivotActive = Mathf.Clamp01(feetPivotActive + t);
                 pivotPosition = m_Transform.position;  
             }
             //  If one leg is raised and one is planted.
@@ -665,6 +658,23 @@
             return Vector3.zero;
         }
 
+        private Vector3 GetFootPosition(HumanBodyBones foot, bool worldPos = false)
+        {
+            if (foot == HumanBodyBones.LeftToes || foot == HumanBodyBones.RightToes)
+            {
+                Vector3 footPos = m_Animator.GetBoneTransform(foot).position;
+                Quaternion footRot = m_Animator.GetBoneTransform(foot).rotation;
+                //float botFootHeight = foot == HumanBodyBones.LeftToes ? m_Animator.leftFeetBottomHeight : m_Animator.rightFeetBottomHeight;
+                //Vector3 footHeight = new Vector3(0, -botFootHeight, 0);
+
+                footPos = footRot * footPos;
+                //footPos += footRot * footHeight;
+
+                return !worldPos ? footPos : m_Transform.InverseTransformPoint(footPos);
+            }
+
+            return Vector3.zero;
+        }
 
 
 
@@ -684,13 +694,11 @@
 
             //CharacterDebug.Log("<color=yellow> leftFootPos </color>", GetFootPosition(0, true));
             //CharacterDebug.Log("<color=yellow> rightFootPos </color>", GetFootPosition(1, true));
-            //CharacterDebug.Log("<color=green> leftFootPos Y </color>", MathUtil.Round(GetFootPosition(AvatarIKGoal.LeftFoot, true).normalized.y));
-            //CharacterDebug.Log("<color=green> rightFootPos Y</color>", MathUtil.Round(GetFootPosition(AvatarIKGoal.RightFoot, true).normalized.y));
-            CharacterDebug.Log("<color=yellow> leftFootPos Z </color>", MathUtil.Round(GetFootPosition(AvatarIKGoal.LeftFoot).normalized.z));
-            CharacterDebug.Log("<color=yellow> rightFootPos Z</color>", MathUtil.Round(GetFootPosition(AvatarIKGoal.RightFoot).normalized.z));
+            CharacterDebug.Log("<color=green> leftFootPos Y </color>", MathUtil.Round(GetFootPosition(AvatarIKGoal.LeftFoot, false).y));
+            CharacterDebug.Log("<color=green> rightFootPos Y</color>", MathUtil.Round(GetFootPosition(AvatarIKGoal.RightFoot, false).y));
 
-            CharacterDebug.Log("<color=green> leftFootPos Y </color>", MathUtil.Round(GetFootPosition(AvatarIKGoal.LeftFoot).y));
-            CharacterDebug.Log("<color=green> rightFootPos Y</color>", MathUtil.Round(GetFootPosition(AvatarIKGoal.RightFoot).y));
+
+
             //CharacterDebug.Log("<color=yellow> leftFootPos Z </color>", MathUtil.Round(GetFootPosition(AvatarIKGoal.LeftFoot, true).z));
             //CharacterDebug.Log("<color=yellow> rightFootPos Z</color>", MathUtil.Round(GetFootPosition(AvatarIKGoal.RightFoot, true).z));
 

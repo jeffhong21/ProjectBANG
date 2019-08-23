@@ -15,21 +15,37 @@ namespace CharacterController
         protected float m_Force = 5;
         [SerializeField]
         protected float m_RecurrenceDelay = 0.2f;
+        [SerializeField]
+        protected SurfaceEffect m_LandSurfaceImpact;
+
+
         private float m_NextJump;
 
 
 
         [SerializeField]
-        protected float jumpHeight = 5;
+        protected float jumpHeight = 4;
 
         protected float acceleration;
         protected float speed;
         protected float verticalVelocity;
         protected Vector3 velocity;
 
+
+
+        protected bool hasReachedApex;
+        protected bool hasLanded;
         //
         // Methods
         //
+        // Calculate the initial velocity of a jump based off gravity and desired maximum height attained
+        protected float CalculateJumpSpeed(float jumpHeight, float gravity)
+        {
+            return Mathf.Sqrt(2 * jumpHeight * gravity);
+        }
+
+
+
         public override bool CanStartAction()
         {
             if (base.CanStartAction())
@@ -49,11 +65,9 @@ namespace CharacterController
             if (m_StateName.Length == 0)
                 m_Animator.SetInteger(HashID.ActionID, m_ActionID);
 
+            hasReachedApex = hasLanded = false;
 
-            int actionIntData = 0;
-            int pivotFoot = m_Controller.GetPlantedPivotFoot();
-            actionIntData += pivotFoot;
-            m_Animator.SetInteger(HashID.ActionIntData, actionIntData);
+
 
             //float timeToJumpApex = 0.4f;
             //var gravity = -(2 * m_Force) / Mathf.Pow(timeToJumpApex, 2);
@@ -69,20 +83,31 @@ namespace CharacterController
             ///
 
             //CalculateJumpVelocity();
-            m_Rigidbody.velocity = CalculateJumpVelocity() + m_Controller.MoveDirection;
-            m_Rigidbody.AddForce(velocity, ForceMode.VelocityChange);
+            //m_Rigidbody.velocity = CalculateJumpVelocity() + m_Controller.MoveDirection;
+            //m_Rigidbody.AddForce(CalculateJumpVelocity(), ForceMode.VelocityChange);
+
+            float jumpForce = CalculateJumpSpeed(jumpHeight, -9.8f);
+            Vector3 vv = Vector3.up * jumpForce + m_Controller.MoveDirection;
+            m_Rigidbody.velocity = vv;
+            m_Rigidbody.AddForce(vv, ForceMode.VelocityChange);
         }
 
 
 
         public override bool CanStopAction()
         {
-            return m_Rigidbody.velocity.y < 0;
+            if (hasReachedApex && hasLanded)
+                return true;
+
+            if (Time.time > m_ActionStartTime + 1.1f)
+                return true;
+            return false;
         }
 
 
         protected override void ActionStopped()
         {
+            hasReachedApex = hasLanded = false;
             m_NextJump = Time.time + m_RecurrenceDelay;
         }
 
@@ -116,8 +141,8 @@ namespace CharacterController
 
         public override bool UpdateMovement()
         {
-            velocity.y -= verticalVelocity * m_DeltaTime;
-            m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, velocity, m_DeltaTime * jumpHeight);
+            //velocity.y -= verticalVelocity * m_DeltaTime;
+            //m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, velocity, m_DeltaTime * jumpHeight);
             return false;
         }
 

@@ -85,13 +85,18 @@ public class OpenScenes
     [MenuItem("Scenes/Prototype Environment Scene", false, 101)]
     public static void OpenPrototypeEnvironmentScene()
     {
-
         string path = "Assets/Scenes/Prototype_Environment/Prototype_Environment.unity";
         OpenScene(path);
     }
 
+    [MenuItem("Scenes/Prototype Environment-IntenseLighting Scene", false, 101)]
+    public static void OpenPrototypeEnvironmentIntenseScene()
+    {
+        string path = "Assets/Scenes/Prototype_Environment/Prototype_Environment-IntenseLighting.unity";
+        OpenScene(path);
+    }
 
-    
+
     [MenuItem("Scenes/Debug All Scenes", false, 1000)]
     public static void DebugAllScenes()
     {

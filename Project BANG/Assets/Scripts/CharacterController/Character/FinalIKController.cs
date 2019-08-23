@@ -132,6 +132,14 @@ namespace CharacterController
 
 
 
+        protected void OnAnimatorIK(int layerIndex)
+        {
+            
+        }
+
+
+
+
         private void EquipUnequip(Item item, int slotID)
         {
 

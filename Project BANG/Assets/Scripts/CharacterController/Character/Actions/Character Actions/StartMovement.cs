@@ -152,13 +152,13 @@ namespace CharacterController
         }
 
 
-        //  Returns the state the given layer should be on.
-        public override string GetDestinationState( int layer )
-        {
-            if (layer == 0)
-                return m_StateName;
-            return "";
-        }
+        ////  Returns the state the given layer should be on.
+        //public override string GetDestinationState( int layer )
+        //{
+        //    if (layer == 0)
+        //        return m_StateName;
+        //    return "";
+        //}
 
 
 

@@ -13,9 +13,9 @@
 
         [SerializeField] protected int maxInputCount = 4;
         [SerializeField, Range(0, 1)]
-        protected float stopThreshold = 0.5f;
-        [SerializeField, Range(0.01f, 0.49f)]
-        protected float pivotWeightThreshold = 0.18f;
+        protected float stopThreshold = 0.8f;
+        //[SerializeField, Range(0.01f, 0.49f)]
+        //protected float pivotWeightThreshold = 0.18f;
 
         protected int detectionCount;
         protected float lastMoveAmount;
@@ -35,26 +35,26 @@
         //
         public override bool CanStartAction()
         {
-            if(successfulStarts >= 5) {
-                successfulStarts = 0;
-                detectionCount = 0;
-                isStopMoving = false;
-                return true;
-            }
+            //if(successfulStarts >= 5) {
+            //    successfulStarts = 0;
+            //    detectionCount = 0;
+            //    isStopMoving = false;
+            //    return true;
+            //}
 
             lastMoveAmount = currentMoveAmount;
             currentMoveAmount = Mathf.Clamp01(Mathf.Abs(m_Controller.InputVector.x) + Mathf.Abs(m_Controller.InputVector.z));
 
-            if (lastMoveAmount > currentMoveAmount)
+            if (lastMoveAmount > currentMoveAmount && lastMoveAmount > stopThreshold)
                 isStopMoving = true;
 
 
             if (isStopMoving) {
                 if (detectionCount >= maxInputCount && currentMoveAmount < stopThreshold) {
-                    //detectionCount = 0;
-                    //isStopMoving = false;
+                    detectionCount = 0;
+                    isStopMoving = false;
                     successfulStarts++;
-                    return false;
+                    return true;
                 }
                 detectionCount++;
             }
@@ -65,35 +65,35 @@
             }
 
 
-            CharacterDebug.Log("--- IsStopMoving", m_Animator.pivotWeight);
+            //CharacterDebug.Log("--- IsStopMoving", m_Animator.pivotWeight);
             return false;
         }
 
 
-        public override void UpdateAction()
-        {
-            if (IsActive && pivotFoot == 0)
-            {
-                if (m_Animator.pivotWeight >= 1 - pivotWeightThreshold) {
-                    pivotFoot = 1;
-                } else if (m_Animator.pivotWeight <= 0 + pivotWeightThreshold) {
-                    pivotFoot = 0;
-                } else
-                    pivotFoot = -1;
+        //public override void UpdateAction()
+        //{
+        //    if (IsActive && pivotFoot == 0)
+        //    {
+        //        if (m_Animator.pivotWeight >= 1 - pivotWeightThreshold) {
+        //            pivotFoot = 1;
+        //        } else if (m_Animator.pivotWeight <= 0 + pivotWeightThreshold) {
+        //            pivotFoot = 0;
+        //        } else
+        //            pivotFoot = -1;
 
-                if (m_IsActive && Time.time > m_ActionStartTime + 1.5f) {
-                    Debug.LogWarningFormat("{0} could not find a planted pivot foot.  Ending Action.", GetType().Name);
-                    CanStopAction();
-                }
-            }
+        //        if (m_IsActive && Time.time > m_ActionStartTime + 1.5f) {
+        //            Debug.LogWarningFormat("{0} could not find a planted pivot foot.  Ending Action.", GetType().Name);
+        //            CanStopAction();
+        //        }
+        //    }
 
 
-        }
+        //}
 
 
         protected override void ActionStarted()
         {
-            if (pivotFoot == -1) return;
+            //if (pivotFoot == -1) return;
 
             //  Set ActionID parameter.
             if (m_StateName.Length == 0)
@@ -101,14 +101,14 @@
 
 
 
-            //  Get the stop move direction.
-            var axisSign = Vector3.Cross(m_Controller.MoveDirection, m_Transform.forward);
-            moveDirection = Vector3.Angle(m_Transform.forward, m_Controller.MoveDirection) * (axisSign.y >= 0 ? -1f : 1f);
+            ////  Get the stop move direction.
+            //var axisSign = Vector3.Cross(m_Controller.MoveDirection, m_Transform.forward);
+            //moveDirection = Vector3.Angle(m_Transform.forward, m_Controller.MoveDirection) * (axisSign.y >= 0 ? -1f : 1f);
 
-            if (moveDirection > 360 || moveDirection < -360)
-                Debug.LogError(string.Format("{0} moveDirection value of {1} is beyond 360", GetType().Name, moveDirection ));
+            //if (moveDirection > 360 || moveDirection < -360)
+            //    Debug.LogError(string.Format("{0} moveDirection value of {1} is beyond 360", GetType().Name, moveDirection ));
 
-            m_Animator.SetFloat(HashID.ActionFloatData, moveDirection);
+            //m_Animator.SetFloat(HashID.ActionFloatData, moveDirection);
 
 
 

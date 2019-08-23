@@ -108,8 +108,12 @@ namespace CharacterController
 
 
         protected RaycastHit groundHit;
-        protected Collider[] nonAllocateOverlapCapsuleResults;
+        [SerializeField, Group("Collisions")]
+        protected Collider[] probedColiders;
+        [SerializeField, Group("Collisions")]
+        protected RaycastHit[] probedHits;
         protected List<Collider> colliderBuffer = new List<Collider>();
+        protected int totalColliderHits, totalRaycastHits;
 
         protected PhysicMaterial characterMaterial;
 
@@ -128,8 +132,9 @@ namespace CharacterController
         protected Vector3 velocitySmooth;
         protected Vector3 externalForceSmooth;
         protected float rotationAngleSmooth, angularDragSmooth;
-        
 
+        float castDistance = 10;
+        float airborneThreshold = 0.3f;
 
 
         protected Animator m_Animator;
@@ -188,7 +193,7 @@ namespace CharacterController
 
         public Vector3 MoveDirection { get { return moveDirection; } protected set { moveDirection = value; } }
 
-        public Quaternion LookRotation { get; set; }
+        public Quaternion LookRotation { get; set; } = default;
 
         public float Speed { get { return Mathf.Abs(m_Speed); } set { m_Speed = Mathf.Abs(value); } }
 
@@ -254,7 +259,10 @@ namespace CharacterController
             
 
             m_CollisionsLayerMask = m_LayerManager.SolidLayers;
-            nonAllocateOverlapCapsuleResults = new Collider[m_MaxCollisionCount];
+
+            
+            probedColiders = new Collider[m_MaxCollisionCount];
+            probedHits = new RaycastHit[m_MaxCollisionCount];
 
             m_GameObject = gameObject;
             m_Transform = transform;
@@ -273,9 +281,6 @@ namespace CharacterController
 
         protected void Start()
         {
-            LookRotation = m_Transform.rotation;
-
-
             m_Rigidbody.mass = m_Mass;
             m_Rigidbody.useGravity = false;
             m_Rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
@@ -286,13 +291,19 @@ namespace CharacterController
             m_Animator.updateMode = AnimatorUpdateMode.AnimatePhysics;
             m_Animator.applyRootMotion = m_UseRootMotion;
 
-            characterMaterial = new PhysicMaterial();
+            characterMaterial = new PhysicMaterial() { name = "Character Physics Material"};
+        }
+
+
+        private void OnEnable()
+        {
+            motionTrajectory = new Vector3[motionTrajectoryResolution];
+
+            LookRotation = Quaternion.LookRotation(m_Transform.forward);
 
             previousForward = m_Transform.forward;
             previousPosition = m_Rigidbody.position;
             previousVelocity = m_Rigidbody.velocity;
-
-            motionTrajectory = new Vector3[motionTrajectoryResolution];
         }
 
 
@@ -360,13 +371,13 @@ namespace CharacterController
                 {
                     colliderBuffer.Clear();
 
-                    int hits = Physics.OverlapCapsuleNonAlloc(segment1, segment2, radius, nonAllocateOverlapCapsuleResults, m_CollisionsLayerMask);
+                    int hits = Physics.OverlapCapsuleNonAlloc(segment1, segment2, radius, probedColiders, m_CollisionsLayerMask);
                     if(hits > 0)
                     {
                         for (int k = 0; k < hits; k++)
                         {
                             
-                            colliderBuffer.Add(nonAllocateOverlapCapsuleResults[k]);
+                            colliderBuffer.Add(probedColiders[k]);
 
                             var collision = colliderBuffer[k];
                             Vector3 direction;
@@ -386,7 +397,7 @@ namespace CharacterController
 
                             var closestPoint = colliderBuffer[k].ClosestPointOnBounds(origin);
 
-                            //Debug.LogFormat("index: {0} | buffer: {1} | nonAlac: {2}", k, colliderBuffer.Capacity, nonAllocateOverlapCapsuleResults.Length);
+                            //Debug.LogFormat("index: {0} | buffer: {1} | nonAlac: {2}", k, colliderBuffer.Capacity, probedColiders.Length);
                             Debug.DrawLine(origin, closestPoint, Color.black);
                             DebugDraw.Sphere(closestPoint, 0.05f, Color.black);
 
@@ -426,6 +437,8 @@ namespace CharacterController
 
             Moving = inputVector.sqrMagnitude > 0;
 
+
+
             //  Set the input vector, move direction and rotation angle based on the movement type.
             switch (m_MovementType) {
                 case (MovementTypes.Adventure):
@@ -434,10 +447,9 @@ namespace CharacterController
                     rotationAngle = GetAngleFromForward(inputVector);
                     inputVector = m_Transform.InverseTransformDirection(inputVector);
                     inputVector.z = Mathf.Clamp01(inputVector.z + Mathf.Abs(rotationAngle) * Mathf.Deg2Rad);
-
                     //currentVelocity += Vector3.Scale(inputVector, m_GroundAcceleration);
-                    //moveDirection = m_Transform.forward * Mathf.Abs(inputVector.z);
-                    moveDirection = Vector3.SmoothDamp(moveDirection, m_Transform.forward * Mathf.Abs(inputVector.z), ref moveDirectionSmooth, 0.18f);
+                    moveDirection = m_Transform.forward * Mathf.Abs(inputVector.z);
+                    //moveDirection = Vector3.SmoothDamp(moveDirection, m_Transform.forward * Mathf.Abs(inputVector.z), ref moveDirectionSmooth, 0.18f);
 
                     break;
 
@@ -450,8 +462,13 @@ namespace CharacterController
 
                     break;
             }
-            CharacterDebug.Log("InputVector", inputVector);
 
+            //acceleration.Set(inputVector.x * m_GroundAcceleration.x, 0, inputVector.z * m_GroundAcceleration.z);
+            //acceleration = Quaternion.Inverse(m_Transform.rotation) * Vector3.ClampMagnitude(acceleration, 1);
+            //moveAmount += m_Transform.forward * acceleration.z;
+            //moveAmount = Vector3.ClampMagnitude(moveAmount, 1);
+            //CharacterDebug.Log("InputVector", inputVector);
+            //CharacterDebug.Log("moveAmount", moveAmount);
 
 
             //Moving = Mathf.Clamp01(Mathf.Abs(InputVector.x) + Mathf.Abs(InputVector.z)) > 0.1f;
@@ -497,122 +514,133 @@ namespace CharacterController
 
 
 
-            Debug.DrawRay(m_Transform.position + Vector3.up * 1.65f, m_Transform.forward, Color.red);
-            Debug.DrawRay(m_Transform.position + Vector3.up * 1.65f, moveDirection, Color.magenta);
+
 
             //if (DebugMotion) Debug.DrawRay(m_Transform.position + Vector3.up * 1.5f, targetVelocity, Color.blue);
             //if (DebugMotion) Debug.DrawLine(m_Transform.position + Vector3.up * 1.8f, targetPosition + Vector3.up *1.8f, Color.green);
             //if (DebugMotion && Moving) DebugDraw.Sphere(targetPosition + Vector3.up * 1.8f, 0.1f, Color.green);
 
-            CharacterDebug.Log("<b><color=magenta>*** RotationAngle </color></b>", MathUtil.Round(rotationAngle , 5));
-            CharacterDebug.Log("<b><color=magenta>*** AngularDelta </color></b>", MathUtil.Round(angularDelta, 5));
+            //CharacterDebug.Log("<b><color=magenta>*** RotationAngle </color></b>", MathUtil.Round(rotationAngle , 5));
+            //CharacterDebug.Log("<b><color=magenta>*** AngularDelta </color></b>", MathUtil.Round(angularDelta, 5));
         }
 
 
 
 
 
-        float castDistance = 10;
-        float airborneThreshold = 0.3f;
 
+        bool sphereCastHit;
         /// <summary>
         /// Perform checks to determine if the character is on the ground.
         /// </summary>
         protected virtual void CheckGround()
         {
-            Grounded = false;
-            Vector3 origin = RaycastOrigin;
-            Vector3 sphereCastOrigin = origin + Vector3.down * radius;
+            bool querriesHitTriggers = Physics.queriesHitTriggers;
+            Physics.queriesHitTriggers = false;
+
+            bool grounded = false;
+            //Vector3 RaycastOrigin = m_Transform.position + Vector3.up * charCollider.radius;
+            float radius = ColliderRadius * 0.9f;
+            Vector3 origin = m_Transform.position + Vector3.up * (ColliderCenter.y - ColliderHeight / 2 + m_SkinWidth); 
+            Vector3 sphereCastOrigin = origin + Vector3.up * (radius + m_SkinWidth);
             groundAngle = 0;
 
-            float groundDistance = 0;
-            groundHit = new RaycastHit();
-            groundHit.point = m_Transform.position - Vector3.up * airborneThreshold;
-            groundHit.normal = m_Transform.up;
-
-            //Vector3 RaycastOrigin = m_Transform.position + Vector3.up * charCollider.radius;
-            float radius = charCollider.radius - m_SkinWidth;
-            
+            float groundDistance = 10;
+            //groundHit = new RaycastHit();
+            //groundHit.point = m_Transform.position - Vector3.up * airborneThreshold;
+            //groundHit.normal = m_Transform.up;
 
 
-
-
-            if (Physics.Raycast(origin, Vector3.down, out groundHit, castDistance, m_LayerManager.SolidLayers))
+            if (Physics.Raycast(origin, Vector3.down, out groundHit, ColliderRadius, m_LayerManager.SolidLayers))
             {
                 groundDistance = Vector3.Project(m_Transform.position - groundHit.point, transform.up).magnitude;
                 groundAngle = Vector3.Angle(groundHit.normal, Vector3.up);
 
-                if (Physics.SphereCast(sphereCastOrigin, radius, Vector3.down, out groundHit, castDistance, m_LayerManager.SolidLayers)) {
-
+                if (Physics.SphereCast(sphereCastOrigin, radius, Vector3.down, out groundHit, ColliderRadius + 2, m_LayerManager.SolidLayers))
+                {
                     groundAngle = Vector3.Angle(groundHit.normal, m_Transform.up);
 
-                    //if (groundAngle > m_SlopeLimit)
-                    //{
-                    //    // Retrieve a vector pointing down the slope
-                    //    Vector3 r = Vector3.Cross(groundHit.normal, -transform.up);
-                    //    Vector3 v = Vector3.Cross(r, groundHit.normal);
+                    if (groundAngle > m_SlopeLimit)
+                    {
+                        // Retrieve a vector pointing down the slope
+                        Vector3 r = Vector3.Cross(groundHit.normal, -transform.up);
+                        Vector3 v = Vector3.Cross(r, groundHit.normal);
 
-                    //    //Get a position slightly above the controller position to raycast down the slope from to avoid clipping
-                    //    Vector3 flushOrigin = groundHit.point + groundHit.normal * tinyOffset;
+                        //Get a position slightly above the controller position to raycast down the slope from to avoid clipping
+                        Vector3 flushOrigin = groundHit.point + groundHit.normal * tinyOffset;
 
-                    //    // Properties of the flushHit ground
-                    //    if (Physics.Raycast(flushOrigin, v, out groundHit, castDistance, m_LayerManager.SolidLayers))//Perform Raycast
-                    //    {
-                    //        float cos = 1 / Mathf.Cos(groundAngle);
-                    //        float smallerRadius = radius * 0.9f;
-                    //        float hypS = smallerRadius * cos;
-                    //        float hypB = radius * cos;
+                        // Properties of the flushHit ground
+                        if (Physics.Raycast(flushOrigin, v, out groundHit, radius * 2, m_LayerManager.SolidLayers))//Perform Raycast
+                        {
+                            float cos = 1 / Mathf.Cos(groundAngle);
+                            float smallerRadius = radius * 0.9f;
+                            float hypS = smallerRadius * cos;
+                            float hypB = radius * cos;
 
-                    //        Vector3 circleCenterSmall = groundHit.point + groundHit.normal * smallerRadius;
-                    //        Vector3 pointOnSurface = circleCenterSmall + hypS * transform.up * -1;
-                    //        Vector3 circleCenterBig = pointOnSurface + hypB * transform.up;
+                            Vector3 circleCenterSmall = groundHit.point + groundHit.normal * smallerRadius;
+                            Vector3 pointOnSurface = circleCenterSmall + hypS * transform.up * -1;
+                            Vector3 circleCenterBig = pointOnSurface + hypB * transform.up;
 
-                    //        groundHit.distance = Vector3.Distance(origin, circleCenterBig);
+                            groundHit.distance = Vector3.Distance(origin, circleCenterBig);
 
-                    //        if (groundHit.distance < tinyOffset * tinyOffset)
-                    //            groundHit.distance = 0;
+                            if (groundHit.distance < tinyOffset * tinyOffset)
+                                groundHit.distance = 0;
 
-                    //        groundHit.point = circleCenterBig - groundHit.normal * radius;
+                            groundHit.point = circleCenterBig - groundHit.normal * radius;
 
-                    //    }
-                    //    else
-                    //    {
-                    //        groundDistance = castDistance;
-                    //    }
-                    //    againstWall = true;
-                    //}
+                        }
 
-                    if (groundDistance > groundHit.distance - charCollider.radius - m_SkinWidth)
-                        groundDistance = groundHit.distance - charCollider.radius - m_SkinWidth;
+                        //againstWall = true;
+                    }
 
-                    //if (groundDistance > groundHit.distance - m_SkinWidth)
-                    //    groundDistance = groundHit.distance - m_SkinWidth;
+
+                    if (groundDistance > groundHit.distance - radius - m_SkinWidth)
+                        groundDistance = groundHit.distance - radius - m_SkinWidth;
+
+                    sphereCastHit = true;
                 }
-
-
-                if (groundDistance < airborneThreshold && groundAngle < 85) {
-                    Grounded = true;
-
-                    Vector3 groundedPos = m_Transform.position - m_Transform.up * groundDistance;
-                    m_Rigidbody.MovePosition(groundedPos);
-                    //var averagePosition = GetAverageRaycast(charCollider.radius + m_SkinWidth, charCollider.radius + m_SkinWidth);
-                    //m_Rigidbody.MovePosition(Vector3.MoveTowards(m_Rigidbody.position, averagePosition, m_DeltaTime * 4));
-                }
-
-
             }
 
 
 
+            if (groundDistance < 0.05f && groundAngle < 85)
+            {
+                grounded = true;
+
+                //Vector3 groundedPos = m_Transform.position - m_Transform.up * groundDistance;
+                //m_Rigidbody.MovePosition(groundedPos);
+                //var averagePosition = GetAverageRaycast(charCollider.radius + m_SkinWidth, charCollider.radius + m_SkinWidth);
+                //m_Rigidbody.MovePosition(Vector3.MoveTowards(m_Rigidbody.position, averagePosition, m_DeltaTime * 4));
+            }
+            else
+            {
+                grounded = false;
+                groundAngle = 0;
+                groundHit.point = m_Transform.position + Vector3.up * airborneThreshold;
+                groundHit.normal = m_Transform.up;
+            }
+
+
+
+            Grounded = grounded;
+            m_Rigidbody.useGravity = !Grounded;
+            Physics.queriesHitTriggers = querriesHitTriggers;
+
+
             //  Draw Sphere cast
-            if (DebugGroundCheck) DebugDraw.Sphere(RaycastOrigin + Vector3.down * (groundDistance - radius), radius, Grounded ? Color.green : Color.grey);
+            if (DebugGroundCheck) DebugDraw.Sphere(groundHit.point + Vector3.up * radius, radius, sphereCastHit ? Color.green : Color.grey);
             if (DebugGroundCheck) Debug.DrawLine(RaycastOrigin, groundHit.point, Grounded ? Color.green : Color.grey);
             if (DebugGroundCheck) DebugDraw.DrawMarker(groundHit.point, 0.1f, Grounded ? Color.green : Color.grey);
 
             CharacterDebug.Log("<color=green>Ground Hit Distance</color>", MathUtil.Round(groundDistance));
             CharacterDebug.Log("<color=green>Ground Angle</color>", MathUtil.Round(groundAngle));
 
+            sphereCastHit = false;
         }
+
+
+
+
 
 
         /// <summary>
@@ -621,55 +649,89 @@ namespace CharacterController
         protected virtual void CheckMovement()
         {
 
+            if(groundAngle > m_SlopeLimit)
+            {
+                //Grab the direction that the controller is moving in
+                Vector3 absoluteMoveDirection = Vector3.ProjectOnPlane(m_Transform.position - previousPosition, groundHit.normal);
+
+                // Retrieve a vector pointing down the slope
+                Vector3 r = Vector3.Cross(groundHit.normal, -m_Transform.up);
+                Vector3 v = Vector3.Cross(r, groundHit.normal);
+
+                //Check the angle between the move direction of the controller and a vector down the slope. If less than 90 degrees then the player is moving down the slope return false
+                float angle = Vector3.Angle(absoluteMoveDirection, v);
+
+                //if (angle <= 90.0f)
+                //    return false;
+
+                //// Calculate where to place the controller on the slope, or at the bottom, based on the desired movement distance
+                //Vector3 resolvedPosition = Math3d.ProjectPointOnLine(initialPosition, r, transform.position);
+                //Vector3 direction = Math3d.ProjectVectorOnPlane(n, resolvedPosition - transform.position);
+
+                //transform.position += direction;
+            }
+
+
+
 
             //MotionTrajectory(targetVelocity);
 
-            //float castRadius = charCollider.radius + m_SkinWidth;
+            float castRadius = charCollider.radius + m_SkinWidth;
 
-            //Vector3 p1 = RaycastOrigin + charCollider.center + Vector3.up * (charCollider.height * 0.5f - castRadius);
-            //Vector3 p2 = RaycastOrigin + charCollider.center - Vector3.up * (charCollider.height * 0.5f - castRadius);
+            Vector3 p1 = RaycastOrigin + charCollider.center + Vector3.up * (charCollider.height * 0.5f - castRadius);
+            Vector3 p2 = RaycastOrigin + charCollider.center - Vector3.up * (charCollider.height * 0.5f - castRadius);
 
-            //var hits = Physics.OverlapCapsuleNonAlloc(p1, p2, castRadius, colliderBuffer, m_CollisionsLayerMask);
+            var hits = Physics.OverlapCapsuleNonAlloc(p1, p2, castRadius, probedColiders, m_CollisionsLayerMask);
+            totalColliderHits += hits;
+            if (hits > 0)
+            {
+                colliderBuffer.Clear();
+                var startIndex = totalColliderHits > hits ? totalColliderHits - hits : 0;
+                var centerMass = m_Transform.TransformPoint(m_Rigidbody.centerOfMass);
+                for (int i = startIndex; i < hits; i++)
+                {
+                    colliderBuffer[i] = probedColiders[i];
+                    var collision = colliderBuffer[i];
+                    Vector3 direction;
+                    float distance;
+                    if (Physics.ComputePenetration(charCollider, m_Transform.position, m_Transform.rotation,
+                                                    collision, collision.transform.position, collision.transform.rotation,
+                                                    out direction, out distance))
+                    {
+                        Vector3 penetrationVector = direction * distance;
+                        Vector3 moveDirectionProjected = Vector3.Project(moveDirection, -direction);
+                        //  m_transform.position = m_transform.position + penetrationVector;
+                        m_Rigidbody.MovePosition(m_Transform.position + penetrationVector);
+                        moveDirection -= moveDirectionProjected;
 
-            //if (hits > 0) {
-            //    var centerMass = m_Transform.TransformPoint(m_Rigidbody.centerOfMass);
-            //    for (int i = 0; i < hits; i++)
-            //    {
-            //        var collision = colliderBuffer[i];
-            //        Vector3 direction;
-            //        float distance;
-            //        if (Physics.ComputePenetration( charCollider, m_Transform.position, m_Transform.rotation,
-            //                                        collision, collision.transform.position, collision.transform.rotation,
-            //                                        out direction, out distance))
-            //        {
-            //            Vector3 penetrationVector = direction * distance;
-            //            Vector3 moveDirectionProjected = Vector3.Project(moveDirection, -direction);
-            //            //  m_transform.position = m_transform.position + penetrationVector;
-            //            m_Rigidbody.MovePosition(m_Transform.position + penetrationVector);
-            //            moveDirection -= moveDirectionProjected;
-            //        }
+                        Debug.DrawRay(centerMass, moveDirection, Color.red);
+                    }
 
-            //        var closestPoint = colliderBuffer[i].ClosestPointOnBounds(centerMass);
+                    var closestPoint = colliderBuffer[i].ClosestPointOnBounds(centerMass);
 
 
-            //        Debug.DrawLine(centerMass, closestPoint, Color.green);
-            //        DebugDraw.Sphere(closestPoint, 0.05f, Color.green);
+                    Debug.DrawLine(centerMass, closestPoint, Color.black);
+                    DebugDraw.Sphere(closestPoint, 0.05f, Color.black);
 
-            //        Rigidbody rb = collision.attachedRigidbody;
-            //        if(rb != null) {
-            //            if(rb.mass > m_Mass) {
+                    //Rigidbody rb = collision.attachedRigidbody;
+                    //if (rb != null)
+                    //{
+                    //    if (rb.mass > m_Mass)
+                    //    {
 
-            //            }
-            //        }
-            //        //colliderBuffer[i].
-            //    }
-            //}
-            //
-            //  If walk into wall.
-            //
+                    //    }
+                    //}
+                    //colliderBuffer[i].
+                }
+            }
+
+            //If walk into wall.
+
+
 
             //RaycastHit collisionHit;
-            //if (Physics.Raycast(m_Transform.position + Vector3.up * m_MaxStepHeight, m_Transform.forward, out collisionHit, 1.5f + charCollider.radius, m_LayerManager.SolidLayers)) {
+            //if (Physics.Raycast(m_Transform.position + Vector3.up * m_MaxStepHeight, m_Transform.forward, out collisionHit, 1.5f + charCollider.radius, m_LayerManager.SolidLayers))
+            //{
             //    Vector3 groundNormal = groundHit.normal;
             //    Vector3 collisionNormal = collisionHit.normal;
             //    Vector3.OrthoNormalize(ref groundNormal, ref collisionNormal);
@@ -681,7 +743,9 @@ namespace CharacterController
 
             //    float angle = Vector3.Angle(m_Transform.forward, desiredVector);
             //    Debug.DrawRay(m_Transform.position + Vector3.up * m_MaxStepHeight, desiredVector, Color.red);
-            //} else {
+            //}
+            //else
+            //{
             //    m_CollisionRotation = Quaternion.identity;
             //}
 
@@ -713,34 +777,36 @@ namespace CharacterController
                     }
                 }
 
-                //if(groundAngle > 0) {
-                //    //  What to do if ground angle is greater than slope limit.
-                //    if (groundAngle > m_SlopeLimit) {
-                //        //  sliding is true.
-                //        Moving = false;
-                //        var localDir = m_Transform.InverseTransformDirection(m_GroundSlopeDir);
-                //        rotationAngle = Mathf.Atan2(localDir.x, localDir.z) * Mathf.Rad2Deg;
-                //        var targetDirection = Vector3.Project(moveDirection, m_GroundSlopeDir).normalized * m_SlopeForceDown;
-                //        moveDirection = Vector3.Lerp(moveDirection, targetDirection, m_DeltaTime * m_RotationSpeed);
-                //        m_Rigidbody.AddForce(moveDirection, ForceMode.Impulse);
-                //        CharacterDebug.Log("<color=red> ** Sliding  </color>", "Sliding");
-                //    }
-                //    //else {
-                //    //    Vector3 slopeDirection = Vector3.Cross(m_Transform.right, groundHit.normal);
-                //    //    float direction = Mathf.Sign(slopeDirection.y);
-                //    //    moveDirection = Vector3.Project(moveDirection, slopeDirection).normalized * (direction > 0 ? m_SlopeForceUp : m_SlopeForceDown);
-                //    //}
+                if (groundAngle > 0)
+                {
+                    //  What to do if ground angle is greater than slope limit.
+                    if (groundAngle > m_SlopeLimit)
+                    {
+                        //  sliding is true.
+                        Moving = false;
+                        var localDir = m_Transform.InverseTransformDirection(m_GroundSlopeDir);
+                        rotationAngle = Mathf.Atan2(localDir.x, localDir.z) * Mathf.Rad2Deg;
+                        var targetDirection = Vector3.Project(moveDirection, m_GroundSlopeDir).normalized * m_SlopeForceDown;
+                        moveDirection = Vector3.Lerp(moveDirection, targetDirection, m_DeltaTime * m_RotationSpeed);
+                        m_Rigidbody.AddForce(moveDirection, ForceMode.Impulse);
+                        CharacterDebug.Log("<color=red> ** Sliding  </color>", "Sliding");
+                    }
+                    //else {
+                    //    Vector3 slopeDirection = Vector3.Cross(m_Transform.right, groundHit.normal);
+                    //    float direction = Mathf.Sign(slopeDirection.y);
+                    //    moveDirection = Vector3.Project(moveDirection, slopeDirection).normalized * (direction > 0 ? m_SlopeForceUp : m_SlopeForceDown);
+                    //}
 
 
-                //    //float slopeStartAngle = 0;
-                //    //float slopeEndAngle = m_SlopeLimit;
-                //    //float angle = 90 - Vector3.Angle(m_Transform.forward, groundHit.normal);
-                //    //angle -= slopeStartAngle;
-                //    //float range = slopeEndAngle - slopeStartAngle;
-                //    //float slopeDamper = 1f - Mathf.Clamp(angle / range, 0f, 1f);
-                //    //CharacterDebug.Log("<color=green>anle  </color>", angle);
-                //    //CharacterDebug.Log("<color=green>slopeDamper  </color>", slopeDamper);
-                //}
+                    //float slopeStartAngle = 0;
+                    //float slopeEndAngle = m_SlopeLimit;
+                    //float angle = 90 - Vector3.Angle(m_Transform.forward, groundHit.normal);
+                    //angle -= slopeStartAngle;
+                    //float range = slopeEndAngle - slopeStartAngle;
+                    //float slopeDamper = 1f - Mathf.Clamp(angle / range, 0f, 1f);
+                    //CharacterDebug.Log("<color=green>anle  </color>", angle);
+                    //CharacterDebug.Log("<color=green>slopeDamper  </color>", slopeDamper);
+                }
 
 
 
@@ -777,6 +843,84 @@ namespace CharacterController
         protected virtual void UpdateMovement()
         {
 
+            Vector3 velocityAdjusted = moveDirection.normalized;
+            if (Grounded)
+            {
+                //float moveDirScale = Mathf.Abs(inputVector.x) + Mathf.Abs(inputVector.z);// + moveDirection.magnitude;
+                float moveDirScale = moveDirection.magnitude;
+                Vector3 groundNormal = groundHit.normal;
+
+                if (Vector3.Dot(moveDirection, groundNormal) >= 0)
+                {
+                    //  If greater than 0, than we are going down a slope.
+
+                }
+                else
+                {
+                    //  We are going up the slope if it is negative.
+
+                }
+                //CharacterDebug.Log("<color=cyan>MoveDir Dot</color>", Vector3.Dot(moveDirection, groundNormal));
+
+
+                velocityAdjusted = GetDirectionTangentToSurface(velocityAdjusted, groundNormal) * moveDirScale;
+
+                // Calculate target velocity
+                Vector3 inputRight = Vector3.Cross(moveDirection, m_Transform.up);
+                Vector3 reorientedInput = Vector3.Cross(groundNormal, inputRight).normalized * moveDirScale;// moveDirection.magnitude;
+                Vector3 targetMovementVelocity = reorientedInput * 10; // MaxStableMoveSpeed;
+
+                //CharacterDebug.Log("<color=cyan>targetMovementVelocity</color>", targetMovementVelocity);
+                
+
+                // Smooth movement Velocity
+                velocityAdjusted = Vector3.Lerp(velocityAdjusted, targetMovementVelocity, 1f - Mathf.Exp(-15 * m_DeltaTime));  //  1f - Mathf.Exp(-StableMovementSharpness * deltaTime));
+
+                //CharacterDebug.Log("<color=blue>velocityAdjusted1</color>", velocityAdjusted);
+            }
+            else
+            {
+                //if (inputVector.sqrMagnitude > 0f)
+                //{
+                //    //float movementContrarity = Mathf.Max(0f, Vector3.Dot(-_moveInputVector.normalized, currentVelocity.normalized));
+                //    //float chosenAccelerationSpeed = Mathf.Lerp(AirAccelerationSpeed, AirAccelerationSpeed * AirAccelerationBias, movementContrarity);
+                //    Vector3 addedVelocity = moveDirection * m_AirborneAcceleration * deltaTime;
+                //    //// TODO: Remove velocity going against all current obstruction normals
+                //    //if (Motor.GroundingStatus.FoundAnyGround)
+                //    //{
+                //    //    Vector3 perpenticularObstructionNormal = Vector3.Cross(Vector3.Cross(Motor.CharacterUp, Motor.GroundingStatus.GroundNormal), Motor.CharacterUp).normalized;
+                //    //    addedVelocity = Vector3.ProjectOnPlane(addedVelocity, perpenticularObstructionNormal);
+                //    //}
+                //}
+
+                //  Gravity
+                velocityAdjusted += Gravity * m_DeltaTime;
+                //  Drag.
+                //velocityAdjusted *= (1f / (1f + (m_Rigidbody.drag * m_DeltaTime)));
+            }
+
+            //targetVelocity = GetDirectionTangentToSurface(targetVelocity, groundHit.normal);
+            //Debug.DrawRay(m_Transform.position + Vector3.up * 0.5f, targetVelocity, Color.blue);
+            //if (velocityAdjusted != Vector3.zero)
+            //{
+            //    Debug.DrawRay(m_Transform.position + Vector3.up * 0.8f, velocityAdjusted, Color.green);
+            //}
+            //else
+            //{
+            //    Debug.DrawRay(m_Transform.position + Vector3.up * 0.8f, m_Transform.forward, Color.grey);
+            //}
+
+            if (!m_Rigidbody.isKinematic)
+            {
+                m_Rigidbody.velocity = Vector3.Lerp(velocityAdjusted, targetVelocity, m_DeltaTime);
+            }
+
+            CharacterDebug.Log("<color=blue>targetVelocity</color>", targetVelocity);
+            CharacterDebug.Log("<color=blue>velocityAdjusted1</color>", velocityAdjusted);
+
+
+
+
             //Vector3 horizontalDir = Vector3.Normalize(Vector3.Cross(moveDirection, groundHit.normal));
             //Vector3 forwardDir = Vector3.Normalize(Vector3.Cross(groundHit.normal, horizontalDir)) * ColliderRadius;
 
@@ -808,54 +952,59 @@ namespace CharacterController
 
 
 
-            if (m_UseRootMotion) {
-                m_Velocity = RootMotionVelocity / m_DeltaTime;
-                m_Velocity = Vector3.Project((RootMotionVelocity / m_DeltaTime), moveDirection);
-                m_Velocity.y = Grounded ? 0 : m_Rigidbody.velocity.y;
-                //moveDirection = RootMotionVelocity / m_DeltaTime;
-            } else {
-                targetVelocity = moveDirection * (Grounded ? m_GroundSpeed : m_AirborneSpeed);
-                float acceleration;
-                if (Moving) acceleration = Grounded ? m_Acceleration : m_AirborneAcceleration;
-                else acceleration = Grounded ? m_MotorDamping : m_AirborneDamping;
-                m_Velocity = Vector3.SmoothDamp(m_Rigidbody.velocity, targetVelocity, ref velocitySmooth, acceleration);
-            }
+            //if (m_UseRootMotion)
+            //{
+            //    m_Velocity = RootMotionVelocity / m_DeltaTime;
+            //    m_Velocity = Vector3.Project((RootMotionVelocity / m_DeltaTime), moveDirection);
+            //    m_Velocity.y = Grounded ? 0 : m_Rigidbody.velocity.y;
+            //    //moveDirection = RootMotionVelocity / m_DeltaTime;
+            //}
+            //else
+            //{
+            //    targetVelocity = moveDirection * (Grounded ? m_GroundSpeed : m_AirborneSpeed);
+            //    float acc;
+            //    if (Moving) acc = Grounded ? m_Acceleration : m_AirborneAcceleration;
+            //    else acc = Grounded ? m_MotorDamping : m_AirborneDamping;
+            //    m_Velocity = Vector3.SmoothDamp(m_Rigidbody.velocity, targetVelocity, ref velocitySmooth, acc);
+            //}
 
-            // // Drag
-            // currentVelocity *= (1f / (1f + (Drag * deltaTime)));
+            //// // Drag
+            //// currentVelocity *= (1f / (1f + (Drag * deltaTime)));
 
-            if (Grounded)
-            {
-                //m_Velocity = targetRotation * m_Velocity;
+            //if (Grounded)
+            //{
+            //    //m_Velocity = targetRotation * m_Velocity;
 
-                if(groundAngle > m_SlopeLimit) {
-                    Vector3 drag = m_Velocity * (groundAngle - m_SlopeLimit) * m_DeltaTime;
-                    if(moveDirection.sqrMagnitude > 0) {
-                        drag *= (1f - Vector3.Dot(moveDirection.normalized, m_Velocity.normalized));
-                    }
+            //    if (groundAngle > m_SlopeLimit)
+            //    {
+            //        Vector3 drag = m_Velocity * (groundAngle - m_SlopeLimit) * m_DeltaTime;
+            //        if (moveDirection.sqrMagnitude > 0)
+            //        {
+            //            drag *= (1f - Vector3.Dot(moveDirection.normalized, m_Velocity.normalized));
+            //        }
 
-                    if (drag.sqrMagnitude > m_Velocity.sqrMagnitude) m_Velocity = Vector3.zero;
-                    else m_Velocity -= drag;
-                 }
+            //        if (drag.sqrMagnitude > m_Velocity.sqrMagnitude) m_Velocity = Vector3.zero;
+            //        else m_Velocity -= drag;
+            //    }
 
-                m_Velocity = Vector3.SmoothDamp(m_Velocity, m_Velocity + moveDirection, ref velocitySmooth, 0.1f);
-                m_Velocity.y = 0;
-                //m_Velocity += (Gravity + Gravity * m_GravityModifier) * m_DeltaTime;
-                m_Velocity = Vector3.ProjectOnPlane(m_Velocity, groundHit.normal * m_GroundStickiness);
+            //    m_Velocity = Vector3.SmoothDamp(m_Velocity, m_Velocity + moveDirection, ref velocitySmooth, 0.1f);
+            //    m_Velocity.y = 0;
+            //    //m_Velocity += (Gravity + Gravity * m_GravityModifier) * m_DeltaTime;
+            //    m_Velocity = Vector3.ProjectOnPlane(m_Velocity, groundHit.normal * m_GroundStickiness);
 
-            }
-            else
-            {
-                m_Velocity -= Vector3.Project(moveDirection, m_Transform.forward);
-                m_Velocity += (Gravity + Gravity * m_GravityModifier) * m_DeltaTime;
-                //Vector3 verticalVelocity = (m_Velocity - m_PreviousPosition) * m_DeltaTime;
-                //verticalVelocity = Vector3.Project(verticalVelocity, Gravity);
-                //m_Velocity += verticalVelocity;
-            }
+            //}
+            //else
+            //{
+            //    m_Velocity -= Vector3.Project(moveDirection, m_Transform.forward);
+            //    m_Velocity += (Gravity + Gravity * m_GravityModifier) * m_DeltaTime;
+            //    //Vector3 verticalVelocity = (m_Velocity - m_PreviousPosition) * m_DeltaTime;
+            //    //verticalVelocity = Vector3.Project(verticalVelocity, Gravity);
+            //    //m_Velocity += verticalVelocity;
+            //}
 
 
-            m_Rigidbody.velocity = m_Velocity;
-            //m_Rigidbody.velocity = Vector3.ProjectOnPlane(m_Rigidbody.velocity, groundHit.normal * m_GroundStickiness);
+            //m_Rigidbody.velocity = m_Velocity;
+            ////m_Rigidbody.velocity = Vector3.ProjectOnPlane(m_Rigidbody.velocity, groundHit.normal * m_GroundStickiness);
         }
 
 
@@ -864,6 +1013,24 @@ namespace CharacterController
         /// </summary>
         protected virtual void UpdateRotation()
         {
+
+            if (LookDirection.sqrMagnitude > 0f)
+            {
+                Vector3 smoothLookDirection = Vector3.Slerp(m_Transform.forward, LookDirection, 1 - Mathf.Exp(-10 * deltaTime)).normalized;
+                currentRotation = Quaternion.LookRotation(smoothLookDirection, m_Transform.up);
+            }
+            //if (Grounded)
+            //{
+            //    var hits = Physics.RaycastNonAlloc(m_Transform.position + m_Transform.rotation * ColliderCenter, -m_Transform.up, probedHits, ColliderHeight, m_CollisionsLayerMask);
+            //    totalRaycastHits += hits;
+            //    if (hits > 0)
+            //    {
+            //        float groundReorientSharpness = 10f;
+            //        Vector3 smoothedNormal = Vector3.Slerp(m_Transform.up, LookDirection, 1 - Mathf.Exp(-groundReorientSharpness * deltaTime)).normalized;  //  VectorB (LookDirection) should be the closest hit from the RaycastNonAlloac
+            //        currentRotation = Quaternion.FromToRotation((currentRotation * Vector3.up), smoothedNormal) * currentRotation;
+            //    }
+            //}
+
             //Quaternion currentRotation = transform.rotation;
             //int maxAngleDifference = 35;
             //Quaternion previousRotation = m_Transform.rotation;
@@ -874,11 +1041,13 @@ namespace CharacterController
             //for (int i = 1; i <= intervals; i++)
             //{
             //    currentRotation = Quaternion.Slerp(currentRotation, targetRotation, subdivided * i);
-            //    if(Physics.CheckCapsule(m_Transform.position + Vector3.up * (ColliderRadius), m_Transform.position + Vector3.up * (ColliderHeight - ColliderRadius), ColliderRadius - m_SkinWidth * 2 )){
+            //    if (Physics.CheckCapsule(m_Transform.position + Vector3.up * (ColliderRadius), m_Transform.position + Vector3.up * (ColliderHeight - ColliderRadius), ColliderRadius - m_SkinWidth * 2))
+            //    {
             //        currentRotation = previousRotation;
             //        break;
             //    }
-            //    else{
+            //    else
+            //    {
             //        previousRotation = currentRotation;
             //    }
 
@@ -893,29 +1062,26 @@ namespace CharacterController
 
 
 
-            var currentAngle = Mathf.SmoothDampAngle(rotationAngle, (rotationAngle * rotationSpeed * m_DeltaTime), ref rotationAngleSmooth, 0.1f);
+            var currentAngle = Mathf.SmoothDampAngle(rotationAngle, (rotationAngle * rotationSpeed * m_DeltaTime), ref rotationAngleSmooth, 0.24f);
             currentAngle = MathUtil.Round(currentAngle);
 
 
-            currentRotation = Quaternion.AngleAxis(currentAngle, m_Transform.up.normalized);
-            angularVelocity = m_Transform.up.normalized * currentAngle;
+            currentRotation = Quaternion.AngleAxis(currentAngle, m_Transform.up);
+            angularVelocity = m_Transform.up * currentAngle;
 
 
             //  Update angular velocity.
-            m_Rigidbody.angularDrag = Mathf.SmoothDamp(m_Rigidbody.angularDrag, moveAmount > 0 ? 0.05f : m_Mass, ref angularDragSmooth, 0.1f);
-            m_Rigidbody.angularVelocity = Vector3.Lerp(m_Rigidbody.angularVelocity, angularVelocity, m_DeltaTime * rotationSpeed);
+            m_Rigidbody.angularDrag = Mathf.SmoothDamp(m_Rigidbody.angularDrag, moveAmount > 0 ? 0.05f : m_Mass, ref angularDragSmooth, 0.16f);
+            m_Rigidbody.angularVelocity = Vector3.Slerp(m_Rigidbody.angularVelocity, angularVelocity, m_DeltaTime * rotationSpeed);
 
 
 
 
-            currentRotation = Quaternion.Slerp(m_Transform.rotation, currentRotation * m_Transform.rotation, (m_RotationSpeed * m_DeltaTime) * (m_RotationSpeed * m_DeltaTime) + m_DeltaTime);
+            currentRotation = Quaternion.Slerp(m_Transform.rotation, currentRotation * m_Transform.rotation, (m_RotationSpeed * m_DeltaTime) * (m_RotationSpeed * m_DeltaTime));
             m_Rigidbody.MoveRotation(currentRotation);
 
 
-            //if (m_Animator.feetPivotActive > 0.75f &&  (m_Animator.pivotWeight - Mathf.Abs(0.5f - m_Animator.pivotWeight) > 0.35f))
-            //{
-            //    RigidbodyRotateAround(m_Animator.pivotPosition, Vector3.up, currentAngle);
-            //}
+
 
 
             //
@@ -964,7 +1130,7 @@ namespace CharacterController
             if (LookAngle > maxLookAngle || LookAngle < -maxLookAngle) lookAngle = Mathf.Lerp(maxLookAngle, 0, m_DeltaTime * 4);
             else lookAngle = LookAngle;
             lookAngle = MathUtil.Round(lookAngle);
-            CharacterDebug.Log("<b><color=orange>*** lookAngle</color></b>", lookAngle);
+            //CharacterDebug.Log("<b><color=orange>*** lookAngle</color></b>", lookAngle);
             m_Animator.SetFloat(HashID.LookAngle, lookAngle);
 
 
@@ -978,10 +1144,11 @@ namespace CharacterController
             rotation *= 0.01f;
             rotation = Mathf.Clamp(rotation / Time.deltaTime, -1f, 1f);
             rotation = MathUtil.Round(rotation, 8);
-            CharacterDebug.Log("<b><color=orange>*** rotation 1</color></b>", rotation);
-            m_Animator.SetFloat(HashID.Rotation, rotation);
-
+            //CharacterDebug.Log("<b><color=orange>*** rotation 1</color></b>", rotation);
+            //m_Animator.SetFloat(HashID.Rotation, rotation);
+            //CharacterDebug.Log("<b><color=orange>*** rotation 1</color></b>", rotationAngle);
             m_Animator.SetFloat(HashID.Rotation, rotationAngle);
+            //m_Animator.SetFloat(HashID.Rotation, rotationAngle, 0.1f, m_DeltaTime);
 
 
 
@@ -1076,6 +1243,16 @@ namespace CharacterController
             return tangent;
         }
 
+        public Vector3 GetDirectionTangentToSurface(Vector3 direction, Vector3 surfaceNormal)
+        {
+            float scale = direction.magnitude;
+            Vector3 temp = Vector3.Cross(surfaceNormal, direction);
+            Vector3 tangent = Vector3.Cross(temp, surfaceNormal);
+            tangent = tangent.normalized * scale;
+            return tangent;
+        }
+
+
 
         public void CollisionsOverlap(Vector3 position)
         {
@@ -1086,7 +1263,7 @@ namespace CharacterController
 
             //DebugDraw.Capsule(position + charCollider.center, Vector3.up, castRadius, charCollider.height, Color.white);
 
-            var hits = Physics.OverlapCapsuleNonAlloc(p1, p2, castRadius, nonAllocateOverlapCapsuleResults, m_CollisionsLayerMask);
+            var hits = Physics.OverlapCapsuleNonAlloc(p1, p2, castRadius, probedColiders, m_CollisionsLayerMask);
 
             if(hits > 0)
             {
@@ -1200,6 +1377,7 @@ namespace CharacterController
             }
         }
 
+
         public virtual float GetColliderHeightAdjustment()
         {
             return charCollider.height;
@@ -1234,6 +1412,7 @@ namespace CharacterController
             return Physics.CheckCapsule(segment1, segment2, radius, mask);
         }
 
+
         public Vector3 GetCapsulePoint(Vector3 origin, Vector3 direction)
         {
             var pointsDist = ColliderHeight - (ColliderRadius * 2f);
@@ -1241,11 +1420,28 @@ namespace CharacterController
         }
 
 
-        protected void GetAcceleration(Vector3 finalVelocity, Vector3 initialVelocity, Vector3 distance)
+        protected Vector3 GetAcceleration(Vector3 finalVelocity, Vector3 initialVelocity, Vector3 distance)
         {
-            var vf = finalVelocity * finalVelocity;
-            var vi = initialVelocity * initialVelocity;
-            Vector3 a = (vf - vi) / (2 * distance);
+            Vector3 vf = new Vector3(finalVelocity.x * finalVelocity.x, finalVelocity.y * finalVelocity.y, finalVelocity.z * finalVelocity.z);
+            Vector3 vi = new Vector3(initialVelocity.x * initialVelocity.x, initialVelocity.y * initialVelocity.y, initialVelocity.z * initialVelocity.z);
+            //Vector3 a = (vf - vi) / (2 * distance);
+            distance *= 2;
+            Vector3 a = vf - vi;
+            a.Set((a.x / distance.x), (a.x / distance.x), (a.x / distance.x));
+            return a;
+        }
+
+
+
+        protected void ClearNonAllocArrays()
+        {
+            if (totalColliderHits > 0)
+                for (int i = 0; i < totalColliderHits; i++)
+                    probedColiders[i] = null;
+
+            //if (totalRaycastHits > 0)
+            //    for (int i = 0; i < totalRaycastHits; i++)
+            //        probedHits[i] = 
         }
 
 
@@ -1272,20 +1468,21 @@ namespace CharacterController
         protected virtual void DebugAttributes()
         {
 
-            CharacterDebug.Log("seperator", "----------");
+            //CharacterDebug.Log("seperator", "----------");
             CharacterDebug.Log("<color=brown>Moving</color>", Moving);
             CharacterDebug.Log("<color=brown>Grounded</color>", Grounded);
-            CharacterDebug.Log("seperator", "----------");
-            
+            //CharacterDebug.Log("seperator", "----------");
+
             CharacterDebug.Log("MoveDirection", MoveDirection);
+            CharacterDebug.Log("MoveDirection", InputVector);
 
 
-            
+
             //CharacterDebug.Log("Velocity", Velocity);
             //CharacterDebug.Log("<color=blue>•rbVelocity</color>", m_Rigidbody.velocity);
             //CharacterDebug.Log("CollisionsCount", GetASctiveCollisions());
             //CharacterDebug.Log("rb_AngularVelocity", m_Rigidbody.angularVelocity);
-            //CharacterDebug.Log("rb_Velocity", m_Rigidbody.velocity.y);
+            CharacterDebug.Log("rb_Velocity", m_Rigidbody.velocity);
         }
 
 
@@ -1341,12 +1538,7 @@ namespace CharacterController
 
                 if (Grounded)
                 {
-                    if (Mathf.Abs(groundAngle) > 0)
-                    {
-                        Gizmos.color = Color.black;
-                        GizmosUtils.DrawArrow(RaycastOrigin, m_GroundSlopeDir);
 
-                    }
                 }
                 GizmosUtils.DrawText(GUI.skin, Grounded.ToString(), transform.position + Vector3.up * 2f, Grounded ? Color.black : Color.red);
 
@@ -1385,3 +1577,34 @@ namespace CharacterController
     }
 
 }
+
+
+
+
+//Debug.Log("Horizontal: " + m_HorizontalMovement + " Forward: " + m_ForwardMovement + " Euler: " + m_LookRotation.eulerAngles);
+//if (m_Controller.Movement == RigidbodyCharacterController.MovementType.Combat || m_Controller.Movement == RigidbodyCharacterController.MovementType.Adventure) {
+//m_LookRotation = m_CameraTransform.rotation;
+//} else if (m_Controller.Movement == RigidbodyCharacterController.MovementType.TopDown) {
+//var direction = (Vector3)PlayerInput.GetMousePosition() - m_Camera.WorldToScreenPoint(m_Transform.position);
+//// Convert the XY direction to an XYZ direction with Y equal to 0.
+//direction.z = direction.y;
+//direction.y = 0;
+//m_LookRotation = Quaternion.LookRotation(direction);
+//} else if (m_Controller.Movement == RigidbodyCharacterController.MovementType.RPG) {
+//if (PlayerInput.IsDisabledButtonDown(false)) {
+//m_LookRotation = m_CameraTransform.rotation;
+//if (PlayerInput.IsDisabledButtonDown(true)) {
+//m_ForwardMovement = 1;
+//}
+//} else if (!PlayerInput.IsDisabledButtonDown(true)) {
+//if (m_ForwardMovement != 0 || m_HorizontalMovement != 0) {
+//m_LookRotation = m_CameraTransform.rotation;
+//}
+//m_HorizontalMovement = 0;
+//}
+//} else if (m_Controller.Movement == RigidbodyCharacterController.MovementType.Pseudo3D) {
+//var direction = (Vector3)PlayerInput.GetMousePosition() - m_Camera.WorldToScreenPoint(m_Transform.position + m_CapsuleCollider.center);
+//m_LookRotation = Quaternion.LookRotation(direction);
+//} else { // Point and Click.
+//m_LookRotation = m_PointClickLookRotation.Get();
+//}
