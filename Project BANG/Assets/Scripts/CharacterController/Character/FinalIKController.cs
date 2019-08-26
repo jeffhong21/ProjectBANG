@@ -1,11 +1,10 @@
+using UnityEngine;
+using RootMotion.FinalIK;
+using System.Collections.Generic;
+
 namespace CharacterController
 {
-    using UnityEngine;
-    using RootMotion.FinalIK;
-    using System.Collections.Generic;
-
-    [DisallowMultipleComponent]
-    public class FinalIKController : MonoBehaviour
+    public class FinalIKController : CharacterIKBase
     {
         [Header("Full Body IK")]
         public FullBodyBipedIK fbIK;
@@ -24,7 +23,7 @@ namespace CharacterController
         [Header("Debug")]
         [SerializeField] private bool hideInInspector;
 
-        private Animator animator;
+
         private bool updateFrame;
 
 
@@ -32,21 +31,30 @@ namespace CharacterController
 
 
 
-        private void Awake()
+
+
+
+        float lookWeight = 1;
+        float lookWeightVelocity;
+        float weightSmoothTime = 0.3f;
+
+
+        protected override void Start()
         {
-            animator = GetComponent<Animator>();
+            base.Start();
+
         }
 
 
-        private void Start()
+        protected override void Initialize()
         {
-            animator = GetComponent<Animator>();
-            if (rightHandTarget == null) rightHandTarget = CreateEffectors("RightHand Effector Target", animator.GetBoneTransform(HumanBodyBones.RightHand).position, animator.GetBoneTransform(HumanBodyBones.RightHand).rotation);
-            if (leftHandTarget == null) leftHandTarget = CreateEffectors("LeftHand Effector Target", animator.GetBoneTransform(HumanBodyBones.LeftHand).position, animator.GetBoneTransform(HumanBodyBones.LeftHand).rotation);
-            if (bodyEffectorTarget == null) bodyEffectorTarget = CreateEffectors("Body Effector Target", animator.bodyPosition, animator.bodyRotation);
+            if (rightHandTarget == null) rightHandTarget = CreateIKEffectors("RightHand Effector Target", animator.GetBoneTransform(HumanBodyBones.RightHand).position, animator.GetBoneTransform(HumanBodyBones.RightHand).rotation);
+            if (leftHandTarget == null) leftHandTarget = CreateIKEffectors("LeftHand Effector Target", animator.GetBoneTransform(HumanBodyBones.LeftHand).position, animator.GetBoneTransform(HumanBodyBones.LeftHand).rotation);
+            if (bodyEffectorTarget == null) bodyEffectorTarget = CreateIKEffectors("Body Effector Target", animator.bodyPosition, animator.bodyRotation);
 
-            if (lookTarget == null) {
-                lookTarget = CreateEffectors("LookAt Target", animator.GetBoneTransform(HumanBodyBones.Head).position + transform.forward, Quaternion.identity);
+            if (lookTarget == null)
+            {
+                lookTarget = CreateIKEffectors("LookAt Target", animator.GetBoneTransform(HumanBodyBones.Head).position + transform.forward, Quaternion.identity);
                 lookTarget.position = animator.GetBoneTransform(HumanBodyBones.Neck).position + transform.forward * 10;
             }
 
@@ -67,9 +75,11 @@ namespace CharacterController
             };
             lookAtIK.solver.spine = spineBones;
 
-            
 
         }
+
+
+
 
 
         private void OnValidate()
@@ -91,43 +101,28 @@ namespace CharacterController
             //iks = GetComponent<IK>();
         }
 
-        //private void FixedUpdate()
-        //{
-        //    updateFrame = true;
-        //}
+
+
+        private void FixedUpdate()
+        {
+            updateFrame = true;
+        }
 
 
 
-        //private void Update()
-        //{
+        private void Update()
+        {
 
-        //}
+        }
 
 
-        float lookWeight = 1;
-        float lookWeightVelocity;
-        float weightSmoothTime = 0.3f;
+
         private void LateUpdate()
         {
-            //// Do nothing if FixedUpdate has not been called since the last LateUpdate
-            //if (!updateFrame) return;
-            //updateFrame = false;
-
-            //// Updating the IK solvers in a specific order. 
-            //foreach (IK component in components) component.GetIKSolver().Update();
-
-            var lookTargetDir = lookTarget.position - transform.position;
-            var angleDif = Vector3.Angle(transform.forward, lookTargetDir);
-
-
-            lookAtIK.solver.IKPositionWeight = Mathf.SmoothDamp(lookAtIK.solver.IKPositionWeight, (angleDif > 75) ? 0 : lookWeight, ref lookWeightVelocity, weightSmoothTime);
-            if (lookAtIK.solver.IKPositionWeight >= 0.999f) lookAtIK.solver.IKPositionWeight = 1f;
-            if (lookAtIK.solver.IKPositionWeight <= 0.001f) lookAtIK.solver.IKPositionWeight = 0f;
-
-            //CharacterDebug.Log("Look Target Angle difference", angleDif);
 
 
 
+            LookAtIKSolver();
         }
 
 
@@ -149,29 +144,26 @@ namespace CharacterController
 
 
 
-        private Transform CreateEffectors(string effectorName, Vector3 position, Quaternion rotation, bool hideFlag = true)
+
+        private void LookAtIKSolver()
         {
-            Transform effector = new GameObject(effectorName).transform;
-            effector.position = position;
-            effector.rotation = rotation;
-            effector.parent = transform;
+            //// Do nothing if FixedUpdate has not been called since the last LateUpdate
+            //if (!updateFrame) return;
+            //updateFrame = false;
 
-            //if(hideFlag) effector.hideFlags = HideFlags.HideInHierarchy;
-            return effector;
+            //// Updating the IK solvers in a specific order. 
+            //foreach (IK component in components) component.GetIKSolver().Update();
+
+            var lookTargetDir = lookTarget.position - transform.position;
+            var angleDif = Vector3.Angle(transform.forward, lookTargetDir);
+
+
+            lookAtIK.solver.IKPositionWeight = Mathf.SmoothDamp(lookAtIK.solver.IKPositionWeight, (angleDif > 75) ? 0 : lookWeight, ref lookWeightVelocity, weightSmoothTime);
+            if (lookAtIK.solver.IKPositionWeight >= 0.999f) lookAtIK.solver.IKPositionWeight = 1f;
+            if (lookAtIK.solver.IKPositionWeight <= 0.001f) lookAtIK.solver.IKPositionWeight = 0f;
+
+            //CharacterDebug.Log("Look Target Angle difference", angleDif);
         }
-
-
-
-
-
-        public void SetHideFlags(bool showFlags)
-        {
-            HideFlags hideFlags = showFlags ? HideFlags.None : HideFlags.HideInHierarchy;
-
-            rightHandTarget.hideFlags = hideFlags;
-        }
-
-
 
 
 

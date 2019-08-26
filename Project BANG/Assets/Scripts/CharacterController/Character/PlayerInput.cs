@@ -181,20 +181,9 @@ namespace CharacterController
                     //{
                     //    var fwd = Vector3.ProjectOnPlane(m_Camera.forward, transform.up);
                     //}
-                    Debug.DrawRay(transform.position + Vector3.up * 0.5f, inputVector, Color.black);
+                    //Debug.DrawRay(transform.position + Vector3.up * 0.5f, inputVector, Color.black);
 
-                    //if (Input.GetMouseButton((int)rotateCharacterKeyCode))
-                    //{
-                    //    //var mouseInput = Mathf.Atan2(MouseInputVector.x, MouseInputVector.y);
-                    //    //mouseInput = MathUtil.Round(mouseInput, 6);
-                    //    //inputVector.x = Mathf.Clamp(mouseInput + inputVector.x, -1, 1);
-                    //    inputVector = m_Camera.right * InputVector.x + lookDirection * InputVector.z;
-                    //    float turnAmount = Mathf.Atan2(lookDirection.x, lookDirection.z) * Mathf.Rad2Deg;
-                    //    //float turnAmount = Mathf.SmoothDampAngle(m_Controller.transform.rotation.y, Mathf.Atan2(inputVector.x, inputVector.z) * Mathf.Rad2Deg, ref rotationVelocitySmooth, 0.1f);
-                    //    lookRotation = Quaternion.AngleAxis(turnAmount, transform.up);
-                    //}
-                    //float turnAmount = Mathf.Atan2(lookDirection.x, lookDirection.z) * Mathf.Rad2Deg;
-                    //lookRotation = Quaternion.AngleAxis(turnAmount, transform.up);
+
                     break;
 
                 case (MovementTypes.Combat):

@@ -432,7 +432,7 @@ GameObject:
   - component: {fileID: 7123048206932478039}
   - component: {fileID: 5742274483415007430}
   - component: {fileID: 3558082288662322614}
-  - component: {fileID: 740342678849291382}
+  - component: {fileID: 902344916}
   m_Layer: 31
   m_Name: Player
   m_TagString: Player
@@ -502,7 +502,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.3
+  m_Radius: 0.36
   m_Height: 1.8
   m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0}
@@ -520,7 +520,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_UseRootMotion: 1
   m_RootMotionSpeedMultiplier: 1
-  m_RootMotionRotationMultiplier: 1.2
+  m_RootMotionRotationMultiplier: 1
   m_GroundAcceleration: {x: 0.18, y: 0, z: 0.18}
   m_Acceleration: 0.12
   m_AirborneAcceleration: 0.2
@@ -548,7 +548,7 @@ MonoBehaviour:
     states:
       showGroundCheck: 0
       showCollisions: 0
-      showMotion: 1
+      showMotion: 0
     colors:
       moveDirectionColor: {r: 0, g: 0, b: 1, a: 1}
       velocityColor: {r: 0, g: 1, b: 0, a: 1}
@@ -564,10 +564,10 @@ MonoBehaviour:
   m_Actions:
   - {fileID: 5742274483415007430}
   - {fileID: 3558082288662322614}
-  - {fileID: 740342678849291382}
   - {fileID: 7123048206932478039}
   - {fileID: 4816647435445959097}
   - {fileID: 6111956693744779233}
+  - {fileID: 902344916}
   m_ActiveAction: {fileID: 0}
 --- !u!114 &6790305966678263073
 MonoBehaviour:
@@ -677,10 +677,10 @@ MonoBehaviour:
   grounderIK: {fileID: 2629031370626121552}
   lookAtIK: {fileID: 8862121799659265725}
   aimIK: {fileID: 7912098401397699587}
-  hideInInspector: 0
+  hideInInspector: 1
 --- !u!114 &3255356862830679799
 MonoBehaviour:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -1138,7 +1138,7 @@ MonoBehaviour:
     pullBodyHorizontal: 0
 --- !u!114 &2629031370626121552
 MonoBehaviour:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -1176,7 +1176,7 @@ MonoBehaviour:
   spine: []
 --- !u!114 &8862121799659265725
 MonoBehaviour:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -1238,7 +1238,7 @@ MonoBehaviour:
     spineTargetOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &7912098401397699587
 MonoBehaviour:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -1344,7 +1344,7 @@ MonoBehaviour:
   m_StopType: 0
   m_InputNames: []
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 1
+  m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
@@ -1368,13 +1368,13 @@ MonoBehaviour:
   m_StateName: 
   m_LayerIndex: 0
   m_ActionID: 21
-  m_TransitionDuration: 0.2
+  m_TransitionDuration: 0.1
   m_StartType: 2
   m_StopType: 0
   m_InputNames:
   - Space
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 1
+  m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
@@ -1382,7 +1382,8 @@ MonoBehaviour:
   m_Debug: 0
   m_Force: 5
   m_RecurrenceDelay: 0.2
-  jumpHeight: 5
+  m_LandSurfaceImpact: {fileID: 0}
+  jumpHeight: 10
 --- !u!114 &3558082288662322614
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1413,7 +1414,7 @@ MonoBehaviour:
   m_MinFallHeight: 2
   m_LandSurfaceImpact: {fileID: 0}
   m_MinSurfaceImpactVelocity: 1
---- !u!114 &740342678849291382
+--- !u!114 &902344916
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1422,19 +1423,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 2247134470855319462}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f62eddceb76e4ce2aab0985c2db98db, type: 3}
+  m_Script: {fileID: 11500000, guid: 6154c3fa2c49643758284fb02e121cd3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_IsActive: 0
   m_StateName: 
   m_LayerIndex: 0
-  m_ActionID: 3
-  m_TransitionDuration: 0.1
-  m_StartType: 0
-  m_StopType: 0
-  m_InputNames: []
+  m_ActionID: 5
+  m_TransitionDuration: 0.2
+  m_StartType: 2
+  m_StopType: 3
+  m_InputNames:
+  - C
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 1
+  m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
