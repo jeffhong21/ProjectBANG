@@ -13,6 +13,7 @@
         [Serializable]
         public class DebugModeStates
         {
+            public bool showDebugUI;
             public bool showGroundCheck;
             public bool showCollisions;
             public bool showMotion;

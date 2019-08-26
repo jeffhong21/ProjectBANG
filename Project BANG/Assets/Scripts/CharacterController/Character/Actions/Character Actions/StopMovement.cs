@@ -25,7 +25,7 @@
         //  The direction the character is moving.
         protected float moveDirection;
 
-        protected int pivotFoot;
+
 
         protected int successfulStarts;
 
@@ -45,7 +45,7 @@
             lastMoveAmount = currentMoveAmount;
             currentMoveAmount = Mathf.Clamp01(Mathf.Abs(m_Controller.InputVector.x) + Mathf.Abs(m_Controller.InputVector.z));
 
-            if (lastMoveAmount > currentMoveAmount && lastMoveAmount > stopThreshold)
+            if (lastMoveAmount > currentMoveAmount)
                 isStopMoving = true;
 
 
@@ -59,7 +59,7 @@
                 detectionCount++;
             }
 
-            if (currentMoveAmount <= 0) {
+            if (currentMoveAmount <= 0 || lastMoveAmount <= currentMoveAmount) {
                 detectionCount = 0;
                 isStopMoving = false;
             }
@@ -70,65 +70,24 @@
         }
 
 
-        //public override void UpdateAction()
-        //{
-        //    if (IsActive && pivotFoot == 0)
-        //    {
-        //        if (m_Animator.pivotWeight >= 1 - pivotWeightThreshold) {
-        //            pivotFoot = 1;
-        //        } else if (m_Animator.pivotWeight <= 0 + pivotWeightThreshold) {
-        //            pivotFoot = 0;
-        //        } else
-        //            pivotFoot = -1;
-
-        //        if (m_IsActive && Time.time > m_ActionStartTime + 1.5f) {
-        //            Debug.LogWarningFormat("{0} could not find a planted pivot foot.  Ending Action.", GetType().Name);
-        //            CanStopAction();
-        //        }
-        //    }
-
-
-        //}
 
 
         protected override void ActionStarted()
         {
-            //if (pivotFoot == -1) return;
-
             //  Set ActionID parameter.
             if (m_StateName.Length == 0)
                 m_Animator.SetInteger(HashID.ActionID, m_ActionID);
 
-
-
-            ////  Get the stop move direction.
-            //var axisSign = Vector3.Cross(m_Controller.MoveDirection, m_Transform.forward);
-            //moveDirection = Vector3.Angle(m_Transform.forward, m_Controller.MoveDirection) * (axisSign.y >= 0 ? -1f : 1f);
-
-            //if (moveDirection > 360 || moveDirection < -360)
-            //    Debug.LogError(string.Format("{0} moveDirection value of {1} is beyond 360", GetType().Name, moveDirection ));
-
-            //m_Animator.SetFloat(HashID.ActionFloatData, moveDirection);
-
-
-
-            //  Determine if we should play walk or run stop and which leg.  0 = left, 1 = right.
+            //  Determine if we should play walk or run stop.
             int actionIntData = 0;
-            if (m_Controller.Speed >= 1)
-                actionIntData = 2;
-            actionIntData += pivotFoot;
+            if (m_Controller.Speed >= 1) actionIntData = 1;
 
             m_Animator.SetInteger(HashID.ActionIntData, actionIntData);
-
-
-            //float runCycle = Mathf.Repeat(m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime, 1);
-            //Debug.Log("* Pivot weight: <b>" + m_Animator.pivotWeight + "</b> | RunCycle: " + runCycle + " | MoveDirection: " + moveDirection);
-
-            //Debug.Log("* Pivot Foot: " + pivotFoot + " | RunCycle: " + runCycle + " | MoveDirection: " + moveDirection);
-            //reset pivot foot index.
-
-            pivotFoot = 0;
         }
+
+
+
+
 
 
 
@@ -169,11 +128,6 @@
             return false;
         }
 
-
-        protected override void ActionStopped()
-        {
-            pivotFoot = 0;
-        }
 
 
 

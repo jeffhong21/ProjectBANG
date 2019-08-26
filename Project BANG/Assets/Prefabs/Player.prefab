@@ -518,7 +518,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e78c0408c7564ed789d7937cadd7677, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UseRootMotion: 1
+  m_useRootMotion: 1
   m_RootMotionSpeedMultiplier: 1
   m_RootMotionRotationMultiplier: 1
   m_GroundAcceleration: {x: 0.18, y: 0, z: 0.18}
@@ -528,27 +528,28 @@ MonoBehaviour:
   m_AirborneDamping: 0.3
   m_GroundSpeed: 1
   m_AirborneSpeed: 0.5
-  m_RotationSpeed: 10
+  m_rotationSpeed: 10
   m_SlopeForceUp: 1
   m_SlopeForceDown: 1.25
   m_DetectObjectHeight: 0.4
   m_Mass: 100
-  m_SkinWidth: 0.08
+  m_skinWidth: 0.08
   m_SlopeLimit: 45
   m_MaxStepHeight: 0.4
-  m_GravityModifier: 0.4
-  m_GroundStickiness: 2
-  m_CollisionsLayerMask:
+  m_gravityModifier: 0.4
+  m_groundStickiness: 6
+  m_collisionsLayerMask:
     serializedVersion: 2
-    m_Bits: 134217728
+    m_Bits: 0
   m_MaxCollisionCount: 100
   m_IdleRotationMultiplier: 1
   debugger:
     debugMode: 1
     states:
+      showDebugUI: 1
       showGroundCheck: 0
       showCollisions: 0
-      showMotion: 0
+      showMotion: 1
     colors:
       moveDirectionColor: {r: 0, g: 0, b: 1, a: 1}
       velocityColor: {r: 0, g: 1, b: 0, a: 1}
@@ -560,7 +561,7 @@ MonoBehaviour:
   displayMovement: 0
   displayPhysics: 0
   displayAnimations: 0
-  displayActions: 1
+  displayActions: 0
   m_Actions:
   - {fileID: 5742274483415007430}
   - {fileID: 3558082288662322614}
@@ -664,7 +665,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2a82b269384f347a0b7be273becfa79a, type: 3}
   m_Name: 
@@ -677,15 +678,15 @@ MonoBehaviour:
   grounderIK: {fileID: 2629031370626121552}
   lookAtIK: {fileID: 8862121799659265725}
   aimIK: {fileID: 7912098401397699587}
-  hideInInspector: 1
+  hideInInspector: 0
 --- !u!114 &3255356862830679799
 MonoBehaviour:
-  m_ObjectHideFlags: 2
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a70e525c82ce9413fa4d940ad7fcf1db, type: 3}
   m_Name: 
@@ -1138,12 +1139,12 @@ MonoBehaviour:
     pullBodyHorizontal: 0
 --- !u!114 &2629031370626121552
 MonoBehaviour:
-  m_ObjectHideFlags: 2
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6c72e1df647af4c0098866e944a04b01, type: 3}
   m_Name: 
@@ -1176,12 +1177,12 @@ MonoBehaviour:
   spine: []
 --- !u!114 &8862121799659265725
 MonoBehaviour:
-  m_ObjectHideFlags: 2
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 776adaaacdc5c4e8ab0395120a6e972b, type: 3}
   m_Name: 
@@ -1238,7 +1239,7 @@ MonoBehaviour:
     spineTargetOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &7912098401397699587
 MonoBehaviour:
-  m_ObjectHideFlags: 2
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}

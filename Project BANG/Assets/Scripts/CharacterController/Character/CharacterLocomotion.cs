@@ -39,9 +39,9 @@
 
         public bool CanAim { get => Grounded; }
 
-        public Vector3 CenterOfMass { get { return m_Animator.bodyPosition; } }
+        public Vector3 CenterOfMass { get { return m_animator.bodyPosition; } }
 
-        public Vector3 BalanceVector {  get { return m_Animator.bodyPosition - m_Transform.position; } }
+        public Vector3 BalanceVector {  get { return m_animator.bodyPosition - m_transform.position; } }
 
         public CharacterAction[] CharActions
         {
@@ -183,9 +183,9 @@
             // Update the Animator.
             if (canUpdateAnimator)
                 UpdateAnimator();
-            //if (m_Animator.pivotWeight < 0.5f || m_Animator.pivotWeight > 0.5f)
-            //    m_Animator.SetFloat(HashID.LegUpIndex, m_Animator.pivotWeight >= 0.5f ? 1 : 0);
-            //else m_Animator.SetFloat(HashID.LegUpIndex, 0.5f + 1);
+            //if (m_animator.pivotWeight < 0.5f || m_animator.pivotWeight > 0.5f)
+            //    m_animator.SetFloat(HashID.LegUpIndex, m_animator.pivotWeight >= 0.5f ? 1 : 0);
+            //else m_animator.SetFloat(HashID.LegUpIndex, 0.5f + 1);
 
 
         }
@@ -195,7 +195,7 @@
         {
             base.LateUpdate();
 
-            //DebugDraw.Circle(m_Animator.pivotPosition, transform.up, 0.1f, Color.yellow);
+            //DebugDraw.Circle(m_animator.pivotPosition, transform.up, 0.1f, Color.yellow);
         }
 
 
@@ -263,29 +263,17 @@
             if (Moving)
             {
                 float legFwdIndex = leftFootPosition.normalized.z > rightFootPosition.normalized.z ? 0 : 1;
-                m_Animator.SetFloat(HashID.LegFwdIndex, legFwdIndex);
+                m_animator.SetFloat(HashID.LegFwdIndex, legFwdIndex);
             }
             else
             {
-                m_Animator.SetFloat(HashID.LegFwdIndex, 0.5f);
+                m_animator.SetFloat(HashID.LegFwdIndex, 0.5f);
             }
 
             base.UpdateAnimator();
         }
 
 
-        /// <summary>
-        /// Anything that should be done in the OnAnimatorMove function.
-        /// </summary>
-        protected override void AnimatorMove()
-        {
-            base.AnimatorMove();
-
-            if (m_Animator.isHuman)
-            {
-
-            }
-        }
 
 
         /// <summary>
@@ -317,7 +305,10 @@
 
 
 
-
+        public void Move(float horizontalMovement, float forwardMovement, Quaternion lookRotation)
+        {
+            throw new NotImplementedException();
+        }
 
 
 
@@ -590,9 +581,9 @@
 
         //private Vector3 GetPivotPosition()
         //{
-        //    m_Animator.stabilizeFeet = true;
+        //    m_animator.stabilizeFeet = true;
 
-        //    Vector3 pivotPosition = m_Animator.pivotPosition;
+        //    Vector3 pivotPosition = m_animator.pivotPosition;
 
         //    leftFootPosition = GetFootPosition(AvatarIKGoal.LeftFoot);
         //    rightFootPosition = GetFootPosition(AvatarIKGoal.RightFoot);
@@ -600,7 +591,7 @@
         //    float rightHeight = MathUtil.Round(Mathf.Abs(rightFootPosition.y));
 
         //    float threshold = 0.1f;
-        //    float pivotDifference = Mathf.Abs(0.5f - m_Animator.pivotWeight);
+        //    float pivotDifference = Mathf.Abs(0.5f - m_animator.pivotWeight);
         //    float t = Mathf.Clamp(pivotDifference, 0, 0.5f) / 0.5f;
         //    //  1 means feet are not pivot.
         //    float feetPivotActive = 1;  
@@ -609,7 +600,7 @@
         //    if( (leftHeight < threshold && rightHeight < threshold) || (leftHeight > threshold && rightHeight > threshold ) && pivotDifference < 5f){
         //        t = Time.deltaTime;
         //        feetPivotActive = Mathf.Clamp01(feetPivotActive + t);
-        //        pivotPosition = m_Transform.position;  
+        //        pivotPosition = m_transform.position;  
         //    }
         //    //  If one leg is raised and one is planted.
         //    else if ((leftHeight < tinyOffset && rightHeight > 0) || rightHeight < tinyOffset && leftHeight > 0)
@@ -617,12 +608,12 @@
         //        t = t * t * t * (t * (6f * t - 15f) + 10f);
         //        feetPivotActive = Mathf.Lerp(0f, 1f, t);
 
-        //        m_Animator.feetPivotActive = feetPivotActive;
-        //        pivotPosition = m_Animator.pivotPosition;
+        //        m_animator.feetPivotActive = feetPivotActive;
+        //        pivotPosition = m_animator.pivotPosition;
         //    }
 
 
-        //    pivotPosition.y = m_Transform.position.y;
+        //    pivotPosition.y = m_transform.position.y;
 
 
         //    CharacterDebug.Log("<color=blue>* FeetPivotWeight *</color>", MathUtil.Round(feetPivotActive));
@@ -634,15 +625,15 @@
         {
             if (foot == AvatarIKGoal.LeftFoot || foot == AvatarIKGoal.RightFoot)
             {
-                Vector3 footPos = m_Animator.GetIKPosition(foot);
-                Quaternion footRot = m_Animator.GetIKRotation(foot);
-                float botFootHeight = foot == AvatarIKGoal.LeftFoot ? m_Animator.leftFeetBottomHeight : m_Animator.rightFeetBottomHeight;
+                Vector3 footPos = m_animator.GetIKPosition(foot);
+                Quaternion footRot = m_animator.GetIKRotation(foot);
+                float botFootHeight = foot == AvatarIKGoal.LeftFoot ? m_animator.leftFeetBottomHeight : m_animator.rightFeetBottomHeight;
                 Vector3 footHeight = new Vector3(0, -botFootHeight, 0);
 
 
                 footPos += footRot * footHeight;
 
-                return !worldPos ? footPos : m_Transform.InverseTransformPoint(footPos);
+                return !worldPos ? footPos : m_transform.InverseTransformPoint(footPos);
             }
 
             return Vector3.zero;
@@ -652,15 +643,15 @@
         //{
         //    if (foot == HumanBodyBones.LeftToes || foot == HumanBodyBones.RightToes)
         //    {
-        //        Vector3 footPos = m_Animator.GetBoneTransform(foot).position;
-        //        Quaternion footRot = m_Animator.GetBoneTransform(foot).rotation;
-        //        //float botFootHeight = foot == HumanBodyBones.LeftToes ? m_Animator.leftFeetBottomHeight : m_Animator.rightFeetBottomHeight;
+        //        Vector3 footPos = m_animator.GetBoneTransform(foot).position;
+        //        Quaternion footRot = m_animator.GetBoneTransform(foot).rotation;
+        //        //float botFootHeight = foot == HumanBodyBones.LeftToes ? m_animator.leftFeetBottomHeight : m_animator.rightFeetBottomHeight;
         //        //Vector3 footHeight = new Vector3(0, -botFootHeight, 0);
 
         //        footPos = footRot * footPos;
         //        //footPos += footRot * footHeight;
 
-        //        return !worldPos ? footPos : m_Transform.InverseTransformPoint(footPos);
+        //        return !worldPos ? footPos : m_transform.InverseTransformPoint(footPos);
         //    }
 
         //    return Vector3.zero;
@@ -679,8 +670,8 @@
 
             //CharacterDebug.Log("seperator", "----------");
             ////CharacterDebug.Log("<color=blue>* FeetPivotWeight *</color>", MathUtil.Round(feetPivotActive));
-            //CharacterDebug.Log("<color=cyan>* PivotWeight *</color>", m_Animator.pivotWeight);
-            //CharacterDebug.Log("<color=cyan>* PivotPos *</color>", m_Transform.InverseTransformPoint(m_Animator.pivotPosition));
+            //CharacterDebug.Log("<color=cyan>* PivotWeight *</color>", m_animator.pivotWeight);
+            //CharacterDebug.Log("<color=cyan>* PivotPos *</color>", m_transform.InverseTransformPoint(m_animator.pivotPosition));
 
             ////CharacterDebug.Log("<color=yellow> leftFootPos </color>", GetFootPosition(0, true));
             ////CharacterDebug.Log("<color=yellow> rightFootPos </color>", GetFootPosition(1, true));
@@ -702,20 +693,20 @@
         protected override void DrawGizmos()
         {
 
-            //if (DebugMotion)
-            //{
-            //    Gizmos.color = Debugger.colors.animatorColor;
-            //    Gizmos.DrawRay(m_Transform.position, Vector3.up);
-            //    Gizmos.DrawRay(m_Transform.position, m_Animator.bodyPosition - m_Transform.position);
-            //    Gizmos.DrawSphere(m_Animator.bodyPosition, 0.05f);
-            //    Gizmos.DrawSphere(GetPivotPosition(), 0.05f);
+            if (DebugMotion)
+            {
+                //Gizmos.color = Debugger.colors.animatorColor;
+                //Gizmos.DrawRay(m_transform.position, Vector3.up);
+                //Gizmos.DrawRay(m_transform.position, m_animator.bodyPosition - m_transform.position);
+                //Gizmos.DrawSphere(m_animator.bodyPosition, 0.05f);
+                //Gizmos.DrawSphere(GetPivotPosition(), 0.05f);
 
 
-            //    Gizmos.color = Debugger.colors.yellow1;
-            //    Gizmos.DrawWireSphere(GetFootPosition(AvatarIKGoal.RightFoot), 0.05f);
-            //    //Gizmos.matrix = Matrix4x4.TRS(m_Animator.GetIKPosition(AvatarIKGoal.LeftFoot), m_Animator.GetIKRotation(AvatarIKGoal.LeftFoot), Vector3.one);
-            //    Gizmos.DrawWireSphere(GetFootPosition(AvatarIKGoal.LeftFoot), 0.05f);
-            //}
+                Gizmos.color = Debugger.colors.yellow1;
+                Gizmos.DrawWireSphere(GetFootPosition(AvatarIKGoal.RightFoot), 0.05f);
+                //Gizmos.matrix = Matrix4x4.TRS(m_animator.GetIKPosition(AvatarIKGoal.LeftFoot), m_animator.GetIKRotation(AvatarIKGoal.LeftFoot), Vector3.one);
+                Gizmos.DrawWireSphere(GetFootPosition(AvatarIKGoal.LeftFoot), 0.05f);
+            }
 
         }
 

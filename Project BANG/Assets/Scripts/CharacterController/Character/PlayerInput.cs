@@ -156,10 +156,10 @@ namespace CharacterController
 
 
 
-        private void Update()
+        private void FixedUpdate()
 		{
             //inputVector = axisRaw ? InputVectorRaw : InputVector;
-            inputVector = InputVectorRaw;
+            inputVector = InputVector;
             cameraFwd.Set(1, 0, 1);
 
             lookDirection = m_CameraController == null ? mTransform.forward : Vector3.Scale(m_Camera.forward, cameraFwd).normalized;
@@ -170,8 +170,8 @@ namespace CharacterController
                     Vector3 fwd = Vector3.ProjectOnPlane(m_Camera.forward, transform.up);
                     Vector3 right = Vector3.Cross(fwd, Vector3.up);
                     Quaternion referentialShift = Quaternion.FromToRotation(Vector3.forward, fwd);
-                    inputVector = referentialShift * inputVector;
-                    //inputVector = m_Camera.right * inputVector.x + fwd * inputVector.z;
+                    //inputVector = referentialShift * inputVector;
+                    inputVector = m_Camera.right * inputVector.x + fwd * inputVector.z;
                     
 
                     //inputVector = m_Camera.right * InputVector.x + lookDirection * InputVector.z;

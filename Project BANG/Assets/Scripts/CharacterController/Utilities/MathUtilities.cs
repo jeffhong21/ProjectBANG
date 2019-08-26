@@ -45,4 +45,12 @@ public static class MathUtilities
     }
 
 
+
+
+
+    public static float SmoothStep(float t)
+    {
+        return t * t * (3f - 2f * t);
+    }
+
 }

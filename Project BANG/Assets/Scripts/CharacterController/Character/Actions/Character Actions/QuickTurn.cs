@@ -23,7 +23,10 @@ namespace CharacterController
         //  What direction turning towards.
         protected float turnDirection;
         //  The starting angle for lerping.
-        protected float startAngle = 180f;
+        protected float startAngle = 135f;
+
+
+        private Vector3 velocitySmoothDamp, rotationSmoothDamp;
 
         //
         // Methods
@@ -102,6 +105,8 @@ namespace CharacterController
         public override bool UpdateMovement()
         {
 
+            float dot = Vector3.Dot(inputDirection, m_Transform.forward);
+            m_Rigidbody.velocity = Vector3.SmoothDamp(m_Rigidbody.velocity, dot > 0 ? m_Controller.RootMotionVelocity : Vector3.zero, ref velocitySmoothDamp, 0.1f);
 
 
             return false;
@@ -111,20 +116,20 @@ namespace CharacterController
         public override bool UpdateRotation()
         {
             float rotationAngle = Vector3.Angle(m_Transform.forward, inputDirection);
-            float t = startAngle / (startAngle - rotationAngle); //  180 / (180 - X)
-            float percentage = t * t * t;
+            float t = rotationAngle / startAngle;
+            //float t = startAngle / (startAngle - rotationAngle); //  180 / (180 - X)
+            float u = (1 - t);
+            float percentage = 1 - (u * u * u);
 
 
             Quaternion currentRotation = Quaternion.AngleAxis(turnDirection * rotationAngle, m_Transform.up);
             Quaternion targetRotation = Quaternion.AngleAxis(startAngle, m_Transform.up);
 
-            m_Rigidbody.MoveRotation(Quaternion.Slerp(currentRotation, targetRotation, percentage));
+            m_Rigidbody.MoveRotation(Quaternion.Slerp(currentRotation, targetRotation, percentage) );
 
 
-            
 
-            //m_Rigidbody.MoveRotation(m_Transform.rotation * currentRotation);
-
+            Debug.LogFormat("<b><color=red>[QuickTurn] percentage: {0} </color></b>", percentage);
 
             return false;
         }
