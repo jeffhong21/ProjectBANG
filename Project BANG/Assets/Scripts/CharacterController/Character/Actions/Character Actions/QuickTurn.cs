@@ -115,21 +115,24 @@ namespace CharacterController
 
         public override bool UpdateRotation()
         {
-            float rotationAngle = Vector3.Angle(m_Transform.forward, inputDirection);
-            float t = rotationAngle / startAngle;
-            //float t = startAngle / (startAngle - rotationAngle); //  180 / (180 - X)
-            float u = (1 - t);
-            float percentage = 1 - (u * u * u);
+            float dot = Vector3.Dot(inputDirection, m_Transform.forward);
+
+            Vector3 rotationVector = Vector3.Lerp(Vector3.zero, new Vector3(0, turnDirection < 0 ? -1 : 1, 0), Mathf.Abs(turnDirection));
 
 
-            Quaternion currentRotation = Quaternion.AngleAxis(turnDirection * rotationAngle, m_Transform.up);
-            Quaternion targetRotation = Quaternion.AngleAxis(startAngle, m_Transform.up);
+            // float rotationAngle = Vector3.Angle(m_Transform.forward, inputDirection);
+            // float t = rotationAngle / startAngle;
+            // //float t = startAngle / (startAngle - rotationAngle); //  180 / (180 - X)
+            // float u = (1 - t);
+            // float percentage = 1 - (u * u * u);
 
-            m_Rigidbody.MoveRotation(Quaternion.Slerp(currentRotation, targetRotation, percentage) );
 
+            // Quaternion currentRotation = Quaternion.AngleAxis(turnDirection * rotationAngle, m_Transform.up);
+            // Quaternion targetRotation = Quaternion.AngleAxis(startAngle, m_Transform.up);
 
+            // m_Rigidbody.MoveRotation(Quaternion.Slerp(currentRotation, targetRotation, percentage) );
 
-            Debug.LogFormat("<b><color=red>[QuickTurn] percentage: {0} </color></b>", percentage);
+            // Debug.LogFormat("<b><color=red>[QuickTurn] percentage: {0} </color></b>", percentage);
 
             return false;
         }
