@@ -4,7 +4,9 @@ namespace CharacterController
     using System;
     using System.Collections.Generic;
 
-    using MathUtil = MathUtilities;
+
+    using DebugUI;
+
 
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Rigidbody), typeof(LayerManager))]
@@ -268,6 +270,7 @@ namespace CharacterController
 
             //  Initialize debugger;
             Debugger.Initialize(this);
+
         }
 
 
@@ -325,7 +328,7 @@ namespace CharacterController
 
         protected virtual void LateUpdate()
         {
-
+            DebugAttributes();
         }
 
 
@@ -354,6 +357,19 @@ namespace CharacterController
 
 
 
+        protected virtual void DebugAttributes()
+        {
+            DebugUI.Log(this, "Moving", Moving, RichTextColor.Brown);
+            DebugUI.Log(this, "Grounded", Grounded, RichTextColor.Brown);
+
+            DebugUI.Log(this, "m_inputVector", m_inputVector, RichTextColor.Green);
+            DebugUI.Log(this, "m_moveDirection", m_moveDirection, RichTextColor.Green);
+            DebugUI.Log(this, "m_velocity", m_velocity, RichTextColor.Yellow);
+            DebugUI.Log(this, "m_targetVelocity", m_targetVelocity, RichTextColor.Yellow);
+            DebugUI.Log(this, "rb_Velocity", m_rigidbody.velocity, RichTextColor.Green);
+            DebugUI.Log(this, "rb_AngularVel", m_rigidbody.angularVelocity, RichTextColor.DarkBlue);
+
+        }
 
 
 
@@ -404,13 +420,11 @@ namespace CharacterController
 
 
 
+            m_velocity = m_rigidbody.velocity;
 
             //if (DebugMotion) Debug.DrawRay(m_transform.position + Vector3.up * 1.5f, m_targetVelocity, Color.blue);
             //if (DebugMotion) Debug.DrawLine(m_transform.position + Vector3.up * 1.8f, m_targetPosition + Vector3.up *1.8f, Color.green);
             //if (DebugMotion && Moving) DebugDraw.Sphere(m_targetPosition + Vector3.up * 1.8f, 0.1f, Color.green);
-            //CharacterDebug.Log("<b><color=green>*** InputVector_m </color></b>", InputVector);
-            //CharacterDebug.Log("<b><color=magenta>*** TargetAngle </color></b>", MathUtil.Round(m_targetAngle, 5));
-            //CharacterDebug.Log("<b><color=magenta>*** AngularDelta </color></b>", MathUtil.Round(angularDelta, 5));
         }
 
 
@@ -424,16 +438,17 @@ namespace CharacterController
 
             //Vector3 RaycastOrigin = m_transform.position + Vector3.up * charCollider.radius;
             float radius = ColliderRadius * 0.9f;
-            Vector3 origin = m_transform.position + Vector3.up * (ColliderCenter.y - ColliderHeight / 2 + m_skinWidth); 
-            Vector3 sphereCastOrigin = origin + Vector3.up * (radius + m_skinWidth);
+            //radius = 0.1f;
+            Vector3 origin = m_transform.position + Vector3.up * (ColliderCenter.y - ColliderHeight / 2 + m_skinWidth);
+            Vector3 sphereCastOrigin = origin + Vector3.up * radius;
             groundAngle = 0;
 
             float groundDistance = 10;
-            //groundHit = new RaycastHit();
-            //groundHit.point = m_transform.position - Vector3.up * airborneThreshold;
-            //groundHit.normal = m_transform.up;
+            groundHit = new RaycastHit();
+            groundHit.point = m_transform.position - Vector3.up * airborneThreshold;
+            groundHit.normal = m_transform.up;
 
-            
+
             if (Physics.Raycast(origin, Vector3.down, out groundHit, airborneThreshold, m_collisionsLayerMask))
             {
                 groundDistance = Vector3.Project(m_transform.position - groundHit.point, transform.up).magnitude;
@@ -477,8 +492,8 @@ namespace CharacterController
                     }
 
 
-                    if (groundDistance > groundHit.distance - radius - m_skinWidth)
-                        groundDistance = groundHit.distance - radius - m_skinWidth;
+                    if (groundDistance > groundHit.distance - m_skinWidth)
+                        groundDistance = groundHit.distance - m_skinWidth;
 
                 }  // End of SphereCast
 
@@ -490,10 +505,15 @@ namespace CharacterController
             {
                 m_grounded = true;
 
-                //Vector3 groundedPos = m_transform.position - m_transform.up * groundDistance;
-                //m_rigidbody.MovePosition(groundedPos);
-                //var averagePosition = GetAverageRaycast(charCollider.radius + m_skinWidth, charCollider.radius + m_skinWidth);
-                //m_rigidbody.MovePosition(Vector3.MoveTowards(m_rigidbody.position, averagePosition, m_deltaTime * 4));
+                if(groundDistance > 0)
+                {
+                    //Vector3 groundedPos = m_transform.position - m_transform.up * groundDistance;
+                    //m_rigidbody.MovePosition(groundHit.point);
+                    var averagePosition = GetAverageRaycast(charCollider.radius - m_skinWidth, charCollider.radius - m_skinWidth);
+                    //m_rigidbody.MovePosition(averagePosition);
+                    m_rigidbody.MovePosition(Vector3.MoveTowards(m_rigidbody.position, averagePosition, m_deltaTime * 4));
+                }
+
             }
             else
             {
@@ -519,10 +539,10 @@ namespace CharacterController
             if (DebugGroundCheck) Debug.DrawLine(RaycastOrigin, groundHit.point, Grounded ? Color.green : Color.grey);
             if (DebugGroundCheck) DebugDraw.DrawMarker(groundHit.point, 0.1f, Grounded ? Color.green : Color.grey);
 
-            CharacterDebug.Log("<color=green>Ground Hit Distance</color>", MathUtil.Round(groundDistance));
-            CharacterDebug.Log("<color=green>Ground Angle</color>", MathUtil.Round(groundAngle));
 
 
+            DebugUI.Log(this, "GroundDistance", MathUtil.Round(groundDistance), RichTextColor.Brown);
+            DebugUI.Log(this, "GroundAngle", MathUtil.Round(groundAngle), RichTextColor.Brown);
         }
 
 
@@ -703,7 +723,7 @@ namespace CharacterController
         /// </summary>
         protected virtual void UpdateMovement()
         {
-            m_velocity = m_rigidbody.velocity;
+            
             
             if (m_grounded)
             {
@@ -734,8 +754,7 @@ namespace CharacterController
             }
 
 
-            //  Set rigidbody velocity.
-            m_rigidbody.velocity = m_velocity;
+
 
             //if(m_grounded) m_rigidbody.velocity = Vector3.ProjectOnPlane(m_rigidbody.velocity, groundHit.normal * m_groundStickiness);
 
@@ -857,7 +876,8 @@ namespace CharacterController
         /// </summary>
         protected virtual void ApplyMovement()
         {
-
+            //  Set rigidbody velocity.
+            m_rigidbody.velocity = m_velocity;
         }
 
 
@@ -947,6 +967,21 @@ namespace CharacterController
 
 
 
+
+        public RaycastHit GetSphereCastGroundHit()
+        {
+            float radius = 0.1f;
+            Vector3 origin = m_transform.position + Vector3.up * (ColliderCenter.y - ColliderHeight / 2 + m_skinWidth);
+            origin += Vector3.up * radius;
+
+            groundHit = new RaycastHit();
+            groundHit.point = m_transform.position - Vector3.up * airborneThreshold;
+            groundHit.normal = m_transform.up;
+
+            Physics.SphereCast(origin, radius, Vector3.down, out groundHit, airborneThreshold * 2, m_collisionsLayerMask);
+
+            return groundHit;
+        }
 
 
         public Vector3 GetDirectionTangentToSurface(Vector3 normal)
@@ -1085,6 +1120,8 @@ namespace CharacterController
 
 
         #region Public Functions
+
+
 
         // Scale the capsule collider to 'mlp' of the initial value
         protected void ScaleCapsule( float scale )
@@ -1264,31 +1301,8 @@ namespace CharacterController
 
 
 
-        protected Vector3 debugHeightOffset = new Vector3(0, 0.25f, 0);
-        
 
 
-
-        protected virtual void DebugAttributes()
-        {
-
-            //CharacterDebug.Log("seperator", "----------");
-            CharacterDebug.Log("<color=brown>Moving</color>", Moving);
-            CharacterDebug.Log("<color=brown>Grounded</color>", Grounded);
-            //CharacterDebug.Log("seperator", "----------");
-
-            CharacterDebug.Log("InputVector", m_inputVector);
-            CharacterDebug.Log("MoveDirection", m_moveDirection);
-            CharacterDebug.Log("<b><color=magenta>*** Velocity </color></b>", m_velocity);
-            CharacterDebug.Log("<b><color=magenta>*** TargetVelocity </color></b>", m_targetVelocity);
-
-            //CharacterDebug.Log("Velocity", Velocity);
-            //CharacterDebug.Log("<color=blue>•rbVelocity</color>", m_rigidbody.velocity);
-            //CharacterDebug.Log("CollisionsCount", GetASctiveCollisions());
-            //CharacterDebug.Log("rb_AngularVelocity", m_rigidbody.m_angularVelocity);
-            CharacterDebug.Log("rb_Velocity", m_rigidbody.velocity);
-            CharacterDebug.Log("rb_AngularVel", m_rigidbody.angularVelocity);
-        }
 
 
 
@@ -1325,52 +1339,7 @@ namespace CharacterController
         {
             if (Debugger.debugMode && Application.isPlaying)
             {
-                //Gizmos.color = Color.white;
-                //Gizmos.DrawRay(transform.position + Vector3.up * 1.5f, m_transform.InverseTransformDirection(LookRotation * m_transform.forward));
-                //GizmosUtils.DrawText(GUI.skin, "LookDirection", transform.position + Vector3.up * 1.5f + LookRotation * transform.forward, Color.green);
-
-                //if(m_rigidbody.velocity != Vector3.zero) {
-                //    Gizmos.color = Color.green;
-                //    GizmosUtils.DrawArrow(RaycastOrigin, m_rigidbody.velocity);
-                //    GizmosUtils.DrawText(GUI.skin, "Velocity", RaycastOrigin + transform.forward, Color.green);
-                //}
-                //Gizmos.color = Color.cyan;
-                //Gizmos.DrawWireSphere(m_transform.position, ColliderRadius);
-                //Gizmos.color = Color.yellow;
-                //GizmosUtils.DrawWireCircle(m_animator.pivotPosition, 0.1f);
-                //GizmosUtils.DrawMarker(m_animator.rootPosition, 0.1f, Color.magenta);
-
-                //if (DebugCollisions) GizmosUtils.DrawWireCapsule(RaycastOrigin + charCollider.center, charCollider.radius + m_skinWidth, charCollider.height - m_skinWidth);
-
-
-                GizmosUtils.DrawText(GUI.skin, MathUtil.Round(m_targetAngle).ToString(), transform.position + Vector3.up * 1.8f, Color.black);
-
-
-                if(DebugMotion)
-                {
-                    Gizmos.color = Color.white;
-                    Gizmos.DrawRay(transform.position + Vector3.up * 1.5f, m_transform.InverseTransformDirection(LookRotation * m_transform.TransformDirection(m_transform.forward)));
-
-
-
-                    float arrowTipSize = 0.2f;
-                    float arrowWidth = 0.4f;
-                    Vector3 origin = m_transform.position + Vector3.up * debugger.heightOffset;
-                    //  Move direction vector.
-                    Gizmos.color = Color.green;
-                    GizmosUtils.DrawArrow(origin, m_transform.TransformDirection(m_moveDirection), 1f, arrowTipSize, arrowWidth);
-                    //  Draw rotation vector.
-                    //Gizmos.color = Color.magenta;
-                    //GizmosUtils.DrawArrow(origin, m_transform.TransformDirection(m_transform.eulerAngles), 1f, arrowTipSize, arrowWidth);
-                    //Gizmos.color = Color.blue;
-                    ////  Velocity vector.
-                    //GizmosUtils.DrawArrow(origin, m_velocity, m_velocity.magnitude, arrowTipSize, arrowWidth);
-                }
-
-
-
-
-
+                Debugger.DrawGizmos();
                 //  Draw Gizmos
                 DrawGizmos();
             }

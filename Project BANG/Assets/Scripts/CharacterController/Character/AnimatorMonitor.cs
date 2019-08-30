@@ -370,11 +370,11 @@
             animator.SetInteger(HashID.ActionID, value);
         }
 
-        public void SetIntDataValue(int value){
+        public void SetActionIntData(int value){
             animator.SetInteger(HashID.ActionIntData, value);
         }
 
-        public void SetFloatDataValue(float value){
+        public void SetActionFloatData(float value){
             animator.SetFloat(HashID.ActionFloatData, value);
         }
 

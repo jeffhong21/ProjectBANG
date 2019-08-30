@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-public static class MathUtilities
+public static class MathUtil
 {
 
     public static float Round(float value, int rounding = 2)

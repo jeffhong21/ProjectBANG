@@ -35,7 +35,7 @@ namespace CharacterController
         {
             if (!base.CanStartAction()) return false;
 
-            if (!m_Controller.Moving) return false;
+            if (!m_Controller.Moving || !m_Controller.Grounded) return false;
 
 
             if (startInputChecks)

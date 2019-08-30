@@ -7,12 +7,16 @@ namespace CharacterController
     [DisallowMultipleComponent]
     public abstract class CharacterIKBase : MonoBehaviour
     {
-
+        protected const float tinyOffset = .0001f;
 
         protected Animator animator;
-        protected Transform mTransform;
-        protected GameObject mGameObject;
+        protected Transform m_transform;
+        protected GameObject m_gameObject;
 
+
+        protected Vector3 m_pivotPosition;
+        protected Vector3 m_leftFootPosition;
+        protected Vector3 m_rightFootPosition;
 
         //  ---  Abstract methods    --------------------
 
@@ -29,15 +33,62 @@ namespace CharacterController
         protected virtual void Start()
         {
             if(animator == null) animator = GetComponent<Animator>();
-            mTransform = transform;
-            mGameObject = gameObject;
+            m_transform = transform;
+            m_gameObject = gameObject;
 
             Initialize();
         }
 
 
 
+        //protected virtual void OnAnimatorIK(int layerIndex)
+        //{
+        //    m_pivotPosition = GetPivotPosition();
+        //}
 
+
+
+        protected Vector3 GetPivotPosition()
+        {
+            animator.stabilizeFeet = true;
+
+            Vector3 pivotPosition = animator.pivotPosition;
+
+            m_leftFootPosition = GetFootPosition(AvatarIKGoal.LeftFoot);
+            m_rightFootPosition = GetFootPosition(AvatarIKGoal.RightFoot);
+            float leftHeight = MathUtil.Round(Mathf.Abs(m_leftFootPosition.y));
+            float rightHeight = MathUtil.Round(Mathf.Abs(m_rightFootPosition.y));
+
+            float threshold = 0.1f;
+            float pivotDifference = Mathf.Abs(0.5f - animator.pivotWeight);
+            float t = Mathf.Clamp(pivotDifference, 0, 0.5f) / 0.5f;
+            //  1 means feet are not pivot.
+            float feetPivotActive = 1;
+
+            //  Both feet are grouned.
+            if ((leftHeight < threshold && rightHeight < threshold) || (leftHeight > threshold && rightHeight > threshold) && pivotDifference < 5f)
+            {
+                t = Time.deltaTime;
+                feetPivotActive = Mathf.Clamp01(feetPivotActive + t);
+                pivotPosition = m_transform.position;
+            }
+            //  If one leg is raised and one is planted.
+            else if ((leftHeight < tinyOffset && rightHeight > 0) || rightHeight < tinyOffset && leftHeight > 0)
+            {
+                t = t * t * t * (t * (6f * t - 15f) + 10f);
+                feetPivotActive = Mathf.Lerp(0f, 1f, t);
+
+                animator.feetPivotActive = feetPivotActive;
+                pivotPosition = animator.pivotPosition;
+            }
+
+
+            pivotPosition.y = m_transform.position.y;
+
+
+            CharacterDebug.Log("<color=blue>* FeetPivotWeight *</color>", MathUtil.Round(feetPivotActive));
+            return pivotPosition;
+        }
 
 
         protected Vector3 GetFootPosition(AvatarIKGoal foot, bool worldPos = false)
@@ -52,7 +103,7 @@ namespace CharacterController
 
                 footPos += footRot * footHeight;
 
-                return !worldPos ? footPos : mTransform.InverseTransformPoint(footPos);
+                return !worldPos ? footPos : m_transform.InverseTransformPoint(footPos);
             }
 
             return Vector3.zero;

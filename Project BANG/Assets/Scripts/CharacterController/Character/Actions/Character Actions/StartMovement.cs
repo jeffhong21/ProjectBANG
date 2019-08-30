@@ -26,6 +26,9 @@ namespace CharacterController
 		//
         public override bool CanStartAction()
         {
+            if (!m_Controller.Grounded) return false;
+
+
             lastMoveAmount = currentMoveAmount;
             currentMoveAmount = Mathf.Clamp01(Mathf.Abs(m_Controller.InputVector.x) + Mathf.Abs(m_Controller.InputVector.z));
 

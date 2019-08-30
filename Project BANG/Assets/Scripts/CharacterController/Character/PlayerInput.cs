@@ -2,7 +2,6 @@ namespace CharacterController
 {
     using UnityEngine;
     using static CharacterController.RigidbodyCharacterController;
-    using MathUtil = MathUtilities;
 
     [DisallowMultipleComponent]
     public class PlayerInput : MonoBehaviour

@@ -3,8 +3,9 @@
     using UnityEngine;
     using System;
     using System.Collections;
-    using System.Text;
-    using MathUtil = MathUtilities;
+
+    using DebugUI;
+
 
     public class CharacterLocomotion : RigidbodyCharacterController
     {
@@ -39,9 +40,6 @@
 
         public bool CanAim { get => Grounded; }
 
-        public Vector3 CenterOfMass { get { return m_animator.bodyPosition; } }
-
-        public Vector3 BalanceVector {  get { return m_animator.bodyPosition - m_transform.position; } }
 
         public CharacterAction[] CharActions
         {
@@ -148,7 +146,6 @@
                     if (canCheckGround) canCheckGround = charAction.CheckGround();
                     //  Ensure the current movement direction is valid.
                     if (canCheckMovement) canCheckMovement = charAction.CheckMovement();
-
                     //  Apply any movement.
                     if (canUpdateMovement) canUpdateMovement = charAction.UpdateMovement();
                     //  Update the rotation forces.
@@ -179,15 +176,12 @@
             //  Update the rotation forces.
             if (canUpdateRotation) UpdateRotation();
 
-
             // Update the Animator.
-            if (canUpdateAnimator)
-                UpdateAnimator();
-            //if (m_animator.pivotWeight < 0.5f || m_animator.pivotWeight > 0.5f)
-            //    m_animator.SetFloat(HashID.LegUpIndex, m_animator.pivotWeight >= 0.5f ? 1 : 0);
-            //else m_animator.SetFloat(HashID.LegUpIndex, 0.5f + 1);
+            if (canUpdateAnimator) UpdateAnimator();
 
 
+            ApplyMovement();
+            ApplyRotation();
         }
 
 
@@ -579,46 +573,7 @@
 
 
 
-        //private Vector3 GetPivotPosition()
-        //{
-        //    m_animator.stabilizeFeet = true;
 
-        //    Vector3 pivotPosition = m_animator.pivotPosition;
-
-        //    leftFootPosition = GetFootPosition(AvatarIKGoal.LeftFoot);
-        //    rightFootPosition = GetFootPosition(AvatarIKGoal.RightFoot);
-        //    float leftHeight = MathUtil.Round(Mathf.Abs(leftFootPosition.y));
-        //    float rightHeight = MathUtil.Round(Mathf.Abs(rightFootPosition.y));
-
-        //    float threshold = 0.1f;
-        //    float pivotDifference = Mathf.Abs(0.5f - m_animator.pivotWeight);
-        //    float t = Mathf.Clamp(pivotDifference, 0, 0.5f) / 0.5f;
-        //    //  1 means feet are not pivot.
-        //    float feetPivotActive = 1;  
-
-        //    //  Both feet are grouned.
-        //    if( (leftHeight < threshold && rightHeight < threshold) || (leftHeight > threshold && rightHeight > threshold ) && pivotDifference < 5f){
-        //        t = Time.deltaTime;
-        //        feetPivotActive = Mathf.Clamp01(feetPivotActive + t);
-        //        pivotPosition = m_transform.position;  
-        //    }
-        //    //  If one leg is raised and one is planted.
-        //    else if ((leftHeight < tinyOffset && rightHeight > 0) || rightHeight < tinyOffset && leftHeight > 0)
-        //    {
-        //        t = t * t * t * (t * (6f * t - 15f) + 10f);
-        //        feetPivotActive = Mathf.Lerp(0f, 1f, t);
-
-        //        m_animator.feetPivotActive = feetPivotActive;
-        //        pivotPosition = m_animator.pivotPosition;
-        //    }
-
-
-        //    pivotPosition.y = m_transform.position.y;
-
-
-        //    CharacterDebug.Log("<color=blue>* FeetPivotWeight *</color>", MathUtil.Round(feetPivotActive));
-        //    return pivotPosition;
-        //}
 
 
         private Vector3 GetFootPosition(AvatarIKGoal foot, bool worldPos = false)
@@ -639,23 +594,32 @@
             return Vector3.zero;
         }
 
-        //private Vector3 GetFootPosition(HumanBodyBones foot, bool worldPos = false)
-        //{
-        //    if (foot == HumanBodyBones.LeftToes || foot == HumanBodyBones.RightToes)
-        //    {
-        //        Vector3 footPos = m_animator.GetBoneTransform(foot).position;
-        //        Quaternion footRot = m_animator.GetBoneTransform(foot).rotation;
-        //        //float botFootHeight = foot == HumanBodyBones.LeftToes ? m_animator.leftFeetBottomHeight : m_animator.rightFeetBottomHeight;
-        //        //Vector3 footHeight = new Vector3(0, -botFootHeight, 0);
+        private Vector3 GetFootPosition(HumanBodyBones foot, bool worldPos = false)
+        {
+            int side = 0;
+            if (foot == HumanBodyBones.LeftFoot || foot == HumanBodyBones.LeftToes) side = -1;
+            else if (foot == HumanBodyBones.RightFoot || foot == HumanBodyBones.RightToes) side = 1;
 
-        //        footPos = footRot * footPos;
-        //        //footPos += footRot * footHeight;
+            if (side == -1 || side == 1)
+            {
+                foot = side == -1 ? HumanBodyBones.LeftToes : HumanBodyBones.RightToes;
+                Vector3 footPos = m_animator.GetBoneTransform(foot).localPosition;
+                Quaternion footRot = m_animator.GetBoneTransform(foot).localRotation;
+                //var rot = Quaternion.
+                float botFootHeight = side == -1 ? m_animator.leftFeetBottomHeight : m_animator.rightFeetBottomHeight;
+                Vector3 footHeight = new Vector3(0,side * -botFootHeight, 0);
 
-        //        return !worldPos ? footPos : m_transform.InverseTransformPoint(footPos);
-        //    }
+                if (side == -1) footPos = Quaternion.Euler(0, 0, 180) * footPos;
+                footPos = footRot * footPos + footHeight;
+                //footPos += footRot * footHeight;
 
-        //    return Vector3.zero;
-        //}
+                
+
+                return worldPos ? m_animator.GetBoneTransform(foot).TransformPoint(footPos) : footPos;
+            }
+
+            return Vector3.zero;
+        }
 
 
 
@@ -667,24 +631,10 @@
         {
             base.DebugAttributes();
 
-
-            //CharacterDebug.Log("seperator", "----------");
-            ////CharacterDebug.Log("<color=blue>* FeetPivotWeight *</color>", MathUtil.Round(feetPivotActive));
-            //CharacterDebug.Log("<color=cyan>* PivotWeight *</color>", m_animator.pivotWeight);
-            //CharacterDebug.Log("<color=cyan>* PivotPos *</color>", m_transform.InverseTransformPoint(m_animator.pivotPosition));
-
-            ////CharacterDebug.Log("<color=yellow> leftFootPos </color>", GetFootPosition(0, true));
-            ////CharacterDebug.Log("<color=yellow> rightFootPos </color>", GetFootPosition(1, true));
-            //CharacterDebug.Log("<color=green> leftFootPos Y </color>", MathUtil.Round(GetFootPosition(AvatarIKGoal.LeftFoot, false).y));
-            //CharacterDebug.Log("<color=green> rightFootPos Y</color>", MathUtil.Round(GetFootPosition(AvatarIKGoal.RightFoot, false).y));
-
-
-
-            ////CharacterDebug.Log("<color=yellow> leftFootPos Z </color>", MathUtil.Round(GetFootPosition(AvatarIKGoal.LeftFoot, true).z));
-            ////CharacterDebug.Log("<color=yellow> rightFootPos Z</color>", MathUtil.Round(GetFootPosition(AvatarIKGoal.RightFoot, true).z));
-
-            //CharacterDebug.Log("seperator", "----------");
-
+            var lf = m_transform.position - GetFootPosition(HumanBodyBones.LeftToes, true);
+            DebugUI.Log(this, m_animator.GetBoneTransform(HumanBodyBones.LeftToes).name, lf, RichTextColor.Orange);
+            var rf = m_transform.position - GetFootPosition(HumanBodyBones.RightToes, true);
+            DebugUI.Log(this, m_animator.GetBoneTransform(HumanBodyBones.RightToes).name, rf, RichTextColor.Orange);
 
         }
 
@@ -693,20 +643,6 @@
         protected override void DrawGizmos()
         {
 
-            if (DebugMotion)
-            {
-                //Gizmos.color = Debugger.colors.animatorColor;
-                //Gizmos.DrawRay(m_transform.position, Vector3.up);
-                //Gizmos.DrawRay(m_transform.position, m_animator.bodyPosition - m_transform.position);
-                //Gizmos.DrawSphere(m_animator.bodyPosition, 0.05f);
-                //Gizmos.DrawSphere(GetPivotPosition(), 0.05f);
-
-
-                Gizmos.color = Debugger.colors.yellow1;
-                Gizmos.DrawWireSphere(GetFootPosition(AvatarIKGoal.RightFoot), 0.05f);
-                //Gizmos.matrix = Matrix4x4.TRS(m_animator.GetIKPosition(AvatarIKGoal.LeftFoot), m_animator.GetIKRotation(AvatarIKGoal.LeftFoot), Vector3.one);
-                Gizmos.DrawWireSphere(GetFootPosition(AvatarIKGoal.LeftFoot), 0.05f);
-            }
 
         }
 

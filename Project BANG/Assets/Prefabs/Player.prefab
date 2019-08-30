@@ -433,6 +433,7 @@ GameObject:
   - component: {fileID: 5742274483415007430}
   - component: {fileID: 3558082288662322614}
   - component: {fileID: 902344916}
+  - component: {fileID: 2002697079}
   m_Layer: 31
   m_Name: Player
   m_TagString: Player
@@ -519,8 +520,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_useRootMotion: 1
-  m_RootMotionSpeedMultiplier: 1
-  m_RootMotionRotationMultiplier: 1
+  m_RootMotionSpeedMultiplier: 1.2
+  m_RootMotionRotationMultiplier: 1.2
   m_GroundAcceleration: {x: 0.18, y: 0, z: 0.18}
   m_Acceleration: 0.12
   m_AirborneAcceleration: 0.2
@@ -536,7 +537,7 @@ MonoBehaviour:
   m_skinWidth: 0.08
   m_SlopeLimit: 45
   m_MaxStepHeight: 0.4
-  m_gravityModifier: 0.4
+  m_gravityModifier: 2
   m_groundStickiness: 6
   m_collisionsLayerMask:
     serializedVersion: 2
@@ -546,7 +547,7 @@ MonoBehaviour:
   debugger:
     debugMode: 1
     states:
-      showDebugUI: 1
+      showDebugUI: 0
       showGroundCheck: 0
       showCollisions: 0
       showMotion: 1
@@ -557,18 +558,21 @@ MonoBehaviour:
       animatorColor: {r: 0, g: 0.7, b: 1, a: 1}
       yellow1: {r: 1, g: 0.92, b: 0.16, a: 1}
     heightOffset: 0.05
+    arrowTipSize: 0.2
+    arrowWidth: 0.4
   probedColiders: []
   displayMovement: 0
   displayPhysics: 0
   displayAnimations: 0
-  displayActions: 0
+  displayActions: 1
   m_Actions:
   - {fileID: 5742274483415007430}
   - {fileID: 3558082288662322614}
+  - {fileID: 2002697079}
   - {fileID: 7123048206932478039}
-  - {fileID: 4816647435445959097}
   - {fileID: 6111956693744779233}
   - {fileID: 902344916}
+  - {fileID: 4816647435445959097}
   m_ActiveAction: {fileID: 0}
 --- !u!114 &6790305966678263073
 MonoBehaviour:
@@ -665,7 +669,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2a82b269384f347a0b7be273becfa79a, type: 3}
   m_Name: 
@@ -678,15 +682,15 @@ MonoBehaviour:
   grounderIK: {fileID: 2629031370626121552}
   lookAtIK: {fileID: 8862121799659265725}
   aimIK: {fileID: 7912098401397699587}
-  hideInInspector: 0
+  hideInInspector: 1
 --- !u!114 &3255356862830679799
 MonoBehaviour:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a70e525c82ce9413fa4d940ad7fcf1db, type: 3}
   m_Name: 
@@ -1139,12 +1143,12 @@ MonoBehaviour:
     pullBodyHorizontal: 0
 --- !u!114 &2629031370626121552
 MonoBehaviour:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6c72e1df647af4c0098866e944a04b01, type: 3}
   m_Name: 
@@ -1177,12 +1181,12 @@ MonoBehaviour:
   spine: []
 --- !u!114 &8862121799659265725
 MonoBehaviour:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 776adaaacdc5c4e8ab0395120a6e972b, type: 3}
   m_Name: 
@@ -1239,7 +1243,7 @@ MonoBehaviour:
     spineTargetOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &7912098401397699587
 MonoBehaviour:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -1381,10 +1385,8 @@ MonoBehaviour:
   m_StartEffect: {fileID: 0}
   m_EndEffect: {fileID: 0}
   m_Debug: 0
-  m_Force: 5
-  m_RecurrenceDelay: 0.2
-  m_LandSurfaceImpact: {fileID: 0}
-  jumpHeight: 10
+  m_jumpHeight: 2
+  m_recurrenceDelay: 0.2
 --- !u!114 &3558082288662322614
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1400,7 +1402,7 @@ MonoBehaviour:
   m_IsActive: 0
   m_StateName: 
   m_LayerIndex: 0
-  m_ActionID: -1
+  m_ActionID: 4
   m_TransitionDuration: 0.2
   m_StartType: 0
   m_StopType: 0
@@ -1412,9 +1414,9 @@ MonoBehaviour:
   m_StartEffect: {fileID: 0}
   m_EndEffect: {fileID: 0}
   m_Debug: 0
-  m_MinFallHeight: 2
-  m_LandSurfaceImpact: {fileID: 0}
-  m_MinSurfaceImpactVelocity: 1
+  m_minFallHeight: 0.5
+  m_landSurfaceImpact: {fileID: 0}
+  m_minSurfaceImpactVelocity: 1
 --- !u!114 &902344916
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1443,6 +1445,34 @@ MonoBehaviour:
   m_StartEffect: {fileID: 0}
   m_EndEffect: {fileID: 0}
   m_Debug: 0
+--- !u!114 &2002697079
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2247134470855319462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f62eddceb76e4ce2aab0985c2db98db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: 
+  m_LayerIndex: 0
+  m_ActionID: 3
+  m_TransitionDuration: 0.2
+  m_StartType: 0
+  m_StopType: 0
+  m_InputNames: []
+  m_SpeedMultiplier: 1
+  m_ApplyBuiltinRootMotion: 1
+  m_StartAudioClips: []
+  m_StopAudioClips: []
+  m_StartEffect: {fileID: 0}
+  m_EndEffect: {fileID: 0}
+  m_Debug: 0
+  maxInputCount: 4
 --- !u!1 &2268023733760728831
 GameObject:
   m_ObjectHideFlags: 0

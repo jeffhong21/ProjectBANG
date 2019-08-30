@@ -50,7 +50,7 @@ namespace CharacterController
         {
             if (rightHandTarget == null) rightHandTarget = CreateIKEffectors("RightHand Effector Target", animator.GetBoneTransform(HumanBodyBones.RightHand).position, animator.GetBoneTransform(HumanBodyBones.RightHand).rotation);
             if (leftHandTarget == null) leftHandTarget = CreateIKEffectors("LeftHand Effector Target", animator.GetBoneTransform(HumanBodyBones.LeftHand).position, animator.GetBoneTransform(HumanBodyBones.LeftHand).rotation);
-            if (bodyEffectorTarget == null) bodyEffectorTarget = CreateIKEffectors("Body Effector Target", animator.bodyPosition, animator.bodyRotation);
+            if (bodyEffectorTarget == null) bodyEffectorTarget = CreateIKEffectors("Body Effector Target", animator.GetBoneTransform(HumanBodyBones.Hips).position, animator.GetBoneTransform(HumanBodyBones.Hips).rotation);
 
             if (lookTarget == null)
             {
@@ -119,18 +119,15 @@ namespace CharacterController
 
         private void LateUpdate()
         {
-
-
+            if (!updateFrame) return;
+            updateFrame = false;
 
             LookAtIKSolver();
         }
 
 
 
-        protected void OnAnimatorIK(int layerIndex)
-        {
-            
-        }
+
 
 
 

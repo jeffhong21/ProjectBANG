@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using MathUtil = MathUtilities;
 
 public static class MovementUtilities
 {
@@ -100,38 +99,30 @@ public static class MovementUtilities
     }
 
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="target"></param>
-    /// <param name="origin"></param>
-    /// <param name="time"> time is how long per second</param>
-    /// <returns></returns>
-    public static Vector3 CalculateVelocity( Vector3 target, Vector3 origin, float time )
+
+
+    public static Vector3 CalculateVelocity(Vector3 target, Vector3 origin, float time)
     {
         //  Define the distance x and y first.
         Vector3 distance = target - origin;
         Vector3 distanceXZ = distance;
         distanceXZ.y = 0;
 
-
         //  Create a float that repsents our distance
-        float Sy = distance.y;              //  vertical distance
-        float Sxz = distanceXZ.magnitude;   //  horizontal distance
-
+        float verticalDistance = distance.y;              //  vertical distance
+        float horizontalDistance = distanceXZ.magnitude;   //  horizontal distance
 
         //  Calculate the initial velocity.  This is distance / time.
-        float Vxz = Sxz / time;
-        float Vy = Sy / time + 0.5f * Mathf.Abs(Physics.gravity.y) * time;
-
-
+        float velocityXZ = horizontalDistance / time;
+        float velocityY = (verticalDistance / time) + 0.5f * Mathf.Abs(Physics.gravity.y) * time;
 
         Vector3 result = distanceXZ.normalized;
-        result *= Vxz;
-        result.y = Vy;
+        result *= velocityXZ;
+        result.y = velocityY;
 
         return result;
     }
+
 
 
     public static Vector3 ComputeTorque(Rigidbody rb, Quaternion desiredRotation )
@@ -156,6 +147,24 @@ public static class MovementUtilities
         Vector3 T = rb.transform.TransformDirection(Tl);
         return T;
     }
+
+
+
+
+    //protected Vector3 CalculateJumpVelocity()
+    //{
+    //    //speed = Mathf.Sqrt(-2.0f * m_Controller.Gravity.y  * jumpHeight);
+    //    speed = .8f;
+    //    acceleration = -(2 * jumpHeight) /(jumpVelocity * jumpVelocity);
+    //    verticalVelocity = Mathf.Abs(acceleration) * speed;
+
+    //    velocity = m_Controller.Velocity;
+    //    velocity.y += verticalVelocity;
+
+    //    //Debug.Log(velocity);
+    //    return velocity;
+    //}
+
 
 
 

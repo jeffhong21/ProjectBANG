@@ -5,88 +5,100 @@ namespace CharacterController
 
     public class Fall : CharacterAction
     {
-        protected enum LandingType { 
-            Default = 1, 
-            Hard = 2, 
-            Roll = 3
-        };
+        public override int ActionID { get { return m_ActionID = ActionTypeID.Fall; } set { m_ActionID = value; } }
 
-        protected LandingType m_LandingType = LandingType.Default;
 
         [SerializeField]
-        protected float m_MinFallHeight = 2f;
+        protected float m_minFallHeight = 1f;
         [SerializeField]
-        protected SurfaceEffect m_LandSurfaceImpact;
+        protected SurfaceEffect m_landSurfaceImpact;
         [SerializeField]
-        protected float m_MinSurfaceImpactVelocity = 1f;
+        protected float m_minSurfaceImpactVelocity = 1f;
 
 
-        protected Vector3 m_LandPosition;
-        protected RaycastHit m_RaycastHit;
-        protected float m_StartHeight;
-        protected float m_FallHeight;
-        
+        protected bool m_isAirborne;
+        protected Vector3 m_currentPosition;
+        protected Vector3 m_startPosition;
+        protected float m_fallHeight;
+
+
+
         //
         // Methods
         //
         public override bool CanStartAction()
         {
-            if (m_Controller.Grounded == false  &&
-                m_Rigidbody.velocity.y < -1f )
+            if(!m_Controller.Grounded && m_Rigidbody.velocity.y < 0)
             {
-                if (Physics.Raycast(m_Transform.position, Vector3.down, out m_RaycastHit, 50, m_Layers.SolidLayers))
+                m_currentPosition = m_Transform.position;
+                if (!m_isAirborne)
                 {
-                    if (m_RaycastHit.distance > m_MinFallHeight)
-                    {
-                        Debug.LogFormat(" **  Rigidbody velocity: {0} | Fall Height: {1}", m_Rigidbody.velocity.y, m_RaycastHit.distance);
-                        return true;
-                    }
+                    m_startPosition = m_currentPosition;
+                    m_isAirborne = true;
                 }
 
+                m_fallHeight = m_startPosition.y - m_currentPosition.y;
+
+                if(Mathf.Abs(m_fallHeight) > m_minFallHeight)
+                {
+                    return true;
+                }
             }
+            else
+            {
+                if(m_Controller.Grounded || m_Rigidbody.velocity.y >= 0 && m_isAirborne)
+                {
+                    m_currentPosition = default;
+                    m_startPosition = default;
+                    m_fallHeight = 0;
+                    m_isAirborne = false;
+                }
+            }
+
+
 
             return false;
 		}
 
+
 		protected override void ActionStarted()
         {
-            m_Animator.SetInteger(HashID.ActionID, ActionTypeID.Fall);
-            m_ActionStartTime = Time.time;
-
+            m_AnimatorMonitor.SetActionID(ActionID);
         }
 
 
-        //public override bool CheckGround()
-        //{
-        //    float checkDistance = 1;
-        //    if (Physics.Raycast(m_Transform.position, Vector3.down, out m_RaycastHit, checkDistance, m_Layers.SolidLayers))
-        //    {
-        //        m_Controller.Grounded = true;
+        public override bool CheckGround()
+        {
+            float radius = 0.1f;
+            Vector3 origin = m_Transform.position + Vector3.up * (0.1f);
+            origin += Vector3.up * radius;
 
-        //        if (Time.time - m_ActionStartTime > 1)
-        //            m_LandingType = LandingType.Hard;
-        //        else if (Time.time - m_ActionStartTime > 1 && m_Controller.InputVector.sqrMagnitude > 0.2f)
-        //            m_LandingType = LandingType.Roll;
-        //        else
-        //            m_LandingType = LandingType.Default;
-
-
-
-        //        if (m_Debug) Debug.LogFormat("Falling has landed. Hit {0} | Total air time: {1}", m_RaycastHit.transform.name, Time.time - m_ActionStartTime);
-        //        //Debug.Break();
+            if(Physics.SphereCast(origin, radius, Vector3.down, out RaycastHit groundHit, 0.3f * 2, m_Layers.SolidLayers))
+            {
+                m_Controller.Grounded = groundHit.distance < 0.3f;
+            }
+            else
+            {
+                m_Controller.Grounded = false;
+            }
 
 
-        //    }
 
-        //    return false;
-        //}
+
+
+            DebugUI.DebugUI.Log(this, "GroundDistance", groundHit.distance, DebugUI.RichTextColor.Red);
+
+            return false;
+        }
 
 
 
 
         public override bool CanStopAction()
         {
-            if (m_Controller.Grounded && m_Rigidbody.velocity.y > -0.01f){
+            if (m_Controller.Grounded && m_Rigidbody.velocity.y > -0.01f)
+            {
+                m_AnimatorMonitor.SetActionID(0);
                 return true;
             }
 
@@ -94,21 +106,31 @@ namespace CharacterController
         }
 
 
-        //protected override void ActionStopped()
-        //{
-        //    m_Animator.SetInteger(HashID.ActionIntData, (int)m_LandingType);
-        //    Debug.LogFormat("Total air time: {0}", Time.time - m_ActionStartTime);
-        //}
-
-
-        //  Returns the state the given layer should be on.
-        public override string GetDestinationState(int layer)
+        public override bool UpdateAnimator()
         {
-            if (layer == 0){
-                return m_StateName;
-            }
-            return "";
+            m_fallHeight = m_startPosition.y - m_currentPosition.y;
+            m_AnimatorMonitor.SetActionFloatData(Mathf.Abs(m_fallHeight));
+
+
+
+            return true;
         }
+
+
+        protected override void ActionStopped()
+        {
+
+            m_currentPosition = default;
+            m_startPosition = default;
+            m_fallHeight = 0;
+            m_isAirborne = false;
+
+
+            DebugUI.DebugUI.Remove(this, "GroundDistance");
+        }
+
+
+
 
 
 

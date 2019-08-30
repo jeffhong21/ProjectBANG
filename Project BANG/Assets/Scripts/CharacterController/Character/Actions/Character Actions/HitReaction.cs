@@ -50,7 +50,7 @@ namespace CharacterController
         {
             m_IsDamaged = false;
             m_AnimatorMonitor.SetActionID(0);
-            m_AnimatorMonitor.SetIntDataValue(0);
+            //m_AnimatorMonitor.SetIntDataValue(0);
         }
 
 

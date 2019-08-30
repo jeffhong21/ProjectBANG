@@ -6,10 +6,7 @@
 
     public class StopMovement : CharacterAction
     {
-        public override int ActionID {
-            get { return m_ActionID = ActionTypeID.StopMovement; }
-            set { m_ActionID = value; }
-        }
+        public override int ActionID { get { return m_ActionID = ActionTypeID.StopMovement; } set { m_ActionID = value; } }
 
         [SerializeField] protected int maxInputCount = 4;
         [SerializeField, Range(0, 1)]
@@ -35,12 +32,9 @@
         //
         public override bool CanStartAction()
         {
-            //if(successfulStarts >= 5) {
-            //    successfulStarts = 0;
-            //    detectionCount = 0;
-            //    isStopMoving = false;
-            //    return true;
-            //}
+            if (!m_Controller.Grounded) return false;
+
+
 
             lastMoveAmount = currentMoveAmount;
             currentMoveAmount = Mathf.Clamp01(Mathf.Abs(m_Controller.InputVector.x) + Mathf.Abs(m_Controller.InputVector.z));
@@ -49,15 +43,30 @@
                 isStopMoving = true;
 
 
-            if (isStopMoving) {
-                if (detectionCount >= maxInputCount && currentMoveAmount < stopThreshold) {
+            if (isStopMoving)
+            {
+                if (detectionCount >= maxInputCount && currentMoveAmount < stopThreshold)
+                {
+                    successfulStarts++;
+                    //return true;
+                }
+                //if (detectionCount >= maxInputCount && currentMoveAmount < stopThreshold) {
+                //    detectionCount = 0;
+                //    isStopMoving = false;
+                //    successfulStarts++;
+                //    return true;
+                //}
+                detectionCount++;
+
+                if (successfulStarts >= 3)
+                {
+                    successfulStarts = 0;
                     detectionCount = 0;
                     isStopMoving = false;
-                    successfulStarts++;
                     return true;
                 }
-                detectionCount++;
             }
+
 
             if (currentMoveAmount <= 0 || lastMoveAmount <= currentMoveAmount) {
                 detectionCount = 0;
