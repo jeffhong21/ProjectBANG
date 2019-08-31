@@ -253,6 +253,8 @@
         /// </summary>
         protected override void UpdateAnimator()
         {
+ 
+
 
             if (Moving)
             {

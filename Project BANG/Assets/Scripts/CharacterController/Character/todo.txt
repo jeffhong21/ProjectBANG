@@ -1,0 +1,10 @@
+
+
+•  Add foot plant using IK.
+•  Add to AnimatorMonitor Actions list and create logic to know 
+   current active state and wht to do to stop state.
+        °  If state is active and animator is transitioning to default state, stop action.
+        °  Split the state fullname and use second partition to check against active state.
+            °  If  "Base Layer.StartMovemnt.Start ", compare "StartMovement" to activeState.GetType().
+•  If viewAngle is greater 90, play turn animation.
+•  When StartMove, velocity should be zero until targetAngle is close to 0.

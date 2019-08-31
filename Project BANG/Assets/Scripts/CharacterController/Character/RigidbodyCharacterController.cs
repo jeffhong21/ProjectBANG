@@ -899,7 +899,7 @@ namespace CharacterController
             //CharacterDebug.Log("<b><color=orange>*** lookAngle</color></b>", lookAngle);
             m_animator.SetFloat(HashID.LookAngle, lookAngle);
 
-
+            
 
 
             m_Speed = InputVector.normalized.sqrMagnitude * (Movement == MovementTypes.Adventure ? 1 : 0);
