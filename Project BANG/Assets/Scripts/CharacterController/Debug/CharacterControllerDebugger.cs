@@ -45,9 +45,9 @@
 
 
         [SerializeField]
-        private float arrowTipSize = 0.2f;
+        private float arrowTipSize = 0.1f;
         [SerializeField]
-        private float arrowWidth = 0.4f;
+        private float arrowWidth = 0.2f;
 
         private Queue<Delegate> drawActions;
 
@@ -139,7 +139,7 @@
             if (states.showMotion)
             {
                 Gizmos.color = Color.white;
-                Gizmos.DrawRay(transform.position + Vector3.up * 1.5f, transform.InverseTransformDirection(character.LookRotation * transform.TransformDirection(transform.forward)));
+                Gizmos.DrawRay(transform.position + Vector3.up , transform.InverseTransformDirection(character.LookRotation * transform.TransformDirection(transform.forward)));
 
 
 

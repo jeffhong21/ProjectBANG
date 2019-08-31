@@ -1,7 +1,9 @@
 namespace CharacterController
 {
     using UnityEngine;
+
     using static CharacterController.RigidbodyCharacterController;
+    using DebugUI;
 
     [DisallowMultipleComponent]
     public class PlayerInput : MonoBehaviour
@@ -54,12 +56,16 @@ namespace CharacterController
         private Quaternion lookRotation;
         private float rotationVelocitySmooth;
 
+        private Vector3 m_targetVelocitySmooth;
+
         //[SerializeField]
         private CameraController m_CameraController;
         private Transform m_Camera;
         private CharacterLocomotion m_Controller;
         private GameObject m_GameObject;
-        private Transform mTransform;
+        private Transform m_transform;
+
+
 
 
 
@@ -107,7 +113,7 @@ namespace CharacterController
         {
             m_Controller = GetComponent<CharacterLocomotion>();
             m_GameObject = gameObject;
-            mTransform = transform;
+            m_transform = transform;
 
             lookTarget = new GameObject("Look Target").transform;
             lookTarget.parent = transform;
@@ -161,7 +167,7 @@ namespace CharacterController
             inputVector = InputVector;
             cameraFwd.Set(1, 0, 1);
 
-            lookDirection = m_CameraController == null ? mTransform.forward : Vector3.Scale(m_Camera.forward, cameraFwd).normalized;
+            lookDirection = m_CameraController == null ? m_transform.forward : Vector3.Scale(m_Camera.forward, cameraFwd).normalized;
 
             switch (m_Controller.Movement) {
                 case (MovementTypes.Adventure):
@@ -189,38 +195,43 @@ namespace CharacterController
                     inputVector = InputVector;
                     //turnAmount = Mathf.Atan2(lookDirection.x, lookDirection.z);
                     //lookRotation = Quaternion.AngleAxis(turnAmount, transform.up);
-                    lookRotation = Quaternion.FromToRotation(mTransform.forward, lookDirection);
+                    lookRotation = Quaternion.FromToRotation(m_transform.forward, lookDirection);
                     break;
                 default:
                     Debug.Log("<b><i>• PlayerInput</i></b> movement type is default");
                     inputVector = axisRaw ? InputVectorRaw : InputVector;
-                    lookRotation = Quaternion.FromToRotation(mTransform.forward, lookDirection);
+                    lookRotation = Quaternion.FromToRotation(m_transform.forward, lookDirection);
                     break;
             }
 
-
-
-            m_Controller.InputVector = inputVector;
-            m_Controller.LookRotation = lookRotation;
 
 
             lookDistance = 8;
             //  Set the look target's position and rotation.
             lookRay.origin = transform.position + Vector3.up * lookHeight;
             lookRay.direction = lookDirection;
-            lookTarget.position = lookRay.GetPoint(lookDistance);
+            lookTarget.position = Vector3.SmoothDamp(lookTarget.position, lookRay.GetPoint(lookDistance), ref m_targetVelocitySmooth, 0.1f);
+            lookTarget.rotation = Quaternion.RotateTowards(lookTarget.rotation, m_transform.rotation, Time.fixedDeltaTime * 4);
+            //lookTarget.position = lookRay.GetPoint(lookDistance);
             //if (Physics.Raycast(lookRay, lookDistance, checkLayer)) {
             //    lookTarget.position = Vector3.Lerp(lookTarget.position, hit.point, Time.deltaTime * 8);
             //} else {
             //    lookTarget.position = lookRay.GetPoint(lookDistance);
-
             //}
 
 
-            float eulerY = Vector3.Angle(transform.forward, lookRay.direction);
-            Quaternion targetRotation = Quaternion.AngleAxis(eulerY, transform.up);
-            lookTarget.rotation = targetRotation;
 
+            //  Get the characters view angle.
+            var axisSign = Vector3.Cross(lookDirection, m_transform.forward).y;
+            float viewAngle = Vector3.Angle(transform.forward, lookRay.direction) * (axisSign >= 0 ? -1f : 1f);
+            DebugUI.Log(this, "ViewAngle", viewAngle);
+
+
+
+
+            m_Controller.InputVector = inputVector;
+            m_Controller.LookRotation = lookRotation;
+            m_Controller.ViewAngle = viewAngle;
 
 
             DebugButtonPress();
@@ -290,8 +301,13 @@ namespace CharacterController
 
 
                 Gizmos.color = Color.magenta;
-                Gizmos.DrawRay(lookRay.origin, lookRay.direction * lookDistance);
+                //Gizmos.DrawRay(lookRay.origin, lookRay.direction * lookDistance);
+                Gizmos.DrawLine(lookRay.origin, lookTarget.position);
                 Gizmos.DrawSphere(lookTarget.position, 0.15f);
+
+                //  Forward direction for look target.
+                Gizmos.color = Color.blue;
+                Gizmos.DrawRay(lookTarget.position, lookTarget.forward);
             }
         }
 

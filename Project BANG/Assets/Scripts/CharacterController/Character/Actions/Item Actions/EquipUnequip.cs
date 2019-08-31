@@ -100,7 +100,7 @@
                 //equipNext = !equipNext;
             }
 
-            m_AnimatorMonitor.RegisterCallback(1, this);
+
 
 
 

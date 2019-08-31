@@ -18,7 +18,13 @@
         [SerializeField, HideInInspector]
         protected CharacterAction[] m_Actions;
         [SerializeField, HideInInspector]
-        protected CharacterAction m_ActiveAction;
+        protected CharacterAction m_ActiveActions;
+
+
+        protected float m_viewAngle;
+        protected Vector3 m_lookDirection;
+
+
 
         protected bool canCheckGround;
         protected bool canCheckMovement;
@@ -40,6 +46,12 @@
 
         public bool CanAim { get => Grounded; }
 
+
+        public float ViewAngle
+        {
+            get { return m_viewAngle; }
+            set { m_viewAngle = Mathf.Clamp(value, -180, 180); }
+        }
 
         public CharacterAction[] CharActions
         {
@@ -253,7 +265,9 @@
         /// </summary>
         protected override void UpdateAnimator()
         {
- 
+
+
+            m_animator.SetFloat(HashID.LookAngle, m_viewAngle);
 
 
             if (Moving)
@@ -327,8 +341,8 @@
                         //  Start the Action and update the animator.
                         charAction.StopAction();
                         //  Reset Active Action.
-                        if (m_ActiveAction = charAction)
-                            m_ActiveAction = null;
+                        if (m_ActiveActions = charAction)
+                            m_ActiveActions = null;
                         //  Move on to the next Action.
                         return true;
                     }
@@ -360,8 +374,8 @@
                         //  Start the Action and update the animator.
                         charAction.StopAction();
                         //  Reset Active Action.
-                        if (m_ActiveAction = charAction)
-                            m_ActiveAction = null;
+                        if (m_ActiveActions = charAction)
+                            m_ActiveActions = null;
                         //  Move on to the next Action.
                         return;
                     }
@@ -373,7 +387,7 @@
                 //  Check if can start Action is StartType is NOT Manual.
                 if (charAction.enabled && charAction.StartType != ActionStartType.Manual)
                 {
-                    if (m_ActiveAction == null)
+                    if (m_ActiveActions == null)
                     {
                         if (charAction.CanStartAction())
                         {
@@ -382,7 +396,7 @@
                             //charAction.UpdateAnimator();
                             //  Set active Action if not concurrent.
                             if (charAction.IsConcurrentAction() == false)
-                                m_ActiveAction = charAction;
+                                m_ActiveActions = charAction;
                             //  Move onto the next Action.
                             return;
                         }
@@ -426,15 +440,15 @@
 
             int index = Array.IndexOf(m_Actions, action);
             //  If there is an active action and current action is non concurrent.
-            if(m_ActiveAction != null && action.IsConcurrentAction() == false){
-                int activeActionIndex = Array.IndexOf(m_Actions, m_ActiveAction);
+            if(m_ActiveActions != null && action.IsConcurrentAction() == false){
+                int activeActionIndex = Array.IndexOf(m_Actions, m_ActiveActions);
                 //Debug.LogFormat("Action index {0} | Active Action index {1}", index, activeActionIndex);
                 if(index < activeActionIndex){
                     if (action.CanStartAction()){
                         //  Stop the current active action.
-                        TryStopAction(m_ActiveAction);
+                        TryStopAction(m_ActiveActions);
                         //  Set the active action.
-                        m_ActiveAction = m_Actions[index];
+                        m_ActiveActions = m_Actions[index];
                         //m_ActiveActions[index] = m_Actions[index];
                         action.StartAction();
                         //action.UpdateAnimator();
@@ -443,7 +457,7 @@
                 } 
             }
             //  If there is an active action and current action is concurrent.
-            else if (m_ActiveAction != null && action.IsConcurrentAction())
+            else if (m_ActiveActions != null && action.IsConcurrentAction())
             {
                 if (action.CanStartAction()){
                     //m_ActiveActions[index] = m_Actions[index];
@@ -453,10 +467,10 @@
                 }
             }
             //  If there is no active action.
-            else if (m_ActiveAction == null){
+            else if (m_ActiveActions == null){
                 if (action.CanStartAction())
                 {
-                    m_ActiveAction = m_Actions[index];
+                    m_ActiveActions = m_Actions[index];
                     //m_ActiveActions[index] = m_Actions[index];
                     action.StartAction();
                     //action.UpdateAnimator();
@@ -487,8 +501,8 @@
 
             if (action.CanStopAction()){
                 int index = Array.IndexOf(m_Actions, action);
-                if (m_ActiveAction == action)
-                    m_ActiveAction = null;
+                if (m_ActiveActions == action)
+                    m_ActiveActions = null;
 
 
                 action.StopAction();
@@ -502,8 +516,8 @@
             if (action == null) return; 
             if(force){
                 int index = Array.IndexOf(m_Actions, action);
-                if (m_ActiveAction == action)
-                    m_ActiveAction = null;
+                if (m_ActiveActions == action)
+                    m_ActiveActions = null;
 
 
                 action.StopAction();

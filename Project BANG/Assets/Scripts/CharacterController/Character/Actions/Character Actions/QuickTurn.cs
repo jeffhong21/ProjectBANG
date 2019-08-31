@@ -57,7 +57,7 @@ namespace CharacterController
                 startInputChecks = true;
                 inputDirection = m_Controller.InputVector.normalized;
                 rotationRemaining = Vector3.Angle(m_Transform.forward, inputDirection);
-                Debug.LogFormat("dot: {0} | rotationRemaining: {1}", dot, rotationRemaining);
+                //Debug.LogFormat("dot: {0} | rotationRemaining: {1}", dot, rotationRemaining);
             }
             return false;
         }

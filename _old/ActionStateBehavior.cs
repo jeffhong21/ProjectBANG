@@ -47,11 +47,11 @@
         {
             base.OnStateUpdate(animator, stateInfo, layerIndex);
 
-            if (matchTarget) {
-                if (stateInfo.normalizedTime >= startMatchTime && stateInfo.normalizedTime <= endMatchTime && animatorMonitor.HasMatchTarget) {
-                    animatorMonitor.MatchTarget(targetBodyPart, weightMask, startMatchTime, endMatchTime);
-                }
-            }
+            //if (matchTarget) {
+            //    if (stateInfo.normalizedTime >= startMatchTime && stateInfo.normalizedTime <= endMatchTime && animatorMonitor.HasMatchTarget) {
+            //        animatorMonitor.MatchTarget(targetBodyPart, weightMask, startMatchTime, endMatchTime);
+            //    }
+            //}
 
 
         }

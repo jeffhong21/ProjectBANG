@@ -279,7 +279,8 @@ namespace CharacterController
             m_rigidbody.mass = m_Mass;
             m_rigidbody.useGravity = false;
             m_rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-            m_rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
+            m_rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+            //m_rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
             //m_rigidbody.isKinematic = true;
 
 
@@ -349,6 +350,7 @@ namespace CharacterController
                 angle = (angle * m_RootMotionSpeedMultiplier * Mathf.Deg2Rad) / m_deltaTime;
                 RootMotionRotation = Quaternion.AngleAxis(angle, axis);
 
+
                 //if (m_animator.hasRootMotion) m_rigidbody.MoveRotation(m_animator.rootRotation);
             }
 
@@ -357,19 +359,6 @@ namespace CharacterController
 
 
 
-        protected virtual void DebugAttributes()
-        {
-            DebugUI.Log(this, "Moving", Moving, RichTextColor.Brown);
-            DebugUI.Log(this, "Grounded", Grounded, RichTextColor.Brown);
-
-            DebugUI.Log(this, "m_inputVector", m_inputVector, RichTextColor.Green);
-            DebugUI.Log(this, "m_moveDirection", m_moveDirection, RichTextColor.Green);
-            DebugUI.Log(this, "m_velocity", m_velocity, RichTextColor.Yellow);
-            DebugUI.Log(this, "m_targetVelocity", m_targetVelocity, RichTextColor.Yellow);
-            DebugUI.Log(this, "rb_Velocity", m_rigidbody.velocity, RichTextColor.Green);
-            DebugUI.Log(this, "rb_AngularVel", m_rigidbody.angularVelocity, RichTextColor.DarkBlue);
-
-        }
 
 
 
@@ -412,7 +401,6 @@ namespace CharacterController
             {
                 m_targetRotation = RootMotionRotation;
                 m_targetVelocity = RootMotionVelocity;
-
             }
 
             m_targetVelocity = m_targetRotation * m_targetVelocity;
@@ -727,7 +715,7 @@ namespace CharacterController
             
             if (m_grounded)
             {
-                m_velocity.y = 0;
+                //m_velocity.y = 0;
                 float velocityMag = m_targetVelocity.magnitude;
                 Vector3 groundNormal = groundHit.normal;
 
@@ -777,33 +765,36 @@ namespace CharacterController
             //}
 
 
+            m_targetRotation.ToAngleAxis(out float angle, out Vector3 axis);
+            m_angularVelocity = axis.normalized * angle;
+            m_rigidbody.angularVelocity = Vector3.Lerp(m_rigidbody.angularVelocity, m_angularVelocity, m_deltaTime * m_rotationSpeed);
 
 
-            var start = 135f * Mathf.Sign(m_targetAngle);
-            float percentage = Mathf.Clamp(m_targetAngle, -Mathf.Abs(start), Mathf.Abs(start)) / start;
 
-            float moveAmount = Mathf.Clamp01(Mathf.Abs(m_moveDirection.x) + Mathf.Abs(m_moveDirection.z));
-            moveAmount = MathUtil.Round(moveAmount);
-            float rotationSpeed = Mathf.Lerp(0, m_rotationSpeed * 2, moveAmount);
+            //var start = 135f * Mathf.Sign(m_targetAngle);
+            //float percentage = Mathf.Clamp(m_targetAngle, -Mathf.Abs(start), Mathf.Abs(start)) / start;
 
-            
-            float currentAngle = Mathf.SmoothDampAngle(m_targetAngle, 0, ref rotationAngleSmooth, 0.12f);
-            //float currentAngle = Mathf.Lerp(m_targetAngle, 0, percentage);
-
-            CharacterDebug.Log("<b><color=white>*** CurrentAngle </color></b>", MathUtil.Round(currentAngle, 5));
-            CharacterDebug.Log("<b><color=orange>*** Percentage </color></b>", 1 - Mathf.Exp(-10 * deltaTime));
-
-            Quaternion currentRotation = Quaternion.AngleAxis(currentAngle, m_transform.up);
-            m_angularVelocity = m_transform.up * currentAngle;
+            //float moveAmount = Mathf.Clamp01(Mathf.Abs(m_moveDirection.x) + Mathf.Abs(m_moveDirection.z));
+            //moveAmount = MathUtil.Round(moveAmount);
+            //float rotationSpeed = Mathf.Lerp(0, m_rotationSpeed * 2, moveAmount);
 
 
-            //  Update angular velocity.
-            m_rigidbody.angularDrag = Mathf.SmoothDamp(m_rigidbody.angularDrag, moveAmount > 0 ? 0.05f : m_Mass, ref angularDragSmooth, 0.16f);
-            m_rigidbody.angularVelocity = Vector3.Slerp(m_rigidbody.angularVelocity, m_angularVelocity, m_deltaTime * rotationSpeed);
-            //CharacterDebug.Log("<b><color=yellow>*** Angular V </color></b>", m_angularVelocity);
-            //CharacterDebug.Log("<b><color=yellow>*** Current R </color></b>", currentRotation);
-            currentRotation = Quaternion.Slerp(m_transform.rotation, currentRotation * m_transform.rotation, (m_rotationSpeed * m_deltaTime) * (m_rotationSpeed * m_deltaTime));
-            m_rigidbody.MoveRotation(currentRotation);
+            //float currentAngle = Mathf.SmoothDampAngle(m_targetAngle, 0, ref rotationAngleSmooth, 0.12f);
+            ////float currentAngle = Mathf.Lerp(m_targetAngle, 0, percentage);
+
+
+
+            //Quaternion currentRotation = Quaternion.AngleAxis(currentAngle, m_transform.up);
+            //m_angularVelocity = m_transform.up * currentAngle;
+
+
+            ////  Update angular velocity.
+            //m_rigidbody.angularDrag = Mathf.SmoothDamp(m_rigidbody.angularDrag, moveAmount > 0 ? 0.05f : m_Mass, ref angularDragSmooth, 0.16f);
+            //m_rigidbody.angularVelocity = Vector3.Slerp(m_rigidbody.angularVelocity, m_angularVelocity, m_deltaTime * rotationSpeed);
+            ////CharacterDebug.Log("<b><color=yellow>*** Angular V </color></b>", m_angularVelocity);
+            ////CharacterDebug.Log("<b><color=yellow>*** Current R </color></b>", currentRotation);
+            //currentRotation = Quaternion.Slerp(m_transform.rotation, currentRotation * m_transform.rotation, (m_rotationSpeed * m_deltaTime) * (m_rotationSpeed * m_deltaTime));
+            //m_rigidbody.MoveRotation(currentRotation);
 
 
 
@@ -891,19 +882,14 @@ namespace CharacterController
             m_animator.SetBool(HashID.Moving, Moving);
 
 
-            float lookAngle = 0;
-            float maxLookAngle = 90;
-            if (LookAngle > maxLookAngle || LookAngle < -maxLookAngle) lookAngle = Mathf.Lerp(maxLookAngle, 0, m_deltaTime * 4);
-            else lookAngle = LookAngle;
-            lookAngle = MathUtil.Round(lookAngle);
-            //CharacterDebug.Log("<b><color=orange>*** lookAngle</color></b>", lookAngle);
-            m_animator.SetFloat(HashID.LookAngle, lookAngle);
-
-            
 
 
             m_Speed = InputVector.normalized.sqrMagnitude * (Movement == MovementTypes.Adventure ? 1 : 0);
             m_animator.SetFloat(HashID.Speed, Speed);
+
+
+            //m_Speed = InputVector.normalized.sqrMagnitude * (Movement == MovementTypes.Adventure ? 1 : 0);
+            //m_animator.SetFloat(HashID.Speed, Speed);
 
             //float rotation = GetAngleFromForward(m_transform.forward) - deltaAngle;
             //deltaAngle = 0;
@@ -1303,35 +1289,25 @@ namespace CharacterController
 
 
 
+        protected virtual void DebugAttributes()
+        {
+            if (debugger.states.showDebugUI == false) return;
+
+            DebugUI.Log(this, "Moving", Moving, RichTextColor.Brown);
+            DebugUI.Log(this, "Grounded", Grounded, RichTextColor.Brown);
+
+            DebugUI.Log(this, "m_inputVector", m_inputVector, RichTextColor.Green);
+            DebugUI.Log(this, "m_moveDirection", m_moveDirection, RichTextColor.Green);
+            DebugUI.Log(this, "m_velocity", m_velocity, RichTextColor.Yellow);
+            DebugUI.Log(this, "m_targetVelocity", m_targetVelocity, RichTextColor.Yellow);
+            DebugUI.Log(this, "rb_Velocity", m_rigidbody.velocity, RichTextColor.Green);
+            DebugUI.Log(this, "rb_AngularVel", m_rigidbody.angularVelocity, RichTextColor.DarkBlue);
+
+        }
 
 
 
         protected abstract void DrawGizmos();
-
-
-        protected virtual void DrawOnGUI()
-        {
-            if (debugger.states.showDebugUI == false) return;
-            DebugAttributes();
-
-            GUI.color = CharacterControllerUtility.DebugTextColor;
-            Rect rect = CharacterControllerUtility.CharacterControllerRect;
-            GUI.BeginGroup(rect, GUI.skin.box);
-
-            GUI.Label(rect, CharacterDebug.Write());
-
-            GUI.EndGroup();
-        }
-
-
-        protected void OnGUI()
-        {
-            if (Application.isPlaying && Debugger.debugMode)
-            {
-                DrawOnGUI();
-            }
-
-        }
 
 
 
