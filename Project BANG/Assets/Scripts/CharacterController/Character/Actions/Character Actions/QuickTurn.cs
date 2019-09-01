@@ -117,7 +117,16 @@ namespace CharacterController
         {
             float dot = Vector3.Dot(inputDirection, m_Transform.forward);
 
-            Vector3 rotationVector = Vector3.Lerp(Vector3.zero, new Vector3(0, turnDirection < 0 ? -1 : 1, 0), Mathf.Abs(turnDirection));
+            float degreesPerSecond = 120;
+            turnDirection = Vector3.Cross(inputDirection, m_Transform.forward).y >= 0 ? -1f : 1f;
+            Vector3 rotationVector = Vector3.Lerp(Vector3.zero, new Vector3(0, degreesPerSecond * (turnDirection < 0 ? -1 : 1), 0), Mathf.Abs(turnDirection));
+            Quaternion turnRotation = Quaternion.Euler(rotationVector);
+			turnRotation = m_Transform.rotation * turnRotation;
+
+
+
+			turnRotation.ToAngleAxis(out float angle, out Vector3 axis);
+            m_Rigidbody.angularVelocity = Vector3.Lerp(m_Rigidbody.angularVelocity, axis.normalized * angle, m_DeltaTime * m_Controller.RotationSpeed);
 
 
             // float rotationAngle = Vector3.Angle(m_Transform.forward, inputDirection);

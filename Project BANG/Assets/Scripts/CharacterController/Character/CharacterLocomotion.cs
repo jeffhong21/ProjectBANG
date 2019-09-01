@@ -267,7 +267,6 @@
         {
 
 
-            m_animator.SetFloat(HashID.LookAngle, m_viewAngle);
 
 
             if (Moving)

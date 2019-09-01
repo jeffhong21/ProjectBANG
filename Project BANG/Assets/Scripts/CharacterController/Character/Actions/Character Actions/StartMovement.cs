@@ -68,9 +68,12 @@ namespace CharacterController
             ////  Start walk angle
             switch (m_Controller.Movement) {
                 case (RigidbodyCharacterController.MovementTypes.Adventure):
-                    Vector3 moveDirection = m_Transform.InverseTransformDirection(m_Controller.InputVector);
-                    Vector3 axisSign = Vector3.Cross(moveDirection, m_Transform.forward);
-                    startAngle = Vector3.Angle(m_Transform.forward, moveDirection) * (axisSign.y >= 0 ? 1f : -1f);
+
+
+                    startAngle = m_Controller.GetAngleFromForward(m_Controller.LookRotation * m_Transform.forward);
+                    //Vector3 moveDirection = m_Transform.InverseTransformDirection(m_Controller.InputVector);
+                    //Vector3 axisSign = Vector3.Cross(moveDirection, m_Transform.forward);
+                    //startAngle = Vector3.Angle(moveDirection, m_Transform.forward) * (axisSign.y >= 0 ? -1f : 1f);
                     break;
                 case (RigidbodyCharacterController.MovementTypes.Combat):
                     //moveDirection = m_Transform.rotation * m_Controller.InputVector;
@@ -91,27 +94,22 @@ namespace CharacterController
 
 
 
-        public override bool UpdateRotation()
-        {
-            if (m_ApplyBuiltinRootMotion) {
-                m_Controller.RootMotionRotation.ToAngleAxis(out float angleInDegrees, out Vector3 rotationAxis);
+        //public override bool UpdateRotation()
+        //{
+        //    if (m_ApplyBuiltinRootMotion) {
+        //        m_Controller.RootMotionRotation.ToAngleAxis(out float angleInDegrees, out Vector3 rotationAxis);
 
-                //  Update angular velocity.
-                m_Rigidbody.angularVelocity = Vector3.Lerp(m_Rigidbody.angularVelocity, rotationAxis.normalized * angleInDegrees, m_DeltaTime * m_Controller.RotationSpeed);
+        //        //  Update angular velocity.
+        //        m_Rigidbody.angularVelocity = Vector3.Lerp(m_Rigidbody.angularVelocity, rotationAxis.normalized * angleInDegrees, m_DeltaTime * m_Controller.RotationSpeed);
 
-                //  Update the rotations.
-                var targetRotation = Quaternion.Slerp(m_Transform.rotation, Quaternion.AngleAxis(angleInDegrees, rotationAxis.normalized), m_DeltaTime * m_Controller.RotationSpeed);
-                m_Rigidbody.MoveRotation(targetRotation * m_Transform.rotation);
-                return false;
-            }
+        //        //  Update the rotations.
+        //        var targetRotation = Quaternion.Slerp(m_Transform.rotation, Quaternion.AngleAxis(angleInDegrees, rotationAxis.normalized), m_DeltaTime * m_Controller.RotationSpeed);
+        //        m_Rigidbody.MoveRotation(targetRotation * m_Transform.rotation);
+        //        return false;
+        //    }
 
-            return true;
-
-
-
-
-            
-        }
+        //    return true;
+        //}
 
 
         bool actionStarted;

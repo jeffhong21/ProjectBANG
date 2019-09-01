@@ -7,9 +7,13 @@ namespace DebugUI
 {
     public static class DebugUI
     {
+        private const string seperator = "------------\n";
         private const int msgCapacity = 2000;
+        private const RichTextColor defaultColor = RichTextColor.White;
+
         private static StringBuilder propertyMessages = new StringBuilder(2000);
         private static Dictionary<object, Dictionary<string, string>> propertyLogs;
+
 
 
         public struct DebugMessage
@@ -28,17 +32,26 @@ namespace DebugUI
         //    Log(value, fieldName, fieldValue.ToString(), textColor, textColor);
         //}
 
-        public static void Log<T, W>(T value, string property, W message, RichTextColor textColor) where T : class
+
+        //
+        //  Add seperators to the end of the message
+        //
+
+
+        public static void Log<T, W>(T value, string property, W message, RichTextColor textColor = defaultColor) where T : class
         {
             Log(value, property, message.ToString(), textColor, textColor);
         }
 
-        public static void Log<T, W>(T value, string property, W message, RichTextColor propertyColor = RichTextColor.White, RichTextColor messageColor = RichTextColor.White) where T : class
+        public static void Log<T, W>(T value, string property, W message, RichTextColor propertyColor = defaultColor, RichTextColor messageColor = defaultColor) where T : class
         {
             Log(value, property, message.ToString(), propertyColor, messageColor);
         }
 
-        public static void Log<T>(T value, string property, string message, RichTextColor propertyColor = RichTextColor.White, RichTextColor messageColor = RichTextColor.White) where T : class
+
+
+
+        public static void Log<T>(T value, string property, string message, RichTextColor propertyColor = defaultColor, RichTextColor messageColor = defaultColor) where T : class
         {
             if (propertyLogs == null) propertyLogs = new Dictionary<object, Dictionary<string, string>>();
             //  Add the context object if not in the dictionary.
@@ -49,6 +62,8 @@ namespace DebugUI
 
             property = SetTextColor(property, propertyColor);
             message = SetTextColor(message, messageColor);
+
+
 
             //  If the context object already contains the property, update the value.
             if (propertyLogs[value].ContainsKey(property))
@@ -70,7 +85,7 @@ namespace DebugUI
 
             foreach (var log in propertyLogs)
             {
-                propertyMessages.AppendFormat("<color={0}>-- {1} -- </color>\n",GetHexValue(RichTextColor.White), SetTextBold(log.Key.GetType().Name) );
+                propertyMessages.AppendFormat("<color={0}>-- {1} -- </color>\n",GetHexValue(defaultColor), SetTextBold(log.Key.GetType().Name) );
 
                 foreach (var property in log.Value)
                 {

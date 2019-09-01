@@ -23,10 +23,12 @@ namespace CharacterController
         protected Vector3 m_verticalVelocity;
         protected Vector3 m_velocity;
 
-
-
-        protected bool hasReachedApex;
-        protected bool hasLanded;
+        [SerializeField]
+        protected bool m_startJump;
+        [SerializeField]
+        protected bool m_hasReachedApex;
+        [SerializeField]
+        protected bool m_hasLanded;
         //
         // Methods
         //
@@ -55,7 +57,7 @@ namespace CharacterController
             m_verticalVelocity = Vector3.up * Mathf.Sqrt(2 * heightAdjusted * Mathf.Abs(m_Controller.Gravity.y) );
             m_Rigidbody.velocity += m_verticalVelocity;
 
-            Debug.Log(heightAdjusted);
+//            Debug.Log(heightAdjusted);
             //m_Rigidbody.AddForce(m_verticalVelocity, ForceMode.VelocityChange);
         }
 
@@ -63,37 +65,74 @@ namespace CharacterController
 
         public override bool CanStopAction()
         {
-            return m_Rigidbody.velocity.y <= 0;
+            return m_hasLanded;
+        }
+
+        protected override void ActionStopped()
+        {
+            base.ActionStopped();
+
+            m_startJump = m_hasReachedApex = m_hasLanded = default;
+            m_verticalVelocity = default;
         }
 
 
-
-
-		public override bool CheckGround()
+        public override bool CheckGround()
 		{
             if (Time.time < m_ActionStartTime + 0.2f) {
                 m_Controller.Grounded = false;
+                return false;
             }
 
 
-            if (m_Rigidbody.velocity.y > 0) {
-                RaycastHit hit = m_Controller.GetSphereCastGroundHit();
+            //if (m_Rigidbody.velocity.y > 0) {
+            //    RaycastHit hit = m_Controller.GetSphereCastGroundHit();
 
-                float groundDistance = Vector3.Project(m_Transform.position - hit.point, m_Transform.up).magnitude;
-                if (groundDistance < 0.1f && m_Rigidbody.velocity.y <= 0){
-                    m_Controller.Grounded = true;
-                }
+            //    float groundDistance = Vector3.Project(m_Transform.position - hit.point, m_Transform.up).magnitude;
+            //    if (groundDistance < 0.1f && m_Rigidbody.velocity.y <= 0){
+            //        m_Controller.Grounded = true;
+            //    }
+            //    m_Controller.Grounded = false;
+
+            //}
+            float radius = 0.1f;
+            Vector3 origin = m_Transform.position + Vector3.up * (0.1f);
+            origin += Vector3.up * radius;
+
+            if (Physics.SphereCast(origin, radius, Vector3.down, out RaycastHit groundHit, 0.3f * 2, m_Layers.SolidLayers))
+            {
+                m_Controller.Grounded = groundHit.distance < 0.3f;
+            }
+            else
+            {
                 m_Controller.Grounded = false;
-
             }
 
-            
-            return false;
+
+
+
+
+            return m_Controller.Grounded;
 		}
 
 
         public override bool UpdateMovement()
         {
+            if (!m_startJump)
+            {
+                m_startJump = m_Rigidbody.velocity.y > 0;
+            }
+
+            if(m_startJump)
+            {
+                if (!m_hasReachedApex) m_hasReachedApex = m_Rigidbody.velocity.y <= 0;
+            }
+
+            if(m_hasReachedApex)
+            {
+                m_hasLanded = m_Controller.Grounded;
+            }
+
             var verticalVelocity = -(2 * m_jumpHeight) / (m_verticalVelocity.y * m_verticalVelocity.y);
             m_verticalVelocity = m_Controller.Gravity * m_DeltaTime + (Vector3.zero * verticalVelocity);
 
@@ -106,6 +145,14 @@ namespace CharacterController
 
 
 
+        public override bool UpdateAnimator()
+        {
+            if (m_hasLanded)
+            {
+                m_AnimatorMonitor.SetActionID(0);
+            }
+            return true;
+        }
 
 
 

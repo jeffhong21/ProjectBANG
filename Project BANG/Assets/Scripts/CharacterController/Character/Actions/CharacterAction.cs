@@ -97,23 +97,16 @@
         public float SpeedMultiplier { get { return m_SpeedMultiplier; } set { m_SpeedMultiplier = value; } }
 
 
-        public ActionStartType StartType
-        {
+        public ActionStartType StartType{
             get { return m_StartType; }
-            //set { m_StartType = value; }
         }
 
-        public ActionStopType StopType
-        {
+        public ActionStopType StopType{
             get { return m_StopType; }
-            //set { m_StopType = value; }
         }
 
 
-        public float ActionStartTime
-        {
-            get { return m_ActionStartTime; }
-        }
+        public float ActionStartTime { get { return m_ActionStartTime; } }
 
 
         //
@@ -637,12 +630,12 @@
 
 
 
-        private void OnAnimatorMove()
-        {
+        //private void OnAnimatorMove()
+        //{
 
-            if (m_IsActive && m_Controller.UseRootMotion && m_ApplyBuiltinRootMotion)
-                m_Animator.ApplyBuiltinRootMotion();
-        }
+        //    if (m_IsActive && m_Controller.UseRootMotion && m_ApplyBuiltinRootMotion)
+        //        m_Animator.ApplyBuiltinRootMotion();
+        //}
 
 
 

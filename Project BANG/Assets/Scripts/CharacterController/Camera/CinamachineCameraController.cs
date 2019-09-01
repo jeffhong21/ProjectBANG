@@ -133,10 +133,13 @@
                 virtualCameras[0].VirtualCamera.gameObject.SetActive(true);
             }
 
+            m_Camera = CMBrain.OutputCamera;
 
-
-
-            m_Camera = CMBrain.OutputCamera; 
+            if(followTarget != null && virtualCameras[0].VirtualCamera is CinemachineFreeLook)
+            {
+                var cmFreeLook = (CinemachineFreeLook)virtualCameras[0].VirtualCamera;
+                cmFreeLook.m_XAxis.Value = followTarget.eulerAngles.y;
+            }
         }
 
 
@@ -149,6 +152,7 @@
                         ICinemachineCamera cmCamera = transform.GetChild(i).GetComponent<ICinemachineCamera>();
                         if (cmCamera.Follow == null) cmCamera.Follow = followTarget;
                         if (cmCamera.LookAt == null) cmCamera.LookAt = lookAtTarget;
+
                     }
                 }
             }

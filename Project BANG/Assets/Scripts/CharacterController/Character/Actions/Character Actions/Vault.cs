@@ -204,7 +204,7 @@
 
             if (apexReached == false) apexReached = heightDistance <= 0f;
 
-            Debug.LogFormat("heightDistance: {0}, apexReached: {1}, rootMotion: {2}", heightDistance, apexReached, m_Animator.applyRootMotion);
+            //Debug.LogFormat("heightDistance: {0}, apexReached: {1}, rootMotion: {2}", heightDistance, apexReached, m_Animator.applyRootMotion);
             if (heightDistance >= 0f && !apexReached) {
                 //verticalPosition = Vector3.Lerp(m_Transform.position, startReach, m_DeltaTime * 10);
                 verticalPosition = Vector3.MoveTowards(m_Transform.position, startReach, m_DeltaTime * 10);

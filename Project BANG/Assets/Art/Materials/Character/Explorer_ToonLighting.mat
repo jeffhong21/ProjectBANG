@@ -144,7 +144,7 @@ Material:
     - _RimEnable: 0
     - _RimIntensity: 0.028
     - _RimOffset: 0.24
-    - _RimPower: 1.12
+    - _RimPower: 1.22
     - _RimSize: 1.09
     - _RimSmoothness: 0.387
     - _Rotation_B: 0
@@ -220,7 +220,7 @@ Material:
     - _HighlightColor: {r: 1, g: 1, b: 1, a: 1}
     - _LMColor: {r: 1, g: 1, b: 1, a: 1}
     - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
-    - _RimColor: {r: 1, g: 1, b: 1, a: 1}
+    - _RimColor: {r: 1.0782592, g: 1.1019235, b: 1.1486983, a: 1}
     - _ShadowColor: {r: 0.49056602, g: 0.49056602, b: 0.49056602, a: 0.609}
     - _SpecColor: {r: 1, g: 1, b: 1, a: 0.5}
     - _TintColor: {r: 1, g: 1, b: 1, a: 1}
