@@ -18,7 +18,7 @@
         [SerializeField]
         protected LayerMask collisionLayers;
         [SerializeField]
-        protected AnimatorStateMatchTarget matchTarget;
+        protected AnimatorMatchTarget matchTarget;
         protected MatchTargetWeightMask matchTargetWeightMask = new MatchTargetWeightMask(Vector3.one, 0);
 
         //  Where to start the vertical raycast.

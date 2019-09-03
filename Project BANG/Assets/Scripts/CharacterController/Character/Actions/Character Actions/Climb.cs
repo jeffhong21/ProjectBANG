@@ -24,7 +24,7 @@ namespace CharacterController
         [Tooltip("Layers to check against.")]
         [SerializeField] protected LayerMask collisionLayers;
         [Tooltip("Layers to check against.")]
-        [SerializeField] protected AnimatorStateMatchTarget matchTarget;
+        [SerializeField] protected AnimatorMatchTarget matchTarget;
 
 
         protected float reachOffset;
@@ -77,10 +77,10 @@ namespace CharacterController
 
         protected override void ActionStarted()
         {
-            if (string.IsNullOrWhiteSpace(matchTarget.stateName) && string.IsNullOrWhiteSpace(m_StateName) == false)
-                matchTarget.stateName = m_StateName;
-            matchTarget.weightMask.positionXYZWeight = matchTarget.positionXYZWeight;
-            matchTarget.weightMask.rotationWeight = matchTarget.rotationWeight;
+            //if (string.IsNullOrWhiteSpace(matchTarget.stateName) && string.IsNullOrWhiteSpace(m_StateName) == false)
+            //    matchTarget.stateName = m_StateName;
+            //matchTarget.weightMask.positionXYZWeight = matchTarget.positionXYZWeight;
+            //matchTarget.weightMask.rotationWeight = matchTarget.rotationWeight;
 
             reachOffset = m_CapsuleCollider.radius + 0.1f;
             objectNormal = objectHit.normal;

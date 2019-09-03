@@ -54,11 +54,12 @@ namespace CharacterController
 
 
             float heightAdjusted = m_jumpHeight - m_Controller.ColliderHeight * m_Controller.ColliderRadius;
+            heightAdjusted = m_jumpHeight;
             m_verticalVelocity = Vector3.up * Mathf.Sqrt(2 * heightAdjusted * Mathf.Abs(m_Controller.Gravity.y) );
-            m_Rigidbody.velocity += m_verticalVelocity;
+            //m_Rigidbody.velocity += m_verticalVelocity;
 
-//            Debug.Log(heightAdjusted);
-            //m_Rigidbody.AddForce(m_verticalVelocity, ForceMode.VelocityChange);
+
+            m_Rigidbody.AddForce(m_verticalVelocity, ForceMode.VelocityChange);
         }
 
 
@@ -137,7 +138,7 @@ namespace CharacterController
             m_verticalVelocity = m_Controller.Gravity * m_DeltaTime + (Vector3.zero * verticalVelocity);
 
             //m_verticalVelocity = m_Controller.Gravity * m_DeltaTime;
-            m_Controller.Velocity += m_verticalVelocity;
+            //m_Controller.Velocity += m_verticalVelocity;
             //m_Rigidbody.velocity += m_verticalVelocity;
 
             return false;

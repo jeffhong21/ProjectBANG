@@ -101,7 +101,7 @@ public static class MovementUtilities
 
 
 
-    public static Vector3 CalculateVelocity(Vector3 target, Vector3 origin, float time)
+    public static Vector3 CalculateVelocity(Vector3 origin, Vector3 target,float time)
     {
         //  Define the distance x and y first.
         Vector3 distance = target - origin;
@@ -167,7 +167,14 @@ public static class MovementUtilities
 
 
 
+    //public static Vector3[] CalculateArcPoints(int resolution)
+    //{
+    //    Vector3[] arcArray = new Vector3[resolution];
 
+
+
+    //    return arcArray;
+    //}
 
 
 

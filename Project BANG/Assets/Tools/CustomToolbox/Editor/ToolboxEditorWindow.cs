@@ -11,7 +11,7 @@ public class ToolboxEditorWindow : EditorWindow
 
 
 
-    [MenuItem("Tools/Toolbox", false, -100)]
+    [MenuItem("Tools/Toolbox/Toolbox Window", false, -1000)]
     public static void ShowWindow()
     {
         var window = GetWindow<ToolboxEditorWindow>();

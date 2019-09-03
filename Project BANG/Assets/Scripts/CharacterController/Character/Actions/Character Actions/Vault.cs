@@ -6,11 +6,7 @@
 
     public class Vault : CharacterAction
     {
-        public override int ActionID
-        {
-            get { return m_ActionID = ActionTypeID.Vault; }
-            set { m_ActionID = value; }
-        }
+        public override int ActionID { get { return m_ActionID = ActionTypeID.Vault; } set { m_ActionID = value; } }
 
         [Tooltip("Maximum height."), Range(0, 90)]
         [SerializeField] protected float angleThreshold = 30f;
@@ -25,7 +21,7 @@
         [Tooltip("Layers to check against.")]
         [SerializeField] protected LayerMask detectLayers;
 
-
+        public ActionStateBehavior stateBehavior;
 
         protected float platformHeight;
         protected RaycastHit objectHit, heightHit;
@@ -48,6 +44,8 @@
         private Vector3 verticalPosition, fwdPosition;
         private bool apexReached;
         private float currentTime, totalTime;
+
+
 
         #region Character Action Methods
 
@@ -178,7 +176,6 @@
             }
 
 
-            EventHandler.ExecuteEvent(gameObject, "OnSetMatchTarget", platformEdge + -objectNormal * m_CapsuleCollider.radius, Quaternion.identity);
 
             currentTime = 0;
             totalTime = 0.5f;
@@ -226,11 +223,6 @@
         }
 
 
-        public override bool Move()
-        {
-            
-            return true;
-        }
 
 
         public override bool CanStopAction()

@@ -18,8 +18,8 @@ namespace CharacterController
         [SerializeField]
         protected LayerMask m_CheckLayers;
         [SerializeField]
-        protected AnimatorStateMatchTarget[] m_MatchTargetStates = new AnimatorStateMatchTarget[0];
-        protected Dictionary<int, AnimatorStateMatchTarget> m_MatchTargetStatesLookup = new Dictionary<int, AnimatorStateMatchTarget>();
+        protected AnimatorMatchTarget[] m_MatchTargetStates = new AnimatorMatchTarget[0];
+        protected Dictionary<int, AnimatorMatchTarget> m_MatchTargetStatesLookup = new Dictionary<int, AnimatorMatchTarget>();
 
 
         //[SerializeField]
@@ -47,12 +47,12 @@ namespace CharacterController
 		{
             base.Awake();
 
-            for (int i = 0; i < m_MatchTargetStates.Length; i++){
-                int shortHash = Animator.StringToHash(m_MatchTargetStates[i].stateName);
-                if(m_MatchTargetStatesLookup.ContainsKey(shortHash) == false ){
-                    m_MatchTargetStatesLookup.Add(shortHash, m_MatchTargetStates[i]);
-                }
-            }
+            //for (int i = 0; i < m_MatchTargetStates.Length; i++){
+            //    int shortHash = Animator.StringToHash(m_MatchTargetStates[i].stateName);
+            //    if(m_MatchTargetStatesLookup.ContainsKey(shortHash) == false ){
+            //        m_MatchTargetStatesLookup.Add(shortHash, m_MatchTargetStates[i]);
+            //    }
+            //}
         }
 
 
@@ -164,15 +164,15 @@ namespace CharacterController
 
         public override bool Move()
         {
-            if (m_MatchTargetStatesLookup.ContainsKey(m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash))
-            {
-                AnimatorStateMatchTarget matchState = m_MatchTargetStatesLookup[m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash];
-                //m_Animator.MatchTarget(ObjectHeightHit.point + matchState.matchTargetOffset, Quaternion.identity, matchState.avatarTarget, m_MatchTargetWeightMask, matchState.matchTargetRange.x, matchState.matchTargetRange.y);
-                m_Animator.MatchTarget(m_Animator.GetBoneTransform(matchState.HumanBodyBone).position + matchState.matchTargetOffset, Quaternion.identity, matchState.avatarTarget, m_MatchTargetWeightMask, matchState.startMatchTarget, matchState.endMatchTarget);
+            //if (m_MatchTargetStatesLookup.ContainsKey(m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash))
+            //{
+            //    AnimatorMatchTarget matchState = m_MatchTargetStatesLookup[m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash];
+            //    //m_Animator.MatchTarget(ObjectHeightHit.point + matchState.matchTargetOffset, Quaternion.identity, matchState.avatarTarget, m_MatchTargetWeightMask, matchState.matchTargetRange.x, matchState.matchTargetRange.y);
+            //    m_Animator.MatchTarget(m_Animator.GetBoneTransform(matchState.HumanBodyBone).position + matchState.matchTargetOffset, Quaternion.identity, matchState.avatarTarget, m_MatchTargetWeightMask, matchState.startMatchTarget, matchState.endMatchTarget);
 
-                //m_Animator.MatchTarget(ObjectHeightHit.point + matchState.matchTargetOffset, Quaternion.identity, matchState.avatarTarget, m_MatchTargetWeightMask, matchState.startMatchTarget, matchState.endMatchTarget);
-                //Debug.Log(matchState.stateName + " | normalized time: " + m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime);
-            }
+            //    //m_Animator.MatchTarget(ObjectHeightHit.point + matchState.matchTargetOffset, Quaternion.identity, matchState.avatarTarget, m_MatchTargetWeightMask, matchState.startMatchTarget, matchState.endMatchTarget);
+            //    //Debug.Log(matchState.stateName + " | normalized time: " + m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime);
+            //}
 
 
             m_Velocity = m_Animator.deltaPosition / m_DeltaTime;

@@ -422,6 +422,7 @@ GameObject:
   - component: {fileID: 1928667715822584718}
   - component: {fileID: 671882786996550958}
   - component: {fileID: 4764323065115179194}
+  - component: {fileID: 5677065510297990036}
   - component: {fileID: 6243743034455682028}
   - component: {fileID: 3255356862830679799}
   - component: {fileID: 2629031370626121552}
@@ -435,7 +436,6 @@ GameObject:
   - component: {fileID: 902344916}
   - component: {fileID: 2002697079}
   - component: {fileID: 1071944184}
-  - component: {fileID: 5677065510297990036}
   m_Layer: 31
   m_Name: Player
   m_TagString: Player
@@ -522,7 +522,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_useRootMotion: 1
-  m_RootMotionSpeedMultiplier: 1
+  m_RootMotionSpeedMultiplier: 1.2
   m_RootMotionRotationMultiplier: 1
   m_GroundAcceleration: {x: 0.18, y: 0, z: 0.18}
   m_Acceleration: 0.12
@@ -539,7 +539,7 @@ MonoBehaviour:
   m_skinWidth: 0.08
   m_SlopeLimit: 45
   m_MaxStepHeight: 0.4
-  m_gravityModifier: 2
+  m_gravityModifier: 1
   m_groundStickiness: 6
   m_collisionsLayerMask:
     serializedVersion: 2
@@ -566,7 +566,7 @@ MonoBehaviour:
   displayMovement: 0
   displayPhysics: 0
   displayAnimations: 0
-  displayActions: 0
+  displayActions: 1
   m_Actions:
   - {fileID: 1071944184}
   - {fileID: 5742274483415007430}
@@ -663,6 +663,25 @@ MonoBehaviour:
     foot: {fileID: 0}
     audioSource: {fileID: 0}
   moveDirectionFrameCount: 7
+--- !u!114 &5677065510297990036
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2247134470855319462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d57256cc704664975affadb5ba24beca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_DefaultLoadout: []
+  m_SlotCount: 6
+  itemEquipSlots: []
+  currentlyEquippedItem: {fileID: 0}
+  previouslyEquippedItem: {fileID: 0}
+  nextActiveSlot: 0
+  m_InventorySlots: []
 --- !u!114 &6243743034455682028
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1513,25 +1532,6 @@ MonoBehaviour:
   detectLayers:
     serializedVersion: 2
     m_Bits: 167772160
---- !u!114 &5677065510297990036
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d57256cc704664975affadb5ba24beca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_DefaultLoadout: []
-  m_SlotCount: 6
-  itemEquipSlots: []
-  currentlyEquippedItem: {fileID: 0}
-  previouslyEquippedItem: {fileID: 0}
-  nextActiveSlot: 0
-  m_InventorySlots: []
 --- !u!1 &2268023733760728831
 GameObject:
   m_ObjectHideFlags: 0

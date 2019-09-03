@@ -29,12 +29,9 @@ namespace CharacterController
         [SerializeField, Group("Motor")] protected float m_RootMotionSpeedMultiplier = 1;
         [SerializeField, Group("Motor")] protected float m_RootMotionRotationMultiplier = 1;
         [SerializeField, Group("Motor")] protected Vector3 m_GroundAcceleration = new Vector3(0.18f, 0, 0.18f);
-        [SerializeField, Group("Motor")] protected float m_Acceleration = 0.12f;
-        [SerializeField, Group("Motor")] protected float m_AirborneAcceleration = 0.2f;
+        [SerializeField, Group("Motor")] protected Vector3 m_AirborneAcceleration = new Vector3(0.15f, 0, 0.15f);
         [SerializeField, Group("Motor")] protected float m_MotorDamping = 0.3f;
         [SerializeField, Group("Motor")] protected float m_AirborneDamping = 0.3f;
-        [SerializeField, Group("Motor")] protected float m_GroundSpeed = 1f;
-        [SerializeField, Group("Motor")] protected float m_AirborneSpeed = 0.5f;
         [SerializeField, Group("Motor")] protected float m_rotationSpeed = 4f;
         [SerializeField, Group("Motor")] protected float m_SlopeForceUp = 1f;
         [SerializeField, Group("Motor")] protected float m_SlopeForceDown = 1.25f;
@@ -89,10 +86,10 @@ namespace CharacterController
         protected Vector3 m_inputVector, m_relativeInputVector;
         protected Vector3 m_moveDirection, m_velocity , m_angularVelocity;
         protected Quaternion m_angularRotation = Quaternion.identity;
+        protected Vector3 m_gravity;
 
 
-
-        protected float groundAngle;
+        protected float m_groundAngle;
         protected Vector3 m_GroundSlopeDir;
 
 
@@ -107,9 +104,9 @@ namespace CharacterController
 
         protected PhysicMaterial characterMaterial;
 
-        protected Vector3 previousForward;
-        protected Vector3 previousPosition, currentPosition, m_targetPosition;
-        protected Vector3 previousVelocity, currentVelocity;
+
+        protected Vector3 m_previousPosition, m_targetPosition;
+        protected Vector3 m_previousVelocity, m_currentVelocity;
 
         protected int motionTrajectoryResolution = 5;
         protected Vector3[] motionTrajectory;
@@ -196,7 +193,13 @@ namespace CharacterController
 
         public bool UseRootMotion { get { return m_useRootMotion; } set { m_useRootMotion = value; } }
 
-        public Vector3 Gravity { get; protected set; }
+        public Vector3 Gravity {
+            get {
+                m_gravity.y = m_gravity.y * m_gravityModifier;
+                return m_gravity;
+            }
+            protected set { m_gravity = value; }
+        }
 
         public Quaternion AngularRotation { get { return m_angularRotation; } set { m_angularRotation = value; } }
 
@@ -294,9 +297,9 @@ namespace CharacterController
 
             LookRotation = Quaternion.LookRotation(m_transform.forward);
 
-            previousForward = m_transform.forward;
-            previousPosition = m_rigidbody.position;
-            previousVelocity = m_rigidbody.velocity;
+
+            m_previousPosition = m_rigidbody.position;
+            m_previousVelocity = m_rigidbody.velocity;
         }
 
 
@@ -307,8 +310,8 @@ namespace CharacterController
             m_deltaTime = deltaTime;
 
 
-            previousPosition = m_rigidbody.position;
-            previousVelocity = m_rigidbody.velocity;
+            m_previousPosition = m_rigidbody.position;
+            m_previousVelocity = m_rigidbody.velocity;
 
             m_previousTargetAngle = m_moveAngle;
         }
@@ -319,8 +322,10 @@ namespace CharacterController
             if (Math.Abs(timeScale) < float.Epsilon) return;
             m_deltaTime = fixedDeltaTime;
 
-
-
+            if(m_rigidbody.isKinematic)
+                m_rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
+            else
+                m_rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         }
 
 
@@ -357,7 +362,11 @@ namespace CharacterController
 
 
 
-
+        protected void InternalMove()
+        {
+            m_previousVelocity = (m_rigidbody.position - m_previousPosition) / m_deltaTime;
+            m_previousPosition = m_rigidbody.position;
+        }
 
 
 
@@ -391,7 +400,7 @@ namespace CharacterController
             //  Is there enough movement to be considered moving.
             m_moving = m_moveDirection.sqrMagnitude > 0;
 
-
+            //  Set rotation.
             m_angularRotation = Quaternion.AngleAxis(m_moveAngle * m_rotationSpeed * m_deltaTime, m_transform.up);
 
             if(m_useRootMotion)
@@ -402,16 +411,22 @@ namespace CharacterController
 
 
             m_velocity = m_angularRotation * m_velocity;
-            m_targetPosition = previousPosition + Quaternion.Inverse(m_transform.rotation) * m_transform.TransformDirection(m_velocity);
+            m_targetPosition = m_previousPosition + Quaternion.Inverse(m_transform.rotation) * m_transform.TransformDirection(m_velocity);
 
             DebugUI.Log(this, "m_targetPosition", Vector3.Distance(m_transform.position, m_targetPosition), RichTextColor.LightBlue);
 
-            //m_velocity = m_rigidbody.velocity;
 
-            //if (DebugMotion) Debug.DrawRay(m_transform.position + Vector3.up * 1.5f, m_velocity, Color.blue);
-            //if (DebugMotion) Debug.DrawLine(m_transform.position + Vector3.up * 1.8f, m_targetPosition + Vector3.up *1.8f, Color.green);
-            //if (DebugMotion && Moving) DebugDraw.Sphere(m_targetPosition + Vector3.up * 1.8f, 0.1f, Color.green);
+
+            Vector3 acceleration = Vector3Util.Multiply(m_GroundAcceleration, m_inputVector) * m_deltaTime;
+            Vector3 initialVelocity = m_rigidbody.velocity;
+            Vector3 finalVelocity = initialVelocity + acceleration;
+            Vector3 finalVelocity2 = m_velocity;
+            Vector3 rootAcceleration = (finalVelocity - initialVelocity) / m_deltaTime;
+
+            DebugUI.Log(this, "vf1", finalVelocity, RichTextColor.Green);
+            DebugUI.Log(this, "rAcceleration", rootAcceleration, RichTextColor.Green);
         }
+
 
 
         /// <summary>
@@ -419,63 +434,77 @@ namespace CharacterController
         /// </summary>
         protected virtual void CheckGround()
         {
-            float groundDistance = airborneThreshold;
-            Vector3 castOrigin = m_transform.position + Vector3.up * (ColliderCenter.y - ColliderHeight / 2 + m_skinWidth);
-            castOrigin += Vector3.up * m_spherecastRadius;
+            //Vector3 RaycastOrigin = m_transform.position + Vector3.up * charCollider.radius;
+            //radius = 0.1f;
+            Vector3 origin = m_transform.position + Vector3.up * (ColliderCenter.y - ColliderHeight / 2 + m_skinWidth);
+            Vector3 spherecastOrigin = origin + Vector3.up * m_spherecastRadius;
+            m_groundAngle = 0;
 
+            float groundDistance = 10;
             m_groundHit = new RaycastHit();
             m_groundHit.point = m_transform.position - Vector3.up * airborneThreshold;
             m_groundHit.normal = m_transform.up;
 
-            if (Physics.SphereCast(castOrigin, m_spherecastRadius, Vector3.down, out m_groundHit, m_spherecastRadius + airborneThreshold, m_collisionsLayerMask))
-            {
-                groundAngle = Vector3.Angle(m_groundHit.normal, m_transform.up);
 
-                if (groundAngle > m_SlopeLimit)
-                {
-                    // Retrieve a vector pointing down the slope
-                    Vector3 r = Vector3.Cross(m_groundHit.normal, -transform.up);
-                    Vector3 v = Vector3.Cross(r, m_groundHit.normal);
-
-                    //Get a position slightly above the controller position to raycast down the slope from to avoid clipping
-                    Vector3 flushOrigin = m_groundHit.point + m_groundHit.normal * tinyOffset;
-
-                    // Properties of the flushHit ground
-                    if (Physics.Raycast(flushOrigin, v, out m_groundHit, m_spherecastRadius * 2, m_collisionsLayerMask))//Perform Raycast
-                    {
-                        float cos = 1 / Mathf.Cos(groundAngle);
-                        float smallerRadius = m_spherecastRadius * 0.9f;
-                        float hypS = smallerRadius * cos;
-                        float hypB = m_spherecastRadius * cos;
-
-                        Vector3 circleCenterSmall = m_groundHit.point + m_groundHit.normal * smallerRadius;
-                        Vector3 pointOnSurface = circleCenterSmall + hypS * transform.up * -1;
-                        Vector3 circleCenterBig = pointOnSurface + hypB * transform.up;
-
-                        m_groundHit.distance = Vector3.Distance(m_transform.position, circleCenterBig);
-
-                        if (m_groundHit.distance < tinyOffset * tinyOffset)
-                            m_groundHit.distance = 0;
-
-                        m_groundHit.point = circleCenterBig - m_groundHit.normal * m_spherecastRadius;
-                    }
-                }
-
+            if (Physics.Raycast(origin, Vector3.down, out m_groundHit, airborneThreshold, m_collisionsLayerMask)) {
                 groundDistance = Vector3.Project(m_transform.position - m_groundHit.point, transform.up).magnitude;
+                m_groundAngle = Vector3.Angle(m_groundHit.normal, Vector3.up);
 
-            }  // End of SphereCast
+                if (Physics.SphereCast(spherecastOrigin, m_spherecastRadius, Vector3.down, out m_groundHit, ColliderRadius + airborneThreshold, m_collisionsLayerMask)) {
+                    m_groundAngle = Vector3.Angle(m_groundHit.normal, m_transform.up);
 
+                    if (m_groundAngle > m_SlopeLimit) {
+                        // Retrieve a vector pointing down the slope
+                        Vector3 r = Vector3.Cross(m_groundHit.normal, -transform.up);
+                        Vector3 v = Vector3.Cross(r, m_groundHit.normal);
 
-            if (groundDistance < 0.05f && groundAngle < 85)
-            {
+                        //Get a position slightly above the controller position to raycast down the slope from to avoid clipping
+                        Vector3 flushOrigin = m_groundHit.point + m_groundHit.normal * tinyOffset;
+
+                        // Properties of the flushHit ground
+                        if (Physics.Raycast(flushOrigin, v, out m_groundHit, m_spherecastRadius * 2, m_collisionsLayerMask))//Perform Raycast
+                        {
+                            float cos = 1 / Mathf.Cos(m_groundAngle);
+                            float smallerRadius = m_spherecastRadius * 0.9f;
+                            float hypS = smallerRadius * cos;
+                            float hypB = m_spherecastRadius * cos;
+
+                            Vector3 circleCenterSmall = m_groundHit.point + m_groundHit.normal * smallerRadius;
+                            Vector3 pointOnSurface = circleCenterSmall + hypS * transform.up * -1;
+                            Vector3 circleCenterBig = pointOnSurface + hypB * transform.up;
+
+                            m_groundHit.distance = Vector3.Distance(origin, circleCenterBig);
+
+                            if (m_groundHit.distance < tinyOffset * tinyOffset)
+                                m_groundHit.distance = 0;
+
+                            m_groundHit.point = circleCenterBig - m_groundHit.normal * m_spherecastRadius;
+
+                        }
+
+                        //againstWall = true;
+                    }
+
+                    if (groundDistance > m_groundHit.distance - m_skinWidth)
+                        groundDistance = m_groundHit.distance - m_skinWidth;
+
+                }  // End of SphereCast
+
+            }  //  End of Raycast.
+
+            if (groundDistance < 0.05f && m_groundAngle < 85) {
                 m_grounded = true;
-            }
-            else
-            {
+                m_velocity += Vector3.ProjectOnPlane(m_groundHit.point - m_transform.position, m_transform.up * m_groundStickiness);
+            } else {
                 if (groundDistance > airborneThreshold)
-                {
+                {    
+                    m_groundAngle = 0;
+                    m_groundHit.point = m_transform.position - Vector3.up * airborneThreshold;
+                    m_groundHit.normal = m_transform.up;
+
+                    //m_velocity.y = Mathf.Clamp(m_velocity.y + m_gravity.y, 0, m_gravity.y * 2);
+
                     m_grounded = false;
-                    groundAngle = 0;
                 }
 
             }
@@ -492,14 +521,9 @@ namespace CharacterController
             if (DebugGroundCheck) Debug.DrawLine(RaycastOrigin, m_groundHit.point, Grounded ? Color.green : Color.grey);
             if (DebugGroundCheck) DebugDraw.DrawMarker(m_groundHit.point, 0.1f, Grounded ? Color.green : Color.grey);
 
-
-
-            DebugUI.Log(this, "GroundDistance",m_grounded ? MathUtil.Round(groundDistance).ToString() : "<Not Grounded>", RichTextColor.Brown);
-            DebugUI.Log(this, "GroundAngle", MathUtil.Round(groundAngle), RichTextColor.Brown);
+            DebugUI.Log(this, "GroundDistance", MathUtil.Round(groundDistance), RichTextColor.Brown);
+            DebugUI.Log(this, "GroundAngle", MathUtil.Round(m_groundAngle), RichTextColor.Brown);
         }
-
-
-
 
 
 
@@ -509,10 +533,10 @@ namespace CharacterController
         protected virtual void CheckMovement()
         {
 
-            if(groundAngle > m_SlopeLimit)
+            if(m_groundAngle > m_SlopeLimit)
             {
                 //Grab the direction that the controller is moving in
-                Vector3 absoluteMoveDirection = Vector3.ProjectOnPlane(m_transform.position - previousPosition, m_groundHit.normal);
+                Vector3 absoluteMoveDirection = Vector3.ProjectOnPlane(m_transform.position - m_previousPosition, m_groundHit.normal);
 
                 // Retrieve a vector pointing down the slope
                 Vector3 r = Vector3.Cross(m_groundHit.normal, -m_transform.up);
@@ -611,18 +635,18 @@ namespace CharacterController
                         if (DebugCollisions) Debug.DrawLine(RaycastOrigin - slopeCheckOffset, slopeHit2.point, Grounded ? Color.green : Color.gray);
 
                         float backAngle = Vector3.Angle(slopeHit2.normal, Vector3.up);
-                        float[] groundAngles = { groundAngle, forwardAngle, backAngle };
+                        float[] groundAngles = { m_groundAngle, forwardAngle, backAngle };
                         Array.Sort(groundAngles);
-                        groundAngle = groundAngles[1];
+                        m_groundAngle = groundAngles[1];
                     } else {
-                        groundAngle = (groundAngle + forwardAngle) / 2;
+                        m_groundAngle = (m_groundAngle + forwardAngle) / 2;
                     }
                 }
 
-                if (groundAngle > 0)
+                if (m_groundAngle > 0)
                 {
                     //  What to do if ground angle is greater than slope limit.
-                    if (groundAngle > m_SlopeLimit)
+                    if (m_groundAngle > m_SlopeLimit)
                     {
                         //  sliding is true.
                         Moving = false;
@@ -668,7 +692,7 @@ namespace CharacterController
             }
 
 
-            //CharacterDebug.Log("<color=green>Ground Angle</color>", groundAngle);
+            //CharacterDebug.Log("<color=green>Ground Angle</color>", m_groundAngle);
 
         }
 
@@ -705,16 +729,15 @@ namespace CharacterController
             }
             else
             {
-                m_velocity += Gravity * m_deltaTime * m_gravityModifier;
+                Vector3 verticalVelocity = Vector3.Project(m_previousVelocity, m_gravity);
+                verticalVelocity += m_gravity * m_gravityModifier * m_deltaTime;
+
+
+
+                m_velocity += verticalVelocity;
+
+                Debug.Log(verticalVelocity);
             }
-
-
-
-
-            //if(m_grounded) m_rigidbody.velocity = Vector3.ProjectOnPlane(m_rigidbody.velocity, m_groundHit.normal * m_groundStickiness);
-
-
-
 
         }
 
@@ -740,58 +763,9 @@ namespace CharacterController
 
             m_rigidbody.angularVelocity = Vector3.Lerp(m_rigidbody.angularVelocity, m_angularVelocity, m_deltaTime * m_rotationSpeed);
 
-            //m_rigidbody.MoveRotation(RootMotionRotation.normalized);
-
-
-            //var start = 135f * Mathf.Sign(m_moveAngle);
-            //float percentage = Mathf.Clamp(m_moveAngle, -Mathf.Abs(start), Mathf.Abs(start)) / start;
-
-            //float moveAmount = Mathf.Clamp01(Mathf.Abs(m_moveDirection.x) + Mathf.Abs(m_moveDirection.z));
-            //moveAmount = MathUtil.Round(moveAmount);
-            //float rotationSpeed = Mathf.Lerp(0, m_rotationSpeed * 2, moveAmount);
-
-
-            //float currentAngle = Mathf.SmoothDampAngle(m_moveAngle, 0, ref rotationAngleSmooth, 0.12f);
-            ////float currentAngle = Mathf.Lerp(m_moveAngle, 0, percentage);
 
 
 
-            //Quaternion currentRotation = Quaternion.AngleAxis(currentAngle, m_transform.up);
-            //m_angularVelocity = m_transform.up * currentAngle;
-
-
-            ////  Update angular velocity.
-            //m_rigidbody.angularDrag = Mathf.SmoothDamp(m_rigidbody.angularDrag, moveAmount > 0 ? 0.05f : m_Mass, ref angularDragSmooth, 0.16f);
-            //m_rigidbody.angularVelocity = Vector3.Slerp(m_rigidbody.angularVelocity, m_angularVelocity, m_deltaTime * rotationSpeed);
-            ////CharacterDebug.Log("<b><color=yellow>*** Angular V </color></b>", m_angularVelocity);
-            ////CharacterDebug.Log("<b><color=yellow>*** Current R </color></b>", currentRotation);
-            //currentRotation = Quaternion.Slerp(m_transform.rotation, currentRotation * m_transform.rotation, (m_rotationSpeed * m_deltaTime) * (m_rotationSpeed * m_deltaTime));
-            //m_rigidbody.MoveRotation(currentRotation);
-
-
-
-            //if(m_moveAngle > 0)
-            //{
-            //    //  Get angular velocity.
-            //    m_angularRotation.ToAngleAxis(out float angleInDegrees, out Vector3 rotationAxis);
-            //    rotationAxis.Normalize();
-            //    m_angularVelocity = rotationAxis * angleInDegrees * Mathf.Deg2Rad * m_rotationSpeed;
-            //    //  Set the rigidbody angular velocity.
-            //    m_rigidbody.angularVelocity = m_angularVelocity;
-
-
-
-            //    var step = m_rotationSpeed * m_deltaTime;
-            //    //  Calculate rotation based on velocity.
-            //    Quaternion velocityRotation = Quaternion.LookRotation(m_velocity, Vector3.up);
-            //    float eulerY = m_transform.rotation.eulerAngles.y;
-            //    eulerY = Mathf.LerpAngle(eulerY, velocityRotation.eulerAngles.y, step);
-
-            //    //  Calculate rotation based on lookRotation.
-
-            //    Quaternion rotationAdjusted = Quaternion.RotateTowards(m_transform.rotation, LookRotation, step);
-
-            //}
 
             //if (LookDirection.sqrMagnitude > 0f)
             //{
@@ -809,14 +783,10 @@ namespace CharacterController
             ////        currentRotation = Quaternion.FromToRotation((currentRotation * Vector3.up), smoothedNormal) * currentRotation;
             ////    }
             ////}
-
-
-
             //
             //  AddRelativeTorque adds torque according to its Inertia Tensors. Therefore, the desired angular
             //  velocity must be transformed according to the Inertia Tensor, to get the required Torque.
             //
-
             //// Rotate about Y principal axis
             //Vector3 desiredAngularVelInY = new Vector3(0, Mathf.PI, 0); //  1/2 revs per second 
             //Vector3 torque = rigidbodyCached.inertiaTensorRotation * Vector3.Scale(rigidbodyCached.inertiaTensor, desiredAngularVelInY);
@@ -839,9 +809,11 @@ namespace CharacterController
         /// </summary>
         protected virtual void ApplyMovement()
         {
+            //m_rigidbody.velocity = m_velocity;
+            //m_rigidbody.velocity = Vector3.SmoothDamp(m_rigidbody.velocity, m_velocity, ref velocitySmooth, 0.1f);
             //  Set rigidbody velocity.
             m_rigidbody.velocity = Vector3.Lerp(m_rigidbody.velocity, m_velocity, m_deltaTime * 10);
-            //                m_velocity = Vector3.SmoothDamp(m_velocity, m_velocity, ref velocitySmooth, 0.1f);
+            ////                
 
         }
 
@@ -852,7 +824,6 @@ namespace CharacterController
         protected virtual void UpdateAnimator()
         {
             
-            m_animator.SetBool(HashID.Grounded, Grounded);
             m_animator.SetBool(HashID.Moving, Moving);
 
             var viewAngle = GetAngleFromForward(LookRotation * m_transform.forward);
@@ -864,17 +835,6 @@ namespace CharacterController
             m_animator.SetFloat(HashID.Speed, Speed);
 
 
-            //m_Speed = InputVector.normalized.sqrMagnitude * (Movement == MovementTypes.Adventure ? 1 : 0);
-            //m_animator.SetFloat(HashID.Speed, Speed);
-
-            //float rotation = GetAngleFromForward(m_transform.forward) - deltaAngle;
-            //deltaAngle = 0;
-            //rotation *= 0.01f;
-            //rotation = Mathf.Clamp(rotation / Time.deltaTime, -1f, 1f);
-            //rotation = MathUtil.Round(rotation, 8);
-            //CharacterDebug.Log("<b><color=orange>*** rotation 1</color></b>", rotation);
-            //m_animator.SetFloat(HashID.Rotation, rotation);
-            //CharacterDebug.Log("<b><color=orange>*** rotation 1</color></b>", m_moveAngle);
             m_animator.SetFloat(HashID.Rotation, m_moveAngle);
             //m_animator.SetFloat(HashID.Rotation, m_moveAngle, 0.1f, m_deltaTime);
 
@@ -947,18 +907,6 @@ namespace CharacterController
         }
 
 
-        public Vector3 GetDirectionTangentToSurface(Vector3 normal)
-        {
-            Vector3 tangent;
-            Vector3 t1 = Vector3.Cross(normal, Vector3.forward);
-            Vector3 t2 = Vector3.Cross(normal, Vector3.up);
-            if (t1.sqrMagnitude > t2.sqrMagnitude) {
-                tangent = t1;
-            } else {
-                tangent = t2;
-            }
-            return tangent;
-        }
 
         public Vector3 GetDirectionTangentToSurface(Vector3 direction, Vector3 surfaceNormal)
         {
@@ -1085,6 +1033,39 @@ namespace CharacterController
         #region Public Functions
 
 
+        protected Vector3 GetDisplacement(Vector3 initialVelocity, Vector3 acceleration, float time)
+        {
+            Vector3 displacement = initialVelocity * time + (acceleration * (time * time)) / 2;
+            return displacement;
+        }
+
+        protected Vector3 GetFinalVelocity(Vector3 initialVelocity, Vector3 acceleration, float time)
+        {
+            return initialVelocity + acceleration * time; 
+        }
+
+
+        /// <summary>
+        /// Get the distance with final velocity.
+        /// </summary>
+        /// <param name="acceleration">Forward acceleration</param>
+        /// <returns>Distance.</returns>
+        protected float GetDistance(float acceleration)
+        {
+            Vector3 u = m_rigidbody.velocity;
+            Vector3 a = m_GroundAcceleration;
+            float t = m_deltaTime;
+            Vector3 v = u + (a * t);
+
+            return (u.sqrMagnitude - v.sqrMagnitude) / -2 * a.z;
+        }
+
+
+        //protected Vector3 GetDisplacement(Vector3 velocity, Vector3 accceleration, float time)
+        //{
+        //    return velocity * time - (accceleration * (time * time)) / 2;
+        //}
+
 
         // Scale the capsule collider to 'mlp' of the initial value
         protected void ScaleCapsule( float scale )
@@ -1139,7 +1120,7 @@ namespace CharacterController
         }
 
 
-        protected Vector3 GetAcceleration(Vector3 finalVelocity, Vector3 initialVelocity, Vector3 distance)
+        protected Vector3 GetAcceleration(Vector3 initialVelocity, Vector3 finalVelocity, Vector3 distance )
         {
             Vector3 vf = new Vector3(finalVelocity.x * finalVelocity.x, finalVelocity.y * finalVelocity.y, finalVelocity.z * finalVelocity.z);
             Vector3 vi = new Vector3(initialVelocity.x * initialVelocity.x, initialVelocity.y * initialVelocity.y, initialVelocity.z * initialVelocity.z);
@@ -1275,14 +1256,13 @@ namespace CharacterController
 
 
             DebugUI.Log(this, "m_inputVector", m_inputVector, RichTextColor.Green);
-            DebugUI.Log(this, "LookRotation", LookRotation, RichTextColor.Green);
+            DebugUI.Log(this, "LookRotation", LookRotation, RichTextColor.Blue);
             DebugUI.Log(this, "m_moveDirection", m_moveDirection, RichTextColor.Green);
             DebugUI.Log(this, "m_velocity", m_velocity, RichTextColor.Yellow);
-            DebugUI.Log(this, "m_velocity", m_velocity, RichTextColor.Yellow);
             DebugUI.Log(this, "rb_Velocity", m_rigidbody.velocity, RichTextColor.Green);
-            DebugUI.Log(this, "rb_VelocitySpeed", m_rigidbody.velocity.magnitude, RichTextColor.Green);
-            DebugUI.Log(this, "rb_AngularVel", m_rigidbody.angularVelocity, RichTextColor.DarkBlue);
-            DebugUI.Log(this, "rb_AngularVelSpeed", m_rigidbody.angularVelocity.magnitude, RichTextColor.DarkBlue);
+            //DebugUI.Log(this, "rb_VelocitySpeed", m_rigidbody.velocity.magnitude, RichTextColor.Green);
+            DebugUI.Log(this, "rb_AngularVel", m_rigidbody.angularVelocity, RichTextColor.Blue);
+            //DebugUI.Log(this, "rb_AngularVelSpeed", m_rigidbody.angularVelocity.magnitude, RichTextColor.Blue);
 
         }
 
@@ -1360,7 +1340,7 @@ namespace CharacterController
 //    //radius = 0.1f;
 //    Vector3 origin = m_transform.position + Vector3.up * (ColliderCenter.y - ColliderHeight / 2 + m_skinWidth);
 //    Vector3 sphereCastOrigin = origin + Vector3.up * radius;
-//    groundAngle = 0;
+//    m_groundAngle = 0;
 
 //    float groundDistance = 10;
 //    m_groundHit = new RaycastHit();
@@ -1371,13 +1351,13 @@ namespace CharacterController
 //    if (Physics.Raycast(origin, Vector3.down, out m_groundHit, airborneThreshold, m_collisionsLayerMask))
 //    {
 //        groundDistance = Vector3.Project(m_transform.position - m_groundHit.point, transform.up).magnitude;
-//        groundAngle = Vector3.Angle(m_groundHit.normal, Vector3.up);
+//        m_groundAngle = Vector3.Angle(m_groundHit.normal, Vector3.up);
 
 //        if (Physics.SphereCast(sphereCastOrigin, radius, Vector3.down, out m_groundHit, ColliderRadius + airborneThreshold, m_collisionsLayerMask))
 //        {
-//            groundAngle = Vector3.Angle(m_groundHit.normal, m_transform.up);
+//            m_groundAngle = Vector3.Angle(m_groundHit.normal, m_transform.up);
 
-//            if (groundAngle > m_SlopeLimit)
+//            if (m_groundAngle > m_SlopeLimit)
 //            {
 //                // Retrieve a vector pointing down the slope
 //                Vector3 r = Vector3.Cross(m_groundHit.normal, -transform.up);
@@ -1389,7 +1369,7 @@ namespace CharacterController
 //                // Properties of the flushHit ground
 //                if (Physics.Raycast(flushOrigin, v, out m_groundHit, radius * 2, m_collisionsLayerMask))//Perform Raycast
 //                {
-//                    float cos = 1 / Mathf.Cos(groundAngle);
+//                    float cos = 1 / Mathf.Cos(m_groundAngle);
 //                    float smallerRadius = radius * 0.9f;
 //                    float hypS = smallerRadius * cos;
 //                    float hypB = radius * cos;
@@ -1420,7 +1400,7 @@ namespace CharacterController
 
 
 
-//    if (groundDistance < 0.05f && groundAngle < 85)
+//    if (groundDistance < 0.05f && m_groundAngle < 85)
 //    {
 //        m_grounded = true;
 
@@ -1439,7 +1419,7 @@ namespace CharacterController
 //        if(groundDistance > airborneThreshold)
 //        {
 //            m_grounded = false;
-//            groundAngle = 0;
+//            m_groundAngle = 0;
 //            m_groundHit.point = m_transform.position + Vector3.up * airborneThreshold;
 //            m_groundHit.normal = m_transform.up;
 //        }
@@ -1461,5 +1441,110 @@ namespace CharacterController
 
 
 //    DebugUI.Log(this, "GroundDistance", MathUtil.Round(groundDistance), RichTextColor.Brown);
-//    DebugUI.Log(this, "GroundAngle", MathUtil.Round(groundAngle), RichTextColor.Brown);
+//    DebugUI.Log(this, "GroundAngle", MathUtil.Round(m_groundAngle), RichTextColor.Brown);
+//}
+
+
+///// <summary>
+///// Update the character’s rotation values.
+///// </summary>
+//protected virtual void UpdateRotation()
+//{
+//    //if (LookDirection.sqrMagnitude > 0f)
+//    //{
+//    //    Vector3 smoothLookDirection = Vector3.Slerp(m_transform.forward, LookDirection, 1 - Mathf.Exp(-10 * deltaTime)).normalized;
+//    //    currentRotation = Quaternion.LookRotation(m_transform.TransformDirection(smoothLookDirection), m_transform.up);
+//    //    m_rigidbody.MoveRotation(currentRotation);
+//    //}
+
+//    //angle *= (1.01f - (Mathf.Abs(angle) / 180f)) * stationaryTurnSpeedMlp;
+
+//    m_angularRotation.ToAngleAxis(out float angle, out Vector3 axis);
+//    m_angularVelocity = axis.normalized * angle;
+
+//    DebugUI.Log(this, "Angle", angle, RichTextColor.Magenta);
+
+//    m_rigidbody.angularVelocity = Vector3.Lerp(m_rigidbody.angularVelocity, m_angularVelocity, m_deltaTime * m_rotationSpeed);
+
+//    //m_rigidbody.MoveRotation(RootMotionRotation.normalized);
+
+
+//    //var start = 135f * Mathf.Sign(m_moveAngle);
+//    //float percentage = Mathf.Clamp(m_moveAngle, -Mathf.Abs(start), Mathf.Abs(start)) / start;
+
+//    //float moveAmount = Mathf.Clamp01(Mathf.Abs(m_moveDirection.x) + Mathf.Abs(m_moveDirection.z));
+//    //moveAmount = MathUtil.Round(moveAmount);
+//    //float rotationSpeed = Mathf.Lerp(0, m_rotationSpeed * 2, moveAmount);
+
+
+//    //float currentAngle = Mathf.SmoothDampAngle(m_moveAngle, 0, ref rotationAngleSmooth, 0.12f);
+//    ////float currentAngle = Mathf.Lerp(m_moveAngle, 0, percentage);
+
+
+
+//    //Quaternion currentRotation = Quaternion.AngleAxis(currentAngle, m_transform.up);
+//    //m_angularVelocity = m_transform.up * currentAngle;
+
+
+//    ////  Update angular velocity.
+//    //m_rigidbody.angularDrag = Mathf.SmoothDamp(m_rigidbody.angularDrag, moveAmount > 0 ? 0.05f : m_Mass, ref angularDragSmooth, 0.16f);
+//    //m_rigidbody.angularVelocity = Vector3.Slerp(m_rigidbody.angularVelocity, m_angularVelocity, m_deltaTime * rotationSpeed);
+//    ////CharacterDebug.Log("<b><color=yellow>*** Angular V </color></b>", m_angularVelocity);
+//    ////CharacterDebug.Log("<b><color=yellow>*** Current R </color></b>", currentRotation);
+//    //currentRotation = Quaternion.Slerp(m_transform.rotation, currentRotation * m_transform.rotation, (m_rotationSpeed * m_deltaTime) * (m_rotationSpeed * m_deltaTime));
+//    //m_rigidbody.MoveRotation(currentRotation);
+
+
+
+//    //if(m_moveAngle > 0)
+//    //{
+//    //    //  Get angular velocity.
+//    //    m_angularRotation.ToAngleAxis(out float angleInDegrees, out Vector3 rotationAxis);
+//    //    rotationAxis.Normalize();
+//    //    m_angularVelocity = rotationAxis * angleInDegrees * Mathf.Deg2Rad * m_rotationSpeed;
+//    //    //  Set the rigidbody angular velocity.
+//    //    m_rigidbody.angularVelocity = m_angularVelocity;
+
+
+
+//    //    var step = m_rotationSpeed * m_deltaTime;
+//    //    //  Calculate rotation based on velocity.
+//    //    Quaternion velocityRotation = Quaternion.LookRotation(m_velocity, Vector3.up);
+//    //    float eulerY = m_transform.rotation.eulerAngles.y;
+//    //    eulerY = Mathf.LerpAngle(eulerY, velocityRotation.eulerAngles.y, step);
+
+//    //    //  Calculate rotation based on lookRotation.
+
+//    //    Quaternion rotationAdjusted = Quaternion.RotateTowards(m_transform.rotation, LookRotation, step);
+
+//    //}
+
+//    //if (LookDirection.sqrMagnitude > 0f)
+//    //{
+//    //    Vector3 smoothLookDirection = Vector3.Slerp(m_transform.forward, LookDirection, 1 - Mathf.Exp(-10 * deltaTime)).normalized;
+//    //    currentRotation = Quaternion.LookRotation(smoothLookDirection, m_transform.up);
+//    //}
+//    ////if (Grounded)
+//    ////{
+//    ////    var hits = Physics.RaycastNonAlloc(m_transform.position + m_transform.rotation * ColliderCenter, -m_transform.up, probedHits, ColliderHeight, m_collisionsLayerMask);
+//    ////    totalRaycastHits += hits;
+//    ////    if (hits > 0)
+//    ////    {
+//    ////        float groundReorientSharpness = 10f;
+//    ////        Vector3 smoothedNormal = Vector3.Slerp(m_transform.up, LookDirection, 1 - Mathf.Exp(-groundReorientSharpness * deltaTime)).normalized;  //  VectorB (LookDirection) should be the closest hit from the RaycastNonAlloac
+//    ////        currentRotation = Quaternion.FromToRotation((currentRotation * Vector3.up), smoothedNormal) * currentRotation;
+//    ////    }
+//    ////}
+
+
+
+//    //
+//    //  AddRelativeTorque adds torque according to its Inertia Tensors. Therefore, the desired angular
+//    //  velocity must be transformed according to the Inertia Tensor, to get the required Torque.
+//    //
+
+//    //// Rotate about Y principal axis
+//    //Vector3 desiredAngularVelInY = new Vector3(0, Mathf.PI, 0); //  1/2 revs per second 
+//    //Vector3 torque = rigidbodyCached.inertiaTensorRotation * Vector3.Scale(rigidbodyCached.inertiaTensor, desiredAngularVelInY);
+//    //rigidbody.AddRelativeTorque(torque, ForceMode.Impulse);
 //}

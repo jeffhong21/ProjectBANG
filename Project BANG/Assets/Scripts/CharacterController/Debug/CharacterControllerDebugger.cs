@@ -76,6 +76,8 @@
                 debugUIView = Resources.Load<DebugUIView>("DebugUIView");
             debugUIView = UnityEngine.Object.Instantiate(debugUIView);
             Debug.Log(DebugUIView.Instance);
+
+            debugUIView.gameObject.SetActive(states.showDebugUI);
         }
 
 

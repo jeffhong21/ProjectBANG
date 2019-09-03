@@ -106,10 +106,8 @@
             StateBehavior[] stateBehaviors = m_animator.GetBehaviours<StateBehavior>();
             if (stateBehaviors.Length > 0) {
                 for (int i = 0; i < stateBehaviors.Length; i++) {
-                    stateBehaviors[i].Initialize(this);
+                    stateBehaviors[i].Initialize(this, m_animator);
                 }
-            } else {
-                Debug.Log("Animator has no state behaviors.");
             }
         }
 

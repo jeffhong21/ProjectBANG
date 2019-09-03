@@ -6,22 +6,21 @@
     public abstract class StateBehavior : StateMachineBehaviour
     {
 
-
-
-
-        [SerializeField]
-        protected AnimatorMonitor animatorMonitor;
-        private bool isInitialized;
+        protected AnimatorMonitor m_animatorMonitor;
+        protected Animator m_animator;
+        private bool m_isInitialized;
 
 
 
 
-        public void Initialize( AnimatorMonitor am )
+        public void Initialize(AnimatorMonitor animatorMonitor, Animator animator)
         {
-
-            animatorMonitor = am;
+            m_animatorMonitor = animatorMonitor;
+            m_animator = animator;
             OnInitialize();
         }
+
+
 
         //protected virtual void OnDestroy()
         //{
