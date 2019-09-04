@@ -86,7 +86,6 @@ namespace CharacterController
             pivotPosition.y = m_transform.position.y;
 
 
-            CharacterDebug.Log("<color=blue>* FeetPivotWeight *</color>", MathUtil.Round(feetPivotActive));
             return pivotPosition;
         }
 

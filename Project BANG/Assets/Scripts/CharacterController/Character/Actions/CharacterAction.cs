@@ -122,6 +122,7 @@
             m_Inventory = GetComponent<Inventory>();
             m_GameObject = gameObject;
             m_Transform = transform;
+            m_CapsuleCollider = GetComponent<CapsuleCollider>();
             //m_DeltaTime = Time.deltaTime;
 
             //EventHandler.RegisterEvent<CharacterAction, bool>(m_GameObject, "OnCharacterActionActive", OnActionActive);
@@ -149,9 +150,9 @@
                 }
             }
 
-            m_CapsuleCollider = m_Controller.Collider;
-            m_ColliderHeight = m_CapsuleCollider.height;
-            m_ColliderCenter = m_CapsuleCollider.center;
+            //if(m_CapsuleCollider == null) m_CapsuleCollider = m_Controller.Collider;
+            //m_ColliderHeight = m_CapsuleCollider.height;
+            //m_ColliderCenter = m_CapsuleCollider.center;
         }
 
 

@@ -53,6 +53,9 @@ namespace DebugUI
 
         public static void Log<T>(T value, string property, string message, RichTextColor propertyColor = defaultColor, RichTextColor messageColor = defaultColor) where T : class
         {
+            if (!DebugUIView.Instance.enabled)
+                return;
+
             if (propertyLogs == null) propertyLogs = new Dictionary<object, Dictionary<string, string>>();
             //  Add the context object if not in the dictionary.
             if (!propertyLogs.ContainsKey(value))

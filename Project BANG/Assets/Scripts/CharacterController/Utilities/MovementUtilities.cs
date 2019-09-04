@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEditor;
 using System.Collections;
 
 public static class MovementUtilities
@@ -19,35 +20,6 @@ public static class MovementUtilities
     //}
 
 
-    public static class MotionPath
-    {
-        public static Transform transform;
-        public static Vector3[] points;
-
-
-        public static Vector3 GetPoint(Vector3 p0, Vector3 p1, Vector3 p2, float t)
-        {
-            t = Mathf.Clamp01(t);
-            float oneMinusT = 1f - t;
-            return
-                oneMinusT * oneMinusT * p0 +
-                2f * oneMinusT * t * p1 +
-                t * t * p2;
-        }
-
-        public static Vector3 GetFirstDerivative(Vector3 p0, Vector3 p1, Vector3 p2, float t)
-        {
-            return
-                2f * (1f - t) * (p1 - p0) +
-                2f * t * (p2 - p1);
-        }
-
-        public static Vector3 GetVelocity(float t)
-        {
-            return transform.TransformPoint(GetFirstDerivative(points[0], points[1], points[2], t)) -
-                transform.position;
-        }
-    }
 
 
 

@@ -46,6 +46,8 @@
         private float currentTime, totalTime;
 
 
+        private MotionUtil.MotionPath motionPath = new MotionUtil.MotionPath(10);
+
 
         #region Character Action Methods
 
@@ -163,7 +165,7 @@
 
             //  Cache variables
             cachedIsKinamatic = m_Rigidbody.isKinematic;
-            m_Rigidbody.isKinematic = true;
+            //m_Rigidbody.isKinematic = true;
 
 
             if(Mathf.Abs(endPosition.y - endReach.y) > m_CapsuleCollider.radius) {
@@ -179,6 +181,10 @@
 
             currentTime = 0;
             totalTime = 0.5f;
+
+
+            motionPath.CalculateTrajectory(startPosition, m_Transform.up, endPosition);
+            StartVault();
         }
 
 
@@ -188,6 +194,19 @@
             m_Rigidbody.MoveRotation(Quaternion.Slerp(rotation, m_Transform.rotation, m_DeltaTime * m_Controller.RotationSpeed));
             return false;
         }
+
+
+
+
+        protected void StartVault()
+        {
+            Vector3 verticalVelocity = Vector3.up * Mathf.Sqrt(2 * (platformHeight + 0.02f) * Mathf.Abs(m_Controller.Gravity.y));
+            m_Rigidbody.AddForce(verticalVelocity, ForceMode.VelocityChange);
+            Vector3 dir = platformEdge - m_Transform.position;
+        }
+
+
+
 
 
         public override bool UpdateMovement()
@@ -210,7 +229,7 @@
                 fwdPosition = Vector3.Lerp(m_Transform.position, endReach, perc * perc);
             }
 
-            m_Rigidbody.MovePosition((verticalPosition + fwdPosition));
+            //m_Rigidbody.MovePosition((verticalPosition + fwdPosition));
 
 
             if (m_Debug) DebugDraw.Sphere(verticalPosition + fwdPosition, 0.1f, Color.black);
@@ -219,6 +238,9 @@
                 m_Rigidbody.isKinematic = cachedIsKinamatic;
             }
 
+
+
+            m_Animator.MatchTarget(endPosition, Quaternion.identity, AvatarTarget.LeftHand, new MatchTargetWeightMask(Vector3.one, 0), 0.2f, 0.4f);
             return false;
         }
 
@@ -300,6 +322,7 @@
                 Gizmos.DrawWireSphere(endPosition,m_CapsuleCollider.radius);
 
 
+                motionPath.DrawMotionPath();
             }
         }
     }

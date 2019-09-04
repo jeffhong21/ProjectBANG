@@ -205,8 +205,8 @@ namespace CharacterController.CharacterCreator
             CharActions.Add(Fall);
             //var TakeDamage = _CharacterObject.AddComponent<TakeDamage>();
             //CharActions.Add(TakeDamage);
-            var Idle = _CharacterObject.AddComponent<Idle>();
-            CharActions.Add(Idle);
+//            var Idle = _CharacterObject.AddComponent<Idle>();
+    //        CharActions.Add(Idle);
 
             _CharacterObject.GetComponent<CharacterLocomotion>().CharActions = CharActions.ToArray();
         }

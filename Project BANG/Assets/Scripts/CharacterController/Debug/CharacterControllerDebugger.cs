@@ -138,25 +138,25 @@
             //GizmosUtils.DrawText(GUI.skin, MathUtil.Round(m_targetAngle).ToString(), transform.position + Vector3.up * 1.8f, Color.black);
 
 
-            if (states.showMotion)
-            {
-                Gizmos.color = Color.white;
-                Gizmos.DrawRay(transform.position + Vector3.up , transform.InverseTransformDirection(character.LookRotation * transform.TransformDirection(transform.forward)));
+            //if (states.showMotion)
+            //{
+            //    Gizmos.color = Color.white;
+            //    Gizmos.DrawRay(transform.position + Vector3.up , transform.InverseTransformDirection(character.LookRotation * transform.TransformDirection(transform.forward)));
 
 
 
 
-                Vector3 origin = transform.position + Vector3.up * heightOffset;
-                //  Move direction vector.
-                Gizmos.color = Color.blue;
-                GizmosUtils.DrawArrow(TransformOriginCast(heightOffset), transform.forward, 1f, arrowTipSize, arrowWidth);
-                //  Draw rotation vector.
-                Gizmos.color = Color.magenta;
-                GizmosUtils.DrawArrow(TransformOriginCast(heightOffset + 0.1f),Quaternion.Inverse(transform.rotation) * transform.TransformDirection(character.MoveDirection), 1f, arrowTipSize, arrowWidth);
-                //Gizmos.color = Color.blue;
-                ////  Velocity vector.
-                //GizmosUtils.DrawArrow(origin, m_velocity, m_velocity.magnitude, arrowTipSize, arrowWidth);
-            }
+            //    Vector3 origin = transform.position + Vector3.up * heightOffset;
+            //    //  Move direction vector.
+            //    Gizmos.color = Color.blue;
+            //    GizmosUtils.DrawArrow(TransformOriginCast(heightOffset), transform.forward, 1f, arrowTipSize, arrowWidth);
+            //    //  Draw rotation vector.
+            //    Gizmos.color = Color.magenta;
+            //    GizmosUtils.DrawArrow(TransformOriginCast(heightOffset + 0.1f),Quaternion.Inverse(transform.rotation) * transform.TransformDirection(character.MoveDirection), 1f, arrowTipSize, arrowWidth);
+            //    //Gizmos.color = Color.blue;
+            //    ////  Velocity vector.
+            //    //GizmosUtils.DrawArrow(origin, m_velocity, m_velocity.magnitude, arrowTipSize, arrowWidth);
+            //}
 
 
 

@@ -141,7 +141,6 @@ namespace CharacterController
 		{
             EventHandler.RegisterEvent<bool>(m_GameObject, EventIDs.OnAimActionStart, OnAimActionStart);
 
-            CharacterDebug.ActiveCharacter = m_Controller;
         }
 
 
@@ -149,7 +148,6 @@ namespace CharacterController
 		{
             EventHandler.UnregisterEvent<bool>(m_GameObject, EventIDs.OnAimActionStart, OnAimActionStart);
 
-            CharacterDebug.ActiveCharacter = null;
         }
 
 
@@ -192,7 +190,7 @@ namespace CharacterController
 
                     Vector3 fwd = Vector3.ProjectOnPlane(m_Camera.forward, transform.up);
                     Vector3 right = Vector3.Cross(fwd, Vector3.up);
-                    Quaternion referentialShift = Quaternion.FromToRotation(Vector3.forward, fwd);
+                    //Quaternion referentialShift = Quaternion.FromToRotation(Vector3.forward, fwd);
                     //m_inputVector = referentialShift * m_inputVector;
                     //m_inputVector = right * m_inputVector.x + fwd * m_inputVector.z;
                     m_inputVector = m_Camera.right * InputVector.x + lookDirection * InputVector.z;
@@ -221,6 +219,7 @@ namespace CharacterController
             }
 
             m_lookRotation = Quaternion.FromToRotation(m_transform.forward, lookDirection);
+            DebugUI.Log(this, "playerInput", m_inputVector, RichTextColor.Red);
 
             m_Controller.InputVector = m_inputVector;
             m_Controller.LookRotation = m_lookRotation;

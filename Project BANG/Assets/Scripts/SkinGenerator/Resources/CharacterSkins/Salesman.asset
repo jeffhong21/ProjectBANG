@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5cc0ee30f22748dd93ac13b5637600b, type: 3}
   m_Name: Salesman
   m_EditorClassIdentifier: 
-  setId: Salesman
+  setId: Frontier
   characterMesh: {fileID: 8893581994033333661, guid: 05aa7dfd142a047289fa0cecbbbbdb6f,
     type: 3}
   hairMesh: {fileID: 0}

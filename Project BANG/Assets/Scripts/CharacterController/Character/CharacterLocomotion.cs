@@ -37,7 +37,8 @@
 
 
         private Vector3 leftFootPosition, rightFootPosition;
-
+        //  Used to update the animator every X second.
+        private float m_animatorUpdateTimer;
 
 
         #region Properties
@@ -67,26 +68,26 @@
 
 
 
-        protected override void Awake()
+        private void Awake()
         {
-            base.Awake();
+
 
             for (int i = 0; i < m_Actions.Length; i++) {
                 m_Actions[i].Initialize(this, fixedDeltaTime);
             }
 
-            EventHandler.RegisterEvent<CharacterAction, bool>(m_GameObject, EventIDs.OnCharacterActionActive, OnActionActive);
-            EventHandler.RegisterEvent<ItemAction, bool>(m_GameObject, EventIDs.OnItemActionActive, OnItemActionActive);
-            EventHandler.RegisterEvent<bool>(m_GameObject, EventIDs.OnAimActionStart, OnAimActionStart);
+            //EventHandler.RegisterEvent<CharacterAction, bool>(m_GameObject, EventIDs.OnCharacterActionActive, OnActionActive);
+            //EventHandler.RegisterEvent<ItemAction, bool>(m_GameObject, EventIDs.OnItemActionActive, OnItemActionActive);
+            //EventHandler.RegisterEvent<bool>(m_GameObject, EventIDs.OnAimActionStart, OnAimActionStart);
 
         }
 
 
         protected void OnDestroy()
 		{
-            EventHandler.UnregisterEvent<CharacterAction, bool>(m_GameObject, EventIDs.OnCharacterActionActive, OnActionActive);
-            EventHandler.UnregisterEvent<ItemAction, bool>(m_GameObject, EventIDs.OnItemActionActive, OnItemActionActive);
-            EventHandler.UnregisterEvent<bool>(m_GameObject, EventIDs.OnAimActionStart, OnAimActionStart);
+            //EventHandler.UnregisterEvent<CharacterAction, bool>(m_GameObject, EventIDs.OnCharacterActionActive, OnActionActive);
+            //EventHandler.UnregisterEvent<ItemAction, bool>(m_GameObject, EventIDs.OnItemActionActive, OnItemActionActive);
+            //EventHandler.UnregisterEvent<bool>(m_GameObject, EventIDs.OnAimActionStart, OnAimActionStart);
 
 
         }
@@ -94,9 +95,16 @@
 
 
 
-        protected override void Update()
+        private void Update()
         {
-            base.Update();
+            timeScale = Time.timeScale;
+            if (Math.Abs(timeScale) < float.Epsilon) return;
+            m_deltaTime = deltaTime;
+
+
+            m_previousPosition = m_rigidbody.position;
+            m_previousVelocity = m_rigidbody.velocity;
+            m_previousMoveAngle = m_moveAngle;
 
 
 
@@ -127,9 +135,10 @@
         }
 
 
-        protected override void FixedUpdate()
+        private void FixedUpdate()
 		{
-            base.FixedUpdate();
+            if (Math.Abs(timeScale) < float.Epsilon) return;
+            m_deltaTime = fixedDeltaTime;
 
             //canMove = true;
 
@@ -197,11 +206,9 @@
         }
 
 
-        protected override void LateUpdate()
+        private void LateUpdate()
         {
-            base.LateUpdate();
-
-            //DebugDraw.Circle(m_animator.pivotPosition, transform.up, 0.1f, Color.yellow);
+            DebugAttributes();
         }
 
 
@@ -266,6 +273,15 @@
         protected override void UpdateAnimator()
         {
 
+            if(!m_moving && m_animatorUpdateTimer > 0.5f)
+            {
+                var viewAngle = GetAngleFromForward(LookRotation * m_transform.forward);
+                if (Mathf.Abs(viewAngle) < 0.1f)
+                    viewAngle = 0;
+                m_animator.SetFloat(HashID.LookAngle, viewAngle);
+
+                m_animatorUpdateTimer += m_deltaTime;
+            }
 
 
 
@@ -544,12 +560,11 @@
                     if(activated)
                     {
                         //Debug.LogFormat(" {0} is starting.", action.GetType().Name);
-                        CharacterDebug.Log(action.GetType().Name, action.GetType());
 
                     }
                     else
                     {
-                        CharacterDebug.Remove(action.GetType().Name);
+
                     }
                 }
             }
