@@ -1,18 +1,23 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class WallRun : MonoBehaviour
+﻿namespace CharacterController
 {
-    // Start is called before the first frame update
-    void Start()
+    using UnityEngine;
+    using System.Collections;
+
+
+    public class WallRun : CharacterAction
     {
-        
+        //public override int ActionID
+        //{
+        //    get { return m_ActionID = ActionTypeID.Jump; }
+        //    set { m_ActionID = value; }
+        //}
+
+
+
+
+
+
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
+

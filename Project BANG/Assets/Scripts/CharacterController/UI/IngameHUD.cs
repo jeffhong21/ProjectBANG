@@ -5,7 +5,7 @@ namespace CharacterController.UI
     using System.Collections;
     using TMPro;
 
-    public class IngameHUD : MonoBehaviour
+    public class InGameHUD : MonoBehaviour
     {
         public HUDCrosshair m_HUDCrosshair;
         //public HUDNotifications 

@@ -6,6 +6,8 @@
     public class ActionStateBehavior : StateBehavior
     {
         [SerializeField]
+        protected string m_characterAction;
+        [SerializeField]
         protected AnimatorMatchTarget m_matchTarget;
 
 

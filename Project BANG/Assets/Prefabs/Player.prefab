@@ -522,30 +522,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_useRootMotion: 1
-  m_RootMotionSpeedMultiplier: 1.2
-  m_RootMotionRotationMultiplier: 1
+  m_rootMotionSpeedMultiplier: 1
+  m_rootMotionRotationMultiplier: 1
   m_groundAcceleration: {x: 0.18, y: 0, z: 0.18}
-  m_AirborneAcceleration: {x: 0.15, y: 0, z: 0.15}
+  m_desiredSpeed: 4
   m_motorDamping: 0.3
-  m_AirborneDamping: 0.3
   m_rotationSpeed: 10
-  m_SlopeForceUp: 1
-  m_SlopeForceDown: 1.25
-  m_Mass: 100
+  m_mass: 100
   m_skinWidth: 0.08
-  m_SlopeLimit: 45
-  m_MaxStepHeight: 0.4
+  m_slopeLimit: 45
+  m_maxStepHeight: 0.4
+<<<<<<< HEAD
+  m_gravityModifier: 1.5
+=======
   m_gravityModifier: 1
+>>>>>>> ff7835c8... motion trajectory
   m_groundStickiness: 6
   m_collisionsLayerMask:
     serializedVersion: 2
     m_Bits: 0
-  m_MaxCollisionCount: 100
-  m_IdleRotationMultiplier: 1
+  m_maxCollisionCount: 100
   debugger:
     debugMode: 1
     states:
-      showDebugUI: 0
+      showDebugUI: 1
       showGroundCheck: 0
       showCollisions: 0
       showMotion: 0
@@ -558,7 +558,21 @@ MonoBehaviour:
     heightOffset: 0.05
     arrowTipSize: 0.2
     arrowWidth: 0.4
-  probedColiders: []
+  m_probedColliders: []
+  colliderBuffer: []
+  totalColliderHits: 0
+  totalRaycastHits: 0
+  m_sampleRate: 4
+  m_positionBias: 0.4
+  m_directionBias: 1.93
+<<<<<<< HEAD
+  m_motionPath:
+=======
+  m_trajectory:
+>>>>>>> ff7835c8... motion trajectory
+    timeHorizon: 0
+    sampleRate: 0
+    rootTransforms: []
   displayMovement: 0
   displayPhysics: 0
   displayAnimations: 0
@@ -649,7 +663,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   surfaceEffect: {fileID: 11400000, guid: 867b450d6e444446488210bdd678fdd5, type: 2}
-  minVelocity: 2
+<<<<<<< HEAD
+  minVelocity: 1.5
+=======
+  minVelocity: 1
+>>>>>>> ff7835c8... motion trajectory
   footstepMode: 0
   footOffset: 0.03
   leftFoot:
@@ -658,7 +676,7 @@ MonoBehaviour:
   rightFoot:
     foot: {fileID: 0}
     audioSource: {fileID: 0}
-  moveDirectionFrameCount: 7
+  moveDirectionFrameCount: 5
 --- !u!114 &5677065510297990036
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -688,7 +706,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2a82b269384f347a0b7be273becfa79a, type: 3}
   m_Name: 
@@ -701,15 +719,15 @@ MonoBehaviour:
   grounderIK: {fileID: 2629031370626121552}
   lookAtIK: {fileID: 8862121799659265725}
   aimIK: {fileID: 7912098401397699587}
-  hideInInspector: 0
+  hideInInspector: 1
 --- !u!114 &3255356862830679799
 MonoBehaviour:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a70e525c82ce9413fa4d940ad7fcf1db, type: 3}
   m_Name: 
@@ -1162,12 +1180,12 @@ MonoBehaviour:
     pullBodyHorizontal: 0
 --- !u!114 &2629031370626121552
 MonoBehaviour:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6c72e1df647af4c0098866e944a04b01, type: 3}
   m_Name: 
@@ -1200,12 +1218,12 @@ MonoBehaviour:
   spine: []
 --- !u!114 &8862121799659265725
 MonoBehaviour:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 776adaaacdc5c4e8ab0395120a6e972b, type: 3}
   m_Name: 
@@ -1227,6 +1245,7 @@ MonoBehaviour:
       length: 0
       sqrMag: 0
       axis: {x: -1, y: -0, z: -0}
+      baseForwardOffsetEuler: {x: 0, y: 0, z: 0}
     eyes: []
     bodyWeight: 0.5
     headWeight: 0.5
@@ -1262,7 +1281,7 @@ MonoBehaviour:
     spineTargetOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &7912098401397699587
 MonoBehaviour:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -1306,12 +1325,12 @@ MonoBehaviour:
   m_IsActive: 0
   m_StateName: 
   m_LayerIndex: 0
-  m_ActionID: -1
+  m_ActionID: 0
   m_TransitionDuration: 0.2
   m_StartType: 2
   m_StopType: 3
   m_InputNames:
-  - Mouse2
+  - Mouse1
   m_SpeedMultiplier: 1
   m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
@@ -1327,7 +1346,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eb969d52822a24d8dbd0b8c198a14803, type: 3}
   m_Name: 
@@ -1355,7 +1374,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5dcb0e67b11b04af4b61cb44c64d5a63, type: 3}
   m_Name: 
@@ -1475,7 +1494,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3f62eddceb76e4ce2aab0985c2db98db, type: 3}
   m_Name: 
@@ -1523,9 +1542,8 @@ MonoBehaviour:
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
   m_EndEffect: {fileID: 0}
-  m_Debug: 0
+  m_Debug: 1
   angleThreshold: 30
-  checkHeight: 0.4
   startDistance: 2
   minHeight: 0.4
   maxHeight: 2

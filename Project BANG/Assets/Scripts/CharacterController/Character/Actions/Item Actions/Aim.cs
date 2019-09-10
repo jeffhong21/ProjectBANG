@@ -50,13 +50,13 @@
 
 
 
-        public override string GetDestinationState(int layer)
-        {
-            if (layer == 0){
-                return m_StateName;
-            }
-            return "";
-        }
+        //public override string GetDestinationState(int layer)
+        //{
+        //    if (layer == 0){
+        //        return m_StateName;
+        //    }
+        //    return "";
+        //}
 
 
 

@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 6884373085003131461}
   - component: {fileID: 6513924248864699631}
   - component: {fileID: 2107964657153892928}
-  - component: {fileID: 498886786100752285}
-  m_Layer: 0
+  - component: {fileID: 4951243059357537578}
+  m_Layer: 27
   m_Name: Wall_4x3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28,7 +28,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 965002757867917307}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.5, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -67,6 +67,7 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -107,7 +108,7 @@ MonoBehaviour:
       m_Anchor: 9
     m_Material: {fileID: 0}
     m_SubmeshIndex: 0
-    m_ManualUV: 0
+    m_ManualUV: 1
     elementGroup: -1
     m_TextureGroup: -1
   - m_Indexes: 040000000500000006000000050000000700000006000000
@@ -124,7 +125,7 @@ MonoBehaviour:
       m_Anchor: 9
     m_Material: {fileID: 0}
     m_SubmeshIndex: 0
-    m_ManualUV: 0
+    m_ManualUV: 1
     elementGroup: -1
     m_TextureGroup: -1
   - m_Indexes: 08000000090000000a000000090000000b0000000a000000
@@ -141,7 +142,7 @@ MonoBehaviour:
       m_Anchor: 9
     m_Material: {fileID: 0}
     m_SubmeshIndex: 0
-    m_ManualUV: 0
+    m_ManualUV: 1
     elementGroup: -1
     m_TextureGroup: -1
   - m_Indexes: 0c0000000d0000000e0000000d0000000f0000000e000000
@@ -158,7 +159,7 @@ MonoBehaviour:
       m_Anchor: 9
     m_Material: {fileID: 0}
     m_SubmeshIndex: 0
-    m_ManualUV: 0
+    m_ManualUV: 1
     elementGroup: -1
     m_TextureGroup: -1
   - m_Indexes: 100000001100000012000000110000001300000012000000
@@ -175,7 +176,7 @@ MonoBehaviour:
       m_Anchor: 9
     m_Material: {fileID: 0}
     m_SubmeshIndex: 0
-    m_ManualUV: 0
+    m_ManualUV: 1
     elementGroup: -1
     m_TextureGroup: -1
   - m_Indexes: 140000001500000016000000150000001700000016000000
@@ -192,7 +193,7 @@ MonoBehaviour:
       m_Anchor: 9
     m_Material: {fileID: 0}
     m_SubmeshIndex: 0
-    m_ManualUV: 0
+    m_ManualUV: 1
     elementGroup: -1
     m_TextureGroup: -1
   m_SharedVertices:
@@ -206,30 +207,30 @@ MonoBehaviour:
   - m_Vertices: 0b0000000e00000012000000
   m_SharedTextures: []
   m_Positions:
-  - {x: -2, y: -1.5, z: 0.125}
-  - {x: 2, y: -1.5, z: 0.125}
-  - {x: -2, y: 1.5, z: 0.125}
-  - {x: 2, y: 1.5, z: 0.125}
-  - {x: 2, y: -1.5, z: 0.125}
-  - {x: 2, y: -1.5, z: -0.125}
-  - {x: 2, y: 1.5, z: 0.125}
-  - {x: 2, y: 1.5, z: -0.125}
-  - {x: 2, y: -1.5, z: -0.125}
-  - {x: -2, y: -1.5, z: -0.125}
-  - {x: 2, y: 1.5, z: -0.125}
-  - {x: -2, y: 1.5, z: -0.125}
-  - {x: -2, y: -1.5, z: -0.125}
-  - {x: -2, y: -1.5, z: 0.125}
-  - {x: -2, y: 1.5, z: -0.125}
-  - {x: -2, y: 1.5, z: 0.125}
-  - {x: -2, y: 1.5, z: 0.125}
-  - {x: 2, y: 1.5, z: 0.125}
-  - {x: -2, y: 1.5, z: -0.125}
-  - {x: 2, y: 1.5, z: -0.125}
-  - {x: -2, y: -1.5, z: -0.125}
-  - {x: 2, y: -1.5, z: -0.125}
-  - {x: -2, y: -1.5, z: 0.125}
-  - {x: 2, y: -1.5, z: 0.125}
+  - {x: 0, y: 0, z: 0.125}
+  - {x: 4, y: 0, z: 0.125}
+  - {x: 0, y: 3, z: 0.125}
+  - {x: 4, y: 3, z: 0.125}
+  - {x: 4, y: 0, z: 0.125}
+  - {x: 4, y: 0, z: -0.125}
+  - {x: 4, y: 3, z: 0.125}
+  - {x: 4, y: 3, z: -0.125}
+  - {x: 4, y: 0, z: -0.125}
+  - {x: 0, y: 0, z: -0.125}
+  - {x: 4, y: 3, z: -0.125}
+  - {x: 0, y: 3, z: -0.125}
+  - {x: 0, y: 0, z: -0.125}
+  - {x: 0, y: 0, z: 0.125}
+  - {x: 0, y: 3, z: -0.125}
+  - {x: 0, y: 3, z: 0.125}
+  - {x: 0, y: 3, z: 0.125}
+  - {x: 4, y: 3, z: 0.125}
+  - {x: 0, y: 3, z: -0.125}
+  - {x: 4, y: 3, z: -0.125}
+  - {x: 0, y: 0, z: -0.125}
+  - {x: 4, y: 0, z: -0.125}
+  - {x: 0, y: 0, z: 0.125}
+  - {x: 4, y: 0, z: 0.125}
   m_Textures0:
   - {x: 2, y: -1.5}
   - {x: -2, y: -1.5}
@@ -302,8 +303,8 @@ MonoBehaviour:
   - a: 3
     b: 2
   m_SelectedVertices: 00000000010000000200000003000000
---- !u!64 &498886786100752285
-MeshCollider:
+--- !u!65 &4951243059357537578
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -312,7 +313,6 @@ MeshCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Convex: 1
-  m_CookingOptions: 14
-  m_Mesh: {fileID: 0}
+  serializedVersion: 2
+  m_Size: {x: 4, y: 3, z: 0.25}
+  m_Center: {x: 2, y: 1.5, z: 0}

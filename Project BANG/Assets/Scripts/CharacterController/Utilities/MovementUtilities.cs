@@ -200,21 +200,27 @@ public static class MovementUtilities
 
     //private static RaycastHit[] s_Hits = new RaycastHit[64];
 
-    //public static bool RaycastNonAllocSingle( Ray ray, out RaycastHit hit, float maxDistance = Mathf.Infinity, int layerMask = Physics.DefaultRaycastLayers, Transform ignoreRoot = null, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal )
+    //public static bool RaycastNonAllocSingle(Ray ray, out RaycastHit hit, float maxDistance = Mathf.Infinity, int layerMask = Physics.DefaultRaycastLayers, Transform ignoreRoot = null, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
     //{
-
+    //    int closest = -1;
     //    int hitCount = Physics.RaycastNonAlloc(ray, s_Hits, maxDistance, layerMask, queryTriggerInteraction);
-    //    if (hitCount > 0) {
+    //    if (hitCount > 0)
+    //    {
     //        // Get the closest (not ignored)int closest = -1;
-    //        for (int i = 0; i < hitCount; ++i) {
+    //        for (int i = 0; i < hitCount; ++i)
+    //        {
     //            // Check if closer
-    //            if (closest == -1 || s_Hits[i].distance < s_Hits[closest].distance) {
-    //                if (ignoreRoot != null) {
+    //            if (closest == -1 || s_Hits[i].distance < s_Hits[closest].distance)
+    //            {
+    //                if (ignoreRoot != null)
+    //                {
     //                    // Check if transform or parents match ignore root
     //                    Transform t = s_Hits[i].transform;
     //                    bool ignore = false;
-    //                    while (t != null) {
-    //                        if (t == ignoreRoot) {
+    //                    while (t != null)
+    //                    {
+    //                        if (t == ignoreRoot)
+    //                        {
     //                            ignore = true;
     //                            break;
     //                        }
@@ -224,12 +230,14 @@ public static class MovementUtilities
     //                    // Not ignored. This is closest
     //                    if (!ignore)
     //                        closest = i;
-    //                } else
+    //                }
+    //                else
     //                    closest = i;
     //            }
     //        }
     //        // Check if all ignored
-    //        if (closest == -1) {
+    //        if (closest == -1)
+    //        {
     //            hit = new RaycastHit();
     //            return false;
     //        }
@@ -237,7 +245,9 @@ public static class MovementUtilities
     //        // Return the relevant hit
     //        hit = s_Hits[closest];
     //        return true;
-    //    } else {
+    //    }
+    //    else
+    //    {
     //        hit = new RaycastHit();
     //        return false;
     //    }

@@ -1,10 +1,107 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+using Unity.Mathematics;
+
 public static class MotionUtil
 {
 
+    //public static Trajectory PredictTrajectory(ref Trajectory trajectory, Vector3 linearVelocity, float positionBias, float directionBias)
+    //{
 
+    //    float sampleRate = trajectory.sampleRate;
+    //    int halfTrajectoryLength = trajectory.Length / 2;
+
+    //    float desiredOrientation = 0;
+    //    Vector3 desiredLinearDisplacement = linearVelocity / sampleRate;
+    //    if (math.length(desiredLinearDisplacement) >= 0.01f)
+    //    {
+    //        desiredOrientation = math.atan2(desiredLinearDisplacement.x, desiredLinearDisplacement.z);
+    //    }
+
+    //    Quaternion targetRotation = Quaternion.AngleAxis(desiredOrientation, Vector3.up);
+
+    //    Vector3[] trajectoryPositions = new Vector3[halfTrajectoryLength];
+    //    trajectoryPositions[0] = trajectory[halfTrajectoryLength].t;
+
+    //    for (int i = 1; i < halfTrajectoryLength; i++)
+    //    {
+    //        float percentage = (float)i / (float)(halfTrajectoryLength - 1);
+
+    //        float oneMinusPercentage = 1.0f - percentage;
+    //        float blendedWeightDisplacement = 1f - math.pow(oneMinusPercentage, positionBias);
+    //        float blendedWeightOrientation = 1f - math.pow(oneMinusPercentage, directionBias);
+
+    //        Vector3 trajectoryDisplacement = trajectory[halfTrajectoryLength + i].t - trajectory[halfTrajectoryLength + i - 1].t;
+    //        Vector3 adjustedTrajectoryDisplacement = Vector3.Lerp(trajectoryDisplacement, desiredLinearDisplacement, blendedWeightDisplacement);
+
+    //        trajectoryPositions[i] = trajectoryPositions[i - 1] + adjustedTrajectoryDisplacement;
+
+    //        trajectory[halfTrajectoryLength + i].q = Quaternion.Slerp(trajectory[halfTrajectoryLength + i].q, targetRotation, blendedWeightOrientation);
+    //    }
+
+<<<<<<< HEAD
+
+    //    for (int i = 1; i < halfTrajectoryLength; i++)
+    //    {
+    //        trajectory[halfTrajectoryLength + i] =
+    //            new AffineTransform(trajectoryPositions[i],
+    //            trajectory[halfTrajectoryLength + i].q);
+    //    }
+
+
+    //    return trajectory;
+    //}
+
+
+    //protected void DrawTrajectory(float drawPercentage)
+    //{
+    //    float sphereSize = 0.1f;
+
+    //    if (drawPercentage < 0) drawPercentage = Mathf.Abs(drawPercentage);
+    //    if (drawPercentage > 1) drawPercentage = Mathf.Clamp01(drawPercentage / m_trajectory.sampleRate);
+
+    //    int drawCount = Mathf.FloorToInt(drawPercentage * m_trajectory.sampleRate);
+
+    //    for (int i = 0; i < drawCount; i++)
+    //    {
+    //        DebugDraw.Sphere(m_trajectory[i].translation, sphereSize, Color.green);
+    //        if (i != drawCount)
+    //            Debug.DrawLine(m_trajectory[i].translation.AddY(0.1f), m_trajectory[i + 1].translation.AddY(0.1f), Color.green);
+    //    }
+
+
+=======
+
+    //    for (int i = 1; i < halfTrajectoryLength; i++)
+    //    {
+    //        trajectory[halfTrajectoryLength + i] =
+    //            new AffineTransform(trajectoryPositions[i],
+    //            trajectory[halfTrajectoryLength + i].q);
+    //    }
+
+
+    //    return trajectory;
+    //}
+
+
+    //public static void DrawTrajectory(ref Trajectory trajectory, float drawPercentage)
+    //{
+    //    float sphereSize = 0.1f;
+
+    //    if (drawPercentage < 0) drawPercentage = Mathf.Abs(drawPercentage);
+    //    if (drawPercentage > 1) drawPercentage = Mathf.Clamp01(drawPercentage / trajectory.sampleRate);
+
+    //    int drawCount = Mathf.FloorToInt(drawPercentage * trajectory.sampleRate);
+
+    //    for (int i = 0; i < drawCount; i++)
+    //    {
+    //        DebugDraw.Sphere(trajectory[i].t, sphereSize, Color.green);
+    //        if (i != drawCount)
+    //            Debug.DrawLine(trajectory[i].t.AddY(0.1f), trajectory[i + 1].t.AddY(0.1f), Color.green);
+    //    }
+>>>>>>> ff7835c8... motion trajectory
+    //}
 
 
 
@@ -115,7 +212,6 @@ public static class MotionUtil
         //}
 
     }
-
 
 
 

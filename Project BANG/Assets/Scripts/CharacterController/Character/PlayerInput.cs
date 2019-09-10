@@ -169,6 +169,7 @@ namespace CharacterController
             //CharacterDebugUI.Instance.Initialize(m_Controller);
             //Debug.Log(Resources.Load<CharacterDebugUI>("CharacterDebugUI"));
 
+            CameraController.Instance.SetCameraState("TOPDOWN");
         }
 
 

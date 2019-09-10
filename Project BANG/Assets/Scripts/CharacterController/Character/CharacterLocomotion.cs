@@ -102,9 +102,7 @@
             m_deltaTime = deltaTime;
 
 
-            m_previousPosition = m_rigidbody.position;
-            m_previousVelocity = m_rigidbody.velocity;
-            m_previousMoveAngle = m_moveAngle;
+
 
 
 

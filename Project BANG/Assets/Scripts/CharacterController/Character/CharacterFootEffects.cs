@@ -12,7 +12,7 @@
         public enum FootstepMode { BodyStep, Trigger, FixedInterval }
 
         [Serializable]
-        private class Feet
+        private class Foot
         {
             public Transform foot;
             public float stepTime { get; set; }
@@ -30,15 +30,15 @@
         private float footOffset = 0.03f;
 
         [SerializeField]
-        private Feet leftFoot = new Feet();
+        private Foot leftFoot = new Foot();
         [SerializeField]
-        private Feet rightFoot = new Feet();
+        private Foot rightFoot = new Foot();
 
         [SerializeField]
         private int moveDirectionFrameCount = 7;
 
 
-        private Feet raisedFoot;
+        private Foot raisedFoot;
         private float raisedFootHeight;
         private int frameCount;
 
@@ -46,13 +46,14 @@
         protected LayerManager layerManager;
         protected Animator animator;
         protected Rigidbody r;
-
+        private Transform m_transform;
 
 
 
 
         private void Awake()
         {
+            m_transform = transform;
             layerManager = GetComponent<LayerManager>();
             animator = GetComponent<Animator>();
             r = GetComponent<Rigidbody>();
@@ -70,7 +71,7 @@
         }
 
 
-        private void InitializeFoot(Feet foot, HumanBodyBones footBodyBone)
+        private void InitializeFoot(Foot foot, HumanBodyBones footBodyBone)
         {
             if(foot.foot == null)
                 foot.foot = animator.GetBoneTransform(footBodyBone);
@@ -85,6 +86,25 @@
             }
             
         }
+
+
+
+
+        private void SpawnFootstep(Foot foot)
+        {
+
+        }
+
+
+
+        private void CheckFoot()
+        {
+            if(Vector3.Dot(r.velocity, m_transform.forward) > minVelocity)
+            {
+
+            }
+        }
+
 
 
         private void FixedUpdate()
@@ -143,6 +163,12 @@
 
 
 
+
+
+
+
+
+
     }
 
 
@@ -177,7 +203,7 @@
             EditorGUILayout.PropertyField(serializedObject.FindProperty("footOffset"));
 
             EditorGUI.indentLevel++;
-            displayFeetOptions = EditorGUILayout.Foldout(displayFeetOptions, "Feet", true);
+            displayFeetOptions = EditorGUILayout.Foldout(displayFeetOptions, "Foot", true);
             if (displayFeetOptions)
             {
                 EditorGUI.indentLevel++;

@@ -1,34 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 881580e98a873418b8b8f3a30dc7ccd7, type: 3}
-  m_Name: LandEffect
-  m_EditorClassIdentifier: 
-  spawnedObjects:
-  - spawnedObject: {fileID: 6784883267551059862, guid: fa3ee4246aa6a4c1fa973ad6b06a6a6f,
-      type: 3}
-    probability: 1
-    randomSpin: 1
-  decals:
-    prefabs: []
-    minScale: 1
-    maxScale: 1
-  audio:
-    audioClips:
-    - {fileID: 8300000, guid: fc8da02e95435406f89db024451a0bb8, type: 3}
-    - {fileID: 8300000, guid: fd944e20ee6444efa87cef28957898aa, type: 3}
-    - {fileID: 8300000, guid: baf4414d6c8024046bb96cce835fbe26, type: 3}
-    - {fileID: 8300000, guid: 027dcff294339478d98ba358c0aeb528, type: 3}
-    minVolume: 1
-    maxVolume: 1
-    minPitch: 1
-    maxPitch: 1
-    randomClipSelection: 1
+version https://git-lfs.github.com/spec/v1
+oid sha256:e9804167fc5a46e5ce8f214d6757e856fb9bf0941105d99ffd5b700509992ba0
+size 1026

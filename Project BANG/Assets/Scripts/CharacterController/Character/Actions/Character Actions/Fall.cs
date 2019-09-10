@@ -83,7 +83,10 @@ namespace CharacterController
             }
 
 
-
+            if (m_Controller.Grounded && m_Rigidbody.velocity.y > -1.01f)
+            {
+                m_AnimatorMonitor.SetActionID(0);
+            }
 
 
             DebugUI.DebugUI.Log(this, "GroundDistance", groundHit.distance, DebugUI.RichTextColor.Red);
@@ -98,7 +101,6 @@ namespace CharacterController
         {
             if (m_Controller.Grounded && m_Rigidbody.velocity.y > -0.01f)
             {
-                m_AnimatorMonitor.SetActionID(0);
                 return true;
             }
 

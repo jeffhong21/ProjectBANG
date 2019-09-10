@@ -28,15 +28,20 @@ public static class Vector3Util
     }
 
 
-    //public static Vector3 Multiply(this Vector3 v, float x)
-    //{
-
-    //}
-
-    public static Vector3 Multiply(Vector3 v1, Vector3 v2)
+    public static Vector3 Multiply(this Vector3 v, float x)
     {
-        return new Vector3(v1.x * v2.x, v1.y * v2.y, v1.z * v2.z);
+        return new Vector3(v.x * x, v.y * x, v.z * x);
     }
+
+    public static Vector3 Multiply(this Vector3 v, Vector3 v2)
+    {
+        return new Vector3(v.x * v2.x, v.y * v2.y, v.z * v2.z);
+    }
+
+    //public static Vector3 Multiply(Vector3 v1, Vector3 v2)
+    //{
+    //    return new Vector3(v1.x * v2.x, v1.y * v2.y, v1.z * v2.z);
+    //}
 
 
 
