@@ -2,16 +2,11 @@
 using System;
 
 [Serializable]
-<<<<<<< HEAD
 public class MotionTrajectory
-=======
-public struct MotionTrajectory
->>>>>>> ff7835c8... motion trajectory
 {
     public float timeHorizon;
     public float sampleRate;
 
-<<<<<<< HEAD
     private MotionPoint[] motionPath;
     private int resolution;
 
@@ -109,17 +104,10 @@ public struct MotionTrajectory
 
     [Serializable]
     public struct MotionPoint
-=======
-    private TrajectoryPoint[] motionPath;
-
-    [Serializable]
-    public struct TrajectoryPoint
->>>>>>> ff7835c8... motion trajectory
     {
         public Vector3 position;
         public Vector3 velocity;
         public Vector3 direction;
-<<<<<<< HEAD
 
         public MotionPoint(Vector3 position)
         {
@@ -127,8 +115,6 @@ public struct MotionTrajectory
             this.velocity = Vector3.zero;
             this.direction = Vector3.zero;
         }
-=======
->>>>>>> ff7835c8... motion trajectory
     }
 }
 

@@ -532,11 +532,7 @@ MonoBehaviour:
   m_skinWidth: 0.08
   m_slopeLimit: 45
   m_maxStepHeight: 0.4
-<<<<<<< HEAD
   m_gravityModifier: 1.5
-=======
-  m_gravityModifier: 1
->>>>>>> ff7835c8... motion trajectory
   m_groundStickiness: 6
   m_collisionsLayerMask:
     serializedVersion: 2
@@ -565,11 +561,7 @@ MonoBehaviour:
   m_sampleRate: 4
   m_positionBias: 0.4
   m_directionBias: 1.93
-<<<<<<< HEAD
   m_motionPath:
-=======
-  m_trajectory:
->>>>>>> ff7835c8... motion trajectory
     timeHorizon: 0
     sampleRate: 0
     rootTransforms: []
@@ -663,11 +655,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   surfaceEffect: {fileID: 11400000, guid: 867b450d6e444446488210bdd678fdd5, type: 2}
-<<<<<<< HEAD
   minVelocity: 1.5
-=======
-  minVelocity: 1
->>>>>>> ff7835c8... motion trajectory
   footstepMode: 0
   footOffset: 0.03
   leftFoot:

@@ -40,7 +40,6 @@ public static class MotionUtil
     //        trajectory[halfTrajectoryLength + i].q = Quaternion.Slerp(trajectory[halfTrajectoryLength + i].q, targetRotation, blendedWeightOrientation);
     //    }
 
-<<<<<<< HEAD
 
     //    for (int i = 1; i < halfTrajectoryLength; i++)
     //    {
@@ -71,36 +70,6 @@ public static class MotionUtil
     //    }
 
 
-=======
-
-    //    for (int i = 1; i < halfTrajectoryLength; i++)
-    //    {
-    //        trajectory[halfTrajectoryLength + i] =
-    //            new AffineTransform(trajectoryPositions[i],
-    //            trajectory[halfTrajectoryLength + i].q);
-    //    }
-
-
-    //    return trajectory;
-    //}
-
-
-    //public static void DrawTrajectory(ref Trajectory trajectory, float drawPercentage)
-    //{
-    //    float sphereSize = 0.1f;
-
-    //    if (drawPercentage < 0) drawPercentage = Mathf.Abs(drawPercentage);
-    //    if (drawPercentage > 1) drawPercentage = Mathf.Clamp01(drawPercentage / trajectory.sampleRate);
-
-    //    int drawCount = Mathf.FloorToInt(drawPercentage * trajectory.sampleRate);
-
-    //    for (int i = 0; i < drawCount; i++)
-    //    {
-    //        DebugDraw.Sphere(trajectory[i].t, sphereSize, Color.green);
-    //        if (i != drawCount)
-    //            Debug.DrawLine(trajectory[i].t.AddY(0.1f), trajectory[i + 1].t.AddY(0.1f), Color.green);
-    //    }
->>>>>>> ff7835c8... motion trajectory
     //}
 
 

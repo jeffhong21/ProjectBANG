@@ -237,7 +237,6 @@
 
 
 
-<<<<<<< HEAD
             //m_Rigidbody.MovePosition((verticalPosition + fwdPosition));
             DebugDraw.Sphere(verticalPosition + fwdPosition, 1f, Color.blue);
             
@@ -251,8 +250,6 @@
 
 
             //m_Controller.Velocity = velocity;
-=======
->>>>>>> ff7835c8... motion trajectory
             //m_Animator.MatchTarget(endPosition, Quaternion.identity, AvatarTarget.Root, new MatchTargetWeightMask(Vector3.one, 0), 0.2f, 0.4f);
             return false;
         }
