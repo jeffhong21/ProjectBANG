@@ -23,16 +23,16 @@
 
         protected override void ActionStarted()
         {
-            m_Animator.SetFloat(HashID.Height, m_Height);
-            m_AnimatorMonitor.SetMovementSetID(2);
+            m_animator.SetFloat(HashID.Height, m_Height);
+            m_animatorMonitor.SetMovementSetID(2);
         }
 
 
 
         protected override void ActionStopped()
         {
-            m_Animator.SetFloat(HashID.Height, m_DefaultHeight);
-            m_AnimatorMonitor.SetMovementSetID(0);
+            m_animator.SetFloat(HashID.Height, m_DefaultHeight);
+            m_animatorMonitor.SetMovementSetID(0);
         }
 
 

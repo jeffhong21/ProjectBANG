@@ -28,9 +28,9 @@ namespace CharacterController
         //
         public override bool CanStartAction()
         {
-            if(!m_Controller.Grounded && m_Rigidbody.velocity.y < 0)
+            if(!m_Controller.Grounded && m_rigidbody.velocity.y < 0)
             {
-                m_currentPosition = m_Transform.position;
+                m_currentPosition = m_transform.position;
                 if (!m_isAirborne)
                 {
                     m_startPosition = m_currentPosition;
@@ -46,7 +46,7 @@ namespace CharacterController
             }
             else
             {
-                if(m_Controller.Grounded || m_Rigidbody.velocity.y >= 0 && m_isAirborne)
+                if(m_Controller.Grounded || m_rigidbody.velocity.y >= 0 && m_isAirborne)
                 {
                     m_currentPosition = default;
                     m_startPosition = default;
@@ -63,17 +63,17 @@ namespace CharacterController
 
 		protected override void ActionStarted()
         {
-            m_AnimatorMonitor.SetActionID(ActionID);
+            m_animatorMonitor.SetActionID(ActionID);
         }
 
 
         public override bool CheckGround()
         {
             float radius = 0.1f;
-            Vector3 origin = m_Transform.position + Vector3.up * (0.1f);
+            Vector3 origin = m_transform.position + Vector3.up * (0.1f);
             origin += Vector3.up * radius;
 
-            if(Physics.SphereCast(origin, radius, Vector3.down, out RaycastHit groundHit, 0.3f * 2, m_Layers.SolidLayers))
+            if(Physics.SphereCast(origin, radius, Vector3.down, out RaycastHit groundHit, 0.3f * 2, m_layers.SolidLayers))
             {
                 m_Controller.Grounded = groundHit.distance < 0.3f;
             }
@@ -83,9 +83,9 @@ namespace CharacterController
             }
 
 
-            if (m_Controller.Grounded && m_Rigidbody.velocity.y > -1.01f)
+            if (m_Controller.Grounded && m_rigidbody.velocity.y > -1.01f)
             {
-                m_AnimatorMonitor.SetActionID(0);
+                m_animatorMonitor.SetActionID(0);
             }
 
 
@@ -99,7 +99,7 @@ namespace CharacterController
 
         public override bool CanStopAction()
         {
-            if (m_Controller.Grounded && m_Rigidbody.velocity.y > -0.01f)
+            if (m_Controller.Grounded && m_rigidbody.velocity.y > -0.01f)
             {
                 return true;
             }
@@ -111,7 +111,7 @@ namespace CharacterController
         public override bool UpdateAnimator()
         {
             m_fallHeight = m_startPosition.y - m_currentPosition.y;
-            m_AnimatorMonitor.SetActionFloatData(Mathf.Abs(m_fallHeight));
+            m_animatorMonitor.SetActionFloatData(Mathf.Abs(m_fallHeight));
 
 
 

@@ -27,7 +27,7 @@
 //		//
 //        protected virtual void Start()
 //        {
-//            m_LayerIndex = m_AnimatorMonitor.UpperBodyLayerIndex;
+//            m_LayerIndex = m_animatorMonitor.UpperBodyLayerIndex;
 //        }
 
 //        public override void StartAction()
@@ -35,16 +35,16 @@
 //            m_IsActive = true;
 
 //            ActionStarted();
-//            EventHandler.ExecuteEvent(m_GameObject, "OnCharacterActionActive", this, true);
+//            EventHandler.ExecuteEvent(m_gameObject, "OnCharacterActionActive", this, true);
 
-//            m_Animator.CrossFade(Animator.StringToHash(GetDestinationState(m_LayerIndex)), m_TransitionDuration, m_LayerIndex);
+//            m_animator.CrossFade(Animator.StringToHash(GetDestinationState(m_LayerIndex)), m_TransitionDuration, m_LayerIndex);
 //        }
 
 //        public override void StopAction()
 //        {
 //            m_IsActive = false;
 //            ActionStopped();
-//            EventHandler.ExecuteEvent(m_GameObject, "OnCharacterActionActive", this, false);
+//            EventHandler.ExecuteEvent(m_gameObject, "OnCharacterActionActive", this, false);
 //        }
 
 
@@ -54,8 +54,8 @@
 //		{
 //            if (Input.GetKeyDown(KeyCode.R))
 //            {
-//                Debug.LogFormat("Reloading {0}", m_Inventory.EquippedItemType);
-//                if (!m_IsActive && m_Inventory.GetCurrentItem() != null && !m_IsReloading)
+//                Debug.LogFormat("Reloading {0}", m_inventory.EquippedItemType);
+//                if (!m_IsActive && m_inventory.GetCurrentItem() != null && !m_IsReloading)
 //                {
 //                    return true;
 //                }
@@ -66,11 +66,11 @@
 
 //		protected override void ActionStarted()
 //        {
-//            Debug.LogFormat("Reloading {0}", m_Inventory.EquippedItemType);
+//            Debug.LogFormat("Reloading {0}", m_inventory.EquippedItemType);
 
 //            m_ItemName = GetItemName();
 //            m_IsReloading = true;
-//            m_AnimatorMonitor.SetItemStateIndex(m_ItemStateID);
+//            m_animatorMonitor.SetItemStateIndex(m_ItemStateID);
 //        }
 
 
@@ -78,8 +78,8 @@
 //		public override bool CanStopAction()
 //        {
 //            if (m_IsActive && m_IsReloading){
-//                if (m_Animator.GetCurrentAnimatorStateInfo(m_LayerIndex).shortNameHash == m_StateHash){
-//                    //Debug.LogFormat("Current Hash: {0} | {1} Hash: {2}", m_Animator.GetCurrentAnimatorStateInfo(m_AnimatorMonitor.UpperBodyLayerIndex).shortNameHash, GetType().Name, m_StateHash);
+//                if (m_animator.GetCurrentAnimatorStateInfo(m_LayerIndex).shortNameHash == m_StateHash){
+//                    //Debug.LogFormat("Current Hash: {0} | {1} Hash: {2}", m_animator.GetCurrentAnimatorStateInfo(m_animatorMonitor.UpperBodyLayerIndex).shortNameHash, GetType().Name, m_StateHash);
 //                    if (GetNormalizedTime() >= 1 - m_TransitionDuration)
 //                    {
 //                        return true;
@@ -93,7 +93,7 @@
 //        {
 //            //m_ItemName = "<Empty>";
 //            m_IsReloading = false;
-//            m_AnimatorMonitor.SetItemID(0);
+//            m_animatorMonitor.SetItemID(0);
 
 //        }
 
@@ -106,20 +106,20 @@
 
 //        public override string GetDestinationState(int layer)
 //        {
-//            string fullStateName = string.Format("{0}.{1}.{2}", m_AnimatorMonitor.UpperBodyLayerName, GetItemName(), "Reload");
+//            string fullStateName = string.Format("{0}.{1}.{2}", m_animatorMonitor.UpperBodyLayerName, GetItemName(), "Reload");
 //            return fullStateName;
 //        }
 
 
 //        public override float GetNormalizedTime()
 //        {
-//            return m_Animator.GetCurrentAnimatorStateInfo(m_LayerIndex).normalizedTime % 1; ;
+//            return m_animator.GetCurrentAnimatorStateInfo(m_LayerIndex).normalizedTime % 1; ;
 //        }
 
 
 //        protected int GetItemID()
 //        {
-//            var itemObject = m_Inventory.GetCurrentItem();
+//            var itemObject = m_inventory.GetCurrentItem();
 //            if (itemObject == null)
 //                return 0;
 
@@ -130,7 +130,7 @@
 
 //        protected string GetItemName()
 //        {
-//            var itemObject = m_Inventory.GetCurrentItem();
+//            var itemObject = m_inventory.GetCurrentItem();
 //            if (itemObject == null)
 //                return null;
 

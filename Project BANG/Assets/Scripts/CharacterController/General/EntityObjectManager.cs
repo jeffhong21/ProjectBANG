@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+using DebugUI;
 namespace CharacterController
 {
     public class EntityObjectManager : MonoBehaviour
@@ -9,7 +11,6 @@ namespace CharacterController
         [SerializeField]
         private float m_deltaTime;
         [SerializeField]
-        private float m_time;
         private float m_previousTime;
 
         private bool m_frameUpdated;
@@ -17,34 +18,56 @@ namespace CharacterController
 
         private void Start()
         {
-            m_time = Time.time;
             m_previousTime = 0f;
         }
 
 
         private void FixedUpdate()
         {
-            m_deltaTime = GetDeltaTime(Time.time);
+            Tick();
 
             m_frameUpdated = true;
+
+
+            DebugUI.DebugUI.Log(this, Time.fixedDeltaTime, "fixedDeltaTime", DebugUI.RichTextColor.Cyan);
         }
 
 
         private void Update()
         {
-            if (m_frameUpdated) return;
+            if (m_frameUpdated)
+            {
+                m_frameUpdated = false;
+                return;
+            }
+            Tick();
 
-            m_deltaTime = GetDeltaTime(Time.time);
+            m_frameUpdated = false;
 
-
-            m_frameUpdated = true;
+            DebugUI.DebugUI.Log(this, Time.deltaTime, "deltaTime", DebugUI.RichTextColor.Cyan);
         }
 
 
 
-        private float GetDeltaTime(float time)
+        private void Tick()
         {
-            return time - m_previousTime;
+            m_deltaTime = Time.time - m_previousTime;
+            m_previousTime = Time.time;
+
+
+
+
+
+            DebugUI.DebugUI.Log(this, m_deltaTime, "custom delta time", Time.inFixedTimeStep ? DebugUI.RichTextColor.Cyan : DebugUI.RichTextColor.LightBlue);
+        }
+
+
+
+        private float GetDeltaTime()
+        {
+            float deltaTime = Time.time - m_previousTime;
+            m_previousTime = Time.time;
+            return deltaTime;
         }
 
 

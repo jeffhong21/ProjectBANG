@@ -107,7 +107,7 @@ namespace CharacterController.CharacterCreator
             }
         }
 
-        [MenuItem("Character/Ragdoll Builder", false, 2000)]
+        [MenuItem("Character Controller/Ragdoll Builder", false, 2000)]
         static void CreateWizard()
         {
             var builder = DisplayWizard<CharacterRagdollBuilder>("Create Ragdoll");

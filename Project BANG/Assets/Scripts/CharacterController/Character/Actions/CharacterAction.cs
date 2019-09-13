@@ -20,6 +20,8 @@
         protected int m_LayerIndex = 0;
         [SerializeField, HideInInspector]
         protected int m_ActionID = -1;
+        [SerializeField, HideInInspector]
+        protected int m_Priority = -1;
 
         [SerializeField, HideInInspector]
         protected float m_TransitionDuration = 0.2f;
@@ -66,16 +68,16 @@
         protected float m_ActionStartTime;
         private float m_DefaultActionStopTime = 0.25f;
         protected bool m_ExitingAction;
-        protected float m_DeltaTime;
+        protected float m_deltaTime;
         protected CharacterLocomotion m_Controller;
-        protected Rigidbody m_Rigidbody;
-        protected CapsuleCollider m_CapsuleCollider;
-        protected Animator m_Animator;
-        protected AnimatorMonitor m_AnimatorMonitor;
-        protected LayerManager m_Layers;
-        protected Inventory m_Inventory;
-        protected GameObject m_GameObject;
-        protected Transform m_Transform;
+        protected Rigidbody m_rigidbody;
+        protected CapsuleCollider m_collider;
+        protected Animator m_animator;
+        protected AnimatorMonitor m_animatorMonitor;
+        protected LayerManager m_layers;
+        protected Inventory m_inventory;
+        protected GameObject m_gameObject;
+        protected Transform m_transform;
 
         protected AnimatorStateInfo m_StateInfo;
         protected AnimatorTransitionInfo m_TransitionInfo;
@@ -93,6 +95,8 @@
         public bool IsActive { get { return m_IsActive; } set { m_IsActive = value; } }
 
         public virtual int ActionID { get { return m_ActionID; } set { m_ActionID = Mathf.Clamp(value, -1, int.MaxValue); } }
+
+        public virtual string StateName { get { return m_StateName; } set { m_StateName = value; } }
 
         public float SpeedMultiplier { get { return m_SpeedMultiplier; } set { m_SpeedMultiplier = value; } }
 
@@ -115,27 +119,28 @@
         protected virtual void Awake()
         {
             //m_Controller = GetComponent<CharacterLocomotion>();
-            m_Rigidbody = GetComponent<Rigidbody>();
-            m_Animator = GetComponent<Animator>();
-            m_AnimatorMonitor = GetComponent<AnimatorMonitor>();
-            m_Layers = GetComponent<LayerManager>();
-            m_Inventory = GetComponent<Inventory>();
-            m_GameObject = gameObject;
-            m_Transform = transform;
-            m_CapsuleCollider = GetComponent<CapsuleCollider>();
-            //m_DeltaTime = Time.deltaTime;
+            m_rigidbody = GetComponent<Rigidbody>();
+            m_animator = GetComponent<Animator>();
+            m_animatorMonitor = GetComponent<AnimatorMonitor>();
+            m_layers = GetComponent<LayerManager>();
+            m_inventory = GetComponent<Inventory>();
+            m_gameObject = gameObject;
+            m_transform = transform;
+            m_collider = GetComponent<CapsuleCollider>();
+            //m_deltaTime = Time.deltaTime;
 
-            //EventHandler.RegisterEvent<CharacterAction, bool>(m_GameObject, "OnCharacterActionActive", OnActionActive);
+            //EventHandler.RegisterEvent<CharacterAction, bool>(m_gameObject, "OnCharacterActionActive", OnActionActive);
 
-            //m_CapsuleCollider = GetComponent<CapsuleCollider>();
+            //m_collider = GetComponent<CapsuleCollider>();
 
             //Initialize();
         }
 
-        public void Initialize(CharacterLocomotion characterController, float deltaTime)
+        public void Initialize(CharacterLocomotion characterController, int priority, float deltaTime)
         {
             m_Controller = characterController;
-            m_DeltaTime = deltaTime;
+            m_Priority = priority;
+            m_deltaTime = deltaTime;
 
             //  Translate input name to keycode.
             if (m_StartType != ActionStartType.Automatic || m_StartType != ActionStartType.Manual ||
@@ -150,19 +155,24 @@
                 }
             }
 
-            //if(m_CapsuleCollider == null) m_CapsuleCollider = m_Controller.Collider;
-            //m_ColliderHeight = m_CapsuleCollider.height;
-            //m_ColliderCenter = m_CapsuleCollider.center;
+            //if(m_collider == null) m_collider = m_Controller.Collider;
+            //m_ColliderHeight = m_collider.height;
+            //m_ColliderCenter = m_collider.center;
         }
 
 
 
-
+        public int SetPriority(int priority)
+        {
+            m_Priority = priority;
+            return m_Priority;
+        }
 
 
         protected virtual void OnValidate()
         {
             m_ActionID = ActionID >= 0 ? ActionID : -1;
+            if (m_StateName.Length == 0) m_StateName = GetType().Name;
         }
 
 
@@ -177,15 +187,15 @@
         {
             var startTime = Time.time;
 
-            var direction = targetPosition - m_Transform.position;
+            var direction = targetPosition - m_transform.position;
             var distanceRemainingSqr = direction.sqrMagnitude;
             while (distanceRemainingSqr >= 0.1f || startTime > startTime + 5)
             {
-                var velocityDelta = targetPosition - m_Transform.position;
-                m_Transform.position += velocityDelta.normalized * minMoveSpeed * m_DeltaTime;
+                var velocityDelta = targetPosition - m_transform.position;
+                m_transform.position += velocityDelta.normalized * minMoveSpeed * m_deltaTime;
 
                 distanceRemainingSqr = velocityDelta.sqrMagnitude;
-                startTime += m_DeltaTime;
+                startTime += m_deltaTime;
                 yield return null;
             }
         }
@@ -300,21 +310,21 @@
             {
                 case ActionStopType.Automatic:
 
-                    string fullPathName = m_Animator.GetLayerName(m_LayerIndex) + "." + m_DestinationStateName + ".";
-                    if (m_Animator.GetCurrentAnimatorStateInfo(m_LayerIndex).fullPathHash == Animator.StringToHash(fullPathName))
+                    string fullPathName = m_animator.GetLayerName(m_LayerIndex) + "." + m_DestinationStateName + ".";
+                    if (m_animator.GetCurrentAnimatorStateInfo(m_LayerIndex).fullPathHash == Animator.StringToHash(fullPathName))
                     {
-                        if (m_Animator.GetNextAnimatorStateInfo(m_LayerIndex).fullPathHash == 0)
+                        if (m_animator.GetNextAnimatorStateInfo(m_LayerIndex).fullPathHash == 0)
                         {
                             m_ExitingAction = true;
                         }
                         if (m_ExitingAction)
                         {
-                            if (m_Animator.GetNextAnimatorStateInfo(m_LayerIndex).fullPathHash != 0)
+                            if (m_animator.GetNextAnimatorStateInfo(m_LayerIndex).fullPathHash != 0)
                             {
                                 return true;
                             }
                         }
-                        if (m_Animator.GetCurrentAnimatorStateInfo(m_LayerIndex).normalizedTime >= 1f)
+                        if (m_animator.GetCurrentAnimatorStateInfo(m_LayerIndex).normalizedTime >= 1f)
                         {
                             //Debug.LogFormat("{0} has stopped by comparing nameHASH", m_MatchTargetState.stateName);
                             return true;
@@ -322,7 +332,7 @@
                         return false;
                     }
 
-                    if (m_Animator.GetCurrentAnimatorStateInfo(m_LayerIndex).IsName(m_DestinationStateName))
+                    if (m_animator.GetCurrentAnimatorStateInfo(m_LayerIndex).IsName(m_DestinationStateName))
                     {
                         Debug.LogFormat("Stopping Action State {0}", m_DestinationStateName);
                         return false;
@@ -371,47 +381,36 @@
         {
             m_ActionStartTime = Time.time;
             m_IsActive = true;
-            EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnCharacterActionActive, this, m_IsActive);
+            EventHandler.ExecuteEvent(m_gameObject, EventIDs.OnCharacterActionActive, this, m_IsActive);
 
             //m_FullPathHash = Animator.StringToHash(string.Format("{0}.{1}", m_StateName, GetDestinationState(m_LayerIndex)));
-            m_Animator.SetInteger(HashID.ActionID, m_ActionID);
-            m_Animator.SetTrigger(HashID.ActionChange);
+            m_animator.SetInteger(HashID.ActionID, m_ActionID);
+            m_animator.SetTrigger(HashID.ActionChange);
 
-
+            m_animatorMonitor.SetActionID(m_ActionID);
+            //m_animatorMonitor.Set
+            //  Initialize action start.
             ActionStarted();
-
-
-            //m_DestinationStateName = m_StateName;
-            for (int index = 0; index < m_Animator.layerCount; index++)
+            //  Loop through all layers and play destination states.
+            for (int layer = 0; layer < m_animator.layerCount; layer++)
             {
-                if (string.IsNullOrEmpty(GetDestinationState(index)) == false)
+                if (string.IsNullOrEmpty(GetDestinationState(layer)) == false)
                 {
-                    string destinationState = GetDestinationState(index);
-                    if(destinationState.Contains(".") == false) {
-                        Debug.Log(this.GetType());
-                    }
-                    string fullStateName = m_Animator.GetLayerName(index) + "." + destinationState;
-                    if (m_Animator.HasState(index, Animator.StringToHash(fullStateName) ))
+                    string destinationState = GetDestinationState(layer);
+                    bool stateChanged = m_animatorMonitor.ChangeAnimatorState(this, layer, destinationState, m_TransitionDuration);
+
+                    if (stateChanged)
                     {
 
-                        if (m_TransitionDuration > 0)
-                            m_Animator.CrossFade(fullStateName, m_TransitionDuration, index);
-                        else
-                            m_Animator.CrossFade(fullStateName, 0.01f, index);
-
-                    }
-                    else
-                    {
-                        Debug.LogErrorFormat("There is no state {0} in layer {1}", fullStateName, index);
                     }
                 }
 
 
 
                 //if (m_TransitionDuration > 0)
-                //    m_Animator.CrossFade(GetDestinationState(index), m_TransitionDuration, index);
+                //    m_animator.CrossFade(GetDestinationState(index), m_TransitionDuration, index);
                 //else
-                //m_Animator.Play(GetDestinationState(index), index);
+                //m_animator.Play(GetDestinationState(index), index);
             }
 
             if(Time.time > m_StartEffectStartTime + m_EffectCooldown)
@@ -423,7 +422,7 @@
         public void StopAction()
         {
             m_IsActive = false;
-            EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnCharacterActionActive, this, m_IsActive);
+            EventHandler.ExecuteEvent(m_gameObject, EventIDs.OnCharacterActionActive, this, m_IsActive);
 
             if (Time.time > m_EndEffectStartTime + m_EffectCooldown)
                 PlayEffect(m_EndEffect, ref m_EndEffectStartTime);
@@ -431,17 +430,17 @@
 
 
 
-            m_Animator.SetInteger(HashID.ActionID, 0);
-            m_Animator.SetInteger(HashID.ActionIntData, 0);
-            m_Animator.SetFloat(HashID.ActionFloatData, 0f);
-            m_Animator.ResetTrigger(HashID.ActionChange);
+            m_animator.SetInteger(HashID.ActionID, 0);
+            m_animator.SetInteger(HashID.ActionIntData, 0);
+            m_animator.SetFloat(HashID.ActionFloatData, 0f);
+            m_animator.ResetTrigger(HashID.ActionChange);
 
             if(this is ItemAction) {
-                m_AnimatorMonitor.SetItemID(0);
-                m_AnimatorMonitor.SetItemStateIndex(0);
+                m_animatorMonitor.SetItemID(0);
+                m_animatorMonitor.SetItemStateIndex(0);
             }
 
-            //m_AnimatorMonitor.SetActionID(0);
+            //m_animatorMonitor.SetActionID(0);
 
             m_ExitingAction = false;
             m_ActionStartTime = -1;
@@ -458,10 +457,10 @@
 
             GameObject effect = null;
             if (ObjectPool.Instance != null){
-                effect = ObjectPool.Get(prefab, m_Transform.position, m_Transform.rotation);
+                effect = ObjectPool.Get(prefab, m_transform.position, m_transform.rotation);
             }
             else{
-                effect = Instantiate(prefab, m_Transform.position, m_Transform.rotation);
+                effect = Instantiate(prefab, m_transform.position, m_transform.rotation);
             }
             Debug.LogFormat("{0} has just spawned {1}", GetType(), effect.name);
             return effect;
@@ -475,11 +474,11 @@
             GameObject effect = null;
             if (ObjectPool.Instance != null)
             {
-                effect = ObjectPool.Get(prefab, m_Transform.position, m_Transform.rotation);
+                effect = ObjectPool.Get(prefab, m_transform.position, m_transform.rotation);
             }
             else
             {
-                effect = Instantiate(prefab, m_Transform.position, m_Transform.rotation);
+                effect = Instantiate(prefab, m_transform.position, m_transform.rotation);
             }
             //Debug.LogFormat("{0} has just spawned {1}", GetType(), effect.name);
             return effect;
@@ -535,6 +534,12 @@
         }
 
 
+        public virtual bool SetPhysicsMaterial()
+        {
+            return true;
+        }
+
+        //  Should the CharacterLocomotion continue execution of its UpdateMovement method?
         public virtual bool UpdateMovement()
         {
             return true;
@@ -578,12 +583,16 @@
         }
 
 
+        public virtual bool HasAnimatorControl(int layer)
+        {
+            return true;
+        }
 
 
 
         public virtual float GetColliderHeightAdjustment()
         {
-            return m_CapsuleCollider.height - m_ColliderHeight;
+            return m_collider.height - m_ColliderHeight;
         }
 
 
@@ -592,10 +601,10 @@
         {
             if (string.IsNullOrWhiteSpace(m_StateName))
                 return "";
-            var layerName = m_Animator.GetLayerName(layer);
+            var layerName = m_animator.GetLayerName(layer);
             var destinationState = layerName + "." + m_StateName;
 
-            if(m_Animator.HasState(layer, Animator.StringToHash(destinationState)))
+            if(m_animator.HasState(layer, Animator.StringToHash(destinationState)))
                 return destinationState;
 
             return "";
@@ -605,7 +614,7 @@
         public virtual float GetTransitionDuration()
         {
             int layerIndex = 0;
-            float transitionDuration = m_Animator.GetAnimatorTransitionInfo(layerIndex).duration;
+            float transitionDuration = m_animator.GetAnimatorTransitionInfo(layerIndex).duration;
             return transitionDuration;
         }
 
@@ -613,17 +622,17 @@
         public virtual float GetNormalizedTime()
         {
             int layerIndex = 0;
-            //float normalizedTime = m_Animator.GetCurrentAnimatorStateInfo(m_AnimatorMonitor.BaseLayerIndex).normalizedTime % 1;
-            return m_Animator.GetCurrentAnimatorStateInfo(layerIndex).normalizedTime % 1; ;
+            //float normalizedTime = m_animator.GetCurrentAnimatorStateInfo(m_animatorMonitor.BaseLayerIndex).normalizedTime % 1;
+            return m_animator.GetCurrentAnimatorStateInfo(layerIndex).normalizedTime % 1; ;
         }
 
 
         //protected void ScaleCapsule(float scaleFactor)
         //{
-        //    if (m_CapsuleCollider.height != m_ColliderHeight * scaleFactor)
+        //    if (m_collider.height != m_ColliderHeight * scaleFactor)
         //    {
-        //        m_CapsuleCollider.height = Mathf.MoveTowards(m_CapsuleCollider.height, m_ColliderHeight * scaleFactor, Time.deltaTime * 4);
-        //        m_CapsuleCollider.center = Vector3.MoveTowards(m_CapsuleCollider.center, m_ColliderCenter * scaleFactor, Time.deltaTime * 2);
+        //        m_collider.height = Mathf.MoveTowards(m_collider.height, m_ColliderHeight * scaleFactor, Time.deltaTime * 4);
+        //        m_collider.center = Vector3.MoveTowards(m_collider.center, m_ColliderCenter * scaleFactor, Time.deltaTime * 2);
         //    }
         //}
 
@@ -635,7 +644,7 @@
         //{
 
         //    if (m_IsActive && m_Controller.UseRootMotion && m_ApplyBuiltinRootMotion)
-        //        m_Animator.ApplyBuiltinRootMotion();
+        //        m_animator.ApplyBuiltinRootMotion();
         //}
 
 

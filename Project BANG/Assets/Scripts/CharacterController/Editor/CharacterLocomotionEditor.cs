@@ -216,6 +216,7 @@ namespace CharacterController
                 SerializedObject elementObj = new SerializedObject(element.objectReferenceValue);
                 SerializedProperty stateName = elementObj.FindProperty("m_StateName");
                 SerializedProperty isActive = elementObj.FindProperty("m_IsActive");
+                SerializedProperty priority = elementObj.FindProperty("m_Priority");
                 SerializedProperty actionID = elementObj.FindProperty("m_ActionID");
 
 
@@ -242,7 +243,7 @@ namespace CharacterController
 
                 //  Toggle Enable
                 rect.x = elementRect.width + 12;
-                rect.width = 36; ;
+                rect.width = 36;
                 action.enabled = EditorGUI.Toggle(rect, action.enabled);
                 //isActive.boolValue = EditorGUI.Toggle(rect, isActive.boolValue);
                 //isActive.boolValue = action.enabled;

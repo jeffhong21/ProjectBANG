@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class Vector3Util
+public static class Vector3Extensions
 {
 
-    public static Vector3 Combine(this Vector3 a, Vector3 b)
+    public static Vector3 Add(this Vector3 a, Vector3 b)
     {
         a.x += b.x;
         a.y += b.y;
@@ -13,6 +13,14 @@ public static class Vector3Util
         return a;
     }
 
+
+    public static Vector3 Subtract(this Vector3 a, Vector3 b)
+    {
+        a.x -= b.x;
+        a.y -= b.y;
+        a.z -= b.z;
+        return a;
+    }
 
     public static Vector3 AddY(this Vector3 v, float y)
     {
@@ -84,6 +92,22 @@ public static class Vector3Util
 
         return closest;
     }
+
+
+
+    /// <summary>
+    /// Transforms a point to world space relative to the transform.
+    /// </summary>
+    /// <param name="point">Vector3 in local space.</param>
+    /// <param name="transform">Transform.</param>
+    /// <returns>Point in world space relative to transform.</returns>
+    public static Vector3 RelativeToTransformWorld(this Vector3 point, Transform transform)
+    {
+        Vector3 ws = transform.TransformPoint(point);
+        Vector3 dif = transform.localPosition + point - ws;
+        return ws + dif;
+    }
+
 
 }
 

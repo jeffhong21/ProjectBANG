@@ -11,6 +11,11 @@ public static class MathUtil
         return (float)Math.Round(value, rounding);
     }
 
+    public static float Round2(this float value, int rounding = 2)
+    {
+        return Round(value, rounding);
+    }
+
 
     public static float Min(float value1, float value2, float value3)
     {
@@ -58,39 +63,41 @@ public static class MathUtil
     //}
 
 
-    /// <summary>
-    /// Clamps and updates a given value around 360 degrees.
-    /// </summary>
-    /// <param name="angle">Angle to clamp. </param>
-    /// <param name="maxAngle">Max angle.  Must be less than 360.</param>
-    /// <returns>Returns the clamped value.</returns>
-    public static float ClampAngle(this float angle, float maxAngle = 360)
-    {
-        maxAngle = Mathf.Abs(maxAngle);
-        maxAngle = maxAngle > 360 ? 360 : maxAngle;
-        float max = maxAngle;
-        float min = max * -1;
-        
-        if (angle < min || angle > max)
-        {
-            int r = 0;
-            r = Mathf.CeilToInt(angle % maxAngle);
-
-            if (angle < min) angle += maxAngle * r;
-            if (angle > max) angle -= maxAngle * r;
-
-            //if (angle < -360F) angle += 360F;
-            //if (angle > 360F) angle -= 360F;
-        }
-
-        return angle;
-    }
+    ///// <summary>
+    ///// Clamps and updates a given value around 360 degrees.
+    ///// </summary>
+    ///// <param name="value">Angle to clamp. </param>
+    ///// <param name="maxAngle">Max angle.  Must be less than 360.</param>
+    ///// <returns>Returns the clamped value.</returns>
+    //public static float ClampAngle(this float value, float maxAngle = 360)
+    //{
+    //    maxAngle = Mathf.Abs(maxAngle);
+    //    maxAngle = maxAngle > 360 ? 360 : maxAngle;
+    //    float max = maxAngle;
+    //    float min = max * -1;
+    //    float angle = value;
 
 
-    public static int ClampAngle(this int angle, float maxAngle = 360)
-    {
-        return angle.ClampAngle(maxAngle);
-    }
+    //    if (angle < min || angle > max)
+    //    {
+    //        int r = 0;
+    //        r = Mathf.CeilToInt(angle % maxAngle);
+
+    //        if (angle < min) angle += maxAngle * r;
+    //        if (angle > max) angle -= maxAngle * r;
+
+    //        //if (angle < -360F) angle += 360F;
+    //        //if (angle > 360F) angle -= 360F;
+    //    }
+
+    //    return angle;
+    //}
+
+
+    //public static int ClampAngle(this int value, float maxAngle = 360)
+    //{
+    //    return value.ClampAngle(maxAngle);
+    //}
 
 
     /// <summary>

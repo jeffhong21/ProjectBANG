@@ -72,7 +72,6 @@ namespace CharacterController
         protected CharacterControllerDebugger debugger = new CharacterControllerDebugger();
 
 
-        protected float maxSpeed { get => 4; }
 
         protected CapsuleCollider m_collider;
         protected float timeScale = 1;
@@ -97,12 +96,8 @@ namespace CharacterController
         protected RaycastHit m_groundHit;
         [SerializeField, Group("Collisions")]
         protected Collider[] m_probedColliders;
-        [SerializeField, Group("Collisions")]
-        protected RaycastHit[] m_probedHits;
-        [SerializeField, Group("Collisions")]
-        protected List<Collider> colliderBuffer = new List<Collider>();
-        [SerializeField, Group("Collisions")]
-        protected int totalColliderHits, totalRaycastHits;
+
+
 
         protected PhysicMaterial characterMaterial;
 
@@ -114,7 +109,7 @@ namespace CharacterController
 
         protected float deltaAngle;
         protected float m_Speed;
-
+        protected float m_dragVelocity;
 
         protected Vector3 moveDirectionSmooth;
         protected Vector3 velocitySmooth;
@@ -247,7 +242,7 @@ namespace CharacterController
             m_rigidbody.mass = m_mass;
             m_rigidbody.useGravity = false;
             m_rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-            m_rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
+            m_rigidbody.collisionDetectionMode = CollisionDetectionMode.Discrete;
             m_rigidbody.isKinematic = false;
             if (!m_rigidbody.isKinematic) m_rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
             else m_rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
@@ -267,7 +262,6 @@ namespace CharacterController
             m_layerManager = GetComponent<LayerManager>();
             m_collisionsLayerMask = m_layerManager.SolidLayers;
             m_probedColliders = new Collider[m_maxCollisionCount];
-            m_probedHits = new RaycastHit[m_maxCollisionCount];
 
 
 
@@ -344,7 +338,7 @@ namespace CharacterController
             trajectoryPositions[0] = m_motionPath[halfTrajectoryLength].translation;
 
             //            Debug.Log(desiredLinearDisplacement);
-            if(debug) DebugUI.Log(this, "desiredLinearDisplacement", desiredLinearDisplacement, RichTextColor.Aqua);
+            //if(debug) DebugUI.Log(this, "desiredLinearDisplacement", desiredLinearDisplacement, RichTextColor.Aqua);
             for (int i = 1; i < halfTrajectoryLength; i++)
             {
                 float percentage = (float)i / (float)(halfTrajectoryLength - 1);
@@ -358,7 +352,7 @@ namespace CharacterController
 
                 trajectoryPositions[i] = trajectoryPositions[i - 1] + adjustedTrajectoryDisplacement;
 
-                if (debug) DebugUI.Log(this, "trajectoryPositions " + (halfTrajectoryLength + i).ToString(), trajectoryPositions[i] + " |Adjust: " + adjustedTrajectoryDisplacement, RichTextColor.Aqua);
+                //if (debug) DebugUI.Log(this, "trajectoryPositions " + (halfTrajectoryLength + i).ToString(), trajectoryPositions[i] + " |Adjust: " + adjustedTrajectoryDisplacement, RichTextColor.Aqua);
                 //DebugUI.Log(this, "trajectoryPositions " + i, trajectoryPositions[i - 1] + " |Adjust: " + adjustedTrajectoryDisplacement, RichTextColor.LightBlue);
 
                 //m_motionPath[halfTrajectoryLength + i].q = Quaternion.Slerp(m_motionPath[halfTrajectoryLength + i].q, targetRotation, blendedWeightOrientation);
@@ -378,26 +372,23 @@ namespace CharacterController
                 //Debug.DrawLine(m_motionPath[halfTrajectoryLength + i].translation.AddY(0.1f), m_motionPath[halfTrajectoryLength + i - 1].translation.AddY(0.1f), Color.green);
             }
 
-            if (debug)
-                for (int i = 0; i < m_motionPath.Length; i++)
-                    DebugUI.Log(this, "trajectory " + i, m_motionPath[i].translation + " | " + m_motionPath[i].rotation.eulerAngles, RichTextColor.LightBlue);
+            //if (debug)
+            //    for (int i = 0; i < m_motionPath.Length; i++)
+            //        DebugUI.Log(this, "trajectory " + i, m_motionPath[i].translation + " | " + m_motionPath[i].rotation.eulerAngles, RichTextColor.LightBlue);
             
 
         }
 
 
 
-
-
-
-
-        protected virtual void Move()
+        protected virtual void InternalMove()
         {
             if (m_inputVector.sqrMagnitude > 1) m_inputVector.Normalize();
             m_inputDirection = m_inputVector;
 
             //  Set the input vector, move direction and rotation angle based on the movement type.
-            switch (m_MovementType) {
+            switch (m_MovementType)
+            {
                 case (MovementTypes.Adventure):
                     //  Get the correct target rotation based on input.
                     m_moveAngle = GetAngleFromForward(m_inputVector);
@@ -414,7 +405,12 @@ namespace CharacterController
 
                     break;
             }
+        }
 
+
+
+        protected virtual void Move()
+        {
 
             m_moveDirection = GetLinearVelocity();
             //  --------------------------
@@ -514,22 +510,30 @@ namespace CharacterController
 
 
 
+
+
         /// <summary>
         /// Ensure the current movement direction is valid.
         /// </summary>
         protected virtual void CheckMovement()
         {
-            Vector3 position = m_motionPath.Next(0);
-            var worldSpacePos = m_transform.TransformPoint(position);
-            var positionDifference = m_transform.localPosition + position - worldSpacePos;
-            position = worldSpacePos + positionDifference;
+            //  Set maxDepentration velocity.
+            float maxDepenetrationVelocity = 10f;
+            float moveSpeed = Vector3.Dot(m_rigidbody.velocity, m_transform.forward);
+            //m_rigidbody.maxDepenetrationVelocity = moveSpeed > maxDepenetrationVelocity ? maxDepenetrationVelocity : moveSpeed;
+            m_rigidbody.maxDepenetrationVelocity = 1;
+
+            DebugUI.Log(this, moveSpeed, "moveSpeed");
+
+            Vector3 position = m_motionPath.Next(0).RelativeToTransformWorld(m_transform);
+            //var worldSpacePos = m_transform.TransformPoint(position);
+            //var positionDifference = m_transform.localPosition + position - worldSpacePos;
+            //position = worldSpacePos + positionDifference;
 
 
             float castRadius = m_collider.radius + m_skinWidth;
             Vector3 castPosition = position.AddY(castRadius + m_skinWidth);
-            //Vector3 p1 = position + m_collider.center + Vector3.up * (m_collider.height * 0.5f - castRadius);
-            //Vector3 p2 = position + m_collider.center - Vector3.up * (m_collider.height * 0.5f - castRadius);
-            //var hits = Physics.OverlapCapsuleNonAlloc(p1, p2, castRadius, m_probedColliders, m_collisionsLayerMask);
+
             var hits = Physics.OverlapSphereNonAlloc(castPosition, castRadius, m_probedColliders, m_collisionsLayerMask);
             if (hits > 0)
             {
@@ -541,25 +545,29 @@ namespace CharacterController
 
                     Vector3 closestPoint = collision.ClosestPoint(m_transform.position);
 
-                    bool overlapped = Physics.ComputePenetration(m_collider, m_transform.position, m_transform.rotation,
-                                                    collision, collision.transform.position, collision.transform.rotation,
-                                                    out Vector3 direction, out float distance);
-                    if (overlapped)
-                    {
-                        Vector3 penetrationVector = direction * distance;
-                        Vector3 moveDirectionProjected = Vector3.Project(m_velocity, -penetrationVector);
-                        //  m_transform.position = m_transform.position + penetrationVector;
-                        //m_rigidbody.MovePosition(m_transform.position + penetrationVector);
-                        m_moveDirection = m_moveDirection.Combine(penetrationVector);
-                        m_moveDirection -= moveDirectionProjected;      //  TODO: optimize me
+                    //bool overlapped = Physics.ComputePenetration(m_collider, m_transform.position, m_transform.rotation,
+                    //                                collision, collision.transform.position, collision.transform.rotation,
+                    //                                out Vector3 direction, out float distance);
+                    //if (overlapped)
+                    //{
+                    //    Vector3 penetrationVector = direction * distance;
+                    //    Vector3 moveDirectionProjected = Vector3.Project(m_velocity, -penetrationVector);
+                    //    //  m_transform.position = m_transform.position + penetrationVector;
+                    //    //m_rigidbody.MovePosition(m_transform.position + penetrationVector);
+                    //    m_velocity = m_velocity.Add(penetrationVector);
+                    //    m_velocity = m_velocity.Subtract(moveDirectionProjected);      //  TODO: optimize me
 
-                        DebugDrawer.DrawLabel(closestPoint + penetrationVector, "Penetration Vector " + penetrationVector.ToString());
-                        Debug.DrawRay(closestPoint, penetrationVector, Color.red);
-                        DebugDrawer.DrawLabel(closestPoint + moveDirectionProjected, "Velocity Projected " + moveDirectionProjected.ToString());
-                        Debug.DrawRay(closestPoint, moveDirectionProjected, Color.cyan);
+                    //    //m_velocity = Vector3.ClampMagnitude(m_velocity, 10);
 
-                        //Debug.Break();
-                    }
+                    //    if (DebugCollisions)
+                    //    {   
+                    //        DebugDrawer.DrawLabel(closestPoint + penetrationVector, "Penetration Vector " + penetrationVector.ToString());
+                    //        Debug.DrawRay(closestPoint, penetrationVector, Color.red);
+                    //        DebugDrawer.DrawLabel(closestPoint + moveDirectionProjected, "Velocity Projected " + moveDirectionProjected.ToString());
+                    //        Debug.DrawRay(closestPoint, moveDirectionProjected, Color.cyan);
+                    //    }
+                    //    //Debug.Break();
+                    //}
 
                     // ----- Debugging
                     Debug.DrawRay(checkPosition, checkPosition - closestPoint, Color.yellow);
@@ -572,34 +580,31 @@ namespace CharacterController
                     float dot = Vector3.Dot(m_transform.forward, closestPointDir);
                     if(dot > 0)
                     {
-                        Vector3 v1 = m_transform.position - closestPoint;   //  Normal vector
-                        Vector3 v2 = Vector3.Cross(v1, Vector3.up);         //  Wall angle
+                        Vector3 normal = m_transform.position - closestPoint;   //  Normal vector
+                        Vector3 v2 = Vector3.Cross(normal, Vector3.up);         //  Wall angle
 
-						Vector3 slideDir = v1 * Vector3.Dot(m_moveDirection, v1);
+						Vector3 slideDir = normal * Vector3.Dot(m_moveDirection, normal);
 						Vector3 wallSlideDir = (m_moveDirection - slideDir).normalized;
 						m_velocity = Vector3.Project(m_velocity, wallSlideDir);
 						Vector3 tangent = m_velocity;
-                        Vector3.OrthoNormalize(ref v1, ref tangent);
+                        Vector3.OrthoNormalize(ref normal, ref tangent);
 
-                        Debug.DrawRay(checkPosition, m_velocity, Color.blue);
-                        Debug.DrawRay(checkPosition.AddY(.1f), tangent, Color.green);
+                        //Debug.DrawRay(checkPosition, m_velocity, Color.blue);
+                        //Debug.DrawRay(checkPosition.AddY(.1f), tangent, Color.green);
 
 
                     }
 
-                    //Rigidbody rb = collision.attachedRigidbody;
-                    //if (rb != null)
-                    //{
-                    //    if (rb.mass > m_mass)
-                    //    {
-
-                    //    }
-                    //}
-                    //colliderBuffer[i].
-
                 }
-                //DebugDraw.DrawCapsule(p1, p2, castRadius, Color.gray);
-                DebugDraw.Sphere(castPosition, castRadius, Color.gray);
+
+
+                //if(m_velocity.sqrMagnitude > 100)
+                //{
+                //    Debug.Log("<b><color=red>[Velocity Exceede Speed]</color></b> Velocity Magnitude: " + m_rigidbody.velocity.magnitude);
+                //}
+
+                //if(DebugCollisions) DebugDraw.DrawCapsule(p1, p2, castRadius, Color.gray);
+                if (DebugCollisions) DebugDraw.Sphere(castPosition, castRadius, Color.gray);
             }
 
 
@@ -737,6 +742,8 @@ namespace CharacterController
         /// </summary>
         protected virtual void ApplyMovement()
         {
+            m_velocity = Vector3.ClampMagnitude(m_velocity, m_desiredSpeed);
+            //m_rigidbody.drag = Mathf.SmoothDamp(m_rigidbody.drag, m_moving ? 0 : m_mass, ref m_dragVelocity, m_moving ? m_groundAcceleration.z : m_motorDamping);
             m_rigidbody.velocity = Vector3.Lerp(m_rigidbody.velocity, m_velocity, m_deltaTime * 10);
         }
 
@@ -880,7 +887,7 @@ namespace CharacterController
                         Vector3 moveDirectionProjected = Vector3.Project(m_moveDirection, -penetrationVector);
                         //  m_transform.position = m_transform.position + penetrationVector;
                         //m_rigidbody.MovePosition(m_transform.position + penetrationVector);
-                        m_moveDirection = m_moveDirection.Combine(penetrationVector);
+                        m_moveDirection = m_moveDirection.Add(penetrationVector);
                         m_moveDirection -= moveDirectionProjected;      //  TODO: optimize me
 
 
@@ -950,13 +957,11 @@ namespace CharacterController
 
         protected void ClearNonAllocArrays()
         {
-            if (totalColliderHits > 0)
-                for (int i = 0; i < totalColliderHits; i++)
-                    m_probedColliders[i] = null;
-
-            //if (totalRaycastHits > 0)
-            //    for (int i = 0; i < totalRaycastHits; i++)
-            //        m_probedHits[i] = 
+            for (int i = 0; i < m_probedColliders.Length; i++)
+            {
+                if (m_probedColliders[i] == null) break;
+                m_probedColliders[i] = default;
+            }
         }
 
 
@@ -997,8 +1002,9 @@ namespace CharacterController
             //DebugUI.Log(this, "m_angularVelocity", m_angularVelocity, RichTextColor.Magenta);
             //DebugUI.Log(this, "r_angularVelocity", m_rigidbody.angularVelocity, RichTextColor.Magenta);
 
-            //DebugUI.Log(this, "5 Power 3", 5f.Pow(3));
-            DebugUI.Log(this, "Angle 730", 730.ClampAngle());
+
+            DebugUI.Log(this, MathUtil.Round(m_rigidbody.maxDepenetrationVelocity), "maxDepenetrationVelocity");
+            DebugUI.Log(this, m_rigidbody.maxDepenetrationVelocity.Round2(4), "maxDepenetrationVelocity2");
         }
 
 

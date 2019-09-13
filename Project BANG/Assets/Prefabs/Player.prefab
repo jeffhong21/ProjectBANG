@@ -494,7 +494,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 80
-  m_CollisionDetection: 1
+  m_CollisionDetection: 0
 --- !u!136 &8140073959955325728
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -543,7 +543,7 @@ MonoBehaviour:
     states:
       showDebugUI: 1
       showGroundCheck: 0
-      showCollisions: 0
+      showCollisions: 1
       showMotion: 0
     colors:
       moveDirectionColor: {r: 0, g: 0, b: 1, a: 1}
@@ -555,9 +555,6 @@ MonoBehaviour:
     arrowTipSize: 0.2
     arrowWidth: 0.4
   m_probedColliders: []
-  colliderBuffer: []
-  totalColliderHits: 0
-  totalRaycastHits: 0
   m_sampleRate: 4
   m_positionBias: 0.4
   m_directionBias: 1.93
@@ -592,9 +589,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_activeAction: {fileID: 0}
+  m_previousAction: {fileID: 0}
+  m_nextAction: {fileID: 0}
   horizontalInputDampTime: 0.1
   forwardInputDampTime: 0.1
-  debugStateChanges: 0
+  debugStateChanges: 1
   logEvents: 0
 --- !u!114 &1928667715822584718
 MonoBehaviour:
@@ -1311,9 +1310,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IsActive: 0
-  m_StateName: 
+  m_StateName: Aim
   m_LayerIndex: 0
   m_ActionID: 0
+  m_Priority: 5
   m_TransitionDuration: 0.2
   m_StartType: 2
   m_StopType: 3
@@ -1334,15 +1334,16 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eb969d52822a24d8dbd0b8c198a14803, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_IsActive: 0
-  m_StateName: 
+  m_StateName: StartMovement
   m_LayerIndex: 0
   m_ActionID: 1
+  m_Priority: 7
   m_TransitionDuration: 0.2
   m_StartType: 0
   m_StopType: 0
@@ -1362,15 +1363,16 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5dcb0e67b11b04af4b61cb44c64d5a63, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_IsActive: 0
-  m_StateName: 
+  m_StateName: StopMovement
   m_LayerIndex: 0
   m_ActionID: 2
+  m_Priority: 4
   m_TransitionDuration: 0.1
   m_StartType: 0
   m_StopType: 0
@@ -1397,9 +1399,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IsActive: 0
-  m_StateName: 
+  m_StateName: Jump
   m_LayerIndex: 0
   m_ActionID: 21
+  m_Priority: 1
   m_TransitionDuration: 0.1
   m_StartType: 2
   m_StopType: 0
@@ -1412,7 +1415,7 @@ MonoBehaviour:
   m_StartEffect: {fileID: 0}
   m_EndEffect: {fileID: 0}
   m_Debug: 0
-  m_jumpHeight: 4
+  m_jumpHeight: 2
   m_recurrenceDelay: 0.2
   m_startJump: 0
   m_hasReachedApex: 0
@@ -1430,9 +1433,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IsActive: 0
-  m_StateName: 
+  m_StateName: Fall
   m_LayerIndex: 0
   m_ActionID: 4
+  m_Priority: 2
   m_TransitionDuration: 0.2
   m_StartType: 0
   m_StopType: 0
@@ -1460,9 +1464,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IsActive: 0
-  m_StateName: 
+  m_StateName: Crouch
   m_LayerIndex: 0
   m_ActionID: 5
+  m_Priority: 6
   m_TransitionDuration: 0.2
   m_StartType: 2
   m_StopType: 3
@@ -1482,15 +1487,16 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3f62eddceb76e4ce2aab0985c2db98db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_IsActive: 0
-  m_StateName: 
+  m_StateName: QuickTurn
   m_LayerIndex: 0
   m_ActionID: 3
+  m_Priority: 3
   m_TransitionDuration: 0.2
   m_StartType: 0
   m_StopType: 0
@@ -1516,9 +1522,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IsActive: 0
-  m_StateName: 
+  m_StateName: Vault
   m_LayerIndex: 0
   m_ActionID: 31
+  m_Priority: 0
   m_TransitionDuration: 0.2
   m_StartType: 2
   m_StopType: 0

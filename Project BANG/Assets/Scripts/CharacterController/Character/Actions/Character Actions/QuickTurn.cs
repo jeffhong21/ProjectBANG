@@ -51,12 +51,12 @@ namespace CharacterController
             }
 
 
-            float dot = Vector3.Dot(m_Controller.InputVector.normalized, m_Transform.forward);
+            float dot = Vector3.Dot(m_Controller.InputVector.normalized, m_transform.forward);
             if (!startInputChecks && dot <= threshold)
             {
                 startInputChecks = true;
                 inputDirection = m_Controller.InputVector.normalized;
-                rotationRemaining = Vector3.Angle(m_Transform.forward, inputDirection);
+                rotationRemaining = Vector3.Angle(m_transform.forward, inputDirection);
                 //Debug.LogFormat("dot: {0} | rotationRemaining: {1}", dot, rotationRemaining);
             }
             return false;
@@ -69,18 +69,18 @@ namespace CharacterController
             //  Get the start angle.
             startAngle = rotationRemaining;
             //  Get the turn direction.
-            turnDirection = Vector3.Cross(inputDirection, m_Transform.forward).y >= 0 ? -1f : 1f;
+            turnDirection = Vector3.Cross(inputDirection, m_transform.forward).y >= 0 ? -1f : 1f;
 
 
             //  Set ActionID parameter.
             if (m_StateName.Length == 0)
-                m_Animator.SetInteger(HashID.ActionID, m_ActionID);
+                m_animator.SetInteger(HashID.ActionID, m_ActionID);
         }
 
 
         public override bool CanStopAction()
         {
-            rotationRemaining = Vector3.Angle(m_Transform.forward, inputDirection);
+            rotationRemaining = Vector3.Angle(m_transform.forward, inputDirection);
             //return rotationRemaining <= 10;
             if (Time.time > m_ActionStartTime + 1 || rotationRemaining <= 10)
                 return true;
@@ -105,8 +105,8 @@ namespace CharacterController
         public override bool UpdateMovement()
         {
 
-            float dot = Vector3.Dot(inputDirection, m_Transform.forward);
-            m_Rigidbody.velocity = Vector3.SmoothDamp(m_Rigidbody.velocity, dot > 0 ? m_Controller.RootMotionVelocity : Vector3.zero, ref velocitySmoothDamp, 0.1f);
+            float dot = Vector3.Dot(inputDirection, m_transform.forward);
+            m_rigidbody.velocity = Vector3.SmoothDamp(m_rigidbody.velocity, dot > 0 ? m_Controller.RootMotionVelocity : Vector3.zero, ref velocitySmoothDamp, 0.1f);
 
 
             return false;
@@ -115,31 +115,31 @@ namespace CharacterController
 
         public override bool UpdateRotation()
         {
-            float dot = Vector3.Dot(inputDirection, m_Transform.forward);
+            float dot = Vector3.Dot(inputDirection, m_transform.forward);
 
             float degreesPerSecond = 120;
-            turnDirection = Vector3.Cross(inputDirection, m_Transform.forward).y >= 0 ? -1f : 1f;
+            turnDirection = Vector3.Cross(inputDirection, m_transform.forward).y >= 0 ? -1f : 1f;
             Vector3 rotationVector = Vector3.Lerp(Vector3.zero, new Vector3(0, degreesPerSecond * (turnDirection < 0 ? -1 : 1), 0), Mathf.Abs(turnDirection));
             Quaternion turnRotation = Quaternion.Euler(rotationVector);
-			turnRotation = m_Transform.rotation * turnRotation;
+			turnRotation = m_transform.rotation * turnRotation;
 
 
 
 			turnRotation.ToAngleAxis(out float angle, out Vector3 axis);
-            m_Rigidbody.angularVelocity = Vector3.Lerp(m_Rigidbody.angularVelocity, axis.normalized * angle, m_DeltaTime * m_Controller.RotationSpeed);
+            m_rigidbody.angularVelocity = Vector3.Lerp(m_rigidbody.angularVelocity, axis.normalized * angle, m_deltaTime * m_Controller.RotationSpeed);
 
 
-            // float rotationAngle = Vector3.Angle(m_Transform.forward, inputDirection);
+            // float rotationAngle = Vector3.Angle(m_transform.forward, inputDirection);
             // float t = rotationAngle / startAngle;
             // //float t = startAngle / (startAngle - rotationAngle); //  180 / (180 - X)
             // float u = (1 - t);
             // float percentage = 1 - (u * u * u);
 
 
-            // Quaternion currentRotation = Quaternion.AngleAxis(turnDirection * rotationAngle, m_Transform.up);
-            // Quaternion targetRotation = Quaternion.AngleAxis(startAngle, m_Transform.up);
+            // Quaternion currentRotation = Quaternion.AngleAxis(turnDirection * rotationAngle, m_transform.up);
+            // Quaternion targetRotation = Quaternion.AngleAxis(startAngle, m_transform.up);
 
-            // m_Rigidbody.MoveRotation(Quaternion.Slerp(currentRotation, targetRotation, percentage) );
+            // m_rigidbody.MoveRotation(Quaternion.Slerp(currentRotation, targetRotation, percentage) );
 
             // Debug.LogFormat("<b><color=red>[QuickTurn] percentage: {0} </color></b>", percentage);
 

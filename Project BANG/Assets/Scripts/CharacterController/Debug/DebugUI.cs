@@ -14,7 +14,7 @@ namespace DebugUI
         private static StringBuilder propertyMessages = new StringBuilder(2000);
         private static Dictionary<object, Dictionary<string, string>> propertyLogs;
 
-
+        public static bool IsNullable(Type type) => Nullable.GetUnderlyingType(type) != null;
 
         public struct DebugMessage
         {
@@ -36,7 +36,18 @@ namespace DebugUI
         //
         //  Add seperators to the end of the message
         //
+        public static void Log<T, W>(T value, W property, string label, RichTextColor textColor = default) where T : class
+        {
+            if(IsNullable(typeof(W)) )
+                Log(value, label, property == null ? "null" : property.ToString(), textColor, textColor);
+            else
+                Log(value, label, property.ToString(), textColor, textColor);
+        }
 
+        public static void Log<T>(T value, string property, string label, RichTextColor textColor = default) where T : class
+        {
+            Log(value, label, property, textColor, textColor);
+        }
 
         public static void Log<T, W>(T value, string property, W message, RichTextColor textColor = default) where T : class
         {

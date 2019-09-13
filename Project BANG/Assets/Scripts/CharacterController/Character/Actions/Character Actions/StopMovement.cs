@@ -74,7 +74,7 @@
             }
 
 
-            //CharacterDebug.Log("--- IsStopMoving", m_Animator.pivotWeight);
+            //CharacterDebug.Log("--- IsStopMoving", m_animator.pivotWeight);
             return false;
         }
 
@@ -85,13 +85,13 @@
         {
             //  Set ActionID parameter.
             if (m_StateName.Length == 0)
-                m_Animator.SetInteger(HashID.ActionID, m_ActionID);
+                m_animator.SetInteger(HashID.ActionID, m_ActionID);
 
             //  Determine if we should play walk or run stop.
             int actionIntData = 0;
             if (m_Controller.Speed >= 1) actionIntData = 1;
 
-            m_Animator.SetInteger(HashID.ActionIntData, actionIntData);
+            m_animator.SetInteger(HashID.ActionIntData, actionIntData);
         }
 
 
@@ -102,35 +102,35 @@
 
         public override bool CanStopAction()
         {
-            //if (m_Animator.pivotWeight == 0.5f) {
+            //if (m_animator.pivotWeight == 0.5f) {
             //    Debug.LogFormat("Stopping {0} by pivotWeight");
             //    return true;
             //}
                 
 
             int layerIndex = 0;
-            if (m_Animator.GetNextAnimatorStateInfo(layerIndex).fullPathHash == 0 && m_Animator.IsInTransition(layerIndex)) {
-                Debug.LogFormat("{1} is exiting. | {0} is the next state.", m_AnimatorMonitor.GetStateName(m_Animator.GetNextAnimatorStateInfo(layerIndex).fullPathHash), this.GetType());
-                Debug.Log(Mathf.Abs(m_Rigidbody.velocity.x) + Mathf.Abs(m_Rigidbody.velocity.z));
+            if (m_animator.GetNextAnimatorStateInfo(layerIndex).fullPathHash == 0 && m_animator.IsInTransition(layerIndex)) {
+                Debug.LogFormat("{1} is exiting. | {0} is the next state.", m_animatorMonitor.GetStateName(m_animator.GetNextAnimatorStateInfo(layerIndex).fullPathHash), this.GetType());
+                Debug.Log(Mathf.Abs(m_rigidbody.velocity.x) + Mathf.Abs(m_rigidbody.velocity.z));
                 return true;
             }
-            //if (m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(m_DestinationStateName))
+            //if (m_animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(m_DestinationStateName))
             //{
-            //    if (m_Animator.GetNextAnimatorStateInfo(0).shortNameHash != 0 && m_Animator.IsInTransition(0))
+            //    if (m_animator.GetNextAnimatorStateInfo(0).shortNameHash != 0 && m_animator.IsInTransition(0))
             //    {
             //        Debug.LogFormat("{0} has stopped because it is entering Exit State", m_StateName);
             //        return true;
             //    }
 
-            //    if (m_Animator.IsInTransition(0))
+            //    if (m_animator.IsInTransition(0))
             //    {
             //        return true;
             //    }
             //}
 
-            //if (Mathf.Abs(m_Rigidbody.velocity.x) + Mathf.Abs(m_Rigidbody.velocity.z) <= 0.05f) return true;
+            //if (Mathf.Abs(m_rigidbody.velocity.x) + Mathf.Abs(m_rigidbody.velocity.z) <= 0.05f) return true;
 
-            //if (m_Animator.pivotWeight == 0.5f) return true;
+            //if (m_animator.pivotWeight == 0.5f) return true;
 
             if (Time.time > m_ActionStartTime + .5f)
                 return true;

@@ -2,7 +2,7 @@
 {
     using UnityEngine;
     using System;
-    using System.Collections;
+    using System.Collections.Generic;
 
     using DebugUI;
 
@@ -19,7 +19,9 @@
         protected CharacterAction[] m_Actions;
         [SerializeField, HideInInspector]
         protected CharacterAction m_ActiveActions;
+        protected CharacterAction m_activeAction;
 
+        protected Dictionary<CharacterAction, int> m_actionInfo;
 
         protected float m_viewAngle;
         protected Vector3 m_lookDirection;
@@ -70,10 +72,14 @@
 
         private void Awake()
         {
+            m_actionInfo = new Dictionary<CharacterAction, int>();
 
+            for (int i = 0; i < m_Actions.Length; i++)
+            {
+                if (!m_actionInfo.ContainsKey(m_Actions[i])) m_actionInfo.Add(m_Actions[i], i);
+                else m_actionInfo[m_Actions[i]] = i;
 
-            for (int i = 0; i < m_Actions.Length; i++) {
-                m_Actions[i].Initialize(this, fixedDeltaTime);
+                m_Actions[i].Initialize(this, Array.IndexOf(m_Actions, m_Actions[i]), fixedDeltaTime);
             }
 
             //EventHandler.RegisterEvent<CharacterAction, bool>(m_GameObject, EventIDs.OnCharacterActionActive, OnActionActive);
@@ -93,6 +99,14 @@
         }
 
 
+        private void OnValidate()
+        {
+            if(m_Actions != null){
+                for (int i = 0; i < m_Actions.Length; i++)
+                    m_Actions[i].SetPriority(i);
+            }
+
+        }
 
 
         private void Update()
@@ -102,14 +116,11 @@
             m_deltaTime = deltaTime;
 
 
-
-
-
-
             canMove = true;
 
             ////  Start Stop Actions.
-            for (int i = 0; i < m_Actions.Length; i++) {
+            for (int i = 0; i < m_Actions.Length; i++)
+            {
                 if (m_Actions[i].enabled == false)
                     continue;
                 CharacterAction charAction = m_Actions[i];
@@ -129,6 +140,7 @@
             }
 
             //  Moves the character according to the input.
+            InternalMove();
             if (canMove) Move();
         }
 
@@ -204,6 +216,9 @@
         }
 
 
+
+
+
         private void LateUpdate()
         {
             DebugAttributes();
@@ -217,52 +232,72 @@
         }
 
 
+
+
+
+
+
         #region Character Locomotion
 
 
-        /// <summary>
-        /// Move charatcer based on input values.
-        /// </summary>
-        protected override void Move()
+        private void OnUpdate(float deltaTime)
         {
-            base.Move();
+            m_deltaTime = deltaTime;
+            timeScale = Time.timeScale;
+            if (Math.Abs(timeScale) <= 0) return;
+
+            for (int i = 0; i < m_Actions.Length; i++)
+            {
+                //  Move to next action if action componenet is disabled.
+                if (!m_Actions[i].enabled) continue;
+                CharacterAction action = m_Actions[i];
+
+                if (action.IsActive == false)
+                {
+                    if (TryStartAction(action) && action.StartType != ActionStartType.Manual)
+                    {
+                        break;
+                    }
+                }
+                else {
+                    if (action.StopType != ActionStopType.Manual)
+                        TryStopAction(action);
+                }
+            }
+
+
+
+            InternalMove();
+            if (m_activeAction == null) Move();
+            else if (m_activeAction.Move()) Move();
+
+            if (m_activeAction == null) CheckGround();
+            else if (m_activeAction.CheckGround()) CheckGround();
+
+            if (m_activeAction == null) CheckMovement();
+            else if (m_activeAction.CheckMovement()) CheckMovement();
+
+            if (m_activeAction == null) SetPhysicsMaterial();
+            else if (m_activeAction.SetPhysicsMaterial()) SetPhysicsMaterial();
+
+            if (m_activeAction == null) UpdateMovement();
+            else if (m_activeAction.UpdateMovement()) UpdateMovement();
+
+            if (m_activeAction == null) UpdateRotation();
+            else if (m_activeAction.UpdateRotation()) UpdateRotation();
+
+            if (m_activeAction == null) UpdateAnimator();
+            else if (m_activeAction.UpdateAnimator()) UpdateAnimator();
+
+            ApplyRotation();
+            ApplyMovement();
+
+
+
         }
 
 
-        /// <summary>
-        /// Perform checks to determine if the character is on the ground.
-        /// </summary>
-        protected override void CheckGround()
-        {
-            base.CheckGround();
-        }
 
-
-        /// <summary>
-        /// Ensure the current movement direction is valid.
-        /// </summary>
-        protected override void CheckMovement()
-        {
-            base.CheckMovement();
-        }
-
-
-        /// <summary>
-        /// Update the character’s rotation values.
-        /// </summary>
-        protected override void UpdateRotation()
-        {
-            base.UpdateRotation();
-        }
-
-
-        /// <summary>
-        /// Apply any movement.
-        /// </summary>
-        protected override void UpdateMovement()
-        {
-            base.UpdateMovement();
-        }
 
 
         /// <summary>
@@ -339,31 +374,103 @@
         #region Character Actions
 
 
-        /// <summary>
-        /// Try to stop the characterAction.
-        /// </summary>
-        /// <param name="charAction"></param>
-        /// <returns></returns>
-        protected bool StopAction(CharacterAction charAction)
-        {
-            //  Current Action is Active.
-            if (charAction.enabled && charAction.IsActive) {
-                //  Check if can stop Action is StopType is NOT Manual.
-                if (charAction.StopType != ActionStopType.Manual) {
-                    if (charAction.CanStopAction()) {
-                        //  Start the Action and update the animator.
-                        charAction.StopAction();
-                        //  Reset Active Action.
-                        if (m_ActiveActions = charAction)
-                            m_ActiveActions = null;
-                        //  Move on to the next Action.
-                        return true;
-                    }
-                }
-            }
+        //public bool TryStartAction(CharacterAction action)
+        //{
+        //    if (action == null) return false;
 
-            return false;
-        }
+        //    int actionPriority = Array.IndexOf(m_Actions, action);
+        //    //  If there is an active action and current action is non concurrent.
+        //    if (m_activeAction != null && action.IsConcurrentAction() == false)
+        //    {
+        //        int activeActionPriority = Array.IndexOf(m_Actions, m_activeAction);
+        //        //Debug.LogFormat("Action index {0} | Active Action index {1}", index, activeActionIndex);
+        //        if (actionPriority < activeActionPriority)
+        //        {
+        //            if (action.CanStartAction())
+        //            {
+        //                //  Stop the current active action.
+        //                TryStopAction(m_activeAction, true);
+        //                //  Set the active action.
+        //                m_activeAction = action;
+        //                action.StartAction();
+        //                return true;
+        //            }
+        //        }
+        //    }
+        //    //  If there is an active action and current action is concurrent.
+        //    else if (m_activeAction != null && action.IsConcurrentAction())
+        //    {
+        //        if (action.CanStartAction())
+        //        {
+        //            //m_ActiveActions[index] = m_Actions[index];
+        //            action.StartAction();
+        //            //action.UpdateAnimator();
+        //            return true;
+        //        }
+        //    }
+        //    //  If there is no active action.
+        //    else
+        //    {
+        //        if (action.CanStartAction())
+        //        {
+        //            m_activeAction = m_Actions[actionPriority];
+        //            //m_ActiveActions[index] = m_Actions[index];
+        //            action.StartAction();
+        //            //action.UpdateAnimator();
+        //            return true;
+        //        }
+        //    }
+
+
+        //    return false;
+        //}
+
+
+        //public void TryStopAction(CharacterAction action, bool force)
+        //{
+        //    if (force)
+        //    {
+        //        if (action == null || !action.IsActive || !action.enabled) return;
+
+        //        if (action.enabled && action.IsActive)
+        //        {
+        //            action.StopAction();
+        //            ActionStopped();
+        //        }
+
+        //    }
+        //    else
+        //    {
+        //        TryStopAction(action);
+        //    }
+
+            
+
+
+
+
+        //}
+
+
+        //public void TryStopAction(CharacterAction action)
+        //{
+        //    if (action == null || !action.IsActive || !action.enabled) return;
+
+        //    if (action.enabled && action.IsActive)
+        //    {
+        //        if (action.CanStopAction())
+        //        {
+        //            action.StopAction();
+        //            if (m_activeAction == action)
+        //                m_activeAction = null;
+        //            ActionStopped();
+        //            return;
+        //        }
+        //    }
+        //}
+
+
+
 
 
 
@@ -453,11 +560,14 @@
 
             int index = Array.IndexOf(m_Actions, action);
             //  If there is an active action and current action is non concurrent.
-            if(m_ActiveActions != null && action.IsConcurrentAction() == false){
+            if (m_ActiveActions != null && action.IsConcurrentAction() == false)
+            {
                 int activeActionIndex = Array.IndexOf(m_Actions, m_ActiveActions);
                 //Debug.LogFormat("Action index {0} | Active Action index {1}", index, activeActionIndex);
-                if(index < activeActionIndex){
-                    if (action.CanStartAction()){
+                if (index < activeActionIndex)
+                {
+                    if (action.CanStartAction())
+                    {
                         //  Stop the current active action.
                         TryStopAction(m_ActiveActions);
                         //  Set the active action.
@@ -467,12 +577,13 @@
                         //action.UpdateAnimator();
                         return true;
                     }
-                } 
+                }
             }
             //  If there is an active action and current action is concurrent.
             else if (m_ActiveActions != null && action.IsConcurrentAction())
             {
-                if (action.CanStartAction()){
+                if (action.CanStartAction())
+                {
                     //m_ActiveActions[index] = m_Actions[index];
                     action.StartAction();
                     //action.UpdateAnimator();
@@ -480,7 +591,8 @@
                 }
             }
             //  If there is no active action.
-            else if (m_ActiveActions == null){
+            else if (m_ActiveActions == null)
+            {
                 if (action.CanStartAction())
                 {
                     m_ActiveActions = m_Actions[index];
@@ -508,11 +620,14 @@
         }
 
 
+
+
         public void TryStopAction(CharacterAction action)
         {
-            if (action == null) return; 
+            if (action == null) return;
 
-            if (action.CanStopAction()){
+            if (action.CanStopAction())
+            {
                 int index = Array.IndexOf(m_Actions, action);
                 if (m_ActiveActions == action)
                     m_ActiveActions = null;
@@ -526,13 +641,12 @@
 
         public void TryStopAction(CharacterAction action, bool force)
         {
-            if (action == null) return; 
-            if(force){
-                int index = Array.IndexOf(m_Actions, action);
+            if (action == null) return;
+            if (force)
+            {
+                //int index = Array.IndexOf(m_Actions, action);
                 if (m_ActiveActions == action)
                     m_ActiveActions = null;
-
-
                 action.StopAction();
                 ActionStopped();
                 return;
@@ -592,6 +706,11 @@
 
 
 
+        public int GetActionPriority(CharacterAction action)
+        {
+            if (!m_actionInfo.TryGetValue(action, out int index)) index = -1;
+            return index;
+        }
 
 
         public void SetMovementType( MovementTypes movementType )

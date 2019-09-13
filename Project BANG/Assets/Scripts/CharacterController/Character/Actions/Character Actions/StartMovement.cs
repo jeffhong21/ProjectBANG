@@ -70,14 +70,14 @@ namespace CharacterController
                 case (RigidbodyCharacterController.MovementTypes.Adventure):
 
 
-                    startAngle = m_Controller.GetAngleFromForward(m_Controller.LookRotation * m_Transform.forward);
-                    //Vector3 moveDirection = m_Transform.InverseTransformDirection(m_Controller.InputVector);
-                    //Vector3 axisSign = Vector3.Cross(moveDirection, m_Transform.forward);
-                    //startAngle = Vector3.Angle(moveDirection, m_Transform.forward) * (axisSign.y >= 0 ? -1f : 1f);
+                    startAngle = m_Controller.GetAngleFromForward(m_Controller.LookRotation * m_transform.forward);
+                    //Vector3 moveDirection = m_transform.InverseTransformDirection(m_Controller.InputVector);
+                    //Vector3 axisSign = Vector3.Cross(moveDirection, m_transform.forward);
+                    //startAngle = Vector3.Angle(moveDirection, m_transform.forward) * (axisSign.y >= 0 ? -1f : 1f);
                     break;
                 case (RigidbodyCharacterController.MovementTypes.Combat):
-                    //moveDirection = m_Transform.rotation * m_Controller.InputVector;
-                    //startAngle = Vector3.Angle(m_Transform.forward, moveDirection) * m_Controller.InputVector.x;
+                    //moveDirection = m_transform.rotation * m_Controller.InputVector;
+                    //startAngle = Vector3.Angle(m_transform.forward, moveDirection) * m_Controller.InputVector.x;
                     startAngle = Mathf.Atan2(m_Controller.InputVector.x, m_Controller.InputVector.z) * Mathf.Rad2Deg;
                     break;
             }
@@ -86,10 +86,10 @@ namespace CharacterController
             startAngle = Mathf.Approximately(startAngle, 0) ? 0 : (float)Math.Round(startAngle, 2);
 
 
-            if (m_StateName.Length == 0) m_Animator.SetInteger(HashID.ActionID, m_ActionID);
-            m_Animator.SetFloat(HashID.ActionFloatData, startAngle);
+            if (m_StateName.Length == 0) m_animator.SetInteger(HashID.ActionID, m_ActionID);
+            m_animator.SetFloat(HashID.ActionFloatData, startAngle);
 
-            actionStarted = true;
+
         }
 
 
@@ -100,11 +100,11 @@ namespace CharacterController
         //        m_Controller.RootMotionRotation.ToAngleAxis(out float angleInDegrees, out Vector3 rotationAxis);
 
         //        //  Update angular velocity.
-        //        m_Rigidbody.angularVelocity = Vector3.Lerp(m_Rigidbody.angularVelocity, rotationAxis.normalized * angleInDegrees, m_DeltaTime * m_Controller.RotationSpeed);
+        //        m_rigidbody.angularVelocity = Vector3.Lerp(m_rigidbody.angularVelocity, rotationAxis.normalized * angleInDegrees, m_deltaTime * m_Controller.RotationSpeed);
 
         //        //  Update the rotations.
-        //        var targetRotation = Quaternion.Slerp(m_Transform.rotation, Quaternion.AngleAxis(angleInDegrees, rotationAxis.normalized), m_DeltaTime * m_Controller.RotationSpeed);
-        //        m_Rigidbody.MoveRotation(targetRotation * m_Transform.rotation);
+        //        var targetRotation = Quaternion.Slerp(m_transform.rotation, Quaternion.AngleAxis(angleInDegrees, rotationAxis.normalized), m_deltaTime * m_Controller.RotationSpeed);
+        //        m_rigidbody.MoveRotation(targetRotation * m_transform.rotation);
         //        return false;
         //    }
 
@@ -112,31 +112,31 @@ namespace CharacterController
         //}
 
 
-        bool actionStarted;
+
         public override bool CanStopAction()
         {
-            //if (m_Animator.GetAnimatorTransitionInfo(0).anyState) {
-            //    var state = m_AnimatorMonitor.GetStateName(m_Animator.GetCurrentAnimatorStateInfo(0).fullPathHash);
-            //    var clip = m_Animator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
-            //    Debug.LogFormat("Current State is <color=blue>{0}</color>.  Current clip is <color=blue>{1}</color>", state, clip);
-            //}
+            ////if (m_animator.GetAnimatorTransitionInfo(0).anyState) {
+            ////    var state = m_animatorMonitor.GetStateName(m_animator.GetCurrentAnimatorStateInfo(0).fullPathHash);
+            ////    var clip = m_animator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
+            ////    Debug.LogFormat("Current State is <color=blue>{0}</color>.  Current clip is <color=blue>{1}</color>", state, clip);
+            ////}
 
-            //if (actionStarted) {
-            //    var state = m_AnimatorMonitor.GetStateName(m_Animator.GetCurrentAnimatorStateInfo(0).fullPathHash);
-            //    var clip = m_Animator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
-            //    Debug.LogFormat("Current State is <color=red>{0}</color>.  Current clip is <color=red>{1}</color>", state, clip);
-            //    actionStarted = false;
-            //}
+            ////if (actionStarted) {
+            ////    var state = m_animatorMonitor.GetStateName(m_animator.GetCurrentAnimatorStateInfo(0).fullPathHash);
+            ////    var clip = m_animator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
+            ////    Debug.LogFormat("Current State is <color=red>{0}</color>.  Current clip is <color=red>{1}</color>", state, clip);
+            ////    actionStarted = false;
+            ////}
 
-            if (m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(m_StateName))
+            if (m_animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(m_StateName))
             {
-                if (m_Animator.GetNextAnimatorStateInfo(0).shortNameHash != 0 && m_Animator.IsInTransition(0))
+                if (m_animator.GetNextAnimatorStateInfo(0).shortNameHash != 0 && m_animator.IsInTransition(0))
                 {
                     Debug.LogFormat("{0} has stopped because it is entering Exit State", m_StateName);
                     return true;
                 }
 
-                if (m_Animator.IsInTransition(0))
+                if (m_animator.IsInTransition(0))
                 {
                     return true;
                 }
@@ -148,7 +148,7 @@ namespace CharacterController
 
 
         protected override void ActionStopped(){
-            //m_Animator.CrossFade("LocomotionFwd", 0.2f, 0);
+            //m_animator.CrossFade("LocomotionFwd", 0.2f, 0);
             startAngle = 0;
         }
 

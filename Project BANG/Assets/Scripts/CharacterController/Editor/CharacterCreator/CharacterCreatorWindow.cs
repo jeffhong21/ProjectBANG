@@ -33,7 +33,7 @@ namespace CharacterController.CharacterCreator
         private GameObject _CharacterObject;
 
 
-        [MenuItem("Character/Create Character", false, -1)]
+        [MenuItem("Character Controller/Create Character", false, -1)]
         public static void ShowWindow()
         {
             var window = GetWindow<CharacterCreatorWindow>();

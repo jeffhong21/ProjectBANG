@@ -15,17 +15,17 @@ namespace CharacterController
         [SerializeField]
         private bool m_matchTarget = true;
         [SerializeField]
-        private Vector3 m_positionOffset = new Vector3(0, 0, 0);
+        private Vector3 m_positionOffset;
         [SerializeField]
-        private Vector3 m_rotationOffset = new Vector3(0, 0, 0);
-        [SerializeField, Range(0f,0.99f)]
-        private float m_startMatchTime = 0.1f;
+        private Vector3 m_rotationOffset;
+        [SerializeField, Range(0f, 0.99f)]
+        private float m_startMatchTime;
         [SerializeField, Range(0.01f, 1f)]
-        private float m_endMatchTime = 0.2f;
+        private float m_endMatchTime;
         //[MinMaxRange(0, 1)]
         //public Vector2 matchTargetRange = new Vector2(0.1f, 0.2f);
         [SerializeField]
-        private AvatarTarget m_avatarTarget = AvatarTarget.Root;
+        private AvatarTarget m_targetBodyPart = AvatarTarget.Root;
         [SerializeField]
         private Vector3 m_positionXYZWeight = Vector3.one;
         [SerializeField, Range(0f, 1f)]
@@ -55,7 +55,7 @@ namespace CharacterController
         public Vector3 matchPosition {
             get {
                 if (m_positionOffset != Vector3.zero)
-                    return m_matchPosition.Combine(m_positionOffset);
+                    return m_matchPosition.Add(m_positionOffset);
                 return m_matchPosition;
             }
             set { m_matchPosition = value; }
@@ -69,6 +69,9 @@ namespace CharacterController
             }
             set { m_matchRotation = value; }
         }
+
+
+        public AvatarTarget targetBodyPart { get { return m_targetBodyPart; } set { m_targetBodyPart = value; } }
 
         public Vector2 matchTargetRange {
             get {
@@ -92,7 +95,7 @@ namespace CharacterController
             get
             {
                 var bone = HumanBodyBones.Hips;
-                switch (m_avatarTarget)
+                switch (m_targetBodyPart)
                 {
                     case AvatarTarget.LeftHand:
                         bone = HumanBodyBones.LeftHand;
@@ -128,13 +131,21 @@ namespace CharacterController
         }
 
 
-
-
-        public bool MatchTarget( Vector3 targetPosition, Quaternion targetRotation )
+        public bool MatchTarget()
         {
-            if (m_animator.isMatchingTarget || !m_matchTarget) return false;
+            if (!m_matchTarget) return false;
+            m_animator.MatchTarget(m_matchPosition + m_positionOffset, m_matchRotation, m_targetBodyPart, m_weightMask, matchTargetRange.x, matchTargetRange.y);
+            return true;
+        }
 
-            m_animator.MatchTarget(targetPosition + m_positionOffset, targetRotation, m_avatarTarget, m_weightMask, matchTargetRange.x, matchTargetRange.y);
+        public bool SetMatchTarget( Vector3 targetPosition, Quaternion targetRotation )
+        {
+            if (!m_matchTarget) return false;
+
+            m_matchPosition = targetPosition;
+            m_matchRotation = targetRotation;
+
+            m_animator.MatchTarget(m_matchPosition + m_positionOffset, m_matchRotation, m_targetBodyPart, m_weightMask, matchTargetRange.x, matchTargetRange.y);
 
             return true;
         }
@@ -144,8 +155,9 @@ namespace CharacterController
         {
             if(stopMatch) m_animator.InterruptMatchTarget(completeMatch);
 
-            m_matchPosition = default;
-            m_matchRotation = default;
+            m_matchPosition = Vector3.zero;
+            m_matchRotation = Quaternion.identity;
+            m_matchTarget = false;
         }
     }
 

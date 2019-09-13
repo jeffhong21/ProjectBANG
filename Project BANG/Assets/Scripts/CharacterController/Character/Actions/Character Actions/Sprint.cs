@@ -83,13 +83,13 @@ namespace CharacterController
         {
             m_CurrentStanima = Mathf.Clamp(m_CurrentStanima - m_StaminaDecreaseRate, 0, 100);
 
-            ////m_Rigidbody.AddForce(m_Transform.forward * m_SpeedChangeMultiplier * m_DeltaTime, ForceMode.VelocityChange);
+            ////m_rigidbody.AddForce(m_transform.forward * m_SpeedChangeMultiplier * m_deltaTime, ForceMode.VelocityChange);
 
-            //var velocity = (m_Animator.deltaPosition / m_DeltaTime);
-            //velocity.y = m_Controller.Grounded ? 0 : m_Rigidbody.velocity.y;
-            ////m_Rigidbody.velocity = Vector3.SmoothDamp(m_Rigidbody.velocity, m_Velocity, ref m_velocitySmooth, m_Moving ? m_Acceleration : m_MotorDamping);
-            ////m_Rigidbody.velocity = Vector3.Lerp(m_Rigidbody.velocity, m_Velocity, m_MovementSpeed);
-            //m_Rigidbody.velocity = velocity;
+            //var velocity = (m_animator.deltaPosition / m_deltaTime);
+            //velocity.y = m_Controller.Grounded ? 0 : m_rigidbody.velocity.y;
+            ////m_rigidbody.velocity = Vector3.SmoothDamp(m_rigidbody.velocity, m_Velocity, ref m_velocitySmooth, m_Moving ? m_Acceleration : m_MotorDamping);
+            ////m_rigidbody.velocity = Vector3.Lerp(m_rigidbody.velocity, m_Velocity, m_MovementSpeed);
+            //m_rigidbody.velocity = velocity;
 
             return true;
         }

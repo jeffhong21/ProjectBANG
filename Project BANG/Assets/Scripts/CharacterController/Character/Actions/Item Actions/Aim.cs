@@ -25,16 +25,16 @@
 
         protected override void ActionStarted()
         {
-            movementsetID = m_Inventory.CurrentlyEquippedItem == null ? 0 : m_Inventory.CurrentlyEquippedItem.AnimatorMovementSetID;
-            //m_AnimatorMonitor.SetItemID(GetItemID(), m_ItemStateID);
+            movementsetID = m_inventory.CurrentlyEquippedItem == null ? 0 : m_inventory.CurrentlyEquippedItem.AnimatorMovementSetID;
+            //m_animatorMonitor.SetItemID(GetItemID(), m_ItemStateID);
             m_Controller.Aiming = true;
-            m_Animator.SetBool(HashID.Aiming, m_Controller.Aiming);
+            m_animator.SetBool(HashID.Aiming, m_Controller.Aiming);
 
-            m_AnimatorMonitor.SetActionID(m_ActionID);
-            m_AnimatorMonitor.SetMovementSetID(movementsetID);
+            m_animatorMonitor.SetActionID(m_ActionID);
+            m_animatorMonitor.SetMovementSetID(movementsetID);
 
 
-            EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnAimActionStart, m_Controller.Aiming);
+            EventHandler.ExecuteEvent(m_gameObject, EventIDs.OnAimActionStart, m_Controller.Aiming);
 
         }
 
@@ -42,10 +42,10 @@
         protected override void ActionStopped()
         {
 
-            //m_AnimatorMonitor.SetItemID(GetItemID(), 0);
+            //m_animatorMonitor.SetItemID(GetItemID(), 0);
             m_Controller.Aiming = false;
-            m_Animator.SetBool(HashID.Aiming, m_Controller.Aiming);
-            EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnAimActionStart, m_Controller.Aiming);
+            m_animator.SetBool(HashID.Aiming, m_Controller.Aiming);
+            EventHandler.ExecuteEvent(m_gameObject, EventIDs.OnAimActionStart, m_Controller.Aiming);
         }
 
 

@@ -40,7 +40,7 @@ namespace CharacterController
         {
             if (!base.CanStartAction()) return false;
 
-            return m_nextJump < Time.time && m_Controller.Grounded && m_Rigidbody.velocity.y > -0.01f;
+            return m_nextJump < Time.time && m_Controller.Grounded && m_rigidbody.velocity.y > -0.01f;
 
 		}
 
@@ -50,16 +50,17 @@ namespace CharacterController
             m_nextJump = Time.time + m_recurrenceDelay;
             //  Set ActionID parameter.
             if (m_StateName.Length == 0)
-                m_Animator.SetInteger(HashID.ActionID, m_ActionID);
+                m_animator.SetInteger(HashID.ActionID, m_ActionID);
 
 
             float heightAdjusted = m_jumpHeight - m_Controller.ColliderHeight * m_Controller.ColliderRadius;
             heightAdjusted = m_jumpHeight;
             m_verticalVelocity = Vector3.up * Mathf.Sqrt(2 * heightAdjusted * Mathf.Abs(m_Controller.Gravity.y) );
-            //m_Rigidbody.velocity += m_verticalVelocity;
+            //m_rigidbody.velocity += m_verticalVelocity;
 
-
-            m_Rigidbody.AddForce(m_verticalVelocity, ForceMode.VelocityChange);
+            //m_rigidbody.ResetCenterOfMass();
+            m_rigidbody.velocity += m_verticalVelocity;
+            //m_rigidbody.AddRelativeForce(m_verticalVelocity, ForceMode.VelocityChange);
         }
 
 
@@ -73,8 +74,9 @@ namespace CharacterController
         {
             base.ActionStopped();
 
+            m_Controller.Velocity = Vector3.zero;
             m_startJump = m_hasReachedApex = m_hasLanded = default;
-            m_verticalVelocity = default;
+            m_verticalVelocity = Vector3.zero;
         }
 
 
@@ -86,21 +88,21 @@ namespace CharacterController
             }
 
 
-            //if (m_Rigidbody.velocity.y > 0) {
+            //if (m_rigidbody.velocity.y > 0) {
             //    RaycastHit hit = m_Controller.GetSphereCastGroundHit();
 
-            //    float groundDistance = Vector3.Project(m_Transform.position - hit.point, m_Transform.up).magnitude;
-            //    if (groundDistance < 0.1f && m_Rigidbody.velocity.y <= 0){
+            //    float groundDistance = Vector3.Project(m_transform.position - hit.point, m_transform.up).magnitude;
+            //    if (groundDistance < 0.1f && m_rigidbody.velocity.y <= 0){
             //        m_Controller.Grounded = true;
             //    }
             //    m_Controller.Grounded = false;
 
             //}
             float radius = 0.1f;
-            Vector3 origin = m_Transform.position + Vector3.up * (0.1f);
+            Vector3 origin = m_transform.position + Vector3.up * (0.1f);
             origin += Vector3.up * radius;
 
-            if (Physics.SphereCast(origin, radius, Vector3.down, out RaycastHit groundHit, 0.3f * 2, m_Layers.SolidLayers))
+            if (Physics.SphereCast(origin, radius, Vector3.down, out RaycastHit groundHit, 0.3f * 2, m_layers.SolidLayers))
             {
                 m_Controller.Grounded = groundHit.distance < 0.3f;
             }
@@ -121,12 +123,12 @@ namespace CharacterController
         {
             if (!m_startJump)
             {
-                m_startJump = m_Rigidbody.velocity.y > 0;
+                m_startJump = m_rigidbody.velocity.y > 0;
             }
 
             if(m_startJump)
             {
-                if (!m_hasReachedApex) m_hasReachedApex = m_Rigidbody.velocity.y <= 0;
+                if (!m_hasReachedApex) m_hasReachedApex = m_rigidbody.velocity.y <= 0;
             }
 
             if(m_hasReachedApex)
@@ -134,12 +136,12 @@ namespace CharacterController
                 m_hasLanded = m_Controller.Grounded;
             }
 
-            var verticalVelocity = -(2 * m_jumpHeight) / (m_verticalVelocity.y * m_verticalVelocity.y);
-            m_verticalVelocity = m_Controller.Gravity * m_DeltaTime + (Vector3.zero * verticalVelocity);
+            //var verticalVelocity = -(2 * m_jumpHeight) / (m_verticalVelocity.y * m_verticalVelocity.y);
+            //m_verticalVelocity = m_Controller.Gravity * m_deltaTime + (Vector3.zero * verticalVelocity);
 
-            //m_verticalVelocity = m_Controller.Gravity * m_DeltaTime;
+            //m_verticalVelocity = m_Controller.Gravity * m_deltaTime;
             //m_Controller.Velocity += m_verticalVelocity;
-            //m_Rigidbody.velocity += m_verticalVelocity;
+            //m_rigidbody.velocity += m_verticalVelocity;
 
             return false;
         }
@@ -150,7 +152,7 @@ namespace CharacterController
         {
             if (m_hasLanded)
             {
-                m_AnimatorMonitor.SetActionID(0);
+                m_animatorMonitor.SetActionID(0);
             }
             return true;
         }
