@@ -55,7 +55,7 @@ namespace CharacterController
         public Vector3 matchPosition {
             get {
                 if (m_positionOffset != Vector3.zero)
-                    return Vector3Util.Add(m_matchPosition, m_positionOffset);
+                    return m_matchPosition.Combine(m_positionOffset);
                 return m_matchPosition;
             }
             set { m_matchPosition = value; }

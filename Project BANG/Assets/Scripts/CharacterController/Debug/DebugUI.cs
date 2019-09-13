@@ -38,20 +38,29 @@ namespace DebugUI
         //
 
 
-        public static void Log<T, W>(T value, string property, W message, RichTextColor textColor = defaultColor) where T : class
+        public static void Log<T, W>(T value, string property, W message, RichTextColor textColor = default) where T : class
         {
             Log(value, property, message.ToString(), textColor, textColor);
         }
 
-        public static void Log<T, W>(T value, string property, W message, RichTextColor propertyColor = defaultColor, RichTextColor messageColor = defaultColor) where T : class
-        {
-            Log(value, property, message.ToString(), propertyColor, messageColor);
-        }
+        //public static void Log<T, W>(T value, string property, W message, RichTextColor propertyColor = default, RichTextColor messageColor = default) where T : class
+        //{
+        //    Log(value, property, message.ToString(), propertyColor, messageColor);
+        //}
 
 
 
 
-        public static void Log<T>(T value, string property, string message, RichTextColor propertyColor = defaultColor, RichTextColor messageColor = defaultColor) where T : class
+        /// <summary>
+        /// Logs the property.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="property"></param>
+        /// <param name="message"></param>
+        /// <param name="propertyColor"></param>
+        /// <param name="messageColor"></param>
+        public static void Log<T>(T value, string property, string message, RichTextColor propertyColor = default, RichTextColor messageColor = default) where T : class
         {
             if (!DebugUIView.Instance.enabled)
                 return;
@@ -63,8 +72,9 @@ namespace DebugUI
                 propertyLogs.Add(value, new Dictionary<string, string>());
             }
 
-            property = SetTextColor(property, propertyColor);
-            message = SetTextColor(message, messageColor);
+
+            property = SetTextColor(property, (propertyColor == default) ? defaultColor : propertyColor);
+            message = SetTextColor(message, (propertyColor == default) ? defaultColor : messageColor);
 
 
 
@@ -79,6 +89,9 @@ namespace DebugUI
                 propertyLogs[value].Add(property, message);
             }
         }
+
+
+
 
 
         public static string WritePropertyMessages()

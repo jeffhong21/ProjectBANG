@@ -996,6 +996,9 @@ namespace CharacterController
             DebugUI.Log(this, "fwd_speed", Vector3.Dot(m_rigidbody.velocity, m_transform.forward), RichTextColor.Cyan);
             //DebugUI.Log(this, "m_angularVelocity", m_angularVelocity, RichTextColor.Magenta);
             //DebugUI.Log(this, "r_angularVelocity", m_rigidbody.angularVelocity, RichTextColor.Magenta);
+
+            //DebugUI.Log(this, "5 Power 3", 5f.Pow(3));
+            DebugUI.Log(this, "Angle 730", 730.ClampAngle());
         }
 
 
