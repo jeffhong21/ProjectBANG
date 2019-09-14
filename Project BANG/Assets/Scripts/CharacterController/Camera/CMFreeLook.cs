@@ -1,4 +1,6 @@
-﻿namespace CharacterController
+///   https://forum.unity.com/threads/free-look-camera-and-mouse-responsiveness.642886/
+
+namespace CharacterController
 {
     using UnityEngine;
     using UnityEngine.Rendering.PostProcessing;
@@ -6,141 +8,127 @@
     using System.Collections;
     using Cinemachine;
 
-
-    public class CinamachineCameraController : CameraController
+    
+    public class CMFreeLook
     {
-        public static CinamachineCameraController Controller { get; private set; }
-
-        [Serializable]
-        public class VirtualCameraState
-        {
-            [SerializeField]
-            private string stateName;
-            [SerializeField]
-            private CinemachineVirtualCameraBase virtualCamera;
-
-            private CinemachineImpulseSource impulseSource;
-
-            //
-            //  Properties
-            //
-            public string StateName {
-                get { return stateName; }
-                set {
-                    stateName = value;
-                    if (stateName.Length == 0) stateName = virtualCamera.name;
-                }
-            }
-
-            public CinemachineVirtualCameraBase VirtualCamera { get { return virtualCamera; } set { virtualCamera = value; } }
-            
-            public CinemachineImpulseSource ImpulseSource { get { return impulseSource; } }
-
-            //
-            //  Constructors.
-            //
-            public VirtualCameraState(string stateName){
-                this.stateName = stateName;
-            }
-
-            public VirtualCameraState(string stateName, CinemachineVirtualCameraBase virtualCamera)
-            {
-                this.stateName = stateName;
-                this.virtualCamera = virtualCamera;
-            }
-
-
-            public void Initialize()
-            {
-                impulseSource = virtualCamera.GetComponent<CinemachineImpulseSource>();
-            }
-        }
-
-
-
-
-
-        [Header("Cinemachine")]
-        [SerializeField]
-        private CinemachineBrain CMBrain;
-        [Header("Targets")]
-        [SerializeField]
-        private Transform followTarget;
-        [SerializeField]
-        private Transform lookAtTarget;
-
+        public string m_stateName;
 
         [SerializeField]
-        private VirtualCameraState[] virtualCameras = { new VirtualCameraState("DEFAULT") };
-        private int activeCameraIndex;
-        private CinemachineVirtualCameraBase activeCamera;
+        private CinemachineBrain m_cmBrain;
 
-        private CinemachineFreeLook[] freeLookCameras;
-        private CinemachineFreeLook.Orbit[] originalOrbits;
+
+        [Tooltip("The minimum scale for the orbits")]
+        [Range(0.01f, 1f)]
+        public float minScale = 0.5f;
+        [Tooltip("The maximum scale for the orbits")]
+        [Range(1F, 5f)]
+        public float maxScale = 1;
+        private CinemachineFreeLook m_cmFreeLook;
+        private CinemachineFreeLook.Orbit[] m_originalOrbits;
+
+        [Tooltip("The zoom axis.  Value is 0..1.  How much to scale the orbits")]
+        [AxisStateProperty]
+        public AxisState zAxis = new AxisState(0, 1, false, true, 50f, 0.1f, 0.1f, "Mouse ScrollWheel", false);
+
+
+        [Tooltip("This depends on your Free Look rigs setup, use to correct Y sensitivity,"
+            + " about 1.5 - 2 results in good Y-X square responsiveness")]
+        public float yCorrection = 2f;
+
+        private float xAxisValue;
+        private float yAxisValue;
 
         //private CinemachineCollider m_CinemachineCollider;
         //private CinemachineImpulseSource m_CinemachineImpulseSource;
-        private PostProcessVolume postProcessVolume;
-        private PostProcessProfile postProcessProfile;
+        // private PostProcessVolume m_postProcessVolume;
+        // private PostProcessProfile m_postProcessProfile;
 
 
 
-
-        protected override void Awake()
+        public void Initialize()
         {
-            base.Awake();
-            _instance = this;
-            Controller = this;
-
-            CMBrain = GetComponentInChildren<CinemachineBrain>();
-            //postProcessVolume = m_Camera.GetComponent<PostProcessVolume>();
-            //postProcessProfile = postProcessVolume.profile;
-
-
-
-            //if (m_DefaultVCam != null)
-            //{
-            //    originalOrbits = new CinemachineFreeLook.Orbit[activeVCam.m_Orbits.Length];
-            //    for (int i = 0; i < originalOrbits.Length; i++)
-            //    {
-            //        originalOrbits[i].m_Height = activeVCam.m_Orbits[i].m_Height;
-            //        originalOrbits[i].m_Radius = activeVCam.m_Orbits[i].m_Radius;
-            //    }
-            //    #if UNITY_EDITOR
-            //    SaveDuringPlay.SaveDuringPlay.OnHotSave -= RestoreOriginalOrbits;
-            //    SaveDuringPlay.SaveDuringPlay.OnHotSave += RestoreOriginalOrbits;
-            //    #endif
-            //}
-            //originalZoom = freeLook.m_Orbits[1].m_Radius;
-            //m_CinemachineCollider = freeLook.GetComponent<CinemachineCollider>();
-            //m_CinemachineImpulseSource = freeLook.GetComponent<CinemachineImpulseSource>();
-
-        }
-
-
-        private void Start()
-        {
-
-            activeCameraIndex = 0;
-            if(virtualCameras.Length > 0)
+            m_cmFreeLook = GetComponentInChildren<CinemachineFreeLook>();
+            if(m_cmFreeLook != null)
             {
-                for (int i = 0; i < virtualCameras.Length; i++)
+                m_originalOrbits = new CinemachineFreeLook.Orbit[m_cmFreeLook.m_Orbits.Length];
+                for (int i = 0; i < freelook.m_Orbits.Length; i++)
                 {
-                    virtualCameras[i].Initialize();
-                    virtualCameras[i].VirtualCamera.gameObject.SetActive(false);
+                    m_originalOrbits[i].m_Height = m_cmFreeLook.m_Orbits[i].m_Height;
+                    m_originalOrbits[i].m_Radius = m_cmFreeLook.m_Orbits[i].m_Radius;
                 }
-
-                virtualCameras[0].VirtualCamera.gameObject.SetActive(true);
+#if UNITY_EDITOR
+                SaveDuringPlay.SaveDuringPlay.OnHotSave -= RestoreOriginalOrbits;
+                SaveDuringPlay.SaveDuringPlay.OnHotSave += RestoreOriginalOrbits;
+#endif
             }
 
-            m_Camera = CMBrain.OutputCamera;
+        }
 
-            if(followTarget != null && virtualCameras[0].VirtualCamera is CinemachineFreeLook)
+#if UNITY_EDITOR
+        private void OnDestroy()
+        {
+            SaveDuringPlay.SaveDuringPlay.OnHotSave -= RestoreOriginalOrbits;
+        }
+ 
+        private void RestoreOriginalOrbits()
+        {
+            if (m_originalOrbits != null)
             {
-                var cmFreeLook = (CinemachineFreeLook)virtualCameras[0].VirtualCamera;
-                cmFreeLook.m_XAxis.Value = followTarget.eulerAngles.y;
+                for (int i = 0; i < m_originalOrbits.Length; i++)
+                {
+                    m_cmFreeLook.m_Orbits[i].m_Height = m_originalOrbits[i].m_Height;
+                    m_cmFreeLook.m_Orbits[i].m_Radius = m_originalOrbits[i].m_Radius;
+                }
             }
         }
+#endif
+
+
+        public void UpdateInput(float mouseX, float mouseY)
+        {
+            // Correction for Y
+            mouseY /= 360f;
+            mouseY *= yCorrection;
+    
+            xAxisValue += mouseX;
+            yAxisValue = Mathf.Clamp01(yAxisValue - mouseY);
+    
+            m_cmFreeLook.m_XAxis.Value = xAxisValue;
+            m_cmFreeLook.m_YAxis.Value = yAxisValue;
+        }
+
+
+        public void UpdateOrbit()
+        {
+            // for (int i = 0; i < m_cmFreeLook.m_Orbits.Length; i++)
+            // {
+            //     m_cmFreeLook.m_Orbits[i].m_Height = m_originalOrbits[i].m_Height * zoomPercent;
+            //     m_cmFreeLook.m_Orbits[i].m_Radius = m_originalOrbits[i].m_Radius * zoomPercent;
+            // }
+            if (m_originalOrbits != null)
+            {
+                zAxis.Update(Time.deltaTime);
+                float scale = Mathf.Lerp(minScale, maxScale, zAxis.Value);
+                for (int i = 0; i < m_originalOrbits.Length; i++)
+                {
+                    m_cmFreeLook.m_Orbits[i].m_Height = m_originalOrbits[i].m_Height * scale;
+                    m_cmFreeLook.m_Orbits[i].m_Radius = m_originalOrbits[i].m_Radius * scale;
+                }
+            }
+        }
+
+        public void FreeLook(bool freeLook)
+        {
+            if(freeLook){
+                m_cmFreeLook.m_XAxis.m_InputAxisName = "Mouse X";
+                
+            }
+
+            if(freeLook == false){
+                m_cmFreeLook.m_XAxis.m_InputAxisValue = 0;
+            }
+        }
+
 
 
         private void OnValidate()
@@ -160,26 +148,10 @@
         }
 
 
-
-        private void InitializeVirtualCamera(CinemachineVirtualCameraBase vCam)
+        private float GetInputAxis(string axisName)
         {
-            if(vCam == null) { return; }
-
-            vCam.Follow = followTarget;
-            vCam.LookAt = lookAtTarget;
+            return !_freeLookActive ? 0 : Input.GetAxis(axisName == "Mouse Y" ? "Mouse Y" : "Mouse X");
         }
-
-
-        public override void SetMainTarget(GameObject target)
-        {
-            if(lookAtTarget == null) lookAtTarget = target.transform;
-            if (followTarget == null) followTarget = target.transform;
-
-            //activeVCam.LookAt = lookAtTarget;
-            //activeVCam.Follow = followTarget;
-        }
-
-
 
 
 
@@ -312,10 +284,6 @@
     }
 
 
-    public class FreeLookCameras
-    {
-
-    }
 
 }
 

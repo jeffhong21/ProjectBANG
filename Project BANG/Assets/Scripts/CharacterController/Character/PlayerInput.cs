@@ -172,7 +172,32 @@ namespace CharacterController
             CameraController.Instance.SetCameraState("TOPDOWN");
         }
 
+        // private KeyCode[] m_inputDownKeys;
+        // private KeyCode[] m_inputUpKeys;
+        // private void InitializeInput()
+        // {
+        //     int actionCount = m_Controller.CharActions.Length;
+        //     m_inputDownKeys = new KeyCode[actionCount];
+        //     m_inputUpKeys = new KeyCode[actionCount];
+        //     for(int i = 0; i < actionCount; i++)
+        //     {
+        //         var action = m_Controller.CharActions[i];
+        //         if( action.StartType == ActionStartType.ButtonDown ||
+        //             action.StartType == ActionStartType.DoublePress ||
+        //             action.StopType == ActionStartType.ButtonUp ||
+        //             action.StopType == ActionStopType.ButtonToggle )
+        //         {
 
+        //             // m_KeyCodes = new KeyCode[m_InputNames.Length];
+        //             // for (int i = 0; i < m_InputNames.Length; i++)
+        //             // {
+        //             //     if (string.IsNullOrWhiteSpace(m_InputNames[i]))
+        //             //         continue;
+        //             //     m_inputDownKeys[i] = (KeyCode)Enum.Parse(typeof(KeyCode), m_InputNames[i]);
+        //             // }
+        //         }
+        //     }
+        // }
 
 
 
