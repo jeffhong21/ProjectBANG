@@ -23,7 +23,7 @@ public class RenameObjectsWindow : EditorWindow {
 	Rect m_ObjectSection;
 
 
-	[MenuItem("Window/JH Tools/RenameObjects")]
+	[MenuItem("Tools/Toolbox/Rename Objects")]
 	private static void OpenWindow(){
 		
 		RenameObjectsWindow window = (RenameObjectsWindow)GetWindow(typeof(RenameObjectsWindow));

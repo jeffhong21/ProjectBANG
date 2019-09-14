@@ -220,15 +220,6 @@ namespace CharacterController
                     //m_inputVector = referentialShift * m_inputVector;
                     //m_inputVector = right * m_inputVector.x + fwd * m_inputVector.z;
                     m_inputVector = m_Camera.right * InputVector.x + lookDirection * InputVector.z;
-
-                    //m_inputVector = Vector3.Project(m_inputVector, fwd);
-                    //if(lookDirection != Vector3.zero)
-                    //{
-                    //    var fwd = Vector3.ProjectOnPlane(m_Camera.forward, transform.up);
-                    //}
-                    //Debug.DrawRay(transform.position + Vector3.up * 0.5f, m_inputVector, Color.black);
-
-                    //m_inputVector = InputVector;
                     break;
 
                 case (MovementTypes.Combat):
@@ -276,14 +267,30 @@ namespace CharacterController
 
         private void LateUpdate()
         {
+            UpdateCameraInmputs();
+        }
+
+
+
+        private void UpdateCameraInmputs()
+        {
             //  -----------
             //  Camera Input
-            if (m_CameraController != null){
-                m_CameraController.RotateCamera(MouseInputVector.x, MouseInputVector.y);
-                //m_CameraController.ZoomCamera(Input.GetAxisRaw(m_MouseScrollInput));
+            if (m_CameraController == null) return;
 
+            m_CameraController.UpdateRotation(MouseInputVector.x, MouseInputVector.y);
+
+            m_CameraController.UpdateZoom(Input.GetAxisRaw(m_MouseScrollInput));
+
+
+            for (int number = 0; number < CinamachineCameraController.Controller.VirtualStatesCount; number++){
+                if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(number.ToString())){
+                    string stateName = CinamachineCameraController.Controller.GetVirtualCameraState(number).StateName;
+                    CinamachineCameraController.Controller.SetCameraState(stateName);
+                }
             }
         }
+
 
 
 
