@@ -20,8 +20,10 @@ namespace CharacterController
         private float m_nextJump;
 
 
-        protected Vector3 m_verticalVelocity;
-        protected Vector3 m_velocity;
+        protected Vector3 m_verticalVelocity, m_velocity;
+        protected Vector3 m_startPosition, m_verticalDirection;
+        protected float m_verticalDistance;
+        protected float m_elapsedTime;
 
         [SerializeField]
         protected bool m_startJump;
@@ -53,14 +55,17 @@ namespace CharacterController
                 m_animator.SetInteger(HashID.ActionID, m_ActionID);
 
 
-            float heightAdjusted = m_jumpHeight - m_Controller.ColliderHeight * m_Controller.ColliderRadius;
-            heightAdjusted = m_jumpHeight;
-            m_verticalVelocity = Vector3.up * Mathf.Sqrt(2 * heightAdjusted * Mathf.Abs(m_Controller.Gravity.y) );
-            //m_rigidbody.velocity += m_verticalVelocity;
-
+            m_verticalVelocity = new Vector3(0, Mathf.Sqrt(-2 * m_jumpHeight * -9.8f), 0);
+            //m_verticalVelocity.x += m_Controller.Velocity.x;
+            //m_verticalVelocity.z += m_Controller.Velocity.z;
             //m_rigidbody.ResetCenterOfMass();
             m_rigidbody.velocity += m_verticalVelocity;
+
             //m_rigidbody.AddRelativeForce(m_verticalVelocity, ForceMode.VelocityChange);
+            m_startPosition = m_transform.position;
+            m_elapsedTime = 0;
+            m_verticalDistance = 0;
+            
         }
 
 
@@ -74,14 +79,18 @@ namespace CharacterController
         {
             base.ActionStopped();
 
-            m_Controller.Velocity = Vector3.zero;
-            m_startJump = m_hasReachedApex = m_hasLanded = default;
-            m_verticalVelocity = Vector3.zero;
+            //m_Controller.Velocity = Vector3.zero;
+            m_startJump = m_hasReachedApex = m_hasLanded = false;
+            m_verticalVelocity = m_startPosition = Vector3.zero;
         }
 
 
         public override bool CheckGround()
 		{
+
+
+            //float velocityY = (verticalDistance / time) + 0.5f * Mathf.Abs(Physics.gravity.y) * time;
+
             if (Time.time < m_ActionStartTime + 0.2f) {
                 m_Controller.Grounded = false;
                 return false;
@@ -115,48 +124,85 @@ namespace CharacterController
 
 
 
-            return m_Controller.Grounded;
+            return false;
 		}
 
-
+        bool reachedJumpHeight;
         public override bool UpdateMovement()
         {
             if (!m_startJump)
             {
                 m_startJump = m_rigidbody.velocity.y > 0;
+
+                if(m_Debug && m_startJump){
+                    Debug.Log("<color=magenta>[m_startJump ]</color>");
+                    Debug.Break();
+                }
+
             }
 
             if(m_startJump)
             {
-                if (!m_hasReachedApex) m_hasReachedApex = m_rigidbody.velocity.y <= 0;
+                m_hasReachedApex = m_rigidbody.velocity.y <= 0;
+
+                if (m_Debug && m_hasReachedApex) {
+                    Debug.Log("<color=magenta>[m_hasReachedApex]</color>");
+                    Debug.Break();
+                }
             }
 
             if(m_hasReachedApex)
             {
                 m_hasLanded = m_Controller.Grounded;
+
+                if (m_Debug && m_hasLanded) {
+                    Debug.Log("<color=magenta>[ m_hasLanded]</color>");
+                    Debug.Break();
+                }
             }
 
-            //var verticalVelocity = -(2 * m_jumpHeight) / (m_verticalVelocity.y * m_verticalVelocity.y);
-            //m_verticalVelocity = m_Controller.Gravity * m_deltaTime + (Vector3.zero * verticalVelocity);
 
-            //m_verticalVelocity = m_Controller.Gravity * m_deltaTime;
-            //m_Controller.Velocity += m_verticalVelocity;
-            //m_rigidbody.velocity += m_verticalVelocity;
+            //m_elapsedTime += m_deltaTime;
+            //m_verticalDirection = m_transform.position - m_startPosition;
+            ////m_verticalDirection = Vector3.Project(m_verticalDirection, Vector3.up);
+            //m_verticalDistance = (m_verticalDirection.y / m_elapsedTime) + Mathf.Abs(Physics.gravity.y) * m_elapsedTime;
+            //m_verticalDistance *= m_deltaTime;
+
+            //Vector3 velocity = m_Controller.Velocity;
+            //float percentage = 0;
+            //if (m_verticalDistance < m_jumpHeight) {
+            //    percentage = Mathf.Clamp01(m_verticalDistance / m_jumpHeight);
+            //    percentage *= percentage * percentage;
+            //    velocity.y = Mathf.Lerp(m_rigidbody.velocity.y, 0, percentage);
+            //}
+            //else {
+            //    percentage = 1;
+            //}
+
+
+            ////var verticalVelocity = -(2 * m_jumpHeight) / (m_verticalVelocity.y * m_verticalVelocity.y);
+            //////m_verticalVelocity = m_Controller.Gravity * m_deltaTime + (Vector3.zero * verticalVelocity);
+            ////var velocity = m_Controller.Velocity;
+            //velocity += m_Controller.Gravity * m_deltaTime;
+            //m_Controller.Velocity = velocity;
+            //////m_rigidbody.velocity += m_verticalVelocity;
+            //Debug.LogFormat("time: {2} | percentage: {0} | distance: {1}", percentage, m_verticalDistance, m_elapsedTime);
+
+
+            //if (m_verticalDistance >= m_jumpHeight) {
+            //    if (reachedJumpHeight == false) {
+            //        reachedJumpHeight = true;
+            //        Debug.LogFormat("<b>percentage: {0} | distance: {1}\n vv: {2} | rb: {3}  | tie: {4}</b>",
+            //            percentage, m_verticalDistance, m_verticalVelocity, m_rigidbody.velocity, m_elapsedTime);
+            //    }
+            //}
+            //else {
+            //    reachedJumpHeight = false;
+            //}
+
 
             return false;
         }
-
-
-
-        public override bool UpdateAnimator()
-        {
-            if (m_hasLanded)
-            {
-                m_animatorMonitor.SetActionID(0);
-            }
-            return true;
-        }
-
 
 
 

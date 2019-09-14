@@ -8,6 +8,9 @@ namespace CharacterController
 {
     public class EntityObjectManager : MonoBehaviour
     {
+
+        private Dictionary<int, IEntityObject> m_allEntityObjects;
+
         [SerializeField]
         private float m_deltaTime;
         [SerializeField]

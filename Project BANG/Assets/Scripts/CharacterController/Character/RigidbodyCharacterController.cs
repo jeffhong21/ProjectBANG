@@ -55,7 +55,7 @@ namespace CharacterController
         [SerializeField] protected float m_groundStickiness = 2f;
 
         //  -- Collision detection
-        [Group("Collisions")]
+        [Group("Collisions")] //[Adnc.Utility.SortLayer]
         [SerializeField] protected LayerMask m_collisionsLayerMask;
         [Group("Collisions")]
         [SerializeField] protected int m_maxCollisionCount = 100;
@@ -217,10 +217,11 @@ namespace CharacterController
         //    }
         //}
 
-        public Vector3 ColliderCenter{ get { return Collider.center; } }
-        public float ColliderHeight { get { return Collider.height * m_transform.lossyScale.x; } }
-        public float ColliderRadius { get { return Collider.radius * m_transform.lossyScale.x; } }
+
         public Vector3 RaycastOrigin { get { return m_transform.position + Vector3.up * m_skinWidth; } }
+
+        protected Vector3 m_colliderCenter;
+        protected float m_colliderHeight, m_colliderRadius;
 
         #endregion
 
@@ -275,7 +276,9 @@ namespace CharacterController
             m_motionPath = new Trajectory(1, m_sampleRate, new AffineTransform(m_transform));
             characterMaterial = new PhysicMaterial() { name = "Character Physics Material" };
 
-
+            m_colliderCenter = m_collider.center;
+            m_colliderHeight = m_collider.height * m_transform.lossyScale.x;
+            m_colliderRadius = m_collider.radius * m_transform.lossyScale.x;
             //m_collider.height -= m_maxStepHeight;
             //m_collider.center += Vector3.up * m_maxStepHeight;
 
@@ -425,7 +428,10 @@ namespace CharacterController
             {
                 m_moveRotation = m_rootMotionRotation;
             }
-
+            else
+            {
+                m_moveRotation = Quaternion.AngleAxis(m_moveAngle * m_rotationSpeed * m_deltaTime, m_transform.up);
+            }
 
 
             //DebugUI.Log(this, "desiredOrientation", desiredOrientation + " | moveAngle: " + m_moveAngle, RichTextColor.Orange);
@@ -445,13 +451,6 @@ namespace CharacterController
             m_velocity = m_moveRotation * m_velocity;
             //  Is there enough movement to be considered moving.
             m_moving = m_inputDirection.sqrMagnitude > 0;
-
-
-
-
-
-
-
         }
 
 
@@ -462,7 +461,7 @@ namespace CharacterController
         {
             if (m_grounded && !m_moving) return;
 
-            Vector3 origin = m_transform.position + Vector3.up * (ColliderCenter.y - ColliderHeight / 2 + m_skinWidth);
+            Vector3 origin = m_transform.position + Vector3.up * (m_colliderCenter.y - m_colliderHeight / 2 + m_skinWidth);
             Vector3 spherecastOrigin = origin + Vector3.up * m_spherecastRadius;
             float groundAngle = 0;
 
@@ -477,7 +476,7 @@ namespace CharacterController
                 groundAngle = Vector3.Angle(m_groundHit.normal, Vector3.up);
 
                 if (Physics.SphereCast(spherecastOrigin, m_spherecastRadius, Vector3.down, out m_groundHit,
-                    ColliderRadius + airborneThreshold, m_collisionsLayerMask))
+                    m_colliderRadius + airborneThreshold, m_collisionsLayerMask))
                 {
                     groundAngle = Vector3.Angle(m_groundHit.normal, m_transform.up);
                     if (groundDistance > m_groundHit.distance - m_skinWidth)
@@ -493,18 +492,27 @@ namespace CharacterController
                 m_grounded = true;
                 m_groundAngle = groundAngle;
                 //m_velocity += Vector3.ProjectOnPlane(m_groundHit.point - m_transform.position, m_transform.up * m_groundStickiness);
-            } else {
-                if (groundDistance > airborneThreshold)
-                {    
+                //ScaleCapsule(1);
+            }
+            else {
+                if (groundDistance > airborneThreshold){
+                    if (m_grounded) {
+                        Vector3 initialFallVelocity = Vector3.Project(m_previousVelocity, m_gravity);
+                        initialFallVelocity += m_gravity * m_gravityModifier * m_deltaTime;
+                        m_velocity += initialFallVelocity;
+                    }
                     m_groundAngle = 0;
                     m_groundHit.point = m_transform.position - Vector3.up * airborneThreshold;
                     m_groundHit.normal = m_transform.up;
                     m_grounded = false;
                 }
 
+                //ScaleCapsule(0.5f);
             }
 
-
+            //float percentage = (groundDistance > 1) ? 1 : groundDistance / 1;
+            //float scale = Mathf.Lerp(1, 0.5f, percentage.Cubed());
+            //ScaleCapsule(0.5f);
         }
 
 
@@ -518,12 +526,9 @@ namespace CharacterController
         protected virtual void CheckMovement()
         {
             //  Set maxDepentration velocity.
-            float maxDepenetrationVelocity = 10f;
-            float moveSpeed = Vector3.Dot(m_rigidbody.velocity, m_transform.forward);
-            //m_rigidbody.maxDepenetrationVelocity = moveSpeed > maxDepenetrationVelocity ? maxDepenetrationVelocity : moveSpeed;
-            m_rigidbody.maxDepenetrationVelocity = 1;
+            m_rigidbody.maxDepenetrationVelocity = 0.01f;
 
-            DebugUI.Log(this, moveSpeed, "moveSpeed");
+
 
             Vector3 position = m_motionPath.Next(0).RelativeToTransformWorld(m_transform);
             //var worldSpacePos = m_transform.TransformPoint(position);
@@ -545,29 +550,32 @@ namespace CharacterController
 
                     Vector3 closestPoint = collision.ClosestPoint(m_transform.position);
 
-                    //bool overlapped = Physics.ComputePenetration(m_collider, m_transform.position, m_transform.rotation,
-                    //                                collision, collision.transform.position, collision.transform.rotation,
-                    //                                out Vector3 direction, out float distance);
-                    //if (overlapped)
-                    //{
-                    //    Vector3 penetrationVector = direction * distance;
-                    //    Vector3 moveDirectionProjected = Vector3.Project(m_velocity, -penetrationVector);
-                    //    //  m_transform.position = m_transform.position + penetrationVector;
-                    //    //m_rigidbody.MovePosition(m_transform.position + penetrationVector);
-                    //    m_velocity = m_velocity.Add(penetrationVector);
-                    //    m_velocity = m_velocity.Subtract(moveDirectionProjected);      //  TODO: optimize me
+                    //  Calculate penetration if the rigidbody is kinematic.
+                    if(m_rigidbody.isKinematic)
+                    {
+                        bool overlapped = Physics.ComputePenetration(m_collider, m_transform.position, m_transform.rotation,
+                                                                    collision, collision.transform.position, collision.transform.rotation,
+                                                                    out Vector3 direction, out float distance);
+                        if (overlapped) {
+                            Vector3 penetrationVector = direction * distance;
+                            Vector3 moveDirectionProjected = Vector3.Project(m_velocity, -penetrationVector);
+                            //  m_transform.position = m_transform.position + penetrationVector;
+                            //m_rigidbody.MovePosition(m_transform.position + penetrationVector);
+                            m_velocity = m_velocity.Add(penetrationVector);
+                            m_velocity = m_velocity.Subtract(moveDirectionProjected);      //  TODO: optimize me
 
-                    //    //m_velocity = Vector3.ClampMagnitude(m_velocity, 10);
+                            //m_velocity = Vector3.ClampMagnitude(m_velocity, 10);
 
-                    //    if (DebugCollisions)
-                    //    {   
-                    //        DebugDrawer.DrawLabel(closestPoint + penetrationVector, "Penetration Vector " + penetrationVector.ToString());
-                    //        Debug.DrawRay(closestPoint, penetrationVector, Color.red);
-                    //        DebugDrawer.DrawLabel(closestPoint + moveDirectionProjected, "Velocity Projected " + moveDirectionProjected.ToString());
-                    //        Debug.DrawRay(closestPoint, moveDirectionProjected, Color.cyan);
-                    //    }
-                    //    //Debug.Break();
-                    //}
+                            if (DebugCollisions) {
+                                DebugDrawer.DrawLabel(closestPoint + penetrationVector, "Penetration Vector " + penetrationVector.ToString());
+                                Debug.DrawRay(closestPoint, penetrationVector, Color.red);
+                                DebugDrawer.DrawLabel(closestPoint + moveDirectionProjected, "Velocity Projected " + moveDirectionProjected.ToString());
+                                Debug.DrawRay(closestPoint, moveDirectionProjected, Color.cyan);
+                            }
+                            //Debug.Break();
+                        }
+                    }
+
 
                     // ----- Debugging
                     Debug.DrawRay(checkPosition, checkPosition - closestPoint, Color.yellow);
@@ -621,7 +629,6 @@ namespace CharacterController
         {
             Vector3 velocity = m_velocity;
 
-
             Vector3 drag = velocity * (m_motorDamping * m_deltaTime);
             if (m_inputDirection.sqrMagnitude > 0)
                 drag *= (1f - Vector3.Dot(m_inputDirection.normalized, velocity.normalized));
@@ -636,9 +643,10 @@ namespace CharacterController
             if (velocity.sqrMagnitude > m_desiredSpeed * m_desiredSpeed)
                 velocity = velocity.normalized * m_desiredSpeed;
 
-
             if (m_grounded)
             {
+
+
                 float velocitySpeed = Vector3.Dot(m_velocity, m_transform.forward);
                 Vector3 groundNormal = m_groundHit.normal;
 
@@ -659,12 +667,14 @@ namespace CharacterController
                 velocity = Vector3.Cross(groundNormal, inputRight).normalized * velocitySpeed;// m_moveDirection.magnitude;
 
                 //m_velocity = Vector3.Lerp(m_velocity, m_velocity, 1f - Mathf.Exp(-15 * m_deltaTime));
-
+                
             } else {
 
                 Vector3 verticalVelocity = Vector3.Project(m_previousVelocity, m_gravity);
                 verticalVelocity += m_gravity * m_gravityModifier * m_deltaTime;
 
+                //if (m_rigidbody.velocity.y < 0)
+                //    verticalVelocity = verticalVelocity.Multiply(1.5f);
 
 
                 velocity += verticalVelocity;
@@ -688,6 +698,8 @@ namespace CharacterController
             Vector3 lookDirection = m_lookRotation * m_transform.forward;
             if (lookDirection.sqrMagnitude > 0)
             {
+                //float scale = m_moveAngle / 180;
+                //m_velocity = m_velocity.Multiply(scale);
                 //Quaternion smoothRotation = Quaternion.LookRotation(lookDirection, m_transform.up);
                 //m_moveRotation = Quaternion.Slerp(m_transform.rotation, desiredRotation * smoothRotation, m_deltaTime * rotationSpeed);
                 m_moveRotation = Quaternion.AngleAxis(m_moveAngle * rotationSpeed * m_deltaTime, m_transform.up);
@@ -709,9 +721,15 @@ namespace CharacterController
             //    }
             //}
 
-
+            //            //  AddRelativeTorque adds torque according to its Inertia Tensors. Therefore, the desired angular
+            //            //  velocity must be transformed according to the Inertia Tensor, to get the required Torque.
+            //            //
+            //            //// Rotate about Y principal axis
+            //            //Vector3 desiredAngularVelInY = new Vector3(0, Mathf.PI, 0); //  1/2 revs per second 
+            //            //Vector3 torque = rigidbodyCached.inertiaTensorRotation * Vector3.Scale(rigidbodyCached.inertiaTensor, desiredAngularVelInY);
+            //            //rigidbody.AddRelativeTorque(torque, ForceMode.Impulse);
         }
-        
+
 
 
         /// <summary>
@@ -742,9 +760,11 @@ namespace CharacterController
         /// </summary>
         protected virtual void ApplyMovement()
         {
-            m_velocity = Vector3.ClampMagnitude(m_velocity, m_desiredSpeed);
+            //m_velocity = Vector3.ClampMagnitude(m_velocity, m_desiredSpeed);
+            //if (m_grounded) m_velocity.y = 0;
             //m_rigidbody.drag = Mathf.SmoothDamp(m_rigidbody.drag, m_moving ? 0 : m_mass, ref m_dragVelocity, m_moving ? m_groundAcceleration.z : m_motorDamping);
             m_rigidbody.velocity = Vector3.Lerp(m_rigidbody.velocity, m_velocity, m_deltaTime * 10);
+
         }
 
 
@@ -821,9 +841,8 @@ namespace CharacterController
                 Vector3 moveDirection = m_lookRotation * m_transform.forward;
                 Vector3 forward = Vector3.ProjectOnPlane(moveDirection, Vector3.up);
                 Vector3 linearVelocity = Quaternion.FromToRotation(Vector3.forward, forward) * m_inputVector;
-                linearVelocity.x *= m_desiredSpeed;
-                linearVelocity.y *= m_desiredSpeed;
-                linearVelocity.z *= m_desiredSpeed;
+                linearVelocity = linearVelocity.Multiply(m_desiredSpeed);
+
                 return world ? linearVelocity : Quaternion.Inverse(m_transform.rotation) * linearVelocity;
             }
 
@@ -835,7 +854,7 @@ namespace CharacterController
         public RaycastHit GetSphereCastGroundHit()
         {
             float radius = 0.1f;
-            Vector3 origin = m_transform.position + Vector3.up * (ColliderCenter.y - ColliderHeight / 2 + m_skinWidth);
+            Vector3 origin = m_transform.position + Vector3.up * (m_colliderCenter.y - m_colliderHeight / 2 + m_skinWidth);
             origin += Vector3.up * radius;
 
             m_groundHit = new RaycastHit();
@@ -863,43 +882,6 @@ namespace CharacterController
 
 
 
-        private void ComputeCapsulePenetration()
-        {
-            float castRadius = m_collider.radius + m_skinWidth;
-
-            Vector3 p1 = GetCapsulePoint(m_transform.position, Vector3.down);
-            Vector3 p2 = GetCapsulePoint(m_transform.position, Vector3.up);
-
-            //DebugDraw.Capsule(position + m_collider.center, Vector3.up, castRadius, m_collider.height, Color.white);
-
-            var hits = Physics.OverlapCapsuleNonAlloc(p1, p2, castRadius, m_probedColliders, m_collisionsLayerMask);
-            if (hits > 0)
-            {
-                for (int i = 0; i < hits; i++)
-                {
-                    Collider collision = m_probedColliders[i];
-
-                    if (Physics.ComputePenetration(m_collider, m_transform.position, m_transform.rotation,
-                                                    collision, collision.transform.position, collision.transform.rotation,
-                                                    out Vector3 direction, out float distance))
-                    {
-                        Vector3 penetrationVector = direction * distance;
-                        Vector3 moveDirectionProjected = Vector3.Project(m_moveDirection, -penetrationVector);
-                        //  m_transform.position = m_transform.position + penetrationVector;
-                        //m_rigidbody.MovePosition(m_transform.position + penetrationVector);
-                        m_moveDirection = m_moveDirection.Add(penetrationVector);
-                        m_moveDirection -= moveDirectionProjected;      //  TODO: optimize me
-
-
-                        Debug.DrawRay(collision.transform.position, penetrationVector, Color.red);
-                    }
-
-                }
-            }
-        }
-
-
-
 
 
         #region Public Functions
@@ -913,9 +895,9 @@ namespace CharacterController
         protected void ScaleCapsule( float scale )
         {
             scale = Mathf.Abs(scale);
-            if (m_collider.height < ColliderHeight * scale || m_collider.height > ColliderHeight * scale) {
-                m_collider.height = Mathf.MoveTowards(m_collider.height, ColliderHeight * scale, Time.deltaTime * 4);
-                m_collider.center = Vector3.MoveTowards(m_collider.center, ColliderCenter * scale, Time.deltaTime * 2);
+            if (m_collider.height < m_colliderHeight * scale || m_collider.height > m_colliderHeight * scale) {
+                m_collider.height = Mathf.MoveTowards(m_collider.height, m_colliderHeight * scale, Time.deltaTime * 4);
+                m_collider.center = Vector3.MoveTowards(m_collider.center, m_colliderCenter * scale, Time.deltaTime * 2);
             }
         }
 
@@ -949,7 +931,7 @@ namespace CharacterController
 
         public Vector3 GetCapsulePoint(Vector3 origin, Vector3 direction)
         {
-            var pointsDist = ColliderHeight - (ColliderRadius * 2f);
+            var pointsDist = m_colliderHeight - (m_colliderRadius * 2f);
             return origin + (direction * (pointsDist * .5f));
         }
 

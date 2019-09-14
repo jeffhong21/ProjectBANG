@@ -28,7 +28,7 @@
         [SerializeField, HideInInspector]
         protected ActionStartType m_StartType = ActionStartType.Manual;
         [SerializeField, HideInInspector]
-        protected ActionStopType m_StopType = ActionStopType.Manual;
+        protected ActionStopType m_StopType = ActionStopType.Automatic;
         [SerializeField, HideInInspector]
         protected string[] m_InputNames = new string[0];
         [SerializeField, HideInInspector]
@@ -100,6 +100,7 @@
 
         public float SpeedMultiplier { get { return m_SpeedMultiplier; } set { m_SpeedMultiplier = value; } }
 
+        public string[] InputNames { get { return m_InputNames; } }
 
         public ActionStartType StartType{
             get { return m_StartType; }
@@ -172,7 +173,7 @@
         protected virtual void OnValidate()
         {
             m_ActionID = ActionID >= 0 ? ActionID : -1;
-            if (m_StateName.Length == 0) m_StateName = GetType().Name;
+            if (string.IsNullOrEmpty(m_StateName)) m_StateName = GetType().Name;
         }
 
 

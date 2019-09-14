@@ -436,6 +436,15 @@ GameObject:
   - component: {fileID: 902344916}
   - component: {fileID: 2002697079}
   - component: {fileID: 1071944184}
+  - component: {fileID: 2129104038}
+  - component: {fileID: 2129104046}
+  - component: {fileID: 2129104045}
+  - component: {fileID: 2129104044}
+  - component: {fileID: 2129104043}
+  - component: {fileID: 2129104042}
+  - component: {fileID: 2129104041}
+  - component: {fileID: 2129104040}
+  - component: {fileID: 2129104039}
   m_Layer: 31
   m_Name: Player
   m_TagString: Player
@@ -542,7 +551,7 @@ MonoBehaviour:
     debugMode: 1
     states:
       showDebugUI: 1
-      showGroundCheck: 0
+      showGroundCheck: 1
       showCollisions: 1
       showMotion: 0
     colors:
@@ -566,16 +575,17 @@ MonoBehaviour:
   displayPhysics: 0
   displayAnimations: 0
   displayActions: 1
-  m_Actions:
-  - {fileID: 1071944184}
-  - {fileID: 5742274483415007430}
-  - {fileID: 3558082288662322614}
-  - {fileID: 2002697079}
-  - {fileID: 7123048206932478039}
-  - {fileID: 6111956693744779233}
-  - {fileID: 902344916}
-  - {fileID: 4816647435445959097}
-  m_ActiveActions: {fileID: 0}
+  m_actions:
+  - {fileID: 2129104040}
+  - {fileID: 2129104039}
+  - {fileID: 2129104038}
+  - {fileID: 2129104042}
+  - {fileID: 2129104043}
+  - {fileID: 2129104044}
+  - {fileID: 2129104046}
+  - {fileID: 2129104045}
+  - {fileID: 2129104041}
+  m_activeAction: {fileID: 0}
 --- !u!114 &6790305966678263073
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -593,7 +603,7 @@ MonoBehaviour:
   m_nextAction: {fileID: 0}
   horizontalInputDampTime: 0.1
   forwardInputDampTime: 0.1
-  debugStateChanges: 1
+  debugStateChanges: 0
   logEvents: 0
 --- !u!114 &1928667715822584718
 MonoBehaviour:
@@ -639,7 +649,6 @@ MonoBehaviour:
   m_SelectPlayerKeyCode: 112
   m_LockCameraRotation: 108
   m_DebugBreakKeyCode: 13
-  m_inputKeys: []
   DebugMode: 1
 --- !u!114 &4764323065115179194
 MonoBehaviour:
@@ -1546,6 +1555,284 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 167772160
   stateBehavior: {fileID: 0}
+--- !u!114 &2129104038
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2247134470855319462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6925d34e29f342f3914c6b5a519e7a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: Jump
+  m_LayerIndex: 0
+  m_ActionID: 21
+  m_Priority: 2
+  m_TransitionDuration: 0.2
+  m_StartType: 2
+  m_StopType: 0
+  m_InputNames:
+  - Space
+  m_SpeedMultiplier: 1
+  m_ApplyBuiltinRootMotion: 0
+  m_StartAudioClips: []
+  m_StopAudioClips: []
+  m_StartEffect: {fileID: 0}
+  m_EndEffect: {fileID: 0}
+  m_Debug: 0
+  m_jumpHeight: 2
+  m_recurrenceDelay: 0.2
+  m_startJump: 0
+  m_hasReachedApex: 0
+  m_hasLanded: 0
+--- !u!114 &2129104046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2247134470855319462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6154c3fa2c49643758284fb02e121cd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: Crouch
+  m_LayerIndex: 0
+  m_ActionID: 5
+  m_Priority: 6
+  m_TransitionDuration: 0.2
+  m_StartType: 2
+  m_StopType: 3
+  m_InputNames:
+  - C
+  m_SpeedMultiplier: 1
+  m_ApplyBuiltinRootMotion: 0
+  m_StartAudioClips: []
+  m_StopAudioClips: []
+  m_StartEffect: {fileID: 0}
+  m_EndEffect: {fileID: 0}
+  m_Debug: 0
+--- !u!114 &2129104045
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2247134470855319462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb969d52822a24d8dbd0b8c198a14803, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: StartMovement
+  m_LayerIndex: 0
+  m_ActionID: 1
+  m_Priority: 7
+  m_TransitionDuration: 0.2
+  m_StartType: 0
+  m_StopType: 0
+  m_InputNames: []
+  m_SpeedMultiplier: 1
+  m_ApplyBuiltinRootMotion: 0
+  m_StartAudioClips: []
+  m_StopAudioClips: []
+  m_StartEffect: {fileID: 0}
+  m_EndEffect: {fileID: 0}
+  m_Debug: 0
+  maxInputCount: 4
+--- !u!114 &2129104044
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2247134470855319462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dcb0e67b11b04af4b61cb44c64d5a63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: StopMovement
+  m_LayerIndex: 0
+  m_ActionID: 2
+  m_Priority: 5
+  m_TransitionDuration: 0.2
+  m_StartType: 0
+  m_StopType: 0
+  m_InputNames: []
+  m_SpeedMultiplier: 1
+  m_ApplyBuiltinRootMotion: 0
+  m_StartAudioClips: []
+  m_StopAudioClips: []
+  m_StartEffect: {fileID: 0}
+  m_EndEffect: {fileID: 0}
+  m_Debug: 0
+  maxInputCount: 4
+  stopThreshold: 0.8
+--- !u!114 &2129104043
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2247134470855319462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f62eddceb76e4ce2aab0985c2db98db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: QuickTurn
+  m_LayerIndex: 0
+  m_ActionID: 3
+  m_Priority: 4
+  m_TransitionDuration: 0.2
+  m_StartType: 0
+  m_StopType: 0
+  m_InputNames: []
+  m_SpeedMultiplier: 1
+  m_ApplyBuiltinRootMotion: 0
+  m_StartAudioClips: []
+  m_StopAudioClips: []
+  m_StartEffect: {fileID: 0}
+  m_EndEffect: {fileID: 0}
+  m_Debug: 0
+  maxInputCount: 4
+--- !u!114 &2129104042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2247134470855319462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24f4915bd11574121a2a533c85cb7cc1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: Fall
+  m_LayerIndex: 0
+  m_ActionID: 4
+  m_Priority: 3
+  m_TransitionDuration: 0.2
+  m_StartType: 0
+  m_StopType: 0
+  m_InputNames: []
+  m_SpeedMultiplier: 1
+  m_ApplyBuiltinRootMotion: 0
+  m_StartAudioClips: []
+  m_StopAudioClips: []
+  m_StartEffect: {fileID: 0}
+  m_EndEffect: {fileID: 0}
+  m_Debug: 0
+  m_minFallHeight: 1
+  m_landSurfaceImpact: {fileID: 0}
+  m_minSurfaceImpactVelocity: 1
+--- !u!114 &2129104041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2247134470855319462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 043998c3940ed496da75fc62118ed578, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: Aim
+  m_LayerIndex: 0
+  m_ActionID: -1
+  m_Priority: 8
+  m_TransitionDuration: 0.2
+  m_StartType: 2
+  m_StopType: 3
+  m_InputNames:
+  - Mouse1
+  m_SpeedMultiplier: 1
+  m_ApplyBuiltinRootMotion: 0
+  m_StartAudioClips: []
+  m_StopAudioClips: []
+  m_StartEffect: {fileID: 0}
+  m_EndEffect: {fileID: 0}
+  m_Debug: 0
+  m_ItemStateID: -1
+--- !u!114 &2129104040
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2247134470855319462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a33cd0f36f52540f39f9a4bf04b5add6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: Vault
+  m_LayerIndex: 0
+  m_ActionID: 31
+  m_Priority: 0
+  m_TransitionDuration: 0.2
+  m_StartType: 2
+  m_StopType: 0
+  m_InputNames:
+  - Space
+  m_SpeedMultiplier: 1
+  m_ApplyBuiltinRootMotion: 0
+  m_StartAudioClips: []
+  m_StopAudioClips: []
+  m_StartEffect: {fileID: 0}
+  m_EndEffect: {fileID: 0}
+  m_Debug: 1
+  angleThreshold: 30
+  startDistance: 2
+  minHeight: 0.4
+  maxHeight: 2
+  detectLayers:
+    serializedVersion: 2
+    m_Bits: 167772160
+  stateBehavior: {fileID: 0}
+--- !u!114 &2129104039
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2247134470855319462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6a50eb5363924e34b3edea697ff11c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: WallRun
+  m_LayerIndex: 0
+  m_ActionID: -1
+  m_Priority: 1
+  m_TransitionDuration: 0.2
+  m_StartType: 2
+  m_StopType: 0
+  m_InputNames:
+  - Space
+  m_SpeedMultiplier: 1
+  m_ApplyBuiltinRootMotion: 0
+  m_StartAudioClips: []
+  m_StopAudioClips: []
+  m_StartEffect: {fileID: 0}
+  m_EndEffect: {fileID: 0}
+  m_Debug: 0
 --- !u!1 &2268023733760728831
 GameObject:
   m_ObjectHideFlags: 0

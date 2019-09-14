@@ -64,7 +64,7 @@ namespace CharacterController
             m_ActiveActionTextStyle.fontStyle = FontStyle.Bold;
 
             displayActions = serializedObject.FindProperty("displayActions");
-            m_ActionsList = new ReorderableList(serializedObject, serializedObject.FindProperty("m_Actions"), true, true, true, true);
+            m_ActionsList = new ReorderableList(serializedObject, serializedObject.FindProperty("m_actions"), true, true, true, true);
 		}
 
 

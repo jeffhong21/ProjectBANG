@@ -20,7 +20,7 @@ namespace CharacterController
         protected Vector3 m_currentPosition;
         protected Vector3 m_startPosition;
         protected float m_fallHeight;
-
+        protected float m_fallTime;
 
 
         //
@@ -28,8 +28,9 @@ namespace CharacterController
         //
         public override bool CanStartAction()
         {
-            if(!m_Controller.Grounded && m_rigidbody.velocity.y < 0)
+            if(!m_Controller.Grounded && m_rigidbody.velocity.y < 0.01f)
             {
+                m_fallTime += Time.deltaTime;
                 m_currentPosition = m_transform.position;
                 if (!m_isAirborne)
                 {
@@ -48,6 +49,7 @@ namespace CharacterController
             {
                 if(m_Controller.Grounded || m_rigidbody.velocity.y >= 0 && m_isAirborne)
                 {
+                    m_fallTime = 0;
                     m_currentPosition = default;
                     m_startPosition = default;
                     m_fallHeight = 0;
@@ -67,33 +69,39 @@ namespace CharacterController
         }
 
 
-        public override bool CheckGround()
-        {
-            float radius = 0.1f;
-            Vector3 origin = m_transform.position + Vector3.up * (0.1f);
-            origin += Vector3.up * radius;
+        //public override bool CheckGround()
+        //{
+        //    float radius = 0.1f;
+        //    Vector3 origin = m_transform.position + Vector3.up * (0.1f);
+        //    origin += Vector3.up * radius;
 
-            if(Physics.SphereCast(origin, radius, Vector3.down, out RaycastHit groundHit, 0.3f * 2, m_layers.SolidLayers))
-            {
-                m_Controller.Grounded = groundHit.distance < 0.3f;
-            }
-            else
-            {
-                m_Controller.Grounded = false;
-            }
-
-
-            if (m_Controller.Grounded && m_rigidbody.velocity.y > -1.01f)
-            {
-                m_animatorMonitor.SetActionID(0);
-            }
+        //    if(Physics.SphereCast(origin, radius, Vector3.down, out RaycastHit groundHit, 0.3f * 2, m_layers.SolidLayers))
+        //    {
+        //        m_Controller.Grounded = groundHit.distance < 0.3f;
+        //    }
+        //    else
+        //    {
+        //        m_Controller.Grounded = false;
+        //    }
 
 
-            DebugUI.DebugUI.Log(this, "GroundDistance", groundHit.distance, DebugUI.RichTextColor.Red);
+        //    if (m_Controller.Grounded && m_rigidbody.velocity.y > -1.01f)
+        //    {
+        //        m_animatorMonitor.SetActionID(0);
+        //    }
 
-            return false;
-        }
 
+        //    DebugUI.DebugUI.Log(this, "GroundDistance", groundHit.distance, DebugUI.RichTextColor.Red);
+
+        //    return false;
+        //}
+
+
+        //public override bool UpdateMovement()
+        //{
+        //    m_Controller.Velocity += m_Controller.Gravity * 1.5f * Time.deltaTime;
+        //    return false;
+        //}
 
 
 
@@ -101,6 +109,7 @@ namespace CharacterController
         {
             if (m_Controller.Grounded && m_rigidbody.velocity.y > -0.01f)
             {
+//                Debug.Log(m_fallTime);
                 return true;
             }
 
@@ -110,8 +119,9 @@ namespace CharacterController
 
         public override bool UpdateAnimator()
         {
+            m_fallTime += Time.deltaTime;
             m_fallHeight = m_startPosition.y - m_currentPosition.y;
-            m_animatorMonitor.SetActionFloatData(Mathf.Abs(m_fallHeight));
+            m_animatorMonitor.SetActionFloatData(m_fallTime);
 
 
 
@@ -125,6 +135,7 @@ namespace CharacterController
             m_currentPosition = default;
             m_startPosition = default;
             m_fallHeight = 0;
+            m_fallTime = 0;
             m_isAirborne = false;
 
 

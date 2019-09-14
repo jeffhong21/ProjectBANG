@@ -43,21 +43,7 @@ namespace CharacterController
         [SerializeField, Tooltip("What key to debug.break.")]
         private KeyCode m_DebugBreakKeyCode = KeyCode.Return;
 
-        [SerializeField]
-        private CharacterActionInputKeys[] m_inputKeys;
 
-        [System.Serializable]
-        private struct CharacterActionInputKeys
-        {
-            public CharacterAction characterAction;
-            public KeyCode[] inputKeys;
-
-            public CharacterActionInputKeys(CharacterAction characterAction, KeyCode[] inputKeys)
-            {
-                this.characterAction = characterAction;
-                this.inputKeys = inputKeys;
-            }
-        }
 
 
         private bool m_freeLook;
@@ -153,7 +139,7 @@ namespace CharacterController
 
 		private void Start()
 		{
-
+            InitializeInput();
 
 
             Cursor.lockState = lockCursor ? CursorLockMode.Locked : CursorLockMode.Confined;
@@ -172,32 +158,48 @@ namespace CharacterController
             CameraController.Instance.SetCameraState("TOPDOWN");
         }
 
-        // private KeyCode[] m_inputDownKeys;
-        // private KeyCode[] m_inputUpKeys;
-        // private void InitializeInput()
-        // {
-        //     int actionCount = m_Controller.CharActions.Length;
-        //     m_inputDownKeys = new KeyCode[actionCount];
-        //     m_inputUpKeys = new KeyCode[actionCount];
-        //     for(int i = 0; i < actionCount; i++)
-        //     {
-        //         var action = m_Controller.CharActions[i];
-        //         if( action.StartType == ActionStartType.ButtonDown ||
-        //             action.StartType == ActionStartType.DoublePress ||
-        //             action.StopType == ActionStartType.ButtonUp ||
-        //             action.StopType == ActionStopType.ButtonToggle )
-        //         {
+        [SerializeField]
+        private List<KeyCode>[] m_inputDownKeys;
+        [SerializeField]
+        private List<KeyCode>[] m_inputUpKeys;
+        private void InitializeInput()
+        {
+            int actionCount = m_Controller.CharActions.Length;
+            m_inputDownKeys = new List<KeyCode>[actionCount];
+            m_inputUpKeys = new List<KeyCode>[actionCount];
+            for (int i = 0; i < actionCount; i++){
+                m_inputDownKeys[i] = new List<KeyCode>();
+                m_inputUpKeys[i] = new List<KeyCode>();
+            }
 
-        //             // m_KeyCodes = new KeyCode[m_InputNames.Length];
-        //             // for (int i = 0; i < m_InputNames.Length; i++)
-        //             // {
-        //             //     if (string.IsNullOrWhiteSpace(m_InputNames[i]))
-        //             //         continue;
-        //             //     m_inputDownKeys[i] = (KeyCode)Enum.Parse(typeof(KeyCode), m_InputNames[i]);
-        //             // }
-        //         }
-        //     }
-        // }
+            for (int i = 0; i < actionCount; i++)
+            {
+                var action = m_Controller.CharActions[i];
+                if (action.StartType == ActionStartType.ButtonDown ||
+                    action.StartType == ActionStartType.DoublePress ||
+                    action.StopType == ActionStopType.ButtonUp ||
+                    action.StopType == ActionStopType.ButtonToggle)
+                {
+                    var inputNames = m_Controller.CharActions[i].InputNames;
+                    if(inputNames != null){
+                        for (int k = 0; k < inputNames.Length; k++)
+                        {
+                            if (string.IsNullOrWhiteSpace(inputNames[k]))
+                                continue;
+                            KeyCode keycode = (KeyCode)System.Enum.Parse(typeof(KeyCode), inputNames[k]);
+
+                            if (action.StartType == ActionStartType.ButtonDown || action.StartType == ActionStartType.DoublePress)
+                                m_inputDownKeys[i].Add(keycode);
+                            if (action.StopType == ActionStopType.ButtonUp || action.StopType == ActionStopType.ButtonToggle)
+                                m_inputUpKeys[i].Add(keycode);
+                        }
+                    }
+
+                }
+
+
+            }
+        }
 
 
 
@@ -263,6 +265,27 @@ namespace CharacterController
             DebugButtonPress();
         }
 
+
+        //private void Update()
+        //{
+
+        //    for (int i = 0; i < m_inputDownKeys.Length; i++)
+        //    {
+        //        int keyCodeCount = m_inputDownKeys[i].Count;
+        //        if (keyCodeCount > 0)
+        //        {
+                    
+        //            for (int k = 0; i < keyCodeCount; k++)
+        //            {
+        //                KeyCode keycode = m_inputDownKeys[i][k];
+        //                if (Input.GetKeyDown(keycode))
+        //                {
+        //                    Debug.LogFormat("Initiated {0} with Keycode {1}", m_Controller.CharActions[i].name, keycode);
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
 
 
         private void LateUpdate()
