@@ -158,10 +158,13 @@ namespace CharacterController
             CameraController.Instance.SetCameraState("TOPDOWN");
         }
 
+
+        private string m_inputDebug;
         [SerializeField]
         private List<KeyCode>[] m_inputDownKeys;
         [SerializeField]
         private List<KeyCode>[] m_inputUpKeys;
+
         private void InitializeInput()
         {
             int actionCount = m_Controller.CharActions.Length;
@@ -174,24 +177,38 @@ namespace CharacterController
 
             for (int i = 0; i < actionCount; i++)
             {
-                var action = m_Controller.CharActions[i];
-                if (action.StartType == ActionStartType.ButtonDown ||
-                    action.StartType == ActionStartType.DoublePress ||
-                    action.StopType == ActionStopType.ButtonUp ||
-                    action.StopType == ActionStopType.ButtonToggle)
+                var characterAction = m_Controller.CharActions[i];
+                if (characterAction.StartType == ActionStartType.ButtonDown ||
+                    characterAction.StartType == ActionStartType.DoublePress ||
+                    characterAction.StopType == ActionStopType.ButtonUp ||
+                    characterAction.StopType == ActionStopType.ButtonToggle)
                 {
-                    var inputNames = m_Controller.CharActions[i].InputNames;
-                    if(inputNames != null){
+                    string[] inputNames = characterAction.InputNames;
+                    if(inputNames != null && inputNames.Length > 0) {
                         for (int k = 0; k < inputNames.Length; k++)
                         {
                             if (string.IsNullOrWhiteSpace(inputNames[k]))
-                                continue;
-                            KeyCode keycode = (KeyCode)System.Enum.Parse(typeof(KeyCode), inputNames[k]);
+                                m_inputDebug += characterAction.GetType().Name + ": No Input specified. \n";
+                            else
+                                m_inputDebug += characterAction.GetType().Name + ": [<b>" + inputNames[k] + "</b>] (" + k + ")\n";
 
-                            if (action.StartType == ActionStartType.ButtonDown || action.StartType == ActionStartType.DoublePress)
-                                m_inputDownKeys[i].Add(keycode);
-                            if (action.StopType == ActionStopType.ButtonUp || action.StopType == ActionStopType.ButtonToggle)
-                                m_inputUpKeys[i].Add(keycode);
+                            if (string.IsNullOrWhiteSpace(inputNames[k]))
+                                continue;
+
+                            KeyCode? asciiChar = (KeyCode)System.Enum.Parse(typeof(KeyCode), inputNames[k]);
+
+                            Debug.AssertFormat(asciiChar != null, characterAction, "[{0}] Incorrect keycode: | {1} |", characterAction.GetType().Name, inputNames[k]);
+                            if (asciiChar == null) {
+                                Debug.LogError(characterAction.GetType().Name + " has incorrect inputname.");
+                            }
+
+
+                            var inputKey = (KeyCode)System.Enum.Parse(typeof(KeyCode), inputNames[k]);
+                            if (characterAction.StartType == ActionStartType.ButtonDown || characterAction.StartType == ActionStartType.DoublePress)
+                                m_inputDownKeys[i].Add(inputKey);
+                            if (characterAction.StopType == ActionStopType.ButtonUp || characterAction.StopType == ActionStopType.ButtonToggle)
+                                m_inputUpKeys[i].Add(inputKey);
+
                         }
                     }
 
@@ -199,6 +216,8 @@ namespace CharacterController
 
 
             }
+
+            Debug.Log(m_inputDebug);
         }
 
 
@@ -268,23 +287,24 @@ namespace CharacterController
 
         //private void Update()
         //{
-
-        //    for (int i = 0; i < m_inputDownKeys.Length; i++)
-        //    {
-        //        int keyCodeCount = m_inputDownKeys[i].Count;
-        //        if (keyCodeCount > 0)
-        //        {
-                    
-        //            for (int k = 0; i < keyCodeCount; k++)
-        //            {
-        //                KeyCode keycode = m_inputDownKeys[i][k];
-        //                if (Input.GetKeyDown(keycode))
-        //                {
-        //                    Debug.LogFormat("Initiated {0} with Keycode {1}", m_Controller.CharActions[i].name, keycode);
-        //                }
-        //            }
-        //        }
+        //    var inputString = "<i>[null]</i>";
+        //    if (Input.anyKeyDown) {
+        //        inputString = Input.inputString;
+        //        DebugUI.Log(this, inputString, "KeyPressed", RichTextColor.LightBlue);
         //    }
+
+        //    //for (int i = 0; i < m_inputDownKeys.Length; i++) {
+        //    //    int keyCodeCount = m_inputDownKeys[i].Count;
+        //    //    if (keyCodeCount > 0) {
+
+        //    //        for (int k = 0; i < keyCodeCount; k++) {
+        //    //            KeyCode keycode = m_inputDownKeys[i][k];
+        //    //            if (Input.GetKeyDown(keycode)) {
+        //    //                Debug.LogFormat("Initiated {0} with Keycode {1}", m_Controller.CharActions[i].name, keycode);
+        //    //            }
+        //    //        }
+        //    //    }
+        //    //}
         //}
 
 
@@ -376,6 +396,20 @@ namespace CharacterController
             }
         }
 
+
+        Rect rect = new Rect();
+        private void OnGUI()
+        {
+
+            rect.width = Screen.width * 0.25f;
+            rect.x = (Screen.width * 0.5f) - (rect.width * 0.5f);
+            rect.y = 8;
+            rect.height = 16 + rect.y;
+            GUI.Label(rect, "MouseInput: " + MouseInputVector.ToString());
+            rect.y += rect.height = 16; 
+            rect.height += rect.height;
+            GUI.Label(rect, "MouseInputAngle: " + Mathf.Atan2(MouseInputVector.x, MouseInputVector.y).ToString());
+        }
 
     }
 }

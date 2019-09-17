@@ -59,7 +59,9 @@ namespace CharacterController
             //m_verticalVelocity.x += m_Controller.Velocity.x;
             //m_verticalVelocity.z += m_Controller.Velocity.z;
             //m_rigidbody.ResetCenterOfMass();
-            m_rigidbody.velocity += m_verticalVelocity;
+            m_velocity = m_rigidbody.velocity + m_verticalVelocity;
+            //m_velocity = Vector3.ClampMagnitude()
+            m_rigidbody.velocity += m_velocity;
 
             //m_rigidbody.AddRelativeForce(m_verticalVelocity, ForceMode.VelocityChange);
             m_startPosition = m_transform.position;
@@ -87,8 +89,6 @@ namespace CharacterController
 
         public override bool CheckGround()
 		{
-
-
             //float velocityY = (verticalDistance / time) + 0.5f * Mathf.Abs(Physics.gravity.y) * time;
 
             if (Time.time < m_ActionStartTime + 0.2f) {
@@ -97,16 +97,6 @@ namespace CharacterController
             }
 
 
-            //if (m_rigidbody.velocity.y > 0) {
-            //    RaycastHit hit = m_Controller.GetSphereCastGroundHit();
-
-            //    float groundDistance = Vector3.Project(m_transform.position - hit.point, m_transform.up).magnitude;
-            //    if (groundDistance < 0.1f && m_rigidbody.velocity.y <= 0){
-            //        m_Controller.Grounded = true;
-            //    }
-            //    m_Controller.Grounded = false;
-
-            //}
             float radius = 0.1f;
             Vector3 origin = m_transform.position + Vector3.up * (0.1f);
             origin += Vector3.up * radius;
@@ -127,7 +117,7 @@ namespace CharacterController
             return false;
 		}
 
-        bool reachedJumpHeight;
+
         public override bool UpdateMovement()
         {
             if (!m_startJump)
@@ -153,7 +143,7 @@ namespace CharacterController
 
             if(m_hasReachedApex)
             {
-                m_hasLanded = m_Controller.Grounded;
+                m_hasLanded = m_Controller.Grounded || m_rigidbody.velocity.y > -0.2f;
 
                 if (m_Debug && m_hasLanded) {
                     Debug.Log("<color=magenta>[ m_hasLanded]</color>");

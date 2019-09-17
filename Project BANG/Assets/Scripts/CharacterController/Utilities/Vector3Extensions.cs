@@ -4,6 +4,16 @@ using UnityEngine;
 
 public static class Vector3Extensions
 {
+    /// <summary>
+    /// Reset all values to 0.
+    /// </summary>
+    public static void Zero(this Vector3 v)
+    {
+        v.x = 0;
+        v.y = 0;
+        v.z = 0;
+    }
+
 
     public static Vector3 Add(this Vector3 a, Vector3 b)
     {
@@ -22,7 +32,8 @@ public static class Vector3Extensions
         return a;
     }
 
-    public static Vector3 AddY(this Vector3 v, float y)
+
+    public static Vector3 WithY(this Vector3 v, float y)
     {
         return new Vector3(v.x, v.y + y, v.z);
     }

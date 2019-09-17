@@ -8,17 +8,42 @@ namespace CharacterController
     {
         int EntityID { get; }
 
+        void SetActive(bool active);
 
-
-        void Update(float deltaTime);
+        void OnUpdate(float deltaTime);
     }
 
 
     public abstract class EntityObject : MonoBehaviour, IEntityObject
     {
-        public abstract int EntityID { get; }
 
-        public abstract void Update(float deltaTime);
+        public void SetActive(bool value)
+        {
+            if (value) {
+                EntityObjectManager.Instance.EnableEntity(this);
+            }
+            else {
+                EntityObjectManager.Instance.DisableEnity(this);
+            }
+
+            this.enabled = value;
+            this.gameObject.SetActive(value);
+        }
+
+
+        public int EntityID { get { return GetInstanceID(); } }
+
+
+
+        private void PreAwake()
+        {
+
+        }
+
+
+        
+
+        public abstract void OnUpdate(float deltaTime);
     }
 
 }

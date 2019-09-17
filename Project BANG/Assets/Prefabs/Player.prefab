@@ -437,7 +437,6 @@ GameObject:
   - component: {fileID: 2002697079}
   - component: {fileID: 1071944184}
   - component: {fileID: 2129104038}
-  - component: {fileID: 2129104046}
   - component: {fileID: 2129104045}
   - component: {fileID: 2129104044}
   - component: {fileID: 2129104043}
@@ -445,6 +444,7 @@ GameObject:
   - component: {fileID: 2129104041}
   - component: {fileID: 2129104040}
   - component: {fileID: 2129104039}
+  - component: {fileID: 6364931836315390225}
   m_Layer: 31
   m_Name: Player
   m_TagString: Player
@@ -582,8 +582,8 @@ MonoBehaviour:
   - {fileID: 2129104042}
   - {fileID: 2129104043}
   - {fileID: 2129104044}
-  - {fileID: 2129104046}
   - {fileID: 2129104045}
+  - {fileID: 6364931836315390225}
   - {fileID: 2129104041}
   m_activeAction: {fileID: 0}
 --- !u!114 &6790305966678263073
@@ -1584,40 +1584,11 @@ MonoBehaviour:
   m_StartEffect: {fileID: 0}
   m_EndEffect: {fileID: 0}
   m_Debug: 0
-  m_jumpHeight: 2
+  m_jumpHeight: 3
   m_recurrenceDelay: 0.2
   m_startJump: 0
   m_hasReachedApex: 0
   m_hasLanded: 0
---- !u!114 &2129104046
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6154c3fa2c49643758284fb02e121cd3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IsActive: 0
-  m_StateName: Crouch
-  m_LayerIndex: 0
-  m_ActionID: 5
-  m_Priority: 6
-  m_TransitionDuration: 0.2
-  m_StartType: 2
-  m_StopType: 3
-  m_InputNames:
-  - C
-  m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 0
-  m_StartAudioClips: []
-  m_StopAudioClips: []
-  m_StartEffect: {fileID: 0}
-  m_EndEffect: {fileID: 0}
-  m_Debug: 0
 --- !u!114 &2129104045
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1634,7 +1605,7 @@ MonoBehaviour:
   m_StateName: StartMovement
   m_LayerIndex: 0
   m_ActionID: 1
-  m_Priority: 7
+  m_Priority: 6
   m_TransitionDuration: 0.2
   m_StartType: 0
   m_StopType: 0
@@ -1811,7 +1782,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c6a50eb5363924e34b3edea697ff11c9, type: 3}
   m_Name: 
@@ -1822,10 +1793,39 @@ MonoBehaviour:
   m_ActionID: -1
   m_Priority: 1
   m_TransitionDuration: 0.2
-  m_StartType: 2
+  m_StartType: 3
   m_StopType: 0
   m_InputNames:
   - Space
+  m_SpeedMultiplier: 1
+  m_ApplyBuiltinRootMotion: 0
+  m_StartAudioClips: []
+  m_StopAudioClips: []
+  m_StartEffect: {fileID: 0}
+  m_EndEffect: {fileID: 0}
+  m_Debug: 0
+--- !u!114 &6364931836315390225
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2247134470855319462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6154c3fa2c49643758284fb02e121cd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: Crouch
+  m_LayerIndex: 0
+  m_ActionID: 5
+  m_Priority: 7
+  m_TransitionDuration: 0.2
+  m_StartType: 2
+  m_StopType: 1
+  m_InputNames:
+  - C
   m_SpeedMultiplier: 1
   m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []

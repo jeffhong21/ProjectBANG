@@ -152,7 +152,15 @@
                 {
                     if (string.IsNullOrWhiteSpace(m_InputNames[i]))
                         continue;
-                    m_KeyCodes[i] = (KeyCode)Enum.Parse(typeof(KeyCode), m_InputNames[i]);
+
+                    KeyCode? inputKey = (KeyCode)Enum.Parse(typeof(KeyCode), m_InputNames[i]);
+                    if(inputKey == null) {
+                        if (m_InputNames[i].Length == 1)
+                            m_InputNames[i].ToUpper();
+                    }
+
+                    if(inputKey != null)
+                        m_KeyCodes[i] = (KeyCode)Enum.Parse(typeof(KeyCode), m_InputNames[i]);
                 }
             }
 

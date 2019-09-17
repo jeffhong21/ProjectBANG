@@ -27,33 +27,42 @@
 
 
 
-
-
+        private bool m_frameUpdated;
+        //  Used to update the animator every X second.
+        private float m_animatorUpdateTimer;
 
 
         private Vector3 leftFootPosition, rightFootPosition;
-        //  Used to update the animator every X second.
-        private float m_animatorUpdateTimer;
-        private bool frameUpdated;
+
+
 
         #region Properties
+        public float timeScale { get {
+                m_timeScale = Time.timeScale;
+                return m_timeScale; }
+        }
 
         public bool Aiming { get; set; }
 
         public bool CanAim { get => Grounded; }
 
 
-        public float ViewAngle
+        public float viewAngle
         {
             get { return m_viewAngle; }
             set { m_viewAngle = Mathf.Clamp(value, -180, 180); }
         }
 
-        public CharacterAction[] CharActions
-        {
-            get { return m_actions; }
-            set { m_actions = value; }
+        public CharacterAction[] CharActions { get { return m_actions; } set { m_actions = value; } }
+
+        public int ActiveActionIndex{
+            get {
+                if (m_activeAction != null)
+                    return Array.IndexOf(m_actions, m_activeAction);
+                return -1;
+            }
         }
+        
 
         #endregion
 
@@ -65,6 +74,59 @@
 
         private void Awake()
         {
+            m_gameObject = gameObject;
+            m_transform = transform;
+
+            m_animatorMonitor = GetComponent<AnimatorMonitor>();
+            m_animator = GetComponent<Animator>();
+            m_animator.updateMode = AnimatorUpdateMode.AnimatePhysics;
+            m_animator.applyRootMotion = m_useRootMotion;
+            //  Rigidbody settings
+            m_rigidbody = GetComponent<Rigidbody>();
+            m_rigidbody.mass = m_mass;
+            m_rigidbody.useGravity = false;
+            m_rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+            m_rigidbody.collisionDetectionMode = CollisionDetectionMode.Discrete;
+            //m_rigidbody.isKinematic = false;
+            if (!m_rigidbody.isKinematic)
+                m_rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+            else
+                m_rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
+            m_gravity = Physics.gravity;
+
+            //  Collider settings
+            m_collider = GetComponent<CapsuleCollider>();
+            if (m_collider == null) {
+                m_collider = gameObject.AddComponent<CapsuleCollider>();
+                m_collider.radius = 0.36f;
+                m_collider.height = MathUtil.Round(gameObject.GetComponentInChildren<SkinnedMeshRenderer>().bounds.center.y * 2);
+                m_collider.center = new Vector3(0, m_collider.height / 2, 0);
+            }
+            m_colliderCenter = m_collider.center;
+            m_colliderHeight = m_collider.height * m_transform.lossyScale.x;
+            m_colliderRadius = m_collider.radius * m_transform.lossyScale.x;
+
+            //  Collision settings
+            m_layerManager = GetComponent<LayerManager>();
+            m_collisionsLayerMask = m_layerManager.SolidLayers;
+            m_probedColliders = new Collider[m_maxCollisionCount];
+
+
+
+            m_deltaTime = Time.deltaTime;
+
+            m_lookRotation = Quaternion.LookRotation(m_transform.forward);
+
+
+            m_motionPath = new Trajectory(1, m_sampleRate, new AffineTransform(m_transform));
+            m_physicsMaterial = new PhysicMaterial() { name = "Character Physics Material" };
+
+
+
+
+            //  Initialize debugger;
+            Debugger.Initialize(this);
+
             m_actionInfo = new Dictionary<CharacterAction, int>();
 
             for (int i = 0; i < m_actions.Length; i++)
@@ -75,18 +137,20 @@
                 m_actions[i].Initialize(this, Array.IndexOf(m_actions, m_actions[i]), Time.deltaTime);
             }
 
-            //EventHandler.RegisterEvent<CharacterAction, bool>(m_GameObject, EventIDs.OnCharacterActionActive, OnActionActive);
-            //EventHandler.RegisterEvent<ItemAction, bool>(m_GameObject, EventIDs.OnItemActionActive, OnItemActionActive);
-            //EventHandler.RegisterEvent<bool>(m_GameObject, EventIDs.OnAimActionStart, OnAimActionStart);
+            //EventHandler.RegisterEvent<CharacterAction, bool>(m_gameObject, EventIDs.OnCharacterActionActive, OnActionActive);
+            //EventHandler.RegisterEvent<ItemAction, bool>(m_gameObject, EventIDs.OnItemActionActive, OnItemActionActive);
+            //EventHandler.RegisterEvent<bool>(m_gameObject, EventIDs.OnAimActionStart, OnAimActionStart);
 
+            m_lastFrameTime = 0f;
+            m_deltaTimeLastFrame = 0f;
         }
 
 
         protected void OnDestroy()
 		{
-            //EventHandler.UnregisterEvent<CharacterAction, bool>(m_GameObject, EventIDs.OnCharacterActionActive, OnActionActive);
-            //EventHandler.UnregisterEvent<ItemAction, bool>(m_GameObject, EventIDs.OnItemActionActive, OnItemActionActive);
-            //EventHandler.UnregisterEvent<bool>(m_GameObject, EventIDs.OnAimActionStart, OnAimActionStart);
+            //EventHandler.UnregisterEvent<CharacterAction, bool>(m_gameObject, EventIDs.OnCharacterActionActive, OnActionActive);
+            //EventHandler.UnregisterEvent<ItemAction, bool>(m_gameObject, EventIDs.OnItemActionActive, OnItemActionActive);
+            //EventHandler.UnregisterEvent<bool>(m_gameObject, EventIDs.OnAimActionStart, OnAimActionStart);
 
 
         }
@@ -96,37 +160,71 @@
         {
             if(m_actions != null){
                 for (int i = 0; i < m_actions.Length; i++)
-                    m_actions[i].SetPriority(i);
+                    if(m_actions[i] != null) m_actions[i].SetPriority(i);
             }
 
         }
 
 
-        private void Update()
-        {
 
-            //ActionUpdate();
-        }
-
+        private float m_lastFrameTime = 0f;
+		private float m_deltaTimeLastFrame = 0f;
 
         private void FixedUpdate()
 		{
 
-
             OnUpdate(m_deltaTime);
-
-
+            m_frameUpdated = true;
         }
 
+        private void Update()
+        {
+            if (m_frameUpdated) return;
 
+            //OnUpdate(m_deltaTime);
+            //m_frameUpdated = true;
+        }
 
 
 
         private void LateUpdate()
         {
+            //  -------------------
+            //  Log debug messages.
             DebugAttributes();
+            //  -------------------
+            m_lastFrameTime = Time.time;
+            //  Continue with updates.
+            if (m_frameUpdated) {
+                m_frameUpdated = false;
+                return;
+            }
         }
 
+
+        private void OnAnimatorMove()
+        {
+            Vector3 f = m_animator.deltaRotation * Vector3.forward;
+            deltaAngle += Mathf.Atan2(f.x, f.z) * Mathf.Rad2Deg;
+
+            
+            if (m_useRootMotion) {
+                m_previousPosition = m_animator.deltaPosition * m_rootMotionSpeedMultiplier;
+                m_rootMotionVelocity = (m_animator.deltaPosition * m_rootMotionSpeedMultiplier) / m_deltaTime;
+                //if (m_animator.hasRootMotion) m_rigidbody.MovePosition(m_animator.rootPosition);
+            }
+
+            if (m_useRootMotion) {
+                //m_previousRotation *= m_animator.deltaRotation;
+
+                m_animator.deltaRotation.ToAngleAxis(out float angle, out Vector3 axis);
+                angle = (angle * m_rootMotionSpeedMultiplier * Mathf.Deg2Rad) / m_deltaTime;
+                m_rootMotionRotation = Quaternion.AngleAxis(angle, axis);
+
+                //if (m_animator.hasRootMotion) m_rigidbody.MoveRotation(m_animator.rootRotation);
+            }
+
+        }
 
         private void OnAnimatorIK(int layerIndex)
         {
@@ -144,11 +242,13 @@
 
         private void OnUpdate(float deltaTime)
         {
-            int activeActionIndex = -1;
-            if (m_activeAction != null) activeActionIndex = Array.IndexOf(m_actions, m_activeAction);
             m_deltaTime = deltaTime;
-            timeScale = Time.timeScale;
-            if (Math.Abs(timeScale) <= 0) return;
+
+            if (m_rigidbody.isKinematic) {
+                InternalMovementTest();
+                return;
+            }
+            if (m_rigidbody.isKinematic) Debug.Log("<b><color=red>[CHARACTER SHOULD NOT BE UPDATING ACTIONS");
 
             for (int i = 0; i < m_actions.Length; i++)
             {
@@ -158,26 +258,26 @@
 
                 CharacterAction action = m_actions[i];
                 if(action.IsActive) {
-                    if (action.StopType != ActionStopType.Manual)
+                    if (action.StopType != ActionStopType.Manual) {
                         TryStopAction(action);
+
+                    }
+                        
                 }
                 else {
-                    if (action.StartType != ActionStartType.Manual) {
-                        TryStartAction(action);
-                    }
-
-                }
-
-                if (action.IsActive == false)
-                {
-                    if (TryStartAction(action) && action.StartType != ActionStartType.Manual)
+                    if (action.StartType != ActionStartType.Manual)
                     {
-                        break;
+                        bool actionStarted = TryStartAction(action);
+                        if (actionStarted) {
+                            if (action.IsConcurrentAction()) {
+                                continue;
+                            }
+                            m_activeAction = action;
+                            break;
+
+                        }
+                        
                     }
-                }
-                else {  
-                    if (action.StopType != ActionStopType.Manual)
-                        TryStopAction(action);
                 }
             }
 
@@ -185,7 +285,8 @@
 
             InternalMove();
             if (m_activeAction != null) {
-                if (m_activeAction.Move()) Move(); }
+                if (m_activeAction.Move()) Move();
+            }
             else Move();
 
             if (m_activeAction != null) {
@@ -224,30 +325,6 @@
 
 
 
-            //if (m_activeAction == null) Move();
-            //else if (m_activeAction.Move()) Move();
-
-            //if (m_activeAction == null) CheckGround();
-            //else if (m_activeAction.CheckGround()) CheckGround();
-
-            //if (m_activeAction == null) CheckMovement();
-            //else if (m_activeAction.CheckMovement()) CheckMovement();
-
-            //if (m_activeAction == null) SetPhysicsMaterial();
-            //else if (m_activeAction.SetPhysicsMaterial()) SetPhysicsMaterial();
-
-            //if (m_activeAction == null) UpdateMovement();
-            //else if (m_activeAction.UpdateMovement()) UpdateMovement();
-
-            //if (m_activeAction == null) UpdateRotation();
-            //else if (m_activeAction.UpdateRotation()) UpdateRotation();
-
-            //if (m_activeAction == null) UpdateAnimator();
-            //else if (m_activeAction.UpdateAnimator()) UpdateAnimator();
-
-            //ApplyRotation();
-            //ApplyMovement();
-
 
 
         }
@@ -263,10 +340,10 @@
 
             if(!m_moving && m_animatorUpdateTimer > 0.5f)
             {
-                var viewAngle = GetAngleFromForward(LookRotation * m_transform.forward);
-                if (Mathf.Abs(viewAngle) < 0.1f)
-                    viewAngle = 0;
-                m_animator.SetFloat(HashID.LookAngle, viewAngle);
+                var angle = GetAngleFromForward(LookRotation * m_transform.forward);
+                if (Mathf.Abs(angle) < 0.1f)
+                    angle = 0;
+                m_animator.SetFloat(HashID.LookAngle, angle);
 
                 m_animatorUpdateTimer = 0;
             }
@@ -308,175 +385,6 @@
         #region Character Actions
 
 
-        //public bool TryStartAction(CharacterAction action)
-        //{
-        //    if (action == null) return false;
-
-        //    int actionPriority = Array.IndexOf(m_actions, action);
-        //    //  If there is an active action and current action is non concurrent.
-        //    if (m_activeAction != null && action.IsConcurrentAction() == false)
-        //    {
-        //        int activeActionPriority = Array.IndexOf(m_actions, m_activeAction);
-        //        //Debug.LogFormat("Action index {0} | Active Action index {1}", index, activeActionIndex);
-        //        if (actionPriority < activeActionPriority)
-        //        {
-        //            if (action.CanStartAction())
-        //            {
-        //                //  Stop the current active action.
-        //                TryStopAction(m_activeAction, true);
-        //                //  Set the active action.
-        //                m_activeAction = action;
-        //                action.StartAction();
-        //                return true;
-        //            }
-        //        }
-        //    }
-        //    //  If there is an active action and current action is concurrent.
-        //    else if (m_activeAction != null && action.IsConcurrentAction())
-        //    {
-        //        if (action.CanStartAction())
-        //        {
-        //            //m_activeAction[index] = m_actions[index];
-        //            action.StartAction();
-        //            //action.UpdateAnimator();
-        //            return true;
-        //        }
-        //    }
-        //    //  If there is no active action.
-        //    else
-        //    {
-        //        if (action.CanStartAction())
-        //        {
-        //            m_activeAction = m_actions[actionPriority];
-        //            //m_activeAction[index] = m_actions[index];
-        //            action.StartAction();
-        //            //action.UpdateAnimator();
-        //            return true;
-        //        }
-        //    }
-
-
-        //    return false;
-        //}
-
-
-        //public void TryStopAction(CharacterAction action, bool force)
-        //{
-        //    if (force)
-        //    {
-        //        if (action == null || !action.IsActive || !action.enabled) return;
-
-        //        if (action.enabled && action.IsActive)
-        //        {
-        //            action.StopAction();
-        //            ActionStopped();
-        //        }
-
-        //    }
-        //    else
-        //    {
-        //        TryStopAction(action);
-        //    }
-
-            
-
-
-
-
-        //}
-
-
-        //public void TryStopAction(CharacterAction action)
-        //{
-        //    if (action == null || !action.IsActive || !action.enabled) return;
-
-        //    if (action.enabled && action.IsActive)
-        //    {
-        //        if (action.CanStopAction())
-        //        {
-        //            action.StopAction();
-        //            if (m_activeAction == action)
-        //                m_activeAction = null;
-        //            ActionStopped();
-        //            return;
-        //        }
-        //    }
-        //}
-
-
-
-
-
-
-        /// <summary>
-        /// Starts and Stops the Action internally.
-        /// </summary>
-        /// <param name="charAction"></param>
-        /// <returns>Returns true if action was started.</returns>
-        protected void StopStartAction(CharacterAction charAction)
-        {
-            //  First, check if current Action can Start or Stop.
-
-            //  Current Action is Active.
-            if (charAction.enabled && charAction.IsActive)
-            {
-                //  Check if can stop Action is StopType is NOT Manual.
-                if (charAction.StopType != ActionStopType.Manual)
-                {
-                    if (charAction.CanStopAction())
-                    {
-                        //  Start the Action and update the animator.
-                        charAction.StopAction();
-                        //  Reset Active Action.
-                        if (m_activeAction = charAction)
-                            m_activeAction = null;
-                        //  Move on to the next Action.
-                        return;
-                    }
-                }
-            }
-            //  Current Action is NOT Active.
-            else
-            {
-                //  Check if can start Action is StartType is NOT Manual.
-                if (charAction.enabled && charAction.StartType != ActionStartType.Manual)
-                {
-                    if (m_activeAction == null)
-                    {
-                        if (charAction.CanStartAction())
-                        {
-                            //  Start the Action and update the animator.
-                            charAction.StartAction();
-                            //charAction.UpdateAnimator();
-                            //  Set active Action if not concurrent.
-                            if (charAction.IsConcurrentAction() == false)
-                                m_activeAction = charAction;
-                            //  Move onto the next Action.
-                            return;
-                        }
-                    }
-                    else if (charAction.IsConcurrentAction())
-                    {
-                        if (charAction.CanStartAction())
-                        {
-                            //  Start the Action and update the animator.
-                            charAction.StartAction();
-                            //charAction.UpdateAnimator();
-                            //  Move onto the next Action.
-                            return;
-                        }
-                    }
-                    else
-                    {
-
-                    }
-                }
-            }
-
-            return;
-        }
-
-
         public T GetAction<T>() where T : CharacterAction
         {
             for (int i = 0; i < m_actions.Length; i++){
@@ -494,7 +402,7 @@
 
             int index = Array.IndexOf(m_actions, action);
             //  If there is an active action and current action is non concurrent.
-            if (m_activeAction != null && action.IsConcurrentAction() == false)
+            if (m_activeAction != null && !action.IsConcurrentAction())
             {
                 int activeActionIndex = Array.IndexOf(m_actions, m_activeAction);
                 //Debug.LogFormat("Action index {0} | Active Action index {1}", index, activeActionIndex);
@@ -536,7 +444,10 @@
                     return true;
                 }
             }
+            else {
 
+                
+            }
 
             return false;
         }
@@ -552,8 +463,6 @@
                 }
             }
         }
-
-
 
 
         public void TryStopAction(CharacterAction action)
@@ -852,3 +761,174 @@
 //    ApplyRotation();
 //}
 
+
+
+
+
+//public bool TryStartAction(CharacterAction action)
+//{
+//    if (action == null) return false;
+
+//    int actionPriority = Array.IndexOf(m_actions, action);
+//    //  If there is an active action and current action is non concurrent.
+//    if (m_activeAction != null && action.IsConcurrentAction() == false)
+//    {
+//        int activeActionPriority = Array.IndexOf(m_actions, m_activeAction);
+//        //Debug.LogFormat("Action index {0} | Active Action index {1}", index, activeActionIndex);
+//        if (actionPriority < activeActionPriority)
+//        {
+//            if (action.CanStartAction())
+//            {
+//                //  Stop the current active action.
+//                TryStopAction(m_activeAction, true);
+//                //  Set the active action.
+//                m_activeAction = action;
+//                action.StartAction();
+//                return true;
+//            }
+//        }
+//    }
+//    //  If there is an active action and current action is concurrent.
+//    else if (m_activeAction != null && action.IsConcurrentAction())
+//    {
+//        if (action.CanStartAction())
+//        {
+//            //m_activeAction[index] = m_actions[index];
+//            action.StartAction();
+//            //action.UpdateAnimator();
+//            return true;
+//        }
+//    }
+//    //  If there is no active action.
+//    else
+//    {
+//        if (action.CanStartAction())
+//        {
+//            m_activeAction = m_actions[actionPriority];
+//            //m_activeAction[index] = m_actions[index];
+//            action.StartAction();
+//            //action.UpdateAnimator();
+//            return true;
+//        }
+//    }
+
+
+//    return false;
+//}
+
+
+//public void TryStopAction(CharacterAction action, bool force)
+//{
+//    if (force)
+//    {
+//        if (action == null || !action.IsActive || !action.enabled) return;
+
+//        if (action.enabled && action.IsActive)
+//        {
+//            action.StopAction();
+//            ActionStopped();
+//        }
+
+//    }
+//    else
+//    {
+//        TryStopAction(action);
+//    }
+
+
+
+
+
+
+//}
+
+
+//public void TryStopAction(CharacterAction action)
+//{
+//    if (action == null || !action.IsActive || !action.enabled) return;
+
+//    if (action.enabled && action.IsActive)
+//    {
+//        if (action.CanStopAction())
+//        {
+//            action.StopAction();
+//            if (m_activeAction == action)
+//                m_activeAction = null;
+//            ActionStopped();
+//            return;
+//        }
+//    }
+//}
+
+
+
+
+
+
+///// <summary>
+///// Starts and Stops the Action internally.
+///// </summary>
+///// <param name="charAction"></param>
+///// <returns>Returns true if action was started.</returns>
+//protected void StopStartAction(CharacterAction charAction)
+//{
+//    //  First, check if current Action can Start or Stop.
+
+//    //  Current Action is Active.
+//    if (charAction.enabled && charAction.IsActive)
+//    {
+//        //  Check if can stop Action is StopType is NOT Manual.
+//        if (charAction.StopType != ActionStopType.Manual)
+//        {
+//            if (charAction.CanStopAction())
+//            {
+//                //  Start the Action and update the animator.
+//                charAction.StopAction();
+//                //  Reset Active Action.
+//                if (m_activeAction = charAction)
+//                    m_activeAction = null;
+//                //  Move on to the next Action.
+//                return;
+//            }
+//        }
+//    }
+//    //  Current Action is NOT Active.
+//    else
+//    {
+//        //  Check if can start Action is StartType is NOT Manual.
+//        if (charAction.enabled && charAction.StartType != ActionStartType.Manual)
+//        {
+//            if (m_activeAction == null)
+//            {
+//                if (charAction.CanStartAction())
+//                {
+//                    //  Start the Action and update the animator.
+//                    charAction.StartAction();
+//                    //charAction.UpdateAnimator();
+//                    //  Set active Action if not concurrent.
+//                    if (charAction.IsConcurrentAction() == false)
+//                        m_activeAction = charAction;
+//                    //  Move onto the next Action.
+//                    return;
+//                }
+//            }
+//            else if (charAction.IsConcurrentAction())
+//            {
+//                if (charAction.CanStartAction())
+//                {
+//                    //  Start the Action and update the animator.
+//                    charAction.StartAction();
+//                    //charAction.UpdateAnimator();
+//                    //  Move onto the next Action.
+//                    return;
+//                }
+//            }
+//            else
+//            {
+
+//            }
+//        }
+//    }
+
+//    return;
+//}

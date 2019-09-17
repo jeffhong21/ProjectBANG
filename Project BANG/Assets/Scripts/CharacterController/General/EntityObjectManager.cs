@@ -6,72 +6,97 @@ using UnityEngine;
 using DebugUI;
 namespace CharacterController
 {
-    public class EntityObjectManager : MonoBehaviour
+    public class EntityObjectManager : SingletonMonoBehaviour<EntityObjectManager>
     {
 
         private Dictionary<int, IEntityObject> m_allEntityObjects;
+        private List<IEntityObject> m_activeEntities;
+        private Queue<IEntityObject> m_updateQueue;
 
         [SerializeField]
         private float m_deltaTime;
         [SerializeField]
-        private float m_previousTime;
+        private float m_lastFrameTime;
 
+        //  Has the frame been updated.
         private bool m_frameUpdated;
+        //  The amount of fixedUpdates between frames.
+        private int m_fixedUpdateCount;
 
 
-        private void Start()
+
+        protected override void OnAwake()
         {
-            m_previousTime = 0f;
+            m_lastFrameTime = 0f;
+            m_allEntityObjects = new Dictionary<int, IEntityObject>();
+            m_activeEntities = new List<IEntityObject>();
+            m_updateQueue = new Queue<IEntityObject>();
         }
 
 
+        public void EnableEntity(IEntityObject entity)
+        {
+            if(m_allEntityObjects.TryGetValue(entity.EntityID, out IEntityObject entityObject)) {
+
+            }
+
+            //if (!m_allEntityObjects.ContainsKey(entity)) {
+            //    m_allEntityObjects.Add(entity, entity.EntityID);
+            //}
+        }
+
+        public void DisableEnity(IEntityObject entity)
+        {
+
+        }
+
+
+
+        #region Update Loop
+
         private void FixedUpdate()
         {
-            Tick();
-
+            m_deltaTime = Time.time - m_lastFrameTime;
+            //  Update entity;
+            OnEntityUpdate(m_deltaTime);
             m_frameUpdated = true;
 
+            m_fixedUpdateCount++;
 
-            DebugUI.DebugUI.Log(this, Time.fixedDeltaTime, "fixedDeltaTime", DebugUI.RichTextColor.Cyan);
+            //DebugUI.DebugUI.Log(this, Time.deltaTime, "deltaTime_FixedUpdate", RichTextColor.Cyan);
         }
 
 
         private void Update()
         {
-            if (m_frameUpdated)
-            {
-                m_frameUpdated = false;
-                return;
-            }
-            Tick();
+            m_deltaTime = Time.time - m_lastFrameTime;
+            m_lastFrameTime = Time.time;
 
+            //DebugUI.DebugUI.Log(this, Time.deltaTime, "deltaTime", RichTextColor.Cyan);
+
+            if (m_frameUpdated) return;
+            //  Update entity;
+            OnEntityUpdate(m_deltaTime);
+            m_frameUpdated = true;
+        }
+
+
+        private void LateUpdate()
+        {
             m_frameUpdated = false;
-
-            DebugUI.DebugUI.Log(this, Time.deltaTime, "deltaTime", DebugUI.RichTextColor.Cyan);
+            m_fixedUpdateCount = 0;
         }
 
+        #endregion
 
 
-        private void Tick()
+
+        private void OnEntityUpdate(float deltaTime)
         {
-            m_deltaTime = Time.time - m_previousTime;
-            m_previousTime = Time.time;
-
-
-
-
-
-            DebugUI.DebugUI.Log(this, m_deltaTime, "custom delta time", Time.inFixedTimeStep ? DebugUI.RichTextColor.Cyan : DebugUI.RichTextColor.LightBlue);
+            //DebugUI.DebugUI.Log(this, m_deltaTime, "dcustom deltaTime", RichTextColor.Cyan);
         }
 
 
-
-        private float GetDeltaTime()
-        {
-            float deltaTime = Time.time - m_previousTime;
-            m_previousTime = Time.time;
-            return deltaTime;
-        }
 
 
     }

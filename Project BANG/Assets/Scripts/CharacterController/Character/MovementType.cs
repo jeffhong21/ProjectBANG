@@ -1,11 +1,25 @@
 ﻿namespace CharacterController
 {
     using UnityEngine;
-    using System.Collections;
+    using System.Linq;
+    using System.Reflection;
+    using System.Collections.Generic;
 
-    public abstract class MovementType
+
+    public class MovementType
     {
+        private static HashSet<MovementType> g_MovementTypes;
 
+
+        public MovementType()
+        {
+            var movementTypes = Assembly.GetAssembly(typeof(MovementType)).GetTypes()
+                          .Where(t => t.IsClass && t.IsSubclassOf(typeof(MovementType))).ToArray();
+
+            //for (int i = 0; i < movementTypes.Length; i++) {
+            //    var mt = movementTypes[i].DeclaringType;
+            //}
+        }
 
 
 
@@ -23,10 +37,17 @@
 
 
 
-        public abstract Vector2 GetInputVector( Vector2 inputVector );
+        public Vector2 GetInputDirection(Vector2 inputVector)
+        {
+            throw new System.NotImplementedException();
+        }
 
 
-        public abstract float GetRotationAngle( float charHorizontalMovement, float charFwdMovement, float cameraHorizontalMovement, float cameraVerticalMovement );
+        public float GetRotationAngle( float charHorizontalMovement, float charFwdMovement, float cameraHorizontalMovement, float cameraVerticalMovement)
+        {
+
+            throw new System.NotImplementedException();
+        }
     }
 
 }
