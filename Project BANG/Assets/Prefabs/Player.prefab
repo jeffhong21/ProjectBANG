@@ -502,7 +502,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 80
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!136 &8140073959955325728
 CapsuleCollider:
@@ -533,8 +533,8 @@ MonoBehaviour:
   m_useRootMotion: 1
   m_rootMotionSpeedMultiplier: 1
   m_rootMotionRotationMultiplier: 1
-  m_groundAcceleration: {x: 0.18, y: 0, z: 0.18}
-  m_desiredSpeed: 4
+  m_acceleration: {x: 0.18, y: 0, z: 0.18}
+  m_desiredSpeed: 1
   m_motorDamping: 0.3
   m_rotationSpeed: 10
   m_mass: 100
@@ -550,9 +550,9 @@ MonoBehaviour:
   debugger:
     debugMode: 1
     states:
-      showDebugUI: 1
-      showGroundCheck: 1
-      showCollisions: 1
+      showDebugUI: 0
+      showGroundCheck: 0
+      showCollisions: 0
       showMotion: 0
     colors:
       moveDirectionColor: {r: 0, g: 0, b: 1, a: 1}
@@ -638,7 +638,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92019d84070ab4ad6939a5a7011333a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_lookSensitivity: {x: 3, y: 3}
+  m_lookSensitivity: {x: 1, y: 1}
   m_moveAxisDeadZone: 0.1
   lookDistance: 20
   axisRaw: 1
@@ -649,7 +649,7 @@ MonoBehaviour:
   m_SelectPlayerKeyCode: 112
   m_LockCameraRotation: 108
   m_DebugBreakKeyCode: 13
-  DebugMode: 1
+  DebugMode: 0
 --- !u!114 &4764323065115179194
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1596,7 +1596,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eb969d52822a24d8dbd0b8c198a14803, type: 3}
   m_Name: 
@@ -1625,7 +1625,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5dcb0e67b11b04af4b61cb44c64d5a63, type: 3}
   m_Name: 
@@ -1655,7 +1655,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3f62eddceb76e4ce2aab0985c2db98db, type: 3}
   m_Name: 
@@ -1823,7 +1823,7 @@ MonoBehaviour:
   m_Priority: 7
   m_TransitionDuration: 0.2
   m_StartType: 2
-  m_StopType: 1
+  m_StopType: 3
   m_InputNames:
   - C
   m_SpeedMultiplier: 1

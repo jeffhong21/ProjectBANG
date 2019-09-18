@@ -181,8 +181,8 @@
         {
             if (m_frameUpdated) return;
 
-            //OnUpdate(m_deltaTime);
-            //m_frameUpdated = true;
+            OnUpdate(m_deltaTime);
+            m_frameUpdated = true;
         }
 
 
@@ -204,27 +204,9 @@
 
         private void OnAnimatorMove()
         {
-            Vector3 f = m_animator.deltaRotation * Vector3.forward;
-            deltaAngle += Mathf.Atan2(f.x, f.z) * Mathf.Rad2Deg;
-
-            
-            if (m_useRootMotion) {
-                m_previousPosition = m_animator.deltaPosition * m_rootMotionSpeedMultiplier;
-                m_rootMotionVelocity = (m_animator.deltaPosition * m_rootMotionSpeedMultiplier) / m_deltaTime;
-                //if (m_animator.hasRootMotion) m_rigidbody.MovePosition(m_animator.rootPosition);
-            }
-
-            if (m_useRootMotion) {
-                //m_previousRotation *= m_animator.deltaRotation;
-
-                m_animator.deltaRotation.ToAngleAxis(out float angle, out Vector3 axis);
-                angle = (angle * m_rootMotionSpeedMultiplier * Mathf.Deg2Rad) / m_deltaTime;
-                m_rootMotionRotation = Quaternion.AngleAxis(angle, axis);
-
-                //if (m_animator.hasRootMotion) m_rigidbody.MoveRotation(m_animator.rootRotation);
-            }
-
+            AnimatorMove();
         }
+
 
         private void OnAnimatorIK(int layerIndex)
         {
@@ -244,11 +226,11 @@
         {
             m_deltaTime = deltaTime;
 
-            if (m_rigidbody.isKinematic) {
-                InternalMovementTest();
-                return;
-            }
-            if (m_rigidbody.isKinematic) Debug.Log("<b><color=red>[CHARACTER SHOULD NOT BE UPDATING ACTIONS");
+            //if (m_rigidbody.isKinematic) {
+            //    InternalMovementTest();
+            //    return;
+            //}
+            //if (m_rigidbody.isKinematic) Debug.Log("<b><color=red>[CHARACTER SHOULD NOT BE UPDATING ACTIONS");
 
             for (int i = 0; i < m_actions.Length; i++)
             {
