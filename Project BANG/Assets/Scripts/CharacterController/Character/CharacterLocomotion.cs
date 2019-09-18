@@ -23,7 +23,7 @@
         protected Dictionary<CharacterAction, int> m_actionInfo;
 
         protected float m_viewAngle;
-        protected Vector3 m_lookDirection;
+
 
 
 
@@ -83,15 +83,6 @@
             m_animator.applyRootMotion = m_useRootMotion;
             //  Rigidbody settings
             m_rigidbody = GetComponent<Rigidbody>();
-            m_rigidbody.mass = m_mass;
-            m_rigidbody.useGravity = false;
-            m_rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-            m_rigidbody.collisionDetectionMode = CollisionDetectionMode.Discrete;
-            //m_rigidbody.isKinematic = false;
-            if (!m_rigidbody.isKinematic)
-                m_rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-            else
-                m_rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
             m_gravity = Physics.gravity;
 
             //  Collider settings
@@ -102,9 +93,7 @@
                 m_collider.height = MathUtil.Round(gameObject.GetComponentInChildren<SkinnedMeshRenderer>().bounds.center.y * 2);
                 m_collider.center = new Vector3(0, m_collider.height / 2, 0);
             }
-            m_colliderCenter = m_collider.center;
-            m_colliderHeight = m_collider.height * m_transform.lossyScale.x;
-            m_colliderRadius = m_collider.radius * m_transform.lossyScale.x;
+
 
             //  Collision settings
             m_layerManager = GetComponent<LayerManager>();
@@ -112,23 +101,20 @@
             m_probedColliders = new Collider[m_maxCollisionCount];
 
 
-
-            m_deltaTime = Time.deltaTime;
-
-            m_lookRotation = Quaternion.LookRotation(m_transform.forward);
-
-
             m_motionPath = new Trajectory(1, m_sampleRate, new AffineTransform(m_transform));
             m_physicsMaterial = new PhysicMaterial() { name = "Character Physics Material" };
 
+            //  --------------------------
+            //  Init
+            //  --------------------------
+            InitializeVariables();
 
 
 
-            //  Initialize debugger;
-            Debugger.Initialize(this);
-
+            //  --------------------------
+            //  Initialize actions;
+            //  --------------------------
             m_actionInfo = new Dictionary<CharacterAction, int>();
-
             for (int i = 0; i < m_actions.Length; i++)
             {
                 if (!m_actionInfo.ContainsKey(m_actions[i])) m_actionInfo.Add(m_actions[i], i);
@@ -137,12 +123,25 @@
                 m_actions[i].Initialize(this, Array.IndexOf(m_actions, m_actions[i]), Time.deltaTime);
             }
 
+            //  --------------------------
+            //  Initialize events;
+            //  --------------------------
             //EventHandler.RegisterEvent<CharacterAction, bool>(m_gameObject, EventIDs.OnCharacterActionActive, OnActionActive);
             //EventHandler.RegisterEvent<ItemAction, bool>(m_gameObject, EventIDs.OnItemActionActive, OnItemActionActive);
             //EventHandler.RegisterEvent<bool>(m_gameObject, EventIDs.OnAimActionStart, OnAimActionStart);
 
-            m_lastFrameTime = 0f;
-            m_deltaTimeLastFrame = 0f;
+            //  --------------------------
+            //  Time manager
+            //  --------------------------
+            m_deltaTime = Time.deltaTime;
+            m_lastFrameTime = Time.realtimeSinceStartup;
+            //  --------------------------
+
+
+            //  --------------------------
+            //  Initialize debugger;
+            //  --------------------------
+            Debugger.Initialize(this);
         }
 
 
@@ -151,8 +150,6 @@
             //EventHandler.UnregisterEvent<CharacterAction, bool>(m_gameObject, EventIDs.OnCharacterActionActive, OnActionActive);
             //EventHandler.UnregisterEvent<ItemAction, bool>(m_gameObject, EventIDs.OnItemActionActive, OnItemActionActive);
             //EventHandler.UnregisterEvent<bool>(m_gameObject, EventIDs.OnAimActionStart, OnAimActionStart);
-
-
         }
 
 
@@ -162,16 +159,22 @@
                 for (int i = 0; i < m_actions.Length; i++)
                     if(m_actions[i] != null) m_actions[i].SetPriority(i);
             }
-
         }
 
 
 
-        private float m_lastFrameTime = 0f;
-		private float m_deltaTimeLastFrame = 0f;
+        private float m_lastFrameTime;
+		private float m_newDeltaTime;
 
         private void FixedUpdate()
 		{
+            //  --------------------------
+            //  Time manager
+            //  --------------------------
+            m_newDeltaTime = Time.realtimeSinceStartup - m_lastFrameTime;
+            //  --------------------------
+
+
 
             OnUpdate(m_deltaTime);
             m_frameUpdated = true;
@@ -179,8 +182,16 @@
 
         private void Update()
         {
-            if (m_frameUpdated) return;
+            //  --------------------------
+            //  Time manager
+            //  --------------------------
+            m_newDeltaTime = Time.realtimeSinceStartup - m_lastFrameTime;
+            m_lastFrameTime = Time.realtimeSinceStartup;
+            //  --------------------------
 
+
+            //KinematicMove();
+            if (m_frameUpdated) return;
             OnUpdate(m_deltaTime);
             m_frameUpdated = true;
         }
@@ -189,11 +200,12 @@
 
         private void LateUpdate()
         {
+            DebugUI.Log(this, "newDeltaTime", m_newDeltaTime);
+            DebugUI.Log(this, "DeltaTime", m_deltaTime);
             //  -------------------
             //  Log debug messages.
             DebugAttributes();
             //  -------------------
-            m_lastFrameTime = Time.time;
             //  Continue with updates.
             if (m_frameUpdated) {
                 m_frameUpdated = false;
@@ -226,11 +238,6 @@
         {
             m_deltaTime = deltaTime;
 
-            //if (m_rigidbody.isKinematic) {
-            //    InternalMovementTest();
-            //    return;
-            //}
-            //if (m_rigidbody.isKinematic) Debug.Log("<b><color=red>[CHARACTER SHOULD NOT BE UPDATING ACTIONS");
 
             for (int i = 0; i < m_actions.Length; i++)
             {
@@ -322,10 +329,11 @@
 
             if(!m_moving && m_animatorUpdateTimer > 0.5f)
             {
-                var angle = GetAngleFromForward(LookRotation * m_transform.forward);
-                if (Mathf.Abs(angle) < 0.1f)
-                    angle = 0;
-                m_animator.SetFloat(HashID.LookAngle, angle);
+
+                //var angle = Mathf.Atan2(m_lookDirection.x, m_lookDirection.z) * Mathf.Rad2Deg;
+                //if (Mathf.Abs(angle) < 0.1f)
+                //    angle = 0;
+                //m_animator.SetFloat(HashID.LookAngle, angle);
 
                 m_animatorUpdateTimer = 0;
             }
@@ -356,10 +364,6 @@
 
 
 
-        public void Move(float horizontalMovement, float forwardMovement, Quaternion lookRotation)
-        {
-            throw new NotImplementedException();
-        }
 
 
 

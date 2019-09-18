@@ -533,9 +533,10 @@ MonoBehaviour:
   m_useRootMotion: 1
   m_rootMotionSpeedMultiplier: 1
   m_rootMotionRotationMultiplier: 1
+  m_motorAcceleration: 0.18
+  m_motorDamping: 0.3
   m_acceleration: {x: 0.18, y: 0, z: 0.18}
   m_desiredSpeed: 1
-  m_motorDamping: 0.3
   m_rotationSpeed: 10
   m_mass: 100
   m_skinWidth: 0.08
@@ -550,7 +551,7 @@ MonoBehaviour:
   debugger:
     debugMode: 1
     states:
-      showDebugUI: 0
+      showDebugUI: 1
       showGroundCheck: 0
       showCollisions: 0
       showMotion: 0
@@ -1715,7 +1716,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 043998c3940ed496da75fc62118ed578, type: 3}
   m_Name: 

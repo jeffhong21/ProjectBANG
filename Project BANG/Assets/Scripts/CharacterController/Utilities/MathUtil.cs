@@ -114,6 +114,17 @@ public static class MathUtil
         return t * t * (3f - 2f * t);
     }
 
+    public static float SmoothStop2(float x)
+    {
+        var s = 1 - x;
+        return 1 - s * s;
+    }
+
+    public static float SmoothStop3(float x)
+    {
+        var s = 1 - x;
+        return 1 - s * s * s;
+    }
 
     public static Vector3 Multiply(Vector3 v1, Vector3 v2)
     {

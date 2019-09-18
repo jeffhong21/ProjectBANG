@@ -50,8 +50,8 @@ namespace CharacterController
         private Ray m_lookRay;
         private float m_lookHeight = 1.4f;
         private Vector3 m_inputVector;
-        private Vector3 cameraFwd = new Vector3(1, 0, 1);
-        private Vector3 lookDirection;
+        private Vector3 m_cameraFwd = new Vector3(1, 0, 1);
+        private Vector3 m_lookDirection;
         private Quaternion m_lookRotation;
 
 
@@ -222,54 +222,32 @@ namespace CharacterController
 
 
 
-        private void FixedUpdate()
+        private void Update()
 		{
             //m_inputVector = axisRaw ? InputVectorRaw : InputVector;
             m_inputVector = InputVector;
-            cameraFwd.Set(1, 0, 1);
+            m_cameraFwd.Set(1, 0, 1);
 
-            lookDirection = m_CameraController == null ? m_transform.forward : Vector3.Scale(m_Camera.forward, cameraFwd).normalized;
+            m_lookDirection = m_CameraController == null ? m_transform.forward : Vector3.Scale(m_Camera.forward, m_cameraFwd).normalized;
+            //Vector3 fwd = Vector3.ProjectOnPlane(m_Camera.forward, transform.up);
+            //Vector3 right = Vector3.Cross(fwd, Vector3.up);
+            //m_lookDirection = m_Camera.right * InputVector.x + m_lookDirection * InputVector.z;
 
 
-            switch (m_Controller.Movement)
-            {
-                case (MovementTypes.Adventure):
 
-                    Vector3 fwd = Vector3.ProjectOnPlane(m_Camera.forward, transform.up);
-                    Vector3 right = Vector3.Cross(fwd, Vector3.up);
-                    //Quaternion referentialShift = Quaternion.FromToRotation(Vector3.forward, fwd);
-                    //m_inputVector = referentialShift * m_inputVector;
-                    //m_inputVector = right * m_inputVector.x + fwd * m_inputVector.z;
-                    m_inputVector = m_Camera.right * InputVector.x + lookDirection * InputVector.z;
-                    break;
-
-                case (MovementTypes.Combat):
-                    m_inputVector = InputVector;
-                    //turnAmount = Mathf.Atan2(lookDirection.x, lookDirection.z);
-                    //m_lookRotation = Quaternion.AngleAxis(turnAmount, transform.up);
-
-                    break;
-                default:
-                    Debug.Log("<b><i>• PlayerInput</i></b> movement type is default");
-                    m_inputVector = axisRaw ? InputVectorRaw : InputVector;
-
-                    break;
-            }
-
-            m_lookRotation = Quaternion.FromToRotation(m_transform.forward, lookDirection);
-            DebugUI.Log(this, "playerInput", m_inputVector, RichTextColor.Red);
+            m_lookRotation = Quaternion.FromToRotation(m_transform.forward, m_lookDirection);
 
             m_Controller.InputVector = m_inputVector;
             m_Controller.LookRotation = m_lookRotation;
 
-
+            //m_Controller.Move(m_inputVector.x, m_inputVector.z, m_lookRotation);
 
 
 
             lookDistance = 8;
             //  Set the look target's position and rotation.
             m_lookRay.origin = transform.position + Vector3.up * m_lookHeight;
-            m_lookRay.direction = lookDirection;
+            m_lookRay.direction = m_lookDirection;
             m_lookTarget.position = Vector3.SmoothDamp(m_lookTarget.position, m_lookRay.GetPoint(lookDistance), ref m_targetVelocitySmooth, 0.1f);
             m_lookTarget.rotation = Quaternion.RotateTowards(m_lookTarget.rotation, m_transform.rotation, Time.fixedDeltaTime * 4);
 
