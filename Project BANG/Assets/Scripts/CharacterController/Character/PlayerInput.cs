@@ -224,25 +224,20 @@ namespace CharacterController
 
         private void Update()
 		{
-            //m_inputVector = axisRaw ? InputVectorRaw : InputVector;
-            m_inputVector = InputVector;
-            m_cameraFwd.Set(1, 0, 1);
 
+            m_cameraFwd.Set(1, 0, 1);
             m_lookDirection = m_CameraController == null ? m_transform.forward : Vector3.Scale(m_Camera.forward, m_cameraFwd).normalized;
             //Vector3 fwd = Vector3.ProjectOnPlane(m_Camera.forward, transform.up);
             //Vector3 right = Vector3.Cross(fwd, Vector3.up);
             //m_lookDirection = m_Camera.right * InputVector.x + m_lookDirection * InputVector.z;
 
-
-
+            m_inputVector = InputVector;
+            //m_inputVector = axisRaw ? InputVectorRaw : InputVector;
             m_lookRotation = Quaternion.FromToRotation(m_transform.forward, m_lookDirection);
 
             m_Controller.InputVector = m_inputVector;
             m_Controller.LookRotation = m_lookRotation;
-
             //m_Controller.Move(m_inputVector.x, m_inputVector.z, m_lookRotation);
-
-
 
             lookDistance = 8;
             //  Set the look target's position and rotation.
@@ -263,27 +258,27 @@ namespace CharacterController
         }
 
 
-        //private void Update()
-        //{
-        //    var inputString = "<i>[null]</i>";
-        //    if (Input.anyKeyDown) {
-        //        inputString = Input.inputString;
-        //        DebugUI.Log(this, inputString, "KeyPressed", RichTextColor.LightBlue);
-        //    }
+        private void ExecuteInput()
+        {
+            var inputString = "<i>[null]</i>";
+            if (Input.anyKeyDown) {
+                inputString = Input.inputString;
+                DebugUI.Log(this, inputString, "KeyPressed", RichTextColor.LightBlue);
+            }
 
-        //    //for (int i = 0; i < m_inputDownKeys.Length; i++) {
-        //    //    int keyCodeCount = m_inputDownKeys[i].Count;
-        //    //    if (keyCodeCount > 0) {
+            //for (int i = 0; i < m_inputDownKeys.Length; i++) {
+            //    int keyCodeCount = m_inputDownKeys[i].Count;
+            //    if (keyCodeCount > 0) {
 
-        //    //        for (int k = 0; i < keyCodeCount; k++) {
-        //    //            KeyCode keycode = m_inputDownKeys[i][k];
-        //    //            if (Input.GetKeyDown(keycode)) {
-        //    //                Debug.LogFormat("Initiated {0} with Keycode {1}", m_Controller.CharActions[i].name, keycode);
-        //    //            }
-        //    //        }
-        //    //    }
-        //    //}
-        //}
+            //        for (int k = 0; i < keyCodeCount; k++) {
+            //            KeyCode keycode = m_inputDownKeys[i][k];
+            //            if (Input.GetKeyDown(keycode)) {
+            //                Debug.LogFormat("Initiated {0} with Keycode {1}", m_Controller.CharActions[i].name, keycode);
+            //            }
+            //        }
+            //    }
+            //}
+        }
 
 
         private void LateUpdate()
@@ -374,19 +369,19 @@ namespace CharacterController
             }
         }
 
-
+        GUIStyle guiStyle = new GUIStyle();
         Rect rect = new Rect();
         private void OnGUI()
         {
-
+            guiStyle.normal.textColor = Color.black;
             rect.width = Screen.width * 0.25f;
             rect.x = (Screen.width * 0.5f) - (rect.width * 0.5f);
             rect.y = 8;
             rect.height = 16 + rect.y;
-            GUI.Label(rect, "MouseInput: " + MouseInputVector.ToString());
+            GUI.Label(rect, "MouseInput: " + MouseInputVector.ToString(), guiStyle);
             rect.y += rect.height = 16; 
             rect.height += rect.height;
-            GUI.Label(rect, "MouseInputAngle: " + Mathf.Atan2(MouseInputVector.x, MouseInputVector.y).ToString());
+            GUI.Label(rect, "MouseInputAngle: " + Mathf.Atan2(MouseInputVector.x, MouseInputVector.y).ToString(), guiStyle);
         }
 
     }

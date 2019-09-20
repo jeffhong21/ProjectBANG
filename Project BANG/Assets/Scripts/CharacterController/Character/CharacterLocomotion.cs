@@ -135,6 +135,7 @@
             //  --------------------------
             m_deltaTime = Time.deltaTime;
             m_lastFrameTime = Time.realtimeSinceStartup;
+            m_lastFixedUpdateTime = new float[2];
             //  --------------------------
 
 
@@ -161,10 +162,16 @@
             }
         }
 
-
+        private static float m_interpolationFactor;
+        public static float interpolateFactor { get { return m_interpolationFactor; } }
 
         private float m_lastFrameTime;
+        private float[] m_lastFixedUpdateTime = new float[2];
 		private float m_newDeltaTime;
+        private int m_newTimeIndex;
+        private int m_oldTimeIndex { get { return m_newTimeIndex == 0 ? 1 : 0; } }
+
+
 
         private void FixedUpdate()
 		{
@@ -172,26 +179,42 @@
             //  Time manager
             //  --------------------------
             m_newDeltaTime = Time.realtimeSinceStartup - m_lastFrameTime;
+            m_lastFrameTime = Time.realtimeSinceStartup;
+            DebugUI.Log(this, "[F] newDeltaTime", m_newDeltaTime, RichTextColor.Lime);
             //  --------------------------
 
 
+            if (!m_rigidbody.isKinematic) {
+                OnUpdate(m_deltaTime);
+                //Set frameUpdated.
+                m_frameUpdated = true;
+            }
 
-            OnUpdate(m_deltaTime);
-            m_frameUpdated = true;
         }
 
         private void Update()
         {
+            float newerTime = m_lastFixedUpdateTime[m_newTimeIndex];
+            float olderTime = m_lastFixedUpdateTime[m_oldTimeIndex];
+
+            if (newerTime != olderTime)
+                m_interpolationFactor = (Time.realtimeSinceStartup - newerTime) / (newerTime - olderTime);
+            else m_interpolationFactor = 1;
+
+
+            if (m_frameUpdated) return;
+
             //  --------------------------
             //  Time manager
             //  --------------------------
             m_newDeltaTime = Time.realtimeSinceStartup - m_lastFrameTime;
             m_lastFrameTime = Time.realtimeSinceStartup;
+            DebugUI.Log(this, "[U] newDeltaTime", m_newDeltaTime, RichTextColor.Magenta);
             //  --------------------------
 
 
             //KinematicMove();
-            if (m_frameUpdated) return;
+
             OnUpdate(m_deltaTime);
             m_frameUpdated = true;
         }
@@ -200,11 +223,12 @@
 
         private void LateUpdate()
         {
-            DebugUI.Log(this, "newDeltaTime", m_newDeltaTime);
+
+            DebugUI.Log(this, "DeltaTime", m_deltaTime);
             DebugUI.Log(this, "DeltaTime", m_deltaTime);
             //  -------------------
             //  Log debug messages.
-            DebugAttributes();
+            DebugUI.Log(this, "interpolateFactor", interpolateFactor, RichTextColor.Lime);
             //  -------------------
             //  Continue with updates.
             if (m_frameUpdated) {
@@ -263,7 +287,6 @@
                             }
                             m_activeAction = action;
                             break;
-
                         }
                         
                     }
@@ -273,6 +296,7 @@
 
 
             InternalMove();
+
             if (m_activeAction != null) {
                 if (m_activeAction.Move()) Move();
             }
@@ -308,7 +332,9 @@
             }
             else UpdateAnimator();
 
+
             ApplyRotation();
+            //  Execute al the updates.
             ApplyMovement();
 
 
@@ -525,6 +551,11 @@
             m_MovementType = Aiming ? MovementTypes.Combat : MovementTypes.Adventure;
         }
 
+
+        protected void OnImpactHit()
+        {
+
+        }
 
         protected void ActionStopped()
         {

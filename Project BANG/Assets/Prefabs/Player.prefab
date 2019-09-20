@@ -537,7 +537,7 @@ MonoBehaviour:
   m_motorDamping: 0.3
   m_acceleration: {x: 0.18, y: 0, z: 0.18}
   m_desiredSpeed: 1
-  m_rotationSpeed: 10
+  m_rotationSpeed: 6
   m_mass: 100
   m_skinWidth: 0.08
   m_slopeLimit: 45
@@ -554,7 +554,7 @@ MonoBehaviour:
       showDebugUI: 1
       showGroundCheck: 0
       showCollisions: 0
-      showMotion: 0
+      showMotion: 1
     colors:
       moveDirectionColor: {r: 0, g: 0, b: 1, a: 1}
       velocityColor: {r: 0, g: 1, b: 0, a: 1}
@@ -1597,7 +1597,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eb969d52822a24d8dbd0b8c198a14803, type: 3}
   m_Name: 
@@ -1626,7 +1626,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5dcb0e67b11b04af4b61cb44c64d5a63, type: 3}
   m_Name: 
@@ -1656,7 +1656,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3f62eddceb76e4ce2aab0985c2db98db, type: 3}
   m_Name: 

@@ -143,8 +143,8 @@ Material:
     - _RealtimeShadow: 0
     - _RimEnable: 0
     - _RimIntensity: 0.028
-    - _RimOffset: 0.26
-    - _RimPower: 1.38
+    - _RimOffset: 0.39
+    - _RimPower: 2.79
     - _RimSize: 1.09
     - _RimSmoothness: 0.387
     - _Rotation_B: 0

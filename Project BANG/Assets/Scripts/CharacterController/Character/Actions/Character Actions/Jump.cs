@@ -191,7 +191,7 @@ namespace CharacterController
             //}
 
 
-            return false;
+            return true;
         }
 
 

@@ -422,6 +422,11 @@
             m_animator.SetTrigger(HashID.ItemStateIndexChange);
         }
 
+        public void SetTrigger(int hashID){
+            //  check if hashID exists.
+            m_animator.SetTrigger(hashID);
+        }
+
         public void ActionChanged() { m_animator.SetTrigger(HashID.ActionChange); }
 
         public void ItemStateChanged() { m_animator.SetTrigger(HashID.ItemStateIndexChange); }

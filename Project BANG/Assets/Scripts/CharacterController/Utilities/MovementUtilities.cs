@@ -99,9 +99,9 @@ public static class MovementUtilities
     /// <summary>
     /// Predict the falling position of the rigid body by physics.
     /// </summary>
-    public static Vector3 GetFallPosition(float time, float power, float mass)
+    public static Vector3 GetFallPosition(float time, float power, float mass, float gravity = -9.8f)
     {
-        float halfGravity = Physics.gravity.y * 0.5f;
+        float halfGravity = gravity * 0.5f;
         float z = time * power / mass;
         float y = halfGravity * (time * time);
         return new Vector3(0, y, z);

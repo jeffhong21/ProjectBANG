@@ -9,7 +9,8 @@ namespace CharacterController
     {
         protected const float tinyOffset = .0001f;
 
-        protected Animator animator;
+        protected CharacterLocomotion m_controller;
+        protected Animator m_animator;
         protected Transform m_transform;
         protected GameObject m_gameObject;
 
@@ -30,16 +31,21 @@ namespace CharacterController
 
 
 
-        protected virtual void Start()
+        private void Awake()
         {
-            if(animator == null) animator = GetComponent<Animator>();
+            if(m_animator == null) m_animator = GetComponent<Animator>();
+            m_controller = GetComponent<CharacterLocomotion>();
             m_transform = transform;
             m_gameObject = gameObject;
 
-            Initialize();
+            
         }
 
 
+        private void Start()
+        {
+            Initialize();
+        }
 
         //protected virtual void OnAnimatorIK(int layerIndex)
         //{
@@ -50,9 +56,9 @@ namespace CharacterController
 
         protected Vector3 GetPivotPosition()
         {
-            animator.stabilizeFeet = true;
+            m_animator.stabilizeFeet = true;
 
-            Vector3 pivotPosition = animator.pivotPosition;
+            Vector3 pivotPosition = m_animator.pivotPosition;
 
             m_leftFootPosition = GetFootPosition(AvatarIKGoal.LeftFoot);
             m_rightFootPosition = GetFootPosition(AvatarIKGoal.RightFoot);
@@ -60,7 +66,7 @@ namespace CharacterController
             float rightHeight = MathUtil.Round(Mathf.Abs(m_rightFootPosition.y));
 
             float threshold = 0.1f;
-            float pivotDifference = Mathf.Abs(0.5f - animator.pivotWeight);
+            float pivotDifference = Mathf.Abs(0.5f - m_animator.pivotWeight);
             float t = Mathf.Clamp(pivotDifference, 0, 0.5f) / 0.5f;
             //  1 means feet are not pivot.
             float feetPivotActive = 1;
@@ -78,8 +84,8 @@ namespace CharacterController
                 t = t * t * t * (t * (6f * t - 15f) + 10f);
                 feetPivotActive = Mathf.Lerp(0f, 1f, t);
 
-                animator.feetPivotActive = feetPivotActive;
-                pivotPosition = animator.pivotPosition;
+                m_animator.feetPivotActive = feetPivotActive;
+                pivotPosition = m_animator.pivotPosition;
             }
 
 
@@ -94,9 +100,9 @@ namespace CharacterController
         {
             if (foot == AvatarIKGoal.LeftFoot || foot == AvatarIKGoal.RightFoot)
             {
-                Vector3 footPos = animator.GetIKPosition(foot);
-                Quaternion footRot = animator.GetIKRotation(foot);
-                float botFootHeight = foot == AvatarIKGoal.LeftFoot ? animator.leftFeetBottomHeight : animator.rightFeetBottomHeight;
+                Vector3 footPos = m_animator.GetIKPosition(foot);
+                Quaternion footRot = m_animator.GetIKRotation(foot);
+                float botFootHeight = foot == AvatarIKGoal.LeftFoot ? m_animator.leftFeetBottomHeight : m_animator.rightFeetBottomHeight;
                 Vector3 footHeight = new Vector3(0, -botFootHeight, 0);
 
 

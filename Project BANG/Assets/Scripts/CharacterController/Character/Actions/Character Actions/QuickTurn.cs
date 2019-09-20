@@ -10,7 +10,7 @@ namespace CharacterController
 
 
         [SerializeField]
-        protected int maxInputCount = 4;
+        protected int maxInputCount = 8;
 
         [Range(-1, 1)]
         protected float threshold = -0.75f;     //  The threshold required to start checking for inputs
@@ -51,7 +51,7 @@ namespace CharacterController
             }
 
 
-            float dot = Vector3.Dot(m_Controller.InputVector.normalized, m_transform.forward);
+            float dot = Vector3.Dot(m_Controller.InputDirection.normalized, m_transform.forward);
             if (!startInputChecks && dot <= threshold)
             {
                 startInputChecks = true;

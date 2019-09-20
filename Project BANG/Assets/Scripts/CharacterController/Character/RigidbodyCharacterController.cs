@@ -43,7 +43,7 @@ namespace CharacterController
 
         
         //  -- Physics variables
-        [Group("Physics")]
+        [FormerlySerializedAs("m_mass")][Group("Physics")]
         [SerializeField] protected float m_mass = 100;
         [Group("Physics")]
         [SerializeField] protected float m_skinWidth = 0.08f;
@@ -254,10 +254,16 @@ namespace CharacterController
             m_rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
             m_rigidbody.collisionDetectionMode = CollisionDetectionMode.Discrete;
             //m_rigidbody.isKinematic = false;
-            if (!m_rigidbody.isKinematic)
+
+            if (!m_rigidbody.isKinematic)   //  Not kinematic
                 m_rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
             else
                 m_rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
+
+
+
+
+            if (m_rigidbody.isKinematic) Debug.LogFormat("<b><color=yellow>[{0}]</color> is kinematic. </b>", this.gameObject.name);
         }
 
 
@@ -298,130 +304,73 @@ namespace CharacterController
             if (m_inputVector.sqrMagnitude > 1) m_inputVector.Normalize();
 
             m_previousVelocity = m_useRootMotion ? m_deltaPosition/m_deltaTime : (m_transform.position - m_previousPosition)/m_deltaTime;
+            m_velocity = m_previousVelocity;
             m_previousPosition = m_transform.position;
 
             m_lookDirection = m_lookRotation * m_transform.forward;
-            //  Set the input vector, move direction and rotation angle based on the movement type.
-            switch (m_MovementType)
-            {
-                case (MovementTypes.Adventure):
-                    //  Get the correct target rotation based on input.
-                    m_moveAngle = m_transform.AngleFromForward(m_lookDirection);
-                    m_inputDirection = Quaternion.Inverse(m_transform.rotation) * m_transform.TransformDirection(m_inputVector);
-                    //m_inputDirection.x = 0;
-                    break;
-
-                case (MovementTypes.Combat):
-                    //  Get the correct target rotation based on look rotation.
-                    m_moveAngle = m_transform.AngleFromForward(m_lookDirection);
-                    m_inputDirection = m_transform.TransformDirection(m_inputVector);
-
-                    break;
-            }
         }
 
 
-        protected virtual void KinematicMove()
-        {
-            m_rigidbody.isKinematic = true;
-            m_rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
 
-            if (m_inputVector.sqrMagnitude > 1)
-                m_inputVector.Normalize();
-            m_lookDirection = m_lookRotation * m_transform.forward;
-
-            m_moveAngle = m_transform.AngleFromForward(m_lookDirection);
-            m_inputDirection = Quaternion.Inverse(m_transform.rotation) * m_transform.TransformDirection(m_inputVector);
-
-
-
-            Vector3 drag = m_moveDirection * MathUtil.SmoothStop2(m_motorDamping);
-            //if (m_inputDirection.sqrMagnitude > 0)
-            //    drag *= (1f - Vector3.Dot(m_lookDirection.normalized, m_moveDirection.normalized));
-            if (drag.sqrMagnitude > m_moveDirection.sqrMagnitude)
-                m_moveDirection = Vector3.zero;
-            else
-                m_moveDirection -= drag;
-
-            Vector3 direction = m_transform.TransformDirection(m_inputVector);
-            m_moveDirection.x += direction.x * m_motorAcceleration;
-            m_moveDirection.z += direction.z * m_motorAcceleration;
-            m_moveDirection.y = 0;
-
-            if (m_moveDirection.sqrMagnitude > m_desiredSpeed * m_desiredSpeed)
-                m_moveDirection = m_moveDirection.normalized * m_desiredSpeed;
-
-
-            //m_movePosition = Vector3.Lerp(m_transform.position, m_transform.position + m_moveDirection, m_deltaTime);
-
-            m_moveRotation = Quaternion.AngleAxis(m_moveAngle * m_rotationSpeed * m_deltaTime, m_transform.up);
-            m_movePosition = m_transform.position + m_moveDirection;
-            m_rigidbody.MoveRotation(m_transform.rotation * m_moveRotation);
-            m_rigidbody.MovePosition(m_movePosition);
-
-            //m_animatorMonitor.SetForwardInputValue(m_inputDirection.z);
-            //m_animatorMonitor.SetHorizontalInputValue(m_inputDirection.x);
-
-            DebugUI.Log(this, "m_inputVector1", m_inputVector, RichTextColor.Yellow);
-            DebugUI.Log(this, "m_inputDirection1", m_inputDirection, RichTextColor.Yellow);
-            DebugUI.Log(this, "moveDirection1", m_moveDirection, RichTextColor.Yellow);
-            DebugUI.Log(this, "m_moveAngle1", m_moveAngle, RichTextColor.Yellow);
-            DebugUI.Log(this, "moveDot", 1 - Vector3.Dot(m_inputDirection.normalized, m_moveDirection.normalized), RichTextColor.Yellow);
-        }
 
 
 
         protected virtual void Move()
         {
 
-
-            //if (m_rigidbody.isKinematic) {
-
-            //    Vector3 drag = m_moveDirection * MathUtil.SmoothStop2(m_motorDamping);
-            //    //if (m_inputDirection.sqrMagnitude > 0)
-            //    //    drag *= (1f - Vector3.Dot(m_lookDirection.normalized, m_moveDirection.normalized));
-            //    if (drag.sqrMagnitude > m_moveDirection.sqrMagnitude)
-            //        m_moveDirection = Vector3.zero;
-            //    else
-            //        m_moveDirection -= drag;
-
-            //    Vector3 direction = m_transform.TransformDirection(m_inputVector);
-            //    m_moveDirection.x += direction.x * m_motorAcceleration;
-            //    m_moveDirection.z += direction.z * m_motorAcceleration;
-            //    m_moveDirection.y = 0;
-
-            //    if (m_moveDirection.sqrMagnitude > m_desiredSpeed * m_desiredSpeed)
-            //        m_moveDirection = m_moveDirection.normalized * m_desiredSpeed;
-
-            //    m_moving = m_inputDirection.sqrMagnitude > 0;
-            //    return;
-            //}
-
-
-            m_velocity = m_previousVelocity;
-            //m_velocity.x *= m_inputDirection.x;
-            //m_velocity.z *= m_inputDirection.z;
-            //m_velocity.y = m_rigidbody.velocity.y;
-
-            //Vector3 direction = m_transform.TransformDirection(m_inputVector);
-            //m_velocity.x += direction.x * m_acceleration.x;
-            //m_velocity.z += direction.z * m_acceleration.z;
-            //m_velocity.y += 0;
+            m_lookDirection = m_lookRotation * m_transform.forward;
+            //  Set the input vector, move direction and rotation angle based on the movement type.
+            switch (m_MovementType) {
+                case (MovementTypes.Adventure):
+                    //  Get the correct target rotation based on input.
+                    m_moveAngle = m_transform.AngleFromForward(m_lookDirection);
+                    //  Get the correct input direction.
+                    m_inputDirection = Quaternion.Inverse(m_transform.rotation) * m_transform.TransformDirection(m_inputVector);
+                    break;
+                case (MovementTypes.Combat):
+                    //  Get the correct target rotation based on look rotation.
+                    m_moveAngle = m_transform.AngleFromForward(m_lookDirection);
+                    //  Get the correct input direction.
+                    m_inputDirection = m_transform.TransformDirection(m_inputVector);
+                    break;
+            }
 
 
 
-            DebugUI.Log(this, "acclerationSquared", m_acceleration.sqrMagnitude, RichTextColor.Yellow);
-            DebugUI.Log(this, "m_inputVector1", m_inputVector, RichTextColor.Yellow);
-            DebugUI.Log(this, "m_inputDirection1", m_inputDirection, RichTextColor.Yellow);
-            //DebugUI.Log(this, "moveDirection1", m_moveDirection, RichTextColor.Yellow);
-            //DebugUI.Log(this, "m_moveAngle1", m_moveAngle, RichTextColor.Yellow);
-            DebugUI.Log(this, "m_velocity1", m_velocity, RichTextColor.Yellow);
-            //DebugUI.Log(this, "moveDot", Vector3.Dot(m_inputDirection.normalized, m_moveDirection.normalized), RichTextColor.Yellow);
+            if (m_rigidbody.isKinematic)
+            {
+                Vector3 drag = m_moveDirection * MathUtil.SmoothStop3(m_motorDamping);
+                //if (m_lookDirection.sqrMagnitude > 0)
+                //    drag *= (1f - Vector3.Dot(m_lookDirection.normalized, m_moveDirection.normalized));
+                if (drag.sqrMagnitude > m_moveDirection.sqrMagnitude)
+                    m_moveDirection = Vector3.zero;
+                else
+                    m_moveDirection -= drag;
 
+                Vector3 dir = m_transform.TransformDirection(m_inputVector);
+                m_moveDirection.x += dir.x * m_motorAcceleration;
+                m_moveDirection.z += dir.z * m_motorAcceleration;
+                m_moveDirection.y = m_rigidbody.velocity.y;
+
+                //if (m_moveDirection.sqrMagnitude > m_desiredSpeed * m_desiredSpeed)
+                //    m_moveDirection = m_moveDirection.normalized * m_desiredSpeed;
+
+                m_moving = m_inputDirection.sqrMagnitude > 0;
+                //return;
+            }
+            else
+            {
+                Vector3 direction = m_transform.TransformDirection(m_inputVector);
+                m_velocity.x += direction.x * m_motorAcceleration;
+                m_velocity.z += direction.z * m_motorAcceleration;
+                m_velocity.y = m_rigidbody.velocity.y;
+            }
 
             //  Is there enough movement to be considered moving.
             m_moving = m_inputDirection.sqrMagnitude > 0;
         }
+
+
 
 
         /// <summary>
@@ -463,14 +412,13 @@ namespace CharacterController
                 m_groundAngle = groundAngle;
             }
             else {
-                if (groundDistance > m_airborneThreshold){
-
+                if (groundDistance > m_airborneThreshold)
+                {
                     m_groundAngle = 0;
                     m_groundHit.point = m_transform.position - Vector3.up * m_airborneThreshold;
                     m_groundHit.normal = m_transform.up;
                     m_grounded = false;
                 }
-
 
             }
         }
@@ -488,32 +436,21 @@ namespace CharacterController
             //  Set maxDepentration velocity.
             m_rigidbody.maxDepenetrationVelocity = 0.01f;
 
-            //  --------------------------
-            //  Get the position based off of the motion path.
-            //  --------------------------
-            //Vector3 position = m_motionPath.Next(0).RelativeToTransformWorld(m_transform);
-            //var worldSpacePos = m_transform.TransformPoint(position);
-            //var positionDifference = m_transform.localPosition + position - worldSpacePos;
-            //position = worldSpacePos + positionDifference;
-
 
             float castRadius = m_collider.radius + m_skinWidth;
             Vector3 castPosition = transform.position.WithYZ(castRadius, castRadius + m_skinWidth);
             int hits = Physics.OverlapSphereNonAlloc(castPosition, castRadius, m_probedColliders, m_collisionsLayerMask);
-            if (hits > 0)
-            {
+            if (hits > 0) {
                 Vector3 checkPosition = m_transform.position.WithY(m_maxStepHeight);
 
-                for (int i = 0; i < hits; i++)
-                {
+                for (int i = 0; i < hits; i++) {
                     Collider collision = m_probedColliders[i];
                     Vector3 closestPoint = collision.ClosestPoint(m_transform.position);
 
                     //  --------------------------
                     //  Calculate penetration (if the rigidbody is kinematic.)
                     //  --------------------------
-                    if (m_rigidbody.isKinematic)
-                    {
+                    if (m_rigidbody.isKinematic) {
                         bool overlapped = Physics.ComputePenetration(m_collider, m_transform.position, m_transform.rotation,
                                                                     collision, collision.transform.position, collision.transform.rotation,
                                                                     out Vector3 direction, out float distance);
@@ -523,7 +460,6 @@ namespace CharacterController
 
                             m_moveDirection = m_moveDirection.Add(penetrationVector);
                             m_moveDirection = m_moveDirection.Subtract(moveDirectionProjected);      //  TODO: optimize me
-
                             //m_velocity = Vector3.ClampMagnitude(m_velocity, 10);
 
                             if (DebugCollisions) {
@@ -542,59 +478,24 @@ namespace CharacterController
                     //  --------------------------
                     Vector3 closestPointDir = closestPoint - m_transform.position;
                     float colliderAngle = Vector3.Dot(m_transform.forward, closestPointDir.normalized);
-                    if(colliderAngle > 0)
-                    {
+                    if (colliderAngle > 0) {
                         Vector3 normal = m_transform.position - closestPoint;   //  Normal vector
                         Vector3 v2 = Vector3.Cross(normal, Vector3.up);         //  Wall angle
 
-						Vector3 slideDir = normal * Vector3.Dot(m_velocity, normal);
-						Vector3 wallSlideDir = (m_velocity - slideDir).normalized;
-                        m_velocity = Vector3.Project(m_velocity, wallSlideDir);
-						Vector3 tangent = m_velocity;
+                        Vector3 slideDir = normal * Vector3.Dot(m_velocity, normal);
+                        Vector3 wallSlideDir = (m_velocity - slideDir).normalized;
+                        Vector3 projectedVelocity = Vector3.Project(m_velocity, wallSlideDir);
+                        Vector3 tangent = projectedVelocity;
                         Vector3.OrthoNormalize(ref normal, ref tangent);
 
-                        //Debug.DrawRay(checkPosition, m_velocity, Color.blue);
-                        //Debug.DrawRay(checkPosition.AddY(.1f), tangent, Color.green);
+                        //  ---------------
+                        // ----- Debugging
+                        //  ---------------
+                        Debug.DrawRay(checkPosition, m_velocity, Color.blue);
+                        Debug.DrawRay(checkPosition.WithY(.1f), tangent, Color.green);
 
 
                     }
-
-                    ////  ---------------
-                    //if (m_rigidbody.isKinematic) {
-                    //    bool overlapped = Physics.ComputePenetration(m_collider, m_transform.position, m_transform.rotation,
-                    //                                                collision, collision.transform.position, collision.transform.rotation,
-                    //                                                out Vector3 direction, out float distance);
-                    //    if (overlapped) {
-                    //        Vector3 penetrationVector = direction * distance;
-                    //        Vector3 moveDirectionProjected = Vector3.Project(m_velocity, -penetrationVector);
-
-                    //        m_velocity = m_velocity.Add(penetrationVector);
-                    //        m_velocity = m_velocity.Subtract(moveDirectionProjected);      //  TODO: optimize me
-
-                    //        //m_velocity = Vector3.ClampMagnitude(m_velocity, 10);
-                    //    }
-                    //}
-
-
-                    ////  --------------------------
-                    ////  Check if a collision has occured.
-                    ////  --------------------------
-                    //Vector3 closestPointDir = closestPoint - m_transform.position;
-                    //float colliderAngle = Vector3.Dot(m_transform.forward, closestPointDir.normalized);
-                    //if (colliderAngle > 0) {
-                    //    Vector3 normal = m_transform.position - closestPoint;   //  Normal vector
-                    //    Vector3 v2 = Vector3.Cross(normal, Vector3.up);         //  Wall angle
-
-                    //    Vector3 slideDir = normal * Vector3.Dot(m_moveDirection, normal);
-                    //    Vector3 wallSlideDir = (m_moveDirection - slideDir).normalized;
-                    //    m_velocity = Vector3.Project(m_velocity, wallSlideDir);
-                    //    Vector3 tangent = m_velocity;
-                    //    Vector3.OrthoNormalize(ref normal, ref tangent);
-                    //}
-                    ////  ---------------
-
-
-
 
                     //  ---------------
                     // ----- Debugging
@@ -626,16 +527,21 @@ namespace CharacterController
         /// </summary>
         protected virtual void UpdateMovement()
         {
+            if (m_rigidbody.isKinematic) {
+                UpdatePosition();
+                return;
+            }
+
             Vector3 velocity = m_velocity;
 
             if (m_grounded)
             {
-                Vector3 direction = m_transform.TransformDirection(m_inputVector);
-                velocity.x += direction.x * m_motorAcceleration;
-                velocity.z += direction.z * m_motorAcceleration;
-                velocity.y += 0;
-                if (velocity.sqrMagnitude > m_desiredSpeed * m_desiredSpeed)
-                    velocity = velocity.normalized * m_desiredSpeed;
+                //Vector3 direction = m_transform.TransformDirection(m_inputVector);
+                //velocity.x += direction.x * m_motorAcceleration;
+                //velocity.z += direction.z * m_motorAcceleration;
+                //velocity.y += 0;
+                //if (velocity.sqrMagnitude > m_desiredSpeed * m_desiredSpeed)
+                //    velocity = velocity.normalized * m_desiredSpeed;
 
                 Vector3 drag = velocity * MathUtil.SmoothStop3(m_motorDamping);
                 if (drag.sqrMagnitude > velocity.sqrMagnitude)
@@ -663,21 +569,17 @@ namespace CharacterController
                 Vector3 inputRight = Vector3.Cross(velocity, m_transform.up);
                 velocity = Vector3.Cross(groundNormal, inputRight).normalized * velocitySpeed;// m_moveDirection.magnitude;
 
-                //m_velocity = Vector3.Lerp(m_velocity, m_velocity, 1f - Mathf.Exp(-15 * m_deltaTime));
-
             }
             else {
 
                 Vector3 verticalVelocity = Vector3.Project(m_previousVelocity, m_gravity);
-                verticalVelocity += m_gravity * m_gravityModifier * m_deltaTime ;
-                DebugDraw.Arrow(m_transform.position, verticalVelocity, Color.red);
-                //if (m_rigidbody.velocity.y < 0)
-                //    verticalVelocity = verticalVelocity.Multiply(1.5f);
+                verticalVelocity += m_gravity * m_gravityModifier * m_deltaTime;
                 velocity += verticalVelocity;
             }
 
 
-           m_velocity = velocity;
+            m_velocity = velocity;
+
         }
 
 
@@ -687,7 +589,7 @@ namespace CharacterController
         /// </summary>
         protected virtual void UpdateRotation()
         {
-
+            m_moveAngle = m_transform.AngleFromForward(m_lookDirection);
             //m_smoothLookDirection = Vector3.Slerp(m_transform.forward, m_lookDirection, smooth).normalized;
             m_moveRotation = Quaternion.AngleAxis(m_moveAngle * m_rotationSpeed * m_deltaTime, m_transform.up);
             //m_moveRotation = Quaternion.AngleAxis(m_moveAngle * m_deltaTime, m_transform.up);
@@ -703,24 +605,21 @@ namespace CharacterController
         /// </summary>
         protected virtual void ApplyRotation()
         {
+            if (m_rigidbody.isKinematic) {
+                m_moveRotation = Quaternion.Slerp(m_transform.rotation, m_moveRotation * m_transform.rotation, 1 - Mathf.Exp(-m_rotationSpeed) * CharacterLocomotion.interpolateFactor);
+                m_rigidbody.MoveRotation(m_moveRotation);
+            }
+            else {
+                m_moveRotation.ToAngleAxis(out float angle, out Vector3 axis);
+                m_angularVelocity = axis.normalized * angle;
+                m_angularVelocity = Vector3.Lerp(m_rigidbody.angularVelocity, m_angularVelocity, m_deltaTime * m_rotationSpeed);
+                m_rigidbody.angularVelocity = m_angularVelocity;
 
-            //if (m_rigidbody.isKinematic) {
-            //    //float t = m_deltaTime * m_rotationSpeed;
-            //    //Quaternion.Slerp(m_transform.rotation, m_moveRotation * m_transform.rotation, t * t);
-            //    return;
-            //}
-
-            m_moveRotation.ToAngleAxis(out float angle, out Vector3 axis);
-            m_angularVelocity = axis.normalized * angle;
-            m_angularVelocity = Vector3.Lerp(m_rigidbody.angularVelocity, m_angularVelocity, m_deltaTime * m_rotationSpeed);
-            m_rigidbody.angularVelocity = m_angularVelocity;
-
-
-            ////AddRelativeTorque adds torque according to its Inertia Tensors. Therefore, the desired angular
-            ////velocity must be transformed according to the Inertia Tensor, to get the required Torque.
-            //Vector3 torque = m_rigidbody.inertiaTensorRotation * Vector3.Scale(m_rigidbody.inertiaTensor, m_angularVelocity);
-            //m_rigidbody.AddRelativeTorque(torque, ForceMode.Impulse);
-
+                ////AddRelativeTorque adds torque according to its Inertia Tensors. Therefore, the desired angular
+                ////velocity must be transformed according to the Inertia Tensor, to get the required Torque.
+                //Vector3 torque = m_rigidbody.inertiaTensorRotation * Vector3.Scale(m_rigidbody.inertiaTensor, m_angularVelocity);
+                //m_rigidbody.AddRelativeTorque(torque, ForceMode.Impulse);
+            }
         }
 
 
@@ -729,15 +628,18 @@ namespace CharacterController
         /// </summary>
         protected virtual void ApplyMovement()
         {
+            if (m_rigidbody.isKinematic)
+            {
+                m_movePosition = m_transform.position + m_moveDirection;
+                m_rigidbody.MovePosition(Vector3.Lerp(m_transform.position, m_movePosition, CharacterLocomotion.interpolateFactor));
 
-            //if (m_rigidbody.isKinematic) {
-            //    m_movePosition = m_transform.position + m_moveDirection;
-            //    m_rigidbody.MovePosition(m_movePosition);
-            //    return;
-            //}
+            }
+            else {
+                m_rigidbody.velocity = Vector3.Lerp(m_rigidbody.velocity, m_velocity, m_deltaTime * 10);
+            }
 
-            DebugUI.Log(this, "m_velocity1", m_velocity, RichTextColor.Yellow);
-            m_rigidbody.velocity = Vector3.Lerp(m_rigidbody.velocity, m_velocity, m_deltaTime * 10);
+            DebugUI.Log(this, "--interpolateFactor", CharacterLocomotion.interpolateFactor, RichTextColor.Cyan);
+
         }
 
 
@@ -755,9 +657,6 @@ namespace CharacterController
             m_animatorMonitor.SetForwardInputValue(m_inputDirection.z);
             m_animatorMonitor.SetHorizontalInputValue(m_inputDirection.x);
         }
-
-
-
 
 
         /// <summary>
@@ -796,7 +695,19 @@ namespace CharacterController
 
 
 
+        #region Kinematic
+        protected virtual void UpdatePosition()
+        {
+            if (m_grounded) {
+            }
+            else {
+                Vector3 verticalVelocity = Vector3.Project(m_velocity, m_gravity);
+                verticalVelocity += m_gravity * m_gravityModifier * m_deltaTime;
 
+                m_moveDirection += verticalVelocity;
+            }
+        }
+        #endregion
 
 
 
@@ -1016,11 +927,11 @@ namespace CharacterController
             DebugUI.Log(this, "m_grounded", m_grounded, RichTextColor.White);
 
 
-            DebugUI.Log(this, "m_moveDirection", m_moveDirection, RichTextColor.Green);
+            DebugUI.Log(this, "InputDirection", InputDirection, RichTextColor.Green);
             DebugUI.Log(this, "m_moveAngle", m_moveAngle, RichTextColor.Green);
             DebugUI.Log(this, "m_moveRotation", m_moveRotation, RichTextColor.Green);
 
-            DebugUI.Log(this, "m_velocity", m_velocity, RichTextColor.Cyan);
+            DebugUI.Log(this, "m_velocity0", m_velocity, RichTextColor.Cyan);
             DebugUI.Log(this, "r_velocity", m_rigidbody.velocity, RichTextColor.Cyan);
             DebugUI.Log(this, "fwd_speed", Vector3.Dot(m_rigidbody.velocity, m_transform.forward), RichTextColor.Cyan);
 
@@ -1065,3 +976,52 @@ namespace CharacterController
 }
 
 
+
+
+//protected virtual void KinematicMove()
+//{
+//    m_rigidbody.isKinematic = true;
+//    m_rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
+
+//    if (m_inputVector.sqrMagnitude > 1)
+//        m_inputVector.Normalize();
+//    m_lookDirection = m_lookRotation * m_transform.forward;
+
+//    m_moveAngle = m_transform.AngleFromForward(m_lookDirection);
+//    m_inputDirection = Quaternion.Inverse(m_transform.rotation) * m_transform.TransformDirection(m_inputVector);
+
+
+
+//    Vector3 drag = m_moveDirection * MathUtil.SmoothStop2(m_motorDamping);
+//    //if (m_inputDirection.sqrMagnitude > 0)
+//    //    drag *= (1f - Vector3.Dot(m_lookDirection.normalized, m_moveDirection.normalized));
+//    if (drag.sqrMagnitude > m_moveDirection.sqrMagnitude)
+//        m_moveDirection = Vector3.zero;
+//    else
+//        m_moveDirection -= drag;
+
+//    Vector3 direction = m_transform.TransformDirection(m_inputVector);
+//    m_moveDirection.x += direction.x * m_motorAcceleration;
+//    m_moveDirection.z += direction.z * m_motorAcceleration;
+//    m_moveDirection.y = 0;
+
+//    if (m_moveDirection.sqrMagnitude > m_desiredSpeed * m_desiredSpeed)
+//        m_moveDirection = m_moveDirection.normalized * m_desiredSpeed;
+
+
+//    //m_movePosition = Vector3.Lerp(m_transform.position, m_transform.position + m_moveDirection, m_deltaTime);
+
+//    m_moveRotation = Quaternion.AngleAxis(m_moveAngle * m_rotationSpeed * m_deltaTime, m_transform.up);
+//    m_movePosition = m_transform.position + m_moveDirection;
+//    m_rigidbody.MoveRotation(m_transform.rotation * m_moveRotation);
+//    m_rigidbody.MovePosition(m_movePosition);
+
+//    //m_animatorMonitor.SetForwardInputValue(m_inputDirection.z);
+//    //m_animatorMonitor.SetHorizontalInputValue(m_inputDirection.x);
+
+//    DebugUI.Log(this, "m_inputVector1", m_inputVector, RichTextColor.Yellow);
+//    DebugUI.Log(this, "m_inputDirection1", m_inputDirection, RichTextColor.Yellow);
+//    DebugUI.Log(this, "moveDirection1", m_moveDirection, RichTextColor.Yellow);
+//    DebugUI.Log(this, "m_moveAngle1", m_moveAngle, RichTextColor.Yellow);
+//    DebugUI.Log(this, "moveDot", 1 - Vector3.Dot(m_inputDirection.normalized, m_moveDirection.normalized), RichTextColor.Yellow);
+//}
