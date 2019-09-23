@@ -4,8 +4,12 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditorInternal;
 
+using CharacterController.CharacterInput;
+
 namespace CharacterController.CharacterCreator
 {
+
+
     public class CharacterCreatorWindow : EditorWindow
     {
         private string m_name;

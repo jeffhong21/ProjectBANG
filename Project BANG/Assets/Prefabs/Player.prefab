@@ -445,6 +445,7 @@ GameObject:
   - component: {fileID: 2129104040}
   - component: {fileID: 2129104039}
   - component: {fileID: 6364931836315390225}
+  - component: {fileID: 1737796330}
   m_Layer: 31
   m_Name: Player
   m_TagString: Player
@@ -531,7 +532,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_useRootMotion: 1
-  m_rootMotionSpeedMultiplier: 1
+  m_rootMotionSpeedMultiplier: 1.1
   m_rootMotionRotationMultiplier: 1
   m_motorAcceleration: 0.18
   m_motorDamping: 0.3
@@ -551,7 +552,7 @@ MonoBehaviour:
   debugger:
     debugMode: 1
     states:
-      showDebugUI: 1
+      showDebugUI: 0
       showGroundCheck: 0
       showCollisions: 0
       showMotion: 1
@@ -581,6 +582,7 @@ MonoBehaviour:
   - {fileID: 2129104039}
   - {fileID: 2129104038}
   - {fileID: 2129104042}
+  - {fileID: 1737796330}
   - {fileID: 2129104043}
   - {fileID: 2129104044}
   - {fileID: 2129104045}
@@ -717,6 +719,7 @@ MonoBehaviour:
   lookAtIK: {fileID: 8862121799659265725}
   aimIK: {fileID: 7912098401397699587}
   hideInInspector: 1
+  legInfo: []
 --- !u!114 &3255356862830679799
 MonoBehaviour:
   m_ObjectHideFlags: 2
@@ -1606,7 +1609,7 @@ MonoBehaviour:
   m_StateName: StartMovement
   m_LayerIndex: 0
   m_ActionID: 1
-  m_Priority: 6
+  m_Priority: 7
   m_TransitionDuration: 0.2
   m_StartType: 0
   m_StopType: 0
@@ -1635,7 +1638,7 @@ MonoBehaviour:
   m_StateName: StopMovement
   m_LayerIndex: 0
   m_ActionID: 2
-  m_Priority: 5
+  m_Priority: 6
   m_TransitionDuration: 0.2
   m_StartType: 0
   m_StopType: 0
@@ -1656,7 +1659,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247134470855319462}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3f62eddceb76e4ce2aab0985c2db98db, type: 3}
   m_Name: 
@@ -1665,7 +1668,7 @@ MonoBehaviour:
   m_StateName: QuickTurn
   m_LayerIndex: 0
   m_ActionID: 3
-  m_Priority: 4
+  m_Priority: 5
   m_TransitionDuration: 0.2
   m_StartType: 0
   m_StopType: 0
@@ -1725,7 +1728,7 @@ MonoBehaviour:
   m_StateName: Aim
   m_LayerIndex: 0
   m_ActionID: -1
-  m_Priority: 8
+  m_Priority: 9
   m_TransitionDuration: 0.2
   m_StartType: 2
   m_StopType: 3
@@ -1821,12 +1824,40 @@ MonoBehaviour:
   m_StateName: Crouch
   m_LayerIndex: 0
   m_ActionID: 5
-  m_Priority: 7
+  m_Priority: 8
   m_TransitionDuration: 0.2
   m_StartType: 2
   m_StopType: 3
   m_InputNames:
   - C
+  m_SpeedMultiplier: 1
+  m_ApplyBuiltinRootMotion: 0
+  m_StartAudioClips: []
+  m_StopAudioClips: []
+  m_StartEffect: {fileID: 0}
+  m_EndEffect: {fileID: 0}
+  m_Debug: 0
+--- !u!114 &1737796330
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2247134470855319462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2b7cc2dc37d6426cb01657648e80a1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: MeleeUnarmed
+  m_LayerIndex: 0
+  m_ActionID: -1
+  m_Priority: 4
+  m_TransitionDuration: 0.2
+  m_StartType: 1
+  m_StopType: 0
+  m_InputNames: []
   m_SpeedMultiplier: 1
   m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []

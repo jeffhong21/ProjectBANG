@@ -125,7 +125,7 @@ namespace CharacterController
 
             //LookAtIKSolver();
 
-            CheckFeetGrounded();
+            //CheckFeetGrounded();
         }
 
 

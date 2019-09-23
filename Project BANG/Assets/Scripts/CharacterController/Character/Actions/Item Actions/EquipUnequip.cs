@@ -57,6 +57,13 @@
         }
 
 
+        public override bool ExecuteItemAction(int index)
+        {
+            Debug.LogFormat("Inventory Item Slot {0} is {1}", index, m_inventory.GetItem(index) );
+            return true;
+        }
+
+
         protected override void ActionStarted()
         {
             Item currentItem = m_inventory.CurrentlyEquippedItem;

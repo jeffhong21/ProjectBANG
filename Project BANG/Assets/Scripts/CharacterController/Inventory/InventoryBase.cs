@@ -5,7 +5,7 @@
     using System.Collections.Generic;
 
 
-    [DisallowMultipleComponent]
+
     public abstract class InventoryBase : MonoBehaviour
     {
         #region Events
