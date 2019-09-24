@@ -223,7 +223,7 @@
 
         private void LateUpdate()
         {
-
+            DebugAttributes();
             DebugUI.Log(this, "DeltaTime", m_deltaTime);
             DebugUI.Log(this, "DeltaTime", m_deltaTime);
             //  -------------------
@@ -344,8 +344,8 @@
 
         }
 
-
-
+        //  Float value to indicate which leg is moving forward.  Right leg is 0, Left leg is 1.  (opposite of pivotWeight)
+        float m_legIndex = 0.5f;
 
         /// <summary>
         /// Updates the animator.
@@ -353,29 +353,23 @@
         protected override void UpdateAnimator()
         {
 
-            if(!m_moving && m_animatorUpdateTimer > 0.5f)
-            {
+            //if(!m_moving && m_animatorUpdateTimer > 0.5f)
+            //{
 
-                //var angle = Mathf.Atan2(m_lookDirection.x, m_lookDirection.z) * Mathf.Rad2Deg;
-                //if (Mathf.Abs(angle) < 0.1f)
-                //    angle = 0;
-                //m_animator.SetFloat(HashID.LookAngle, angle);
+            //    //var angle = Mathf.Atan2(m_lookDirection.x, m_lookDirection.z) * Mathf.Rad2Deg;
+            //    //if (Mathf.Abs(angle) < 0.1f)
+            //    //    angle = 0;
+            //    //m_animator.SetFloat(HashID.LookAngle, angle);
 
-                m_animatorUpdateTimer = 0;
-            }
-            m_animatorUpdateTimer += m_deltaTime;
+            //    m_animatorUpdateTimer = 0;
+            //}
+            //m_animatorUpdateTimer += m_deltaTime;
 
-
-            if (Moving)
-            {
-                float legFwdIndex = leftFootPosition.normalized.z > rightFootPosition.normalized.z ? 0 : 1;
-                m_animator.SetFloat(HashID.LegFwdIndex, legFwdIndex);
-            }
-            else
-            {
-                m_animator.SetFloat(HashID.LegFwdIndex, 0.5f);
-            }
-
+            float forwardLeg = 0.5f;
+            if (m_moving)
+                forwardLeg = leftFootPosition.normalized.z > rightFootPosition.normalized.z ? 0 : 1;
+            m_legIndex = Mathf.Lerp(m_legIndex, forwardLeg, m_deltaTime * 8);
+            m_animator.SetFloat(HashID.LegFwdIndex, m_legIndex);
             base.UpdateAnimator();
         }
 
@@ -638,10 +632,12 @@
         {
             base.DebugAttributes();
 
-            var lf = m_transform.position - GetFootPosition(HumanBodyBones.LeftToes, true);
-            DebugUI.Log(this, m_animator.GetBoneTransform(HumanBodyBones.LeftToes).name, lf, RichTextColor.Orange);
-            var rf = m_transform.position - GetFootPosition(HumanBodyBones.RightToes, true);
-            DebugUI.Log(this, m_animator.GetBoneTransform(HumanBodyBones.RightToes).name, rf, RichTextColor.Orange);
+            var lf = m_transform.position - GetFootPosition(HumanBodyBones.LeftFoot, true);
+            lf = m_animator.GetBoneTransform(HumanBodyBones.LeftFoot).localPosition;
+            DebugUI.Log(this, m_animator.GetBoneTransform(HumanBodyBones.LeftFoot).name, lf, RichTextColor.Orange);
+            var rf = m_transform.position - GetFootPosition(HumanBodyBones.RightFoot, true);
+            rf = m_animator.GetBoneTransform(HumanBodyBones.RightFoot).localPosition;
+            DebugUI.Log(this, m_animator.GetBoneTransform(HumanBodyBones.RightFoot).name, rf, RichTextColor.Orange);
 
         }
 

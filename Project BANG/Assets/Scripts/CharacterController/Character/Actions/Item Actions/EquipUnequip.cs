@@ -66,7 +66,7 @@
 
         protected override void ActionStarted()
         {
-            Item currentItem = m_inventory.CurrentlyEquippedItem;
+            Item currentItem = m_inventory.EquippedItem;
             Item nextItem;
 
             //

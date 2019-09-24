@@ -5,6 +5,8 @@
     using UnityEngine;
     using UnityEngine.Events;
 
+    using CharacterController.CharacterInventory;
+
     public class Item : MonoBehaviour
     {
 
@@ -19,6 +21,8 @@
         protected ItemType itemType;
         [SerializeField]
         protected int slotID = -1;
+        [SerializeField]
+        protected ItemSocketType socket = ItemSocketType.RightHand;
         [SerializeField]
         protected int animatorItemID;
         [SerializeField]
@@ -56,6 +60,8 @@
         public ItemType ItemType{ get { return itemType; } }
 
         public int SlotID { get { return slotID; } set { slotID = value; } }
+
+        public ItemSocketType Socket { get { return socket; } }
 
         public int AnimatorItemID { get { return animatorItemID; } }
 
@@ -152,16 +158,16 @@
             Debug.LogFormat("<b><color=red>{0}</color> is now {1}</b>", itemType.name, active);
 
             if (active) {
-                if (holsterTarget && slotID > -1)
-                {
-                    //  Parent the item to a item equip slot.
-                    Transform parent = inventory.GetItemEquipSlot(slotID);
-                    if (parent != null) {
-                        mGameObject.transform.parent = parent;
-                        mGameObject.transform.localPosition = localSpawnPosition;
-                        mGameObject.transform.localEulerAngles = localSpawnRotation;
-                    }
-                }
+                //if (holsterTarget && slotID > -1)
+                //{
+                //    //  Parent the item to a item equip slot.
+                //    Transform parent = inventory.GetItemSocket(slotID);
+                //    if (parent != null) {
+                //        mGameObject.transform.parent = parent;
+                //        mGameObject.transform.localPosition = localSpawnPosition;
+                //        mGameObject.transform.localEulerAngles = localSpawnRotation;
+                //    }
+                //}
 
 
                 //  Show the item.

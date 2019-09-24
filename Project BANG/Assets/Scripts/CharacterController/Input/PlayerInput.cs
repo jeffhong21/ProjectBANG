@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
+
 using DebugUI;
 using CharacterController.CharacterInput;
 using Boo.Lang;
@@ -122,6 +123,7 @@ namespace CharacterController
         private float MouseZoomInput{ get { return Input.GetAxis(m_MouseScrollInput) ; } }
 
         private float MouseZoomInputRaw { get { return Input.GetAxisRaw(m_MouseScrollInput); } }
+
 
 
 

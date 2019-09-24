@@ -124,14 +124,14 @@ namespace CharacterController
         /// <param name="rotation"></param>
         /// <param name="hideFlag"></param>
         /// <returns></returns>
-        protected Transform CreateIKEffectors(string effectorName, Vector3 position, Quaternion rotation, bool hideFlag = true)
+        protected Transform CreateIKEffectors(string effectorName, Vector3 position, Quaternion rotation, bool hideFlag = false)
         {
             Transform effector = new GameObject(effectorName).transform;
             effector.position = position;
             effector.rotation = rotation;
             effector.parent = transform;
 
-            //if(hideFlag) effector.hideFlags = HideFlags.HideInHierarchy;
+            if(hideFlag) effector.hideFlags = HideFlags.HideInHierarchy;
             return effector;
         }
     }

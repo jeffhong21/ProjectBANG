@@ -11,12 +11,21 @@
     using System;
     using System.Collections;
 
+    using CharacterController.CharacterInventory;
+
     [DisallowMultipleComponent]
     public class Inventory : InventoryBase
     {
+        [Serializable]
+        public struct InventorySlot
+        {
+            public Item item;
+            public int quantity;
+            public bool isActive;
+        }
 
         [SerializeField, DisplayOnly]
-        protected Item currentlyEquippedItem;
+        protected Item equppiedItem;
         [SerializeField, DisplayOnly]
         protected Item previouslyEquippedItem;
         [SerializeField, DisplayOnly]
@@ -24,16 +33,16 @@
 
 
         [SerializeField, DisplayOnly]
-        protected InventorySlot[] m_InventorySlots;
+        protected InventorySlot[] m_inventorySlot;
 
-        public Item CurrentlyEquippedItem {
-            get { return currentlyEquippedItem; }
+        public Item EquippedItem {
+            get { return equppiedItem; }
         }
 
         protected int NextActiveSlot {
             get {
-                for (int i = 0; i < m_InventorySlots.Length + 0; i++) {
-                    if (m_InventorySlots[i].item == null) {
+                for (int i = 0; i < m_inventorySlot.Length + 0; i++) {
+                    if (m_inventorySlot[i].item == null) {
                         nextActiveSlot = i;
                         return nextActiveSlot;
                     }
@@ -46,58 +55,78 @@
 
 
 
+        #region Sockets
+
+        [SerializeField] protected ItemEquipSocket m_rightHandSocket;
+        #endregion
 
 
-
-
-        protected virtual void Awake()
-        {
-            m_GameObject = gameObject;
-            m_Animator = GetComponent<Animator>();
-
-
-            itemEquipSlots = GetComponentsInChildren<ItemEquipSlot>(true);
-
-            GetComponentsInChildren<Item>(true, m_AllItems);
-            for (int i = 0; i < m_AllItems.Count; i++) {
-                AddItem(m_AllItems[i], false);
-                if (m_AllItems[i].SlotID > -1)
-                    m_AllItems[i].transform.parent = GetItemEquipSlot(m_AllItems[i].SlotID);
-
-            }
-
-            m_InventorySlots = new InventorySlot[SlotCount];
-
-            EventHandler.RegisterEvent<ItemAction, bool>(m_GameObject, EventIDs.OnItemActionActive, OnItemActionActive);
-        
-        }
-
-
-        private void OnDestroy()
-        {
-            EventHandler.UnregisterEvent<ItemAction, bool>(m_GameObject, EventIDs.OnItemActionActive, OnItemActionActive);
-
-        }
-
-
+        [Header("----- Debug -----")]
+        [SerializeField] private bool m_debug;
 
 
 
 
         private void Start()
         {
-            //  REgister for OnDeath and OnRespawn.
+            m_inventorySlot = new InventorySlot[SlotCount];
+            EventHandler.RegisterEvent<ItemAction, bool>(m_gameObject, EventIDs.OnItemActionActive, OnItemActionActive);
+
+            //  Get item sockets.
+            SetSockets(m_animator);
+
+            //  Parent Items to the correct socket.
+            GetComponentsInChildren<Item>(true, m_AllItems);
+            for (int i = 0; i < m_AllItems.Count; i++)
+            {
+                //  Add the item to the inventory.
+                AddItem(m_AllItems[i], false);
+                //  Move Item to the correct socket.
+                m_AllItems[i].transform.SetParent(m_rightHandSocket.transform);
+            }
 
             //  Load default items.
             LoadDefaultLoadout();
         }
 
 
+
+        private void OnDestroy()
+        {
+            EventHandler.UnregisterEvent<ItemAction, bool>(m_gameObject, EventIDs.OnItemActionActive, OnItemActionActive);
+        }
+
+
         private void OnValidate()
         {
-            m_Animator = GetComponent<Animator>();
-            itemEquipSlots = GetComponentsInChildren<ItemEquipSlot>(true);
+            if (m_animator == null) m_animator = GetComponent<Animator>();
+
+            if (m_animator != null) SetSockets(m_animator);
         }
+
+
+
+
+
+        protected void SetSockets(Animator animator)
+        {
+            if(m_rightHandSocket == null) {
+                var handTransform = animator.GetBoneTransform(HumanBodyBones.RightHand);
+                var socket = handTransform.GetComponentInChildren<ItemEquipSocket>(true);
+
+                if(socket == null) {
+                    var go = new GameObject("R Hand Socket", typeof(ItemEquipSocket));
+                    go.transform.parent = handTransform;
+                    go.transform.localPosition = Vector3.zero;
+                    socket = go.GetComponent<ItemEquipSocket>();
+                }
+                m_rightHandSocket = socket;
+            }
+            m_rightHandSocket.Init(animator);
+        }
+
+
+
 
 
         /// <summary>
@@ -111,7 +140,13 @@
                     var amount = m_DefaultLoadout[index].Amount;
                     var equipItem = m_DefaultLoadout[index].Equip;
                     PickupItemType(itemType, amount, true, equipItem, false);
+                }
+            }
 
+            if (m_debug) {
+                for (int i = 0; i < m_inventorySlot.Length; i++) {
+                    var itemSlot = m_inventorySlot[i];
+                    Debug.Log(itemSlot.item != null ? itemSlot.item.name + " | equipped: (" + itemSlot.isActive + ") " : "[<b>Slot (" + (int)(i + 1) + "</b>] is empty>");
                 }
             }
 
@@ -134,20 +169,20 @@
                 return false;
 
             //  Add the itemType count.
-            bool pickedupItem = InternalPickupItemType(itemType, count);
+            bool pickedUpItem = InternalPickupItemType(itemType, count);
 
             //  Notify those interested that an item has been picked up.
             if (notifyOnPickup) {
 
             }
 
-            if (pickedupItem)
+            if (pickedUpItem)
             {
                 //  Add item to invetory slot.
                 Item item;
                 if (m_ItemTypeItemMap.TryGetValue(itemType, out item)) {
                     if (NextActiveSlot >= 0) {
-                        m_InventorySlots[NextActiveSlot].item = item;
+                        m_inventorySlot[NextActiveSlot].item = item;
                     }
                 }
 
@@ -157,7 +192,7 @@
                 }
             }
 
-            return pickedupItem;
+            return pickedUpItem;
         }
 
 
@@ -173,8 +208,8 @@
 
             if(item != null) {
                 //  Remove the item from the inventory slot.
-                if (m_InventorySlots[slotIndex].item != null && m_InventorySlots[slotIndex].item.ItemType == itemType) {
-                    m_InventorySlots[slotIndex].item = null;
+                if (m_inventorySlot[slotIndex].item != null && m_inventorySlot[slotIndex].item.ItemType == itemType) {
+                    m_inventorySlot[slotIndex].item = null;
                 }
             }
             return item;
@@ -223,7 +258,7 @@
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public override Item GetItem( int index ) { return m_InventorySlots[index].item; }
+        public override Item GetItem( int index ) { return m_inventorySlot[index].item; }
 
 
         /// <summary>
@@ -233,7 +268,7 @@
         /// <returns></returns>
         public int GetItemSlotIndex( ItemType itemType )
         {
-            for (int index = 0; index < m_InventorySlots.Length; index++) {
+            for (int index = 0; index < m_inventorySlot.Length; index++) {
                 if (GetItem(index).ItemType == itemType) {
                     return index;
                 }
@@ -249,9 +284,9 @@
         /// <returns></returns>
         public bool HasItem( Item item )
         {
-            for (int i = 0; i < m_InventorySlots.Length; i++) {
-                if (m_InventorySlots[i].item == null) { continue; }
-                if (m_InventorySlots[i].item != item) { continue; }
+            for (int i = 0; i < m_inventorySlot.Length; i++) {
+                if (m_inventorySlot[i].item == null) { continue; }
+                if (m_inventorySlot[i].item != item) { continue; }
                 return true;
             }
             return false;
@@ -273,17 +308,22 @@
                 return null;
             }
 
-            Item item = m_InventorySlots[slotIndex].item;
+            Item item = m_inventorySlot[slotIndex].item;
+
             if (item != null)
             {
-                previouslyEquippedItem = currentlyEquippedItem;
-                currentlyEquippedItem = item;
+                previouslyEquippedItem = equppiedItem;
+                equppiedItem = item;
 
                 //  Execute the equip event.
                 InternalEquipItem(item);
+                //  Set is switching to off.
+                IsSwitching = false;
+            }
+            else if(equppiedItem == item) {
+                UnequipCurrentItem();
             }
 
-            IsSwitching = false;
             return item;
         }
 
@@ -301,10 +341,10 @@
         public Item EquipNextItem(bool next)
         {
             int index = 0;
-            if(CurrentlyEquippedItem != null) index = GetItemSlotIndex(CurrentlyEquippedItem.ItemType);
+            if(EquippedItem != null) index = GetItemSlotIndex(EquippedItem.ItemType);
             
             if (index < 0 || index > SlotCount) return null;
-            //Debug.Log("Currently equipped: " +  CurrentlyEquippedItem.ItemType + " | SlotIndex: " + index);
+            //Debug.Log("Currently equipped: " +  EquippedItem.ItemType + " | SlotIndex: " + index);
 
             if (next) {
                 if (index == SlotCount - 1)
@@ -326,14 +366,14 @@
 
         public void UnequipCurrentItem()
         {
-            if (currentlyEquippedItem != null) {
+            if (equppiedItem != null) {
                 IsSwitching = true;
                 //  Execute the equip event.
                 InternalUnequipCurrentItem(previouslyEquippedItem);
             }
 
-            previouslyEquippedItem = currentlyEquippedItem;
-            currentlyEquippedItem = null;
+            previouslyEquippedItem = equppiedItem;
+            equppiedItem = null;
 
 
         }
@@ -364,9 +404,9 @@
 
         protected void UpdateInventorySlots( int slot1, int slot2 )
         {
-            var tempSlot = m_InventorySlots[slot2];
-            m_InventorySlots[slot2] = m_InventorySlots[slot1];
-            m_InventorySlots[slot1] = tempSlot;
+            var tempSlot = m_inventorySlot[slot2];
+            m_inventorySlot[slot2] = m_inventorySlot[slot1];
+            m_inventorySlot[slot1] = tempSlot;
         }
 
 

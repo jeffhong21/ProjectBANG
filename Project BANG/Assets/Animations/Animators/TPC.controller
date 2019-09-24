@@ -6622,12 +6622,12 @@ AnimatorStateMachine:
   - first: {fileID: -3408312688630318746}
     second:
     - {fileID: 8256654069513071235}
-  - first: {fileID: 7388991948910343856}
-    second:
-    - {fileID: 1426706128699964120}
   - first: {fileID: 6996445633442417894}
     second:
     - {fileID: -4257398114237130703}
+  - first: {fileID: 7388991948910343856}
+    second:
+    - {fileID: 1426706128699964120}
   m_StateMachineBehaviours: []
   m_AnyStatePosition: {x: 350, y: -110, z: 0}
   m_EntryPosition: {x: 530, y: -110, z: 0}
@@ -7396,15 +7396,15 @@ AnimatorStateMachine:
   m_AnyStateTransitions: []
   m_EntryTransitions: []
   m_StateMachineTransitions:
+  - first: {fileID: -6738547865601585466}
+    second:
+    - {fileID: -6335588657331646353}
   - first: {fileID: -5502825027806061480}
     second:
     - {fileID: 2615936404475403409}
   - first: {fileID: 3046320219627574741}
     second:
     - {fileID: -4770385011436851331}
-  - first: {fileID: -6738547865601585466}
-    second:
-    - {fileID: -6335588657331646353}
   m_StateMachineBehaviours: []
   m_AnyStatePosition: {x: 30, y: 110, z: 0}
   m_EntryPosition: {x: 30, y: 190, z: 0}
@@ -10708,7 +10708,7 @@ AnimatorController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: ThirdPersonController
+  m_Name: TPC
   serializedVersion: 5
   m_AnimatorParameters:
   - m_Name: ForwardInput
@@ -26655,15 +26655,15 @@ AnimatorStateMachine:
   m_AnyStateTransitions: []
   m_EntryTransitions: []
   m_StateMachineTransitions:
-  - first: {fileID: 8833248854115214185}
-    second:
-    - {fileID: -5128922171664330421}
   - first: {fileID: -249711467073082234}
     second:
     - {fileID: -6014563301188962588}
   - first: {fileID: 4924017837581480169}
     second:
     - {fileID: 1345786650390419654}
+  - first: {fileID: 8833248854115214185}
+    second:
+    - {fileID: -5128922171664330421}
   m_StateMachineBehaviours: []
   m_AnyStatePosition: {x: 0, y: 110, z: 0}
   m_EntryPosition: {x: 0, y: 200, z: 0}

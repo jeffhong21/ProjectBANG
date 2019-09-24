@@ -25,7 +25,7 @@
 
         protected override void ActionStarted()
         {
-            movementsetID = m_inventory.CurrentlyEquippedItem == null ? 0 : m_inventory.CurrentlyEquippedItem.AnimatorMovementSetID;
+            movementsetID = m_inventory.EquippedItem == null ? 0 : m_inventory.EquippedItem.AnimatorMovementSetID;
             //m_animatorMonitor.SetItemID(GetItemID(), m_ItemStateID);
             m_Controller.Aiming = true;
             m_animator.SetBool(HashID.Aiming, m_Controller.Aiming);

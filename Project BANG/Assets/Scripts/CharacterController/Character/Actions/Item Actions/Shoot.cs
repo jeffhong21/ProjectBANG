@@ -14,14 +14,14 @@
         public override bool CanStartAction()
         {
             if (base.CanStartAction() && m_Controller.Aiming)
-                return m_inventory.CurrentlyEquippedItem != null;
+                return m_inventory.EquippedItem != null;
             return false;
         }
 
 
         protected override void ActionStarted()
         {
-            //m_inventory.CurrentlyEquippedItem.TryUse();
+            //m_inventory.EquippedItem.TryUse();
             //if (CameraController.Instance != null) {
             //    m_ShootableWeapon = (ShootableWeapon)m_inventory.GetCurrentItem(m_inventory.EquippedItemType);
             //    Ray ray = CameraController.Instance.Camera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));

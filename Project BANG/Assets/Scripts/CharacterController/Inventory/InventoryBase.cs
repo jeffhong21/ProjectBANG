@@ -1,11 +1,11 @@
-﻿namespace CharacterController
+﻿using UnityEngine;
+using System;
+using System.Collections.Generic;
+
+
+
+namespace CharacterController
 {
-    using UnityEngine;
-    using System;
-    using System.Collections.Generic;
-
-
-
     public abstract class InventoryBase : MonoBehaviour
     {
         #region Events
@@ -24,13 +24,7 @@
         //public event OnInventoryRemoveItem InventoryRemoveItem = delegate{ };
         #endregion
 
-        [Serializable]
-        public struct InventorySlot
-        {
-            public Item item;
-            public int quantity;
-            public bool isActive;
-        }
+
 
 
         //  All the items parented to the character.
@@ -43,7 +37,7 @@
         [Tooltip("The max amount of inventory slots.")]
         [SerializeField] protected int m_SlotCount = 6;
 
-        [SerializeField] protected ItemEquipSlot[] itemEquipSlots = new ItemEquipSlot[0];
+
 
         //  When ever an item is added, the item will be mapped here.
         protected Dictionary<ItemType, Item> m_ItemTypeItemMap = new Dictionary<ItemType, Item>();
@@ -54,9 +48,8 @@
 
 
 
-
-        protected Animator m_Animator;
-        protected GameObject m_GameObject;
+        protected Animator m_animator;
+        protected GameObject m_gameObject;
 
 
         //
@@ -66,10 +59,17 @@
 
         public bool IsSwitching { get; protected set; }
 
-        public ItemEquipSlot[] EquipSlots { get { return itemEquipSlots; } }
 
 
 
+        protected virtual void Awake()
+        {
+            m_gameObject = gameObject;
+            m_animator = GetComponent<Animator>();
+
+
+
+        }
 
 
 
@@ -141,14 +141,14 @@
         protected bool InternalAddItem( Item item, bool immediatelyEquip )
         {
             //  Notify others that an item has been added to the inventory.
-            EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnInventoryAddItem, item);
+            EventHandler.ExecuteEvent(m_gameObject, EventIDs.OnInventoryAddItem, item);
 
             //  Pickup event should be called when the count is greater than zero.
             //  This allows the item Type to be pickedup before the item has been added.
             float count = 0;
             if ((count + GetItemTypeCount(item.ItemType)) > 0) {
                 //item.Pickup();
-                EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnInventoryPickupItem, item, count, immediatelyEquip, false);
+                EventHandler.ExecuteEvent(m_gameObject, EventIDs.OnInventoryPickupItem, item, count, immediatelyEquip, false);
             }
 
 
@@ -158,7 +158,7 @@
 
         protected void InternalUseItem( ItemType itemType, float count )
         {
-            EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnInventoryUseItem, itemType, count);
+            EventHandler.ExecuteEvent(m_gameObject, EventIDs.OnInventoryUseItem, itemType, count);
         }
 
 
@@ -171,13 +171,13 @@
         protected void InternalEquipItem(Item item)
         {
             //  Execute the equip event.
-            EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnInventoryEquipItem, item);
+            EventHandler.ExecuteEvent(m_gameObject, EventIDs.OnInventoryEquipItem, item);
         }
 
 
         protected void InternalUnequipCurrentItem(Item lastEquippedItem)
         {
-            EventHandler.ExecuteEvent(m_GameObject, EventIDs.OnInventoryUnequipItem, lastEquippedItem);
+            EventHandler.ExecuteEvent(m_gameObject, EventIDs.OnInventoryUnequipItem, lastEquippedItem);
         }
 
 
@@ -211,17 +211,7 @@
         }
 
 
-        public Transform GetItemEquipSlot(int slotID)
-        {
-            if (slotID < 0) return null;
-            for (int i = 0; i < itemEquipSlots.Length; i++) {
-                if((int)itemEquipSlots[i].SlotID == slotID) {
-                    return itemEquipSlots[i].transform;
-                }
-            }
 
-            return null;
-        }
 
 
         /// <summary>
