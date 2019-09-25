@@ -34,8 +34,6 @@
         [SerializeField, HideInInspector]
         protected float m_SpeedMultiplier = 1;
         [SerializeField, HideInInspector]
-        protected bool m_ApplyBuiltinRootMotion;
-        [SerializeField, HideInInspector]
         protected AudioClip[] m_StartAudioClips = new AudioClip[0];
         [SerializeField, HideInInspector]
         protected AudioClip[] m_StopAudioClips = new AudioClip[0];

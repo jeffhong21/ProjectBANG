@@ -446,6 +446,14 @@ GameObject:
   - component: {fileID: 2129104039}
   - component: {fileID: 6364931836315390225}
   - component: {fileID: 1737796330}
+  - component: {fileID: 7312768888468139943}
+  - component: {fileID: 8422096685285446488}
+  - component: {fileID: 2482428211465248368}
+  - component: {fileID: 3654135042409310376}
+  - component: {fileID: 6056417145651354465}
+  - component: {fileID: 4635777281422831146}
+  - component: {fileID: 839902726772253661}
+  - component: {fileID: 3491435594945264188}
   m_Layer: 31
   m_Name: Player
   m_TagString: Player
@@ -515,7 +523,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.36
+  m_Radius: 0.4
   m_Height: 1.8
   m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0}
@@ -531,29 +539,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e78c0408c7564ed789d7937cadd7677, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_useRootMotion: 1
-  m_rootMotionSpeedMultiplier: 1.1
+  m_useRootMotionPosition: 1
+  m_useRootMotionRotation: 1
+  m_rootMotionSpeedMultiplier: 1
   m_rootMotionRotationMultiplier: 1
   m_motorAcceleration: 0.18
   m_motorDamping: 0.3
   m_acceleration: {x: 0.18, y: 0, z: 0.18}
-  m_desiredSpeed: 1
-  m_rotationSpeed: 6
+  m_desiredSpeed: 4
+  m_rotationSpeed: 4
   m_mass: 100
   m_skinWidth: 0.08
   m_slopeLimit: 45
   m_maxStepHeight: 0.4
-  m_gravityModifier: 1.5
-  m_groundStickiness: 6
+  m_gravityModifier: 1
+  m_groundStickiness: 2
   m_collisionsLayerMask:
     serializedVersion: 2
-    m_Bits: 0
-  m_maxCollisionCount: 100
+    m_Bits: 134217728
+  m_maxCollisionCount: 32
   debugger:
     debugMode: 1
     states:
       showDebugUI: 1
-      showGroundCheck: 0
+      showGroundCheck: 1
       showCollisions: 0
       showMotion: 0
     colors:
@@ -563,31 +572,23 @@ MonoBehaviour:
       animatorColor: {r: 0, g: 0.7, b: 1, a: 1}
       yellow1: {r: 1, g: 0.92, b: 0.16, a: 1}
     heightOffset: 0.05
-    arrowTipSize: 0.2
-    arrowWidth: 0.4
+    arrowTipSize: 0.1
+    arrowWidth: 0.2
   m_probedColliders: []
-  m_sampleRate: 4
-  m_positionBias: 0.4
-  m_directionBias: 1.93
-  m_motionPath:
-    timeHorizon: 0
-    sampleRate: 0
-    rootTransforms: []
   displayMovement: 0
   displayPhysics: 0
+  displayCollisions: 0
   displayAnimations: 0
   displayActions: 1
   m_actions:
-  - {fileID: 2129104040}
-  - {fileID: 2129104039}
-  - {fileID: 2129104038}
-  - {fileID: 2129104042}
-  - {fileID: 1737796330}
-  - {fileID: 2129104043}
-  - {fileID: 2129104044}
-  - {fileID: 2129104045}
-  - {fileID: 6364931836315390225}
-  - {fileID: 2129104041}
+  - {fileID: 3491435594945264188}
+  - {fileID: 4635777281422831146}
+  - {fileID: 7312768888468139943}
+  - {fileID: 3654135042409310376}
+  - {fileID: 2482428211465248368}
+  - {fileID: 8422096685285446488}
+  - {fileID: 6056417145651354465}
+  - {fileID: 839902726772253661}
   m_activeAction: {fileID: 0}
 --- !u!114 &6790305966678263073
 MonoBehaviour:
@@ -628,7 +629,7 @@ MonoBehaviour:
     m_Bits: 0
   m_SolidLayers:
     serializedVersion: 2
-    m_Bits: 251658240
+    m_Bits: 134217728
 --- !u!114 &671882786996550958
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -641,7 +642,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92019d84070ab4ad6939a5a7011333a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_lookSensitivity: {x: 1, y: 1}
+  m_lookSensitivity: {x: 3, y: 3}
   m_moveAxisDeadZone: 0.1
   m_lookDistance: 20
   m_axisRaw: 1
@@ -664,7 +665,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   surfaceEffect: {fileID: 11400000, guid: 867b450d6e444446488210bdd678fdd5, type: 2}
-  minVelocity: 1.5
+  minVelocity: 3
   footstepMode: 0
   footOffset: 0.03
   leftFoot:
@@ -673,7 +674,7 @@ MonoBehaviour:
   rightFoot:
     foot: {fileID: 0}
     audioSource: {fileID: 0}
-  moveDirectionFrameCount: 5
+  moveDirectionFrameCount: 7
 --- !u!114 &5677065510297990036
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -688,7 +689,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_DefaultLoadout:
   - m_Item: {fileID: 11400000, guid: 35be7b2ac6209491fbd2befd091a4a23, type: 2}
-    m_Amount: 1
+    m_Amount: 0
     m_Equip: 0
   m_SlotCount: 6
   equppiedItem: {fileID: 0}
@@ -1193,8 +1194,8 @@ MonoBehaviour:
   solver:
     layers:
       serializedVersion: 2
-      m_Bits: 134217728
-    maxStep: 0.4
+      m_Bits: 0
+    maxStep: 0.5
     heightOffset: 0
     footSpeed: 2.5
     footRadius: 0.15
@@ -1211,7 +1212,7 @@ MonoBehaviour:
     rootSphereCastRadius: 0.1
     overstepFallsDown: 1
     quality: 2
-  ik: {fileID: 3255356862830679799}
+  ik: {fileID: 0}
   spineBend: 2
   spineSpeed: 3
   spine: []
@@ -1231,7 +1232,7 @@ MonoBehaviour:
   solver:
     IKPosition: {x: 0, y: 0, z: 0}
     IKPositionWeight: 1
-    root: {fileID: 7595469946329358426}
+    root: {fileID: 0}
     target: {fileID: 0}
     spine: []
     head:
@@ -1294,7 +1295,7 @@ MonoBehaviour:
   solver:
     IKPosition: {x: 0, y: 0, z: 0}
     IKPositionWeight: 1
-    root: {fileID: 7595469946329358426}
+    root: {fileID: 0}
     target: {fileID: 0}
     tolerance: 0
     maxIterations: 4
@@ -1324,15 +1325,13 @@ MonoBehaviour:
   m_IsActive: 0
   m_StateName: Aim
   m_LayerIndex: 0
-  m_ActionID: 0
-  m_Priority: 5
+  m_ActionID: -1
+  m_Priority: -1
   m_TransitionDuration: 0.2
-  m_StartType: 2
-  m_StopType: 3
-  m_InputNames:
-  - Mouse1
+  m_StartType: 1
+  m_StopType: 0
+  m_InputNames: []
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
@@ -1355,13 +1354,12 @@ MonoBehaviour:
   m_StateName: StartMovement
   m_LayerIndex: 0
   m_ActionID: 1
-  m_Priority: 7
+  m_Priority: -1
   m_TransitionDuration: 0.2
-  m_StartType: 0
+  m_StartType: 1
   m_StopType: 0
   m_InputNames: []
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
@@ -1384,20 +1382,19 @@ MonoBehaviour:
   m_StateName: StopMovement
   m_LayerIndex: 0
   m_ActionID: 2
-  m_Priority: 4
-  m_TransitionDuration: 0.1
-  m_StartType: 0
+  m_Priority: -1
+  m_TransitionDuration: 0.2
+  m_StartType: 1
   m_StopType: 0
   m_InputNames: []
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
   m_EndEffect: {fileID: 0}
   m_Debug: 0
   maxInputCount: 4
-  stopThreshold: 0.853
+  stopThreshold: 0.8
 --- !u!114 &5742274483415007430
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1414,14 +1411,12 @@ MonoBehaviour:
   m_StateName: Jump
   m_LayerIndex: 0
   m_ActionID: 21
-  m_Priority: 1
-  m_TransitionDuration: 0.1
-  m_StartType: 2
+  m_Priority: -1
+  m_TransitionDuration: 0.2
+  m_StartType: 1
   m_StopType: 0
-  m_InputNames:
-  - Space
+  m_InputNames: []
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
@@ -1448,19 +1443,18 @@ MonoBehaviour:
   m_StateName: Fall
   m_LayerIndex: 0
   m_ActionID: 4
-  m_Priority: 2
+  m_Priority: -1
   m_TransitionDuration: 0.2
-  m_StartType: 0
+  m_StartType: 1
   m_StopType: 0
   m_InputNames: []
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
   m_EndEffect: {fileID: 0}
   m_Debug: 0
-  m_minFallHeight: 0.5
+  m_minFallHeight: 1
   m_landSurfaceImpact: {fileID: 0}
   m_minSurfaceImpactVelocity: 1
 --- !u!114 &902344916
@@ -1479,14 +1473,12 @@ MonoBehaviour:
   m_StateName: Crouch
   m_LayerIndex: 0
   m_ActionID: 5
-  m_Priority: 6
+  m_Priority: -1
   m_TransitionDuration: 0.2
-  m_StartType: 2
-  m_StopType: 3
-  m_InputNames:
-  - C
+  m_StartType: 1
+  m_StopType: 0
+  m_InputNames: []
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
@@ -1508,19 +1500,18 @@ MonoBehaviour:
   m_StateName: QuickTurn
   m_LayerIndex: 0
   m_ActionID: 3
-  m_Priority: 3
+  m_Priority: -1
   m_TransitionDuration: 0.2
-  m_StartType: 0
+  m_StartType: 1
   m_StopType: 0
   m_InputNames: []
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
   m_EndEffect: {fileID: 0}
   m_Debug: 0
-  maxInputCount: 4
+  maxInputCount: 8
 --- !u!114 &1071944184
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1537,26 +1528,24 @@ MonoBehaviour:
   m_StateName: Vault
   m_LayerIndex: 0
   m_ActionID: 31
-  m_Priority: 0
+  m_Priority: -1
   m_TransitionDuration: 0.2
-  m_StartType: 2
+  m_StartType: 1
   m_StopType: 0
-  m_InputNames:
-  - Space
+  m_InputNames: []
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
   m_EndEffect: {fileID: 0}
-  m_Debug: 1
+  m_Debug: 0
   angleThreshold: 30
   startDistance: 2
   minHeight: 0.4
   maxHeight: 2
   detectLayers:
     serializedVersion: 2
-    m_Bits: 167772160
+    m_Bits: 0
   stateBehavior: {fileID: 0}
 --- !u!114 &2129104038
 MonoBehaviour:
@@ -1574,20 +1563,18 @@ MonoBehaviour:
   m_StateName: Jump
   m_LayerIndex: 0
   m_ActionID: 21
-  m_Priority: 2
+  m_Priority: -1
   m_TransitionDuration: 0.2
-  m_StartType: 2
+  m_StartType: 1
   m_StopType: 0
-  m_InputNames:
-  - Space
+  m_InputNames: []
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
   m_EndEffect: {fileID: 0}
   m_Debug: 0
-  m_jumpHeight: 3
+  m_jumpHeight: 2
   m_recurrenceDelay: 0.2
   m_startJump: 0
   m_hasReachedApex: 0
@@ -1608,13 +1595,12 @@ MonoBehaviour:
   m_StateName: StartMovement
   m_LayerIndex: 0
   m_ActionID: 1
-  m_Priority: 7
+  m_Priority: -1
   m_TransitionDuration: 0.2
-  m_StartType: 0
+  m_StartType: 1
   m_StopType: 0
   m_InputNames: []
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
@@ -1637,13 +1623,12 @@ MonoBehaviour:
   m_StateName: StopMovement
   m_LayerIndex: 0
   m_ActionID: 2
-  m_Priority: 6
+  m_Priority: -1
   m_TransitionDuration: 0.2
-  m_StartType: 0
+  m_StartType: 1
   m_StopType: 0
   m_InputNames: []
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
@@ -1667,19 +1652,18 @@ MonoBehaviour:
   m_StateName: QuickTurn
   m_LayerIndex: 0
   m_ActionID: 3
-  m_Priority: 5
+  m_Priority: -1
   m_TransitionDuration: 0.2
-  m_StartType: 0
+  m_StartType: 1
   m_StopType: 0
   m_InputNames: []
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
   m_EndEffect: {fileID: 0}
   m_Debug: 0
-  maxInputCount: 4
+  maxInputCount: 8
 --- !u!114 &2129104042
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1696,13 +1680,12 @@ MonoBehaviour:
   m_StateName: Fall
   m_LayerIndex: 0
   m_ActionID: 4
-  m_Priority: 3
+  m_Priority: -1
   m_TransitionDuration: 0.2
-  m_StartType: 0
+  m_StartType: 1
   m_StopType: 0
   m_InputNames: []
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
@@ -1727,14 +1710,12 @@ MonoBehaviour:
   m_StateName: Aim
   m_LayerIndex: 0
   m_ActionID: -1
-  m_Priority: 9
+  m_Priority: -1
   m_TransitionDuration: 0.2
-  m_StartType: 2
-  m_StopType: 3
-  m_InputNames:
-  - Mouse1
+  m_StartType: 1
+  m_StopType: 0
+  m_InputNames: []
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
@@ -1757,26 +1738,24 @@ MonoBehaviour:
   m_StateName: Vault
   m_LayerIndex: 0
   m_ActionID: 31
-  m_Priority: 0
+  m_Priority: -1
   m_TransitionDuration: 0.2
-  m_StartType: 2
+  m_StartType: 1
   m_StopType: 0
-  m_InputNames:
-  - Space
+  m_InputNames: []
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
   m_EndEffect: {fileID: 0}
-  m_Debug: 1
+  m_Debug: 0
   angleThreshold: 30
   startDistance: 2
   minHeight: 0.4
   maxHeight: 2
   detectLayers:
     serializedVersion: 2
-    m_Bits: 167772160
+    m_Bits: 0
   stateBehavior: {fileID: 0}
 --- !u!114 &2129104039
 MonoBehaviour:
@@ -1794,14 +1773,12 @@ MonoBehaviour:
   m_StateName: WallRun
   m_LayerIndex: 0
   m_ActionID: -1
-  m_Priority: 1
+  m_Priority: -1
   m_TransitionDuration: 0.2
-  m_StartType: 3
+  m_StartType: 1
   m_StopType: 0
-  m_InputNames:
-  - Space
+  m_InputNames: []
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
@@ -1823,14 +1800,12 @@ MonoBehaviour:
   m_StateName: Crouch
   m_LayerIndex: 0
   m_ActionID: 5
-  m_Priority: 8
+  m_Priority: -1
   m_TransitionDuration: 0.2
-  m_StartType: 2
-  m_StopType: 3
-  m_InputNames:
-  - C
+  m_StartType: 1
+  m_StopType: 0
+  m_InputNames: []
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
@@ -1852,18 +1827,260 @@ MonoBehaviour:
   m_StateName: MeleeUnarmed
   m_LayerIndex: 0
   m_ActionID: -1
-  m_Priority: 4
+  m_Priority: -1
   m_TransitionDuration: 0.2
   m_StartType: 1
   m_StopType: 0
   m_InputNames: []
   m_SpeedMultiplier: 1
-  m_ApplyBuiltinRootMotion: 0
   m_StartAudioClips: []
   m_StopAudioClips: []
   m_StartEffect: {fileID: 0}
   m_EndEffect: {fileID: 0}
   m_Debug: 0
+--- !u!114 &7312768888468139943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2247134470855319462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24f4915bd11574121a2a533c85cb7cc1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: Fall
+  m_LayerIndex: 0
+  m_ActionID: 4
+  m_Priority: 2
+  m_TransitionDuration: 0.2
+  m_StartType: 0
+  m_StopType: 0
+  m_InputNames: []
+  m_SpeedMultiplier: 1
+  m_StartAudioClips: []
+  m_StopAudioClips: []
+  m_StartEffect: {fileID: 0}
+  m_EndEffect: {fileID: 0}
+  m_Debug: 0
+  m_minFallHeight: 1
+  m_landSurfaceImpact: {fileID: 0}
+  m_minSurfaceImpactVelocity: 1
+--- !u!114 &8422096685285446488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2247134470855319462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6154c3fa2c49643758284fb02e121cd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: Crouch
+  m_LayerIndex: 0
+  m_ActionID: 5
+  m_Priority: 5
+  m_TransitionDuration: 0.2
+  m_StartType: 2
+  m_StopType: 3
+  m_InputNames:
+  - C
+  m_SpeedMultiplier: 1
+  m_StartAudioClips: []
+  m_StopAudioClips: []
+  m_StartEffect: {fileID: 0}
+  m_EndEffect: {fileID: 0}
+  m_Debug: 0
+--- !u!114 &2482428211465248368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2247134470855319462}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb969d52822a24d8dbd0b8c198a14803, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: StartMovement
+  m_LayerIndex: 0
+  m_ActionID: 1
+  m_Priority: 4
+  m_TransitionDuration: 0.2
+  m_StartType: 0
+  m_StopType: 0
+  m_InputNames: []
+  m_SpeedMultiplier: 1
+  m_StartAudioClips: []
+  m_StopAudioClips: []
+  m_StartEffect: {fileID: 0}
+  m_EndEffect: {fileID: 0}
+  m_Debug: 0
+  maxInputCount: 12
+--- !u!114 &3654135042409310376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2247134470855319462}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dcb0e67b11b04af4b61cb44c64d5a63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: StopMovement
+  m_LayerIndex: 0
+  m_ActionID: 2
+  m_Priority: 3
+  m_TransitionDuration: 0.2
+  m_StartType: 0
+  m_StopType: 0
+  m_InputNames: []
+  m_SpeedMultiplier: 1
+  m_StartAudioClips: []
+  m_StopAudioClips: []
+  m_StartEffect: {fileID: 0}
+  m_EndEffect: {fileID: 0}
+  m_Debug: 0
+  maxInputCount: 8
+  stopThreshold: 0.8
+--- !u!114 &6056417145651354465
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2247134470855319462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 043998c3940ed496da75fc62118ed578, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: Aim
+  m_LayerIndex: 0
+  m_ActionID: -1
+  m_Priority: 6
+  m_TransitionDuration: 0.2
+  m_StartType: 2
+  m_StopType: 3
+  m_InputNames:
+  - Mouse2
+  m_SpeedMultiplier: 1
+  m_StartAudioClips: []
+  m_StopAudioClips: []
+  m_StartEffect: {fileID: 0}
+  m_EndEffect: {fileID: 0}
+  m_Debug: 0
+  m_ItemStateID: -1
+--- !u!114 &4635777281422831146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2247134470855319462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6925d34e29f342f3914c6b5a519e7a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: Jump
+  m_LayerIndex: 0
+  m_ActionID: 21
+  m_Priority: 1
+  m_TransitionDuration: 0.2
+  m_StartType: 2
+  m_StopType: 0
+  m_InputNames:
+  - Space
+  m_SpeedMultiplier: 1
+  m_StartAudioClips: []
+  m_StopAudioClips: []
+  m_StartEffect: {fileID: 0}
+  m_EndEffect: {fileID: 0}
+  m_Debug: 0
+  m_jumpHeight: 2
+  m_recurrenceDelay: 0.2
+  m_startJump: 0
+  m_hasReachedApex: 0
+  m_hasLanded: 0
+--- !u!114 &839902726772253661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2247134470855319462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b6ec39a2dc534f0fa6540e118998f69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: EquipUnequip
+  m_LayerIndex: 0
+  m_ActionID: -1
+  m_Priority: 7
+  m_TransitionDuration: 0.2
+  m_StartType: 1
+  m_StopType: 0
+  m_InputNames: []
+  m_SpeedMultiplier: 1
+  m_StartAudioClips: []
+  m_StopAudioClips: []
+  m_StartEffect: {fileID: 0}
+  m_EndEffect: {fileID: 0}
+  m_Debug: 0
+  m_ItemStateID: -1
+  equipItemStateIndex: 4
+  unEquipItemStateIndex: 5
+--- !u!114 &3491435594945264188
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2247134470855319462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a33cd0f36f52540f39f9a4bf04b5add6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsActive: 0
+  m_StateName: Vault
+  m_LayerIndex: 0
+  m_ActionID: 31
+  m_Priority: 0
+  m_TransitionDuration: 0.2
+  m_StartType: 2
+  m_StopType: 0
+  m_InputNames:
+  - Space
+  m_SpeedMultiplier: 1
+  m_StartAudioClips: []
+  m_StopAudioClips: []
+  m_StartEffect: {fileID: 0}
+  m_EndEffect: {fileID: 0}
+  m_Debug: 0
+  angleThreshold: 30
+  startDistance: 2
+  minHeight: 0.4
+  maxHeight: 2
+  detectLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  stateBehavior: {fileID: 0}
 --- !u!1 &2268023733760728831
 GameObject:
   m_ObjectHideFlags: 0
@@ -2146,12 +2363,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f5ee5acc98c44fa6b1ce64aec653011, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skinData: {fileID: 11400000, guid: adddf65e1081d4d98aea86c4bcfb944c, type: 2}
+  skinData: {fileID: 0}
   skinOverrideMaterial: {fileID: 0}
   enableHat: 0
   hat: {fileID: 0}
-  hairObject: {fileID: 7980443806311101523}
-  hatHairObject: {fileID: 1136173532199811426}
+  hairObject: {fileID: 0}
+  hatHairObject: {fileID: 0}
 --- !u!1 &2465901180975268368
 GameObject:
   m_ObjectHideFlags: 0
@@ -4035,6 +4252,21 @@ PrefabInstance:
     - target: {fileID: 5642330344903995389, guid: df5aa01e7d02a44c8957cccc722fd979,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 308690195619889190, guid: df5aa01e7d02a44c8957cccc722fd979,
+        type: 3}
+      propertyPath: m_FirePoint
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 241671883942732441, guid: df5aa01e7d02a44c8957cccc722fd979,
+        type: 3}
+      propertyPath: slotID
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 241671883942732441, guid: df5aa01e7d02a44c8957cccc722fd979,
+        type: 3}
+      propertyPath: animatorItemID
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

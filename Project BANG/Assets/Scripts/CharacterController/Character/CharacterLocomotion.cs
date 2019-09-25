@@ -1,6 +1,7 @@
 ﻿namespace CharacterController
 {
     using UnityEngine;
+    using UnityEngine.Serialization;
     using System;
     using System.Collections.Generic;
 
@@ -15,14 +16,14 @@
 
 
         //  --  Character Actions
-        [SerializeField, HideInInspector]
+        [SerializeField, HideInInspector, FormerlySerializedAs("m_actions")]
         protected CharacterAction[] m_actions;
-        [SerializeField, HideInInspector]
+        [SerializeField, HideInInspector, FormerlySerializedAs("m_activeAction")]
         protected CharacterAction m_activeAction;
 
         protected Dictionary<CharacterAction, int> m_actionInfo;
 
-        protected float m_viewAngle;
+
 
 
 
@@ -80,7 +81,7 @@
             m_animatorMonitor = GetComponent<AnimatorMonitor>();
             m_animator = GetComponent<Animator>();
             m_animator.updateMode = AnimatorUpdateMode.AnimatePhysics;
-            m_animator.applyRootMotion = m_useRootMotion;
+            m_animator.applyRootMotion = m_useRootMotionPosition || m_useRootMotionRotation;
             //  Rigidbody settings
             m_rigidbody = GetComponent<Rigidbody>();
             m_gravity = Physics.gravity;

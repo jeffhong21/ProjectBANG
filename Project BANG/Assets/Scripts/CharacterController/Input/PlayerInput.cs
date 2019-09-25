@@ -40,7 +40,7 @@ namespace CharacterController
         {
             public ItemAction useAction { get; private set; }
             public ItemAction aimAction { get; private set; }
-            public ItemAction equipUnequipAction { get; private set; }
+            public EquipUnequip equipUnequipAction { get; private set; }
 
             public InventoryHandler(CharacterLocomotion controller)
             {
@@ -323,7 +323,7 @@ namespace CharacterController
         
 
 
-        private string[] m_globalIgnoreKeys = {"w", "a", "s", "d" };
+
         private HashSet<string> m_ignoreKeysBuffer = new HashSet<string>();
         private bool AnyKeyDown(bool includeGlobalIgnore = true, params string[] ignore)
         {
@@ -332,8 +332,9 @@ namespace CharacterController
             m_ignoreKeysBuffer.Add("\b");
             m_ignoreKeysBuffer.Add("\n");
             if (includeGlobalIgnore) {
-                for (int i = 0; i < m_globalIgnoreKeys.Length; i++)
-                    m_ignoreKeysBuffer.Add(m_globalIgnoreKeys[i]);
+                string[] globalIgnoreKeys = { "w", "a", "s", "d" };
+                for (int i = 0; i < globalIgnoreKeys.Length; i++)
+                    m_ignoreKeysBuffer.Add(globalIgnoreKeys[i]);
             }
             if (ignore != null && ignore.Length > 0) {
                 for (int i = 0; i < ignore.Length; i++)
@@ -357,16 +358,17 @@ namespace CharacterController
                 if(m_inventoryHandler.equipUnequipAction != null) {
                     for (int number = 1; number < m_inventory.SlotCount + 1; number++) {
                         if (Input.GetKeyDown(number.ToString())) {
-                            Debug.LogFormat("Inventory Item Slot {0} is {1}", number -1, m_inventory.GetItem(number - 1));
+                            m_inventoryHandler.equipUnequipAction.StartEquipUnequipAction(number);
+
                         }
                     }
                 }
 
-                for (int number = 1; number < m_inventory.SlotCount + 1; number++) {
-                    if (Input.GetKeyDown(number.ToString())) {
-                        Debug.LogFormat("Inventory Item Slot {0} is {1}", number - 1, m_inventory.GetItem(number - 1));
-                    }
-                }
+                //for (int number = 1; number < m_inventory.SlotCount + 1; number++) {
+                //    if (Input.GetKeyDown(number.ToString())) {
+                //        Debug.LogFormat("Inventory Item Slot {0} is {1}", number - 1, m_inventory.GetItem(number - 1));
+                //    }
+                //}
             }
         }
 

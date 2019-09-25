@@ -36,7 +36,7 @@ namespace CharacterController
         //
 
 
-
+            
 
         public override bool CanStartAction()
         {
@@ -55,15 +55,15 @@ namespace CharacterController
                 m_animator.SetInteger(HashID.ActionID, m_ActionID);
 
 
-            m_verticalVelocity = new Vector3(0, Mathf.Sqrt(-2 * m_jumpHeight * -9.8f), 0);
+            m_verticalVelocity = new Vector3(0, Mathf.Sqrt(-2 * m_jumpHeight * -9.8f) * m_deltaTime, 0);
             //m_verticalVelocity.x += m_Controller.Velocity.x;
             //m_verticalVelocity.z += m_Controller.Velocity.z;
             //m_rigidbody.ResetCenterOfMass();
-            m_velocity = m_rigidbody.velocity + m_verticalVelocity;
+            //m_velocity = m_rigidbody.velocity + m_verticalVelocity;
             //m_velocity = Vector3.ClampMagnitude()
-            m_rigidbody.velocity += m_velocity;
+            //m_rigidbody.velocity += m_verticalVelocity;
 
-            //m_rigidbody.AddRelativeForce(m_verticalVelocity, ForceMode.VelocityChange);
+            m_rigidbody.AddRelativeForce(m_verticalVelocity.normalized * m_jumpHeight, ForceMode.VelocityChange);
             m_startPosition = m_transform.position;
             m_elapsedTime = 0;
             m_verticalDistance = 0;

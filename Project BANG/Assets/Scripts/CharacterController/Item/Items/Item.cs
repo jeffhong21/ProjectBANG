@@ -77,8 +77,8 @@
         protected GameObject character;
         protected CharacterLocomotion charLocomotion;
         protected Inventory inventory;
-        protected GameObject mGameObject;
-        protected Transform mTransform;
+        protected GameObject m_gameObject;
+        protected Transform m_transform;
 
 
         //
@@ -120,8 +120,8 @@
             inventory = _inventory;
             animator = charLocomotion.GetComponent<Animator>();
 
-            mGameObject = gameObject;
-            mTransform = transform;
+            m_gameObject = gameObject;
+            m_transform = transform;
 
 
 
@@ -136,7 +136,7 @@
 
             if (m_NonDominantHandIKTarget == null) {
                 m_NonDominantHandIKTarget = new GameObject("NonDominantHandIKTarget").transform;
-                m_NonDominantHandIKTarget.parent = mTransform;
+                m_NonDominantHandIKTarget.parent = m_transform;
                 m_NonDominantHandIKTarget.localPosition = Vector3.zero;
                 m_NonDominantHandIKTarget.localEulerAngles = new Vector3(3, 50, 180);
             }
@@ -163,28 +163,28 @@
                 //    //  Parent the item to a item equip slot.
                 //    Transform parent = inventory.GetItemSocket(slotID);
                 //    if (parent != null) {
-                //        mGameObject.transform.parent = parent;
-                //        mGameObject.transform.localPosition = localSpawnPosition;
-                //        mGameObject.transform.localEulerAngles = localSpawnRotation;
+                //        m_gameObject.transform.parent = parent;
+                //        m_gameObject.transform.localPosition = localSpawnPosition;
+                //        m_gameObject.transform.localEulerAngles = localSpawnRotation;
                 //    }
                 //}
 
 
                 //  Show the item.
-                mGameObject.SetActive(true);
+                m_gameObject.SetActive(true);
             }
             else
             {
                 if (holsterTarget){
                     //  Parent the object to the holster and reset position and rotation values.
-                    mGameObject.transform.parent = holsterTarget;
-                    mGameObject.transform.localPosition = Vector3.zero;
-                    mGameObject.transform.localEulerAngles = Vector3.zero;
+                    m_gameObject.transform.parent = holsterTarget;
+                    m_gameObject.transform.localPosition = Vector3.zero;
+                    m_gameObject.transform.localEulerAngles = Vector3.zero;
                 }
 
 
                 //  Deactivate the item.
-                mGameObject.SetActive(false);
+                m_gameObject.SetActive(false);
 
             }
         }
@@ -204,6 +204,7 @@
             //OnEquipEvent.Invoke(itemType);
             //  Update the inventory.
             inventory.EquipItem(inventory.GetItemSlotIndex(itemType));
+            inventory.EquipItem(itemType);
             SetActive(true);
         }
 

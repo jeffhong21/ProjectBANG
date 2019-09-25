@@ -46,13 +46,13 @@ namespace CharacterController
 
         protected override void Initialize()
         {
-            if (rightHandTarget == null) rightHandTarget = CreateIKEffectors("RightHand Effector Target", m_animator.GetBoneTransform(HumanBodyBones.RightHand).position, m_animator.GetBoneTransform(HumanBodyBones.RightHand).rotation, true);
-            if (leftHandTarget == null) leftHandTarget = CreateIKEffectors("LeftHand Effector Target", m_animator.GetBoneTransform(HumanBodyBones.LeftHand).position, m_animator.GetBoneTransform(HumanBodyBones.LeftHand).rotation, true);
-            if (bodyEffectorTarget == null) bodyEffectorTarget = CreateIKEffectors("Body Effector Target", m_animator.GetBoneTransform(HumanBodyBones.Hips).position, m_animator.GetBoneTransform(HumanBodyBones.Hips).rotation, true);
+            if (rightHandTarget == null) rightHandTarget = CreateIKEffectors("RightHand Effector Target", m_animator.GetBoneTransform(HumanBodyBones.RightHand).position, m_animator.GetBoneTransform(HumanBodyBones.RightHand).rotation);
+            if (leftHandTarget == null) leftHandTarget = CreateIKEffectors("LeftHand Effector Target", m_animator.GetBoneTransform(HumanBodyBones.LeftHand).position, m_animator.GetBoneTransform(HumanBodyBones.LeftHand).rotation);
+            if (bodyEffectorTarget == null) bodyEffectorTarget = CreateIKEffectors("Body Effector Target", m_animator.GetBoneTransform(HumanBodyBones.Hips).position, m_animator.GetBoneTransform(HumanBodyBones.Hips).rotation);
 
             if (lookTarget == null)
             {
-                lookTarget = CreateIKEffectors("LookAt Target", m_animator.GetBoneTransform(HumanBodyBones.Head).position + transform.forward, Quaternion.identity, true);
+                lookTarget = CreateIKEffectors("LookAt Target", m_animator.GetBoneTransform(HumanBodyBones.Head).position + transform.forward, Quaternion.identity);
                 lookTarget.position = m_animator.GetBoneTransform(HumanBodyBones.Neck).position + transform.forward * 10;
             }
 

@@ -19,10 +19,11 @@ namespace CharacterController
     public class CharacterLocomotionEditor : ccEditor.InspectorEditor
     {
         //private CharacterLocomotion script { get { return target as CharacterLocomotion; } }
+        private static readonly string[] m_DontInclude = { "m_Script", "debugger" };
 
 
-        private readonly bool m_UseDefaultFoldout = true;
-
+        private bool m_useCustomeHeader = true;
+        private bool m_spaceBetweenSections = true;
 
         private const string MotorFoldoutHeader = "Character Movement";
         private const string PhysicsFoldoutHeader = "Character Physics";
@@ -37,8 +38,8 @@ namespace CharacterController
 
 
         //  -- Locomotion variables
-        private SerializedProperty m_useRootMotion;
-        private SerializedProperty m_UseRootMotionRotation;     //  double check
+        private SerializedProperty m_useRootMotionPosition;
+        private SerializedProperty m_useRootMotionRotation;     //  double check
         private SerializedProperty m_rootMotionSpeedMultiplier;
         private SerializedProperty m_rootMotionRotationMultiplier;
         private SerializedProperty m_motorAcceleration;
@@ -59,7 +60,7 @@ namespace CharacterController
         private SerializedProperty m_collisionsLayerMask;
         private SerializedProperty m_maxCollisionCount;
 
-        private SerializedProperty displayActions;
+        private SerializedProperty displayMovement, displayPhysics, displayCollisions, displayActions;
 
         private GUIStyle m_DefaultActionTextStyle = new GUIStyle();
         private GUIStyle m_ActiveActionTextStyle = new GUIStyle();
@@ -77,8 +78,8 @@ namespace CharacterController
             m_ActiveActionTextStyle.fontStyle = FontStyle.Bold;
 
 
-            m_useRootMotion = serializedObject.FindProperty("m_useRootMotion");
-            m_UseRootMotionRotation = serializedObject.FindProperty("m_UseRootMotionRotation");
+            m_useRootMotionPosition = serializedObject.FindProperty("m_useRootMotionPosition");
+            m_useRootMotionRotation = serializedObject.FindProperty("m_useRootMotionRotation");
             m_rootMotionSpeedMultiplier = serializedObject.FindProperty("m_rootMotionSpeedMultiplier");
             m_rootMotionRotationMultiplier = serializedObject.FindProperty("m_rootMotionRotationMultiplier");
             m_motorAcceleration = serializedObject.FindProperty("m_motorAcceleration");
@@ -97,6 +98,9 @@ namespace CharacterController
             m_collisionsLayerMask = serializedObject.FindProperty("m_collisionsLayerMask");
             m_maxCollisionCount = serializedObject.FindProperty("m_maxCollisionCount");
 
+            displayMovement = serializedObject.FindProperty("displayMovement");
+            displayPhysics = serializedObject.FindProperty("displayPhysics");
+            displayCollisions = serializedObject.FindProperty("displayCollisions");
             displayActions = serializedObject.FindProperty("displayActions");
             m_ActionsList = new ReorderableList(serializedObject, serializedObject.FindProperty("m_actions"), true, true, true, true);
 		}
@@ -104,17 +108,75 @@ namespace CharacterController
 
 		public override void OnInspectorGUI()
         {
-            base.OnInspectorGUI();
-
-
+            //base.OnInspectorGUI();
             serializedObject.Update();
 
+            InspectorUtility.PropertyField(serializedObject.FindProperty("m_Script"));
+            EditorGUILayout.Space();
+            //  -----
+            //  Character Movement
+            //  -----
+
+            displayMovement.boolValue = m_useCustomeHeader ? InspectorUtility.Foldout(displayMovement.boolValue, MotorFoldoutHeader) : EditorGUILayout.Foldout(displayMovement.boolValue, MotorFoldoutHeader);
+            //displayMovement.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayMovement.boolValue, MotorFoldoutHeader) : InspectorUtility.Foldout(displayMovement.boolValue, MotorFoldoutHeader);
+            if (displayMovement.boolValue)
+            {
+                EditorGUILayout.PropertyField(m_useRootMotionPosition);
+                //  Root motion related variables.
+                EditorGUILayout.PropertyField(m_rootMotionSpeedMultiplier);
+                //EditorGUI.indentLevel++;
+                EditorGUILayout.PropertyField(m_useRootMotionRotation);
+                //EditorGUI.indentLevel--;
+                //  Motion related variables.
+                EditorGUILayout.PropertyField(m_rootMotionRotationMultiplier);
+
+
+                EditorGUILayout.PropertyField(m_motorAcceleration);
+                EditorGUILayout.PropertyField(m_motorDamping);
+                EditorGUILayout.PropertyField(m_acceleration);
+                EditorGUILayout.PropertyField(m_desiredSpeed);
+                EditorGUILayout.PropertyField(m_rotationSpeed);
+
+            }
+            if(m_spaceBetweenSections) EditorGUILayout.Space();
+
+            //  -----
+            //  Character Physics
+            //  -----
+            displayPhysics.boolValue = m_useCustomeHeader ? InspectorUtility.Foldout(displayPhysics.boolValue, PhysicsFoldoutHeader) : EditorGUILayout.Foldout(displayPhysics.boolValue, PhysicsFoldoutHeader);
+            //displayPhysics.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayPhysics.boolValue, PhysicsFoldoutHeader) : InspectorUtility.Foldout(displayPhysics.boolValue, PhysicsFoldoutHeader);
+            if (displayPhysics.boolValue)
+            {
+                EditorGUILayout.PropertyField(m_mass);
+                EditorGUILayout.PropertyField(m_skinWidth);
+                EditorGUILayout.PropertyField(m_slopeLimit);
+
+                EditorGUILayout.PropertyField(m_maxStepHeight);
+                EditorGUILayout.PropertyField(m_gravityModifier);
+                EditorGUILayout.PropertyField(m_groundStickiness);
+
+
+            }
+            if (m_spaceBetweenSections) EditorGUILayout.Space();
+
+            //  -----
+            //  Character Collisions
+            //  -----
+            displayCollisions.boolValue = m_useCustomeHeader ? InspectorUtility.Foldout(displayCollisions.boolValue, AnimationFoldoutHeader) : EditorGUILayout.Foldout(displayCollisions.boolValue, AnimationFoldoutHeader);
+            //displayCollisions.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayCollisions.boolValue, AnimationFoldoutHeader) : InspectorUtility.Foldout(displayCollisions.boolValue, AnimationFoldoutHeader);
+            if (displayCollisions.boolValue)
+            {
+                EditorGUILayout.PropertyField(m_collisionsLayerMask);
+                EditorGUILayout.PropertyField(m_maxCollisionCount);
+
+            }
+            if (m_spaceBetweenSections) EditorGUILayout.Space();
 
             //  -----
             //  Character Actions
             //  -----
-
-            displayActions.boolValue = EditorGUILayout.Foldout(displayActions.boolValue, ActionsFoldoutHeader);
+            displayActions.boolValue = m_useCustomeHeader ? InspectorUtility.Foldout(displayActions.boolValue, ActionsFoldoutHeader) : EditorGUILayout.Foldout(displayActions.boolValue, ActionsFoldoutHeader);
+            //displayActions.boolValue = EditorGUILayout.Foldout(displayActions.boolValue, ActionsFoldoutHeader);
             if(displayActions.boolValue)
             {
                 ////  Active Action.
@@ -151,17 +213,25 @@ namespace CharacterController
                 }
                 //EditorGUI.indentLevel--;
                 EditorGUI.indentLevel--;
-
-                EditorGUILayout.Space();
             }
+            if (m_spaceBetweenSections) EditorGUILayout.Space();
 
+
+            //  -----
+            //  Draw the rest of the indefault inspector.
+            //  -----
+            EditorGUILayout.Space();
+            EditorGUI.indentLevel++;
+            DrawPropertiesExcluding(serializedObject, m_DontInclude);
+            EditorGUI.indentLevel--;
+            EditorGUILayout.Space();
 
             //  -----
             //  Debugging
             //  -----
-            EditorGUILayout.Space();
+            EditorGUI.indentLevel++;
             InspectorUtility.PropertyField(serializedObject.FindProperty("debugger"), true);
-
+            EditorGUI.indentLevel--;
 
 
             EditorGUILayout.Space();

@@ -12,7 +12,7 @@
 
         private bool equipNext = true;
         private int itemSlotIndex = -1;
-
+        private Item m_equippedItem;
 
         protected override void Awake()
         {
@@ -57,10 +57,16 @@
         }
 
 
-        public override bool ExecuteItemAction(int index)
+        public void StartEquipUnequipAction(int index)
         {
             Debug.LogFormat("Inventory Item Slot {0} is {1}", index, m_inventory.GetItem(index) );
-            return true;
+            m_equippedItem = m_inventory.EquipItem(index);
+            if(m_equippedItem != null) {
+                m_equippedItem.SetActive(true);
+            }
+
+
+
         }
 
 

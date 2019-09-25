@@ -99,7 +99,7 @@
             }
 
 
-            InspectorUtility.PropertyField(serializedObject.FindProperty("m_ApplyBuiltinRootMotion"));
+            //InspectorUtility.PropertyField(serializedObject.FindProperty("m_ApplyBuiltinRootMotion"));
             InspectorUtility.PropertyField(serializedObject.FindProperty("m_StartAudioClips"), true);
             InspectorUtility.PropertyField(serializedObject.FindProperty("m_StopAudioClips"), true);
             InspectorUtility.PropertyField(serializedObject.FindProperty("m_StartEffect"));

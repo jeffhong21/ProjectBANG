@@ -29,13 +29,22 @@ public static class InspectorUtility
         foldoutStyle = new GUIStyle("ShurikenModuleTitle") // ShurikenModuleTitle
         {
             font = new GUIStyle(EditorStyles.label).font,
-            fontStyle = FontStyle.Bold,
+            fontStyle = FontStyle.Normal,
             fontSize = 11,
             border = new RectOffset(15, 7, 4, 4),
-            fixedHeight = 22,
+            //fixedHeight = 22,
             contentOffset = new Vector2(20f, -2f),
         };
-
+        //foldoutStyle = new GUIStyle(EditorStyles.foldoutHeader) // EditorStyles.foldoutHeader
+        //{
+        //    font = new GUIStyle(EditorStyles.label).font,
+        //    fontStyle = FontStyle.Bold,
+        //    fontSize = 11,
+        //    border = new RectOffset(15, 7, 4, 4),
+        //    //fixedHeight = 22,
+        //    contentOffset = new Vector2(20f, -2f),
+            
+        //};
 
     }
 
@@ -116,15 +125,14 @@ public static class InspectorUtility
 
     public static bool Foldout(bool display, string title)
     {
-        EditorGUILayout.Space();
+        //EditorGUILayout.Space();
         var rect = GUILayoutUtility.GetRect(16f, 22f, foldoutStyle);
         GUI.Box(rect, title, foldoutStyle);
 
         var e = Event.current;
 
-        var toggleRect = new Rect(rect.x + 4f, rect.y + 2f, 13f, 13f);
-        if (e.type == EventType.Repaint)
-        {
+        var toggleRect = new Rect(rect.x + 4f, rect.y, 13f, 13f);
+        if (e.type == EventType.Repaint) {
             EditorStyles.foldout.Draw(toggleRect, false, false, display, false);
         }
 
@@ -133,7 +141,7 @@ public static class InspectorUtility
             display = !display;
             e.Use();
         }
-        EditorGUILayout.Space();
+        //EditorGUILayout.Space();
         return display;
     }
 
