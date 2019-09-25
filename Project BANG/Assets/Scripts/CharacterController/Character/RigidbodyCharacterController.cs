@@ -81,7 +81,7 @@ namespace CharacterController
         protected MovementTypes m_MovementType = MovementTypes.Adventure;
 
         protected bool m_moving, m_grounded = true;
-        protected float m_moveAngle;
+        protected float m_moveAngle, m_viewAngle;
         protected Vector3 m_inputVector, m_inputDirection;
         protected Vector3 m_moveDirection, m_velocity , m_angularVelocity;
         protected Vector3 m_movePosition;
@@ -310,6 +310,7 @@ namespace CharacterController
             m_previousPosition = m_transform.position;
 
             m_lookDirection = m_lookRotation * m_transform.forward;
+            m_viewAngle = m_transform.AngleFromForward(m_lookDirection);
         }
 
 
@@ -320,18 +321,13 @@ namespace CharacterController
         protected virtual void Move()
         {
 
-            m_lookDirection = m_lookRotation * m_transform.forward;
             //  Set the input vector, move direction and rotation angle based on the movement type.
             switch (m_MovementType) {
                 case (MovementTypes.Adventure):
-                    //  Get the correct target rotation based on input.
-                    m_moveAngle = m_transform.AngleFromForward(m_lookDirection);
                     //  Get the correct input direction.
                     m_inputDirection = Quaternion.Inverse(m_transform.rotation) * m_transform.TransformDirection(m_inputVector);
                     break;
                 case (MovementTypes.Combat):
-                    //  Get the correct target rotation based on look rotation.
-                    m_moveAngle = m_transform.AngleFromForward(m_lookDirection);
                     //  Get the correct input direction.
                     m_inputDirection = m_transform.TransformDirection(m_inputVector);
                     break;
@@ -372,6 +368,69 @@ namespace CharacterController
             m_moving = m_inputDirection.sqrMagnitude > 0;
         }
 
+
+        //  float h = Input.GetAxisRaw("Horizontal");
+        //  float v = Input.GetAxisRaw("Vertical");
+        //  movement.Set(h, 0f, v);
+        //  movement = movement.normalized * speed * Time.deltaTime;
+        //  movement = transform.worldToLocalMatrix.inverse * movement;
+        //  playerRigidbody.MovePosition(transform.position + movement);
+
+
+
+        // protected void DetectEdge()
+        // {
+        //     //Vector3 toCenter = Math3d.ProjectVectorOnPlane(up, (controller.transform.position - hit.point).normalized * TinyTolerance);
+        //     Vector3 toCenter = Vector3.ProjectOnPlane((controller.transform.position - hit.point).normalized * TinyTolerance, m_transform.up);
+        //     Vector3 awayFromCenter = Quaternion.AngleAxis(-80.0f, Vector3.Cross(toCenter, up)) * -toCenter;
+
+        //     Vector3 nearPoint = hit.point + toCenter + (up * TinyTolerance);
+        //     Vector3 farPoint = hit.point + (awayFromCenter * 3);
+
+        //     RaycastHit nearHit;
+        //     RaycastHit farHit;
+
+        //     Physics.Raycast(nearPoint, down, out nearHit, m_colliderRadius * 2, m_collisionsLayerMask);
+        //     Physics.Raycast(farPoint, down, out farHit, m_colliderRadius * 2, m_collisionsLayerMask);
+
+        //     // If we are currently standing on a ledge then the face nearest the center of the
+        //     // controller should be steep enough to be counted as a wall. Retrieve the ground
+        //     // it is connected to at it's base, if there exists any
+        //     if (Vector3.Angle(nearHit.normal, up) > superColType.StandAngle || nearHit.distance > Tolerance)
+        //     {
+        //         SuperCollisionType col = null;
+            
+        //         if (nearHit.collider != null)
+        //         {
+        //             col = nearHit.collider.gameObject.GetComponent<SuperCollisionType>();
+        //         }
+                
+        //         if (col == null)
+        //         {
+        //             col = defaultCollisionType;
+        //         }
+
+        //         // We contacted the wall of the ledge, rather than the landing. Raycast down
+        //         // the wall to retrieve the proper landing
+        //         if (Vector3.Angle(nearHit.normal, up) > col.StandAngle)
+        //         {
+        //             // Retrieve a vector pointing down the slope
+        //             Vector3 r = Vector3.Cross(nearHit.normal, down);
+        //             Vector3 v = Vector3.Cross(r, nearHit.normal);
+
+        //             RaycastHit stepHit;
+
+        //             if (Physics.Raycast(nearPoint, v, out stepHit, Mathf.Infinity, walkable, triggerInteraction))
+        //             {
+        //                 stepGround = new GroundHit(stepHit.point, stepHit.normal, stepHit.distance);
+        //             }
+        //         }
+        //         else
+        //         {
+        //             stepGround = new GroundHit(nearHit.point, nearHit.normal, nearHit.distance);
+        //         }
+        //     }
+        // }
 
 
 
@@ -504,68 +563,42 @@ namespace CharacterController
         /// </summary>
         protected virtual void CheckMovement()
         {
+
+
+
             if(m_rigidbody.isKinematic)
             {
                 float castRadius = m_collider.radius + m_skinWidth;
-                Vector3 castPosition = transform.position.WithY(castRadius);
+                Vector3 castPosition = m_transform.position.WithY(castRadius);
                 int hits = Physics.OverlapSphereNonAlloc(castPosition, castRadius, m_probedColliders, m_collisionsLayerMask);
                 if (hits > 0)
                 {
                     for (int i = 0; i < hits; i++)
                     {
-                        if(m_probedColliders[i] != m_collider)
+                        if(m_probedColliders[i] == m_collider) continue;
+                        Collider collision = m_probedColliders[i];
+                        Vector3 position = castPosition;
+                        Vector3 contactPoint = collision.ClosestPoint(position);
+
+                        if(contactPoint != Vector3.zero)
                         {
-                            Collider collision = m_probedColliders[i];
-                            Vector3 position = castPosition;
-                            Vector3 contactPoint = collision.ClosestPoint(position);
+                            Vector3 contactDirection = contactPoint - m_transform.position;
 
-                            if(contactPoint != Vector3.zero)
-                            {
-                                Vector3 contactDirection = contactPoint - m_transform.position;
+                            float colliderAngle = Vector3.Dot(m_transform.forward, contactDirection.normalized);
+                            if (colliderAngle > 0) {
+                                Vector3 normal = m_transform.position - contactPoint;   //  Normal vector
+                                Vector3 v2 = Vector3.Cross(normal, Vector3.up);         //  Wall angle
 
-                                bool overlapped = Physics.ComputePenetration(m_collider, m_transform.position, m_transform.rotation,
-                                                                             collision, collision.transform.position, collision.transform.rotation,
-                                                                             out Vector3 direction, out float distance);
-                                if (overlapped) {
-                                    Vector3 penetrationVector = direction * distance;
-                                    Vector3 moveDirectionProjected = Vector3.Project(m_moveDirection, -penetrationVector);
-
-                                    m_moveDirection = m_moveDirection.Add(penetrationVector);
-                                    m_moveDirection = m_moveDirection.Subtract(moveDirectionProjected);      //  TODO: optimize me
-                                                                                                             //m_velocity = Vector3.ClampMagnitude(m_velocity, 10);
-                                }
-
-
-                                //  --------------------------
-                                //  Check if a collision has occured.
-                                //  --------------------------
-
-                                float colliderAngle = Vector3.Dot(m_transform.forward, contactDirection.normalized);
-                                if (colliderAngle > 0) {
-                                    Vector3 normal = m_transform.position - contactPoint;   //  Normal vector
-                                    Vector3 v2 = Vector3.Cross(normal, Vector3.up);         //  Wall angle
-
-                                    Vector3 slideDir = normal * Vector3.Dot(m_velocity, normal);
-                                    Vector3 wallSlideDir = (m_velocity - slideDir).normalized;
-                                    Vector3 projectedVelocity = Vector3.Project(m_velocity, wallSlideDir);
-                                    Vector3 tangent = projectedVelocity;
-                                    Vector3.OrthoNormalize(ref normal, ref tangent);
-
-
-                                }
-
+                                Vector3 slideDir = normal * Vector3.Dot(m_velocity, normal);
+                                Vector3 wallSlideDir = (m_velocity - slideDir).normalized;
+                                Vector3 projectedVelocity = Vector3.Project(m_velocity, wallSlideDir);
+                                Vector3 tangent = projectedVelocity;
+                                Vector3.OrthoNormalize(ref normal, ref tangent);
                             }
-
-
                         }
-
-
-
                     }
-
-
-
                 }
+
             }
             //  ---
             //  rigidbody not kinematic
@@ -733,8 +766,10 @@ namespace CharacterController
         /// </summary>
         protected virtual void UpdateRotation()
         {
+            if(MathF.Abs(m_viewAngle) > 30)
+                m_smoothLookDirection = Vector3.Slerp(m_transform.forward, m_lookDirection, 1 - Mathf.Exp(-10 * deltaTime)).normalized;
             m_moveAngle = m_transform.AngleFromForward(m_lookDirection);
-            //m_smoothLookDirection = Vector3.Slerp(m_transform.forward, m_lookDirection, smooth).normalized;
+
             m_moveRotation = Quaternion.AngleAxis(m_moveAngle * m_rotationSpeed * m_deltaTime, m_transform.up);
             //m_moveRotation = Quaternion.AngleAxis(m_moveAngle * m_deltaTime, m_transform.up);
             //m_moveRotation = Quaternion.Slerp(m_transform.rotation, m_moveRotation * m_transform.rotation, t * t * t);
@@ -855,6 +890,8 @@ namespace CharacterController
         #region Kinematic
         protected virtual void UpdatePosition()
         {
+
+
             if (m_grounded) {
             }
             else {
@@ -996,6 +1033,42 @@ namespace CharacterController
 
 
         #region Public Functions
+
+
+        private void CalculatePenetration()
+        {
+            float castRadius = m_collider.radius + m_skinWidth;
+            Vector3 castPosition = m_transform.position.WithY(castRadius);
+            int hits = Physics.OverlapSphereNonAlloc(castPosition, castRadius, m_probedColliders, m_collisionsLayerMask);
+            if (hits > 0)
+            {
+                for (int i = 0; i < hits; i++)
+                {
+                    if(m_probedColliders[i] == m_collider) continue;
+                    Collider collision = m_probedColliders[i];
+                    Vector3 position = castPosition;
+                    Vector3 contactPoint = collision.ClosestPoint(position);
+
+                    if(contactPoint != Vector3.zero)
+                    {
+                        Vector3 contactDirection = contactPoint - m_transform.position;
+
+                        bool overlapped = Physics.ComputePenetration(m_collider, m_transform.position, m_transform.rotation,
+                                                                        collision, collision.transform.position, collision.transform.rotation,
+                                                                        out Vector3 direction, out float distance);
+                        if (overlapped)
+                        {
+                            Vector3 penetrationVector = direction * distance;
+                            Vector3 moveDirectionProjected = Vector3.Project(m_moveDirection, -penetrationVector);
+
+                            m_rigidbody.MovePosition(penetrationVector);
+                            m_moveDirection = m_moveDirection.Subtract(moveDirectionProjected);      //  TODO: optimize me
+                                                                                                        //m_velocity = Vector3.ClampMagnitude(m_velocity, 10);
+                        }
+                    }
+                }
+            }
+        }
 
 
 

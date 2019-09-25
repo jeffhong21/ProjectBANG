@@ -30,27 +30,40 @@ namespace CharacterController
         private const string ActionsFoldoutHeader = "Actions List";
         private const string DebugHeader = "Debug ";
 
+        private CharacterLocomotion m_Controller;
+        private ReorderableList m_ActionsList;
+        private CharacterAction m_SelectedAction;
+        private Editor m_ActionEditor;
 
 
-        CharacterLocomotion m_Controller;
+        //  -- Locomotion variables
+        private SerializedProperty m_useRootMotion;
+        private SerializedProperty m_UseRootMotionRotation;     //  double check
+        private SerializedProperty m_rootMotionSpeedMultiplier;
+        private SerializedProperty m_rootMotionRotationMultiplier;
+        private SerializedProperty m_motorAcceleration;
+        private SerializedProperty m_motorDamping;
+        private SerializedProperty m_acceleration;
+        private SerializedProperty m_desiredSpeed;
+        private SerializedProperty m_rotationSpeed;
 
-        ReorderableList m_ActionsList;
-        CharacterAction m_SelectedAction;
-        Editor m_ActionEditor;
+        //  -- Physics variables
+        private SerializedProperty m_mass;
+        private SerializedProperty m_skinWidth;
+        private SerializedProperty m_slopeLimit;
+        private SerializedProperty m_maxStepHeight;
+        private SerializedProperty m_gravityModifier;
+        private SerializedProperty m_groundStickiness;
 
-
-
-
-        private GUIStyle m_DefaultActionTextStyle = new GUIStyle();
-        private GUIStyle m_ActiveActionTextStyle = new GUIStyle();
-
-
-
-        private float m_LineHeight;
-
+        //  -- Collision variables
+        private SerializedProperty m_collisionsLayerMask;
+        private SerializedProperty m_maxCollisionCount;
 
         private SerializedProperty displayActions;
 
+        private GUIStyle m_DefaultActionTextStyle = new GUIStyle();
+        private GUIStyle m_ActiveActionTextStyle = new GUIStyle();
+        private float m_LineHeight;
 
         protected override void OnEnable()
 		{
@@ -62,6 +75,27 @@ namespace CharacterController
             m_LineHeight = EditorGUIUtility.singleLineHeight;
             m_DefaultActionTextStyle.fontStyle = FontStyle.Normal;
             m_ActiveActionTextStyle.fontStyle = FontStyle.Bold;
+
+
+            m_useRootMotion = serializedObject.FindProperty("m_useRootMotion");
+            m_UseRootMotionRotation = serializedObject.FindProperty("m_UseRootMotionRotation");
+            m_rootMotionSpeedMultiplier = serializedObject.FindProperty("m_rootMotionSpeedMultiplier");
+            m_rootMotionRotationMultiplier = serializedObject.FindProperty("m_rootMotionRotationMultiplier");
+            m_motorAcceleration = serializedObject.FindProperty("m_motorAcceleration");
+            m_motorDamping = serializedObject.FindProperty("m_motorDamping");
+            m_acceleration = serializedObject.FindProperty("m_acceleration");
+            m_desiredSpeed = serializedObject.FindProperty("m_desiredSpeed");
+            m_rotationSpeed = serializedObject.FindProperty("m_rotationSpeed");
+
+            m_mass = serializedObject.FindProperty("m_mass");
+            m_skinWidth = serializedObject.FindProperty("m_skinWidth");
+            m_slopeLimit = serializedObject.FindProperty("m_slopeLimit");
+            m_maxStepHeight = serializedObject.FindProperty("m_maxStepHeight");
+            m_gravityModifier = serializedObject.FindProperty("m_gravityModifier");
+            m_groundStickiness = serializedObject.FindProperty("m_groundStickiness");
+
+            m_collisionsLayerMask = serializedObject.FindProperty("m_collisionsLayerMask");
+            m_maxCollisionCount = serializedObject.FindProperty("m_maxCollisionCount");
 
             displayActions = serializedObject.FindProperty("displayActions");
             m_ActionsList = new ReorderableList(serializedObject, serializedObject.FindProperty("m_actions"), true, true, true, true);
