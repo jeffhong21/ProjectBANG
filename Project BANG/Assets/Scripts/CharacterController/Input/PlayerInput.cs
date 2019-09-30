@@ -298,8 +298,8 @@ namespace CharacterController
             //  Set the look target's position and rotation.
             m_lookRay.origin = transform.position + Vector3.up * m_lookHeight;
             m_lookRay.direction = m_lookDirection;
-            m_lookTarget.position = Vector3.SmoothDamp(m_lookTarget.position, m_lookRay.GetPoint(lookDistance), ref m_targetVelocitySmooth, 0.1f);
-            m_lookTarget.rotation = Quaternion.RotateTowards(m_lookTarget.rotation, m_transform.rotation, m_deltaTime * 4);
+            m_lookTarget.position = Vector3.SmoothDamp(m_lookTarget.position, m_lookRay.GetPoint(lookDistance), ref m_targetVelocitySmooth, 0.12f);
+            //m_lookTarget.rotation = Quaternion.RotateTowards(m_lookTarget.rotation, m_transform.rotation, m_deltaTime * 4);
         }
 
 
@@ -358,7 +358,7 @@ namespace CharacterController
                 if(m_inventoryHandler.equipUnequipAction != null) {
                     for (int number = 1; number < m_inventory.SlotCount + 1; number++) {
                         if (Input.GetKeyDown(number.ToString())) {
-                            m_inventoryHandler.equipUnequipAction.StartEquipUnequipAction(number);
+                            m_inventoryHandler.equipUnequipAction.StartEquipUnequipAction(number-1);
 
                         }
                     }

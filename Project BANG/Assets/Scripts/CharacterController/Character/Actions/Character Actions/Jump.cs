@@ -31,13 +31,14 @@ namespace CharacterController
         protected bool m_hasReachedApex;
         [SerializeField]
         protected bool m_hasLanded;
+
+
+        private bool useGravityCache;
+
+
         //
         // Methods
         //
-
-
-            
-
         public override bool CanStartAction()
         {
             if (!base.CanStartAction()) return false;
@@ -54,16 +55,12 @@ namespace CharacterController
             if (m_StateName.Length == 0)
                 m_animator.SetInteger(HashID.ActionID, m_ActionID);
 
+            useGravityCache = m_rigidbody.useGravity;
+            m_rigidbody.useGravity = false;
+            m_verticalVelocity = new Vector3(0, Mathf.Sqrt(-2 * m_jumpHeight * -9.8f), 0);
 
-            m_verticalVelocity = new Vector3(0, Mathf.Sqrt(-2 * m_jumpHeight * -9.8f) * m_deltaTime, 0);
-            //m_verticalVelocity.x += m_Controller.Velocity.x;
-            //m_verticalVelocity.z += m_Controller.Velocity.z;
-            //m_rigidbody.ResetCenterOfMass();
-            //m_velocity = m_rigidbody.velocity + m_verticalVelocity;
-            //m_velocity = Vector3.ClampMagnitude()
-            //m_rigidbody.velocity += m_verticalVelocity;
 
-            m_rigidbody.AddRelativeForce(m_verticalVelocity.normalized * m_jumpHeight, ForceMode.VelocityChange);
+            m_rigidbody.AddForce(m_verticalVelocity * m_jumpHeight, ForceMode.VelocityChange);
             m_startPosition = m_transform.position;
             m_elapsedTime = 0;
             m_verticalDistance = 0;
@@ -81,6 +78,7 @@ namespace CharacterController
         {
             base.ActionStopped();
 
+            m_rigidbody.useGravity = useGravityCache;
             //m_Controller.Velocity = Vector3.zero;
             m_startJump = m_hasReachedApex = m_hasLanded = false;
             m_verticalVelocity = m_startPosition = Vector3.zero;
@@ -91,24 +89,24 @@ namespace CharacterController
 		{
             //float velocityY = (verticalDistance / time) + 0.5f * Mathf.Abs(Physics.gravity.y) * time;
 
-            if (Time.time < m_ActionStartTime + 0.2f) {
-                m_Controller.Grounded = false;
-                return false;
-            }
+            //if (Time.time < m_ActionStartTime + 0.2f) {
+            //    m_Controller.Grounded = false;
+            //    return false;
+            //}
 
 
-            float radius = 0.1f;
-            Vector3 origin = m_transform.position + Vector3.up * (0.1f);
-            origin += Vector3.up * radius;
+            //float radius = 0.1f;
+            //Vector3 origin = m_transform.position.WithY(0.1f);
+            //origin += Vector3.up * radius;
 
-            if (Physics.SphereCast(origin, radius, Vector3.down, out RaycastHit groundHit, 0.3f * 2, m_layers.SolidLayers))
-            {
-                m_Controller.Grounded = groundHit.distance < 0.3f;
-            }
-            else
-            {
-                m_Controller.Grounded = false;
-            }
+            //if (Physics.SphereCast(origin, radius, Vector3.down, out RaycastHit groundHit, 0.3f * 2, m_layers.SolidLayers))
+            //{
+            //    m_Controller.Grounded = groundHit.distance < 0.3f;
+            //}
+            //else
+            //{
+            //    m_Controller.Grounded = false;
+            //}
 
 
 
@@ -152,6 +150,15 @@ namespace CharacterController
             }
 
 
+
+            if (m_rigidbody.velocity.y < 0) {
+                m_rigidbody.useGravity = useGravityCache;
+                m_Controller.MoveDirection += m_Controller.Gravity * m_deltaTime;
+            }
+
+            
+
+
             //m_elapsedTime += m_deltaTime;
             //m_verticalDirection = m_transform.position - m_startPosition;
             ////m_verticalDirection = Vector3.Project(m_verticalDirection, Vector3.up);
@@ -191,7 +198,7 @@ namespace CharacterController
             //}
 
 
-            return true;
+            return false;
         }
 
 

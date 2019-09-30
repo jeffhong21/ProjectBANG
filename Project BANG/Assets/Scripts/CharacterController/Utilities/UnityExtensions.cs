@@ -141,4 +141,14 @@ public static class UnityExtensions
 
     #endregion
 
+
+
+    #region LayerMask Ext
+
+    public static bool Contains(this LayerMask layers, GameObject gameObject)
+    {
+        return 0 != (layers.value & 1 << gameObject.layer);
+    }
+
+    #endregion
 }

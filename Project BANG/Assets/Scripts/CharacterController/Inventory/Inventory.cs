@@ -1,6 +1,6 @@
 ﻿namespace CharacterController
 {
-    /*  TODO: Add a set itemType count method.
+    /*  
      *
      *
      *
@@ -8,6 +8,7 @@
      *
      * */
     using UnityEngine;
+    using UnityEngine.Serialization;
     using System;
     using System.Collections;
 
@@ -16,35 +17,34 @@
     [DisallowMultipleComponent]
     public class Inventory : InventoryBase
     {
-        [Serializable]
-        public struct InventorySlot
-        {
-            public Item item;
-            public int quantity;
-            public bool isActive;
-        }
-
-        [SerializeField, DisplayOnly]
-        protected Item equppiedItem;
-        [SerializeField, DisplayOnly]
-        protected Item previouslyEquippedItem;
-        [SerializeField, DisplayOnly]
-        protected int nextActiveSlot;
 
 
         [SerializeField, DisplayOnly]
-        protected InventorySlot[] m_inventorySlot;
+        protected Item m_equippedItem;
+        [SerializeField, DisplayOnly]
+        protected Item m_previouslyEquippedItem;
+        [SerializeField, DisplayOnly]
+        protected int m_nextActiveSlot;
+        [Tooltip("The max amount of inventory slots.")]
+        [SerializeField] protected int m_slotCount = 6;
+
+        [SerializeField] protected InventorySlot[] m_inventorySlots;
+
+
+        //  
+        //  Properties
+        //
 
         public Item EquippedItem {
-            get { return equppiedItem; }
+            get { return m_equippedItem; }
         }
 
         protected int NextActiveSlot {
             get {
-                for (int i = 0; i < m_inventorySlot.Length + 0; i++) {
-                    if (m_inventorySlot[i].item == null) {
-                        nextActiveSlot = i;
-                        return nextActiveSlot;
+                for (int i = 0; i < m_inventorySlots.Length + 0; i++) {
+                    if (m_inventorySlots[i].item == null) {
+                        m_nextActiveSlot = i;
+                        return m_nextActiveSlot;
                     }
                         
                 }
@@ -52,7 +52,7 @@
             }
         }
 
-
+        public int SlotCount { get { return m_slotCount; } }
 
 
         #region Sockets
@@ -61,7 +61,8 @@
         #endregion
 
 
-        [Header("----- Debug -----")]
+
+        [FormerlySerializedAs("m_debug")]
         [SerializeField] private bool m_debug;
 
 
@@ -69,7 +70,7 @@
 
         private void Start()
         {
-            m_inventorySlot = new InventorySlot[SlotCount];
+
             EventHandler.RegisterEvent<ItemAction, bool>(m_gameObject, EventIDs.OnItemActionActive, OnItemActionActive);
 
             //  Get item sockets.
@@ -99,8 +100,22 @@
 
         private void OnValidate()
         {
-            if (m_animator == null) m_animator = GetComponent<Animator>();
+            if(m_inventorySlots != null){
+                int oldSlotCount = m_inventorySlots.Length;
+                Array.Resize(ref m_inventorySlots, m_slotCount);
+                if(m_slotCount > oldSlotCount) {
+                    for (int i = oldSlotCount; i < m_slotCount; i++) {
+                        m_inventorySlots[i] = new InventorySlot();
+                    }
+                }
+            }
+            else {
+                m_inventorySlots = new InventorySlot[m_slotCount];
+            }
+            
 
+
+            if (m_animator == null) m_animator = GetComponent<Animator>();
             if (m_animator != null) SetSockets(m_animator);
         }
 
@@ -143,12 +158,12 @@
                 }
             }
 
-            if (m_debug) {
-                for (int i = 0; i < m_inventorySlot.Length; i++) {
-                    var itemSlot = m_inventorySlot[i];
-                    Debug.Log(itemSlot.item != null ? itemSlot.item.name + " | equipped: (" + itemSlot.isActive + ") " : "[<b>Slot (" + (int)(i + 1) + "</b>] is empty>");
-                }
-            }
+            //if (m_debug) {
+            //    for (int i = 0; i < m_inventorySlots.Length; i++) {
+            //        var itemSlot = m_inventorySlots[i];
+            //        Debug.Log(itemSlot.item != null ? itemSlot.item.name + " | equipped: (" + itemSlot.isActive + ") " : "[<b>Slot (" + (int)(i + 1) + "</b>] is empty>");
+            //    }
+            //}
 
         }
 
@@ -182,7 +197,7 @@
                 Item item;
                 if (m_ItemTypeItemMap.TryGetValue(itemType, out item)) {
                     if (NextActiveSlot >= 0) {
-                        m_inventorySlot[NextActiveSlot].item = item;
+                        m_inventorySlots[NextActiveSlot].item = item;
                     }
                 }
 
@@ -208,8 +223,8 @@
 
             if(item != null) {
                 //  Remove the item from the inventory slot.
-                if (m_inventorySlot[slotIndex].item != null && m_inventorySlot[slotIndex].item.ItemType == itemType) {
-                    m_inventorySlot[slotIndex].item = null;
+                if (m_inventorySlots[slotIndex].item != null && m_inventorySlots[slotIndex].item.ItemType == itemType) {
+                    m_inventorySlots[slotIndex].item = null;
                 }
             }
             return item;
@@ -258,7 +273,7 @@
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public override Item GetItem( int index ) { return m_inventorySlot[index].item; }
+        public override Item GetItem( int index ) { return m_inventorySlots[index].item; }
 
 
         /// <summary>
@@ -268,7 +283,7 @@
         /// <returns></returns>
         public int GetItemSlotIndex( ItemType itemType )
         {
-            for (int index = 0; index < m_inventorySlot.Length; index++) {
+            for (int index = 0; index < m_inventorySlots.Length; index++) {
                 if (GetItem(index).ItemType == itemType) {
                     return index;
                 }
@@ -284,9 +299,9 @@
         /// <returns></returns>
         public bool HasItem( Item item )
         {
-            for (int i = 0; i < m_inventorySlot.Length; i++) {
-                if (m_inventorySlot[i].item == null) { continue; }
-                if (m_inventorySlot[i].item != item) { continue; }
+            for (int i = 0; i < m_inventorySlots.Length; i++) {
+                if (m_inventorySlots[i].item == null) { continue; }
+                if (m_inventorySlots[i].item != item) { continue; }
                 return true;
             }
             return false;
@@ -308,21 +323,22 @@
                 return null;
             }
 
-            Item item = m_inventorySlot[slotIndex].item;
+            Item item = m_inventorySlots[slotIndex].item;
 
-            if (item != null)
+            if (m_equippedItem == item) {
+                UnequipCurrentItem();
+            }
+            else if (item != null)
             {
-                previouslyEquippedItem = equppiedItem;
-                equppiedItem = item;
+                m_previouslyEquippedItem = m_equippedItem;
+                m_equippedItem = item;
 
                 //  Execute the equip event.
                 InternalEquipItem(item);
                 //  Set is switching to off.
                 IsSwitching = false;
             }
-            else if(equppiedItem == item) {
-                UnequipCurrentItem();
-            }
+
 
             return item;
         }
@@ -366,14 +382,14 @@
 
         public void UnequipCurrentItem()
         {
-            if (equppiedItem != null) {
+            if (m_equippedItem != null) {
                 IsSwitching = true;
                 //  Execute the equip event.
-                InternalUnequipCurrentItem(previouslyEquippedItem);
+                InternalUnequipCurrentItem(m_previouslyEquippedItem);
             }
 
-            previouslyEquippedItem = equppiedItem;
-            equppiedItem = null;
+            m_previouslyEquippedItem = m_equippedItem;
+            m_equippedItem = null;
 
 
         }
@@ -404,9 +420,9 @@
 
         protected void UpdateInventorySlots( int slot1, int slot2 )
         {
-            var tempSlot = m_inventorySlot[slot2];
-            m_inventorySlot[slot2] = m_inventorySlot[slot1];
-            m_inventorySlot[slot1] = tempSlot;
+            var tempSlot = m_inventorySlots[slot2];
+            m_inventorySlots[slot2] = m_inventorySlots[slot1];
+            m_inventorySlots[slot1] = tempSlot;
         }
 
 
@@ -429,6 +445,28 @@
 
 
 
+
+
+
+
+
+
+        GUIStyle guiStyle = new GUIStyle();
+        Rect rect = new Rect();
+        private void OnGUI()
+        {
+            guiStyle.normal.textColor = Color.black;
+            guiStyle.richText = true;
+            rect.width = Screen.width * 0.25f;
+            rect.x = (Screen.width * 0.5f) - (rect.width * 0.5f);
+            
+            rect.height = 16;
+            rect.y = Screen.height - rect.height * 2;
+            GUI.Label(rect, m_equippedItem == null ? "Nothing equipped" : "Currently Equipped: <b>" + m_equippedItem.ItemType.name + "</b>", guiStyle);
+
+
+
+        }
 
 
     }

@@ -12,7 +12,7 @@ namespace CharacterController
         }
 
 
-        [SerializeField] protected int maxInputCount = 4;
+        [SerializeField] protected int maxInputCount = 15;
 
 
         protected int detectionCount;
@@ -21,6 +21,10 @@ namespace CharacterController
         protected float currentMoveAmount;
         protected bool isStartingToMove;
         protected float moveAmount;
+
+        protected bool m_wasPreviouslyMoving;
+        protected bool m_isCurrentlyMoving;
+
 		//
 		// Methods
 		//
@@ -28,19 +32,36 @@ namespace CharacterController
         {
             if (!m_Controller.Grounded) return false;
 
+            //m_wasPreviouslyMoving = m_isCurrentlyMoving;
+            //m_isCurrentlyMoving = m_Controller.Grounded;
+
+            //if (m_isCurrentlyMoving && !m_wasPreviouslyMoving)
+            //    isStartingToMove = true;
+
+            //if (m_wasPreviouslyMoving == false && m_isCurrentlyMoving == false) return false;
+
+            //if (isStartingToMove) {
+            //    if (detectionCount >= maxInputCount) {
+            //        detectionCount = 0;
+            //        isStartingToMove = false;
+            //        return true;
+            //    }
+            //    detectionCount++;
+            //}
+
+
 
             lastMoveAmount = currentMoveAmount;
             currentMoveAmount = Mathf.Clamp01(Mathf.Abs(m_Controller.InputVector.x) + Mathf.Abs(m_Controller.InputVector.z));
-
 
             if (Math.Abs(lastMoveAmount) < float.Epsilon && currentMoveAmount > 0)
                 isStartingToMove = true;
 
             //if (lastMoveAmount < currentMoveAmount) 
             //    isStartingToMove = true;
-            
 
-            if (isStartingToMove){
+
+            if (isStartingToMove) {
                 if (detectionCount >= maxInputCount) {
                     detectionCount = 0;
                     isStartingToMove = false;
@@ -49,7 +70,7 @@ namespace CharacterController
                 detectionCount++;
             }
 
-            if(currentMoveAmount >= 1) {
+            if (currentMoveAmount >= 1) {
                 detectionCount = 0;
                 isStartingToMove = false;
             }

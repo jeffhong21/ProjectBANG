@@ -67,29 +67,8 @@
         }
 
 
-        private void Start()
-        {
 
-            activeCameraIndex = 0;
-            if(m_virtualCameras.Length > 0)
-            {
-                for (int i = 0; i < m_virtualCameras.Length; i++)
-                {
-                    m_virtualCameras[i].Initialize();
-                    m_virtualCameras[i].VirtualCamera.gameObject.SetActive(false);
-                }
-                m_virtualCameras[0].VirtualCamera.gameObject.SetActive(true);
-            }
-
-            m_camera = m_cmBrain.OutputCamera;
-
-            if(m_followTarget != null && m_virtualCameras[0].VirtualCamera is CinemachineFreeLook)
-            {
-                var cmFreeLook = (CinemachineFreeLook)m_virtualCameras[0].VirtualCamera;
-                cmFreeLook.m_XAxis.Value = m_followTarget.eulerAngles.y;
-            }
-        }
-
+#if UNITY_EDITOR
 
         private void OnValidate()
         {
@@ -106,6 +85,34 @@
             }
 
 
+        }
+
+#endif
+
+
+        private void Start()
+        {
+
+            activeCameraIndex = 0;
+            if (m_virtualCameras.Length > 0) {
+                for (int i = 0; i < m_virtualCameras.Length; i++) {
+                    m_virtualCameras[i].Initialize();
+                    m_virtualCameras[i].VirtualCamera.gameObject.SetActive(false);
+                }
+                m_virtualCameras[0].VirtualCamera.gameObject.SetActive(true);
+            }
+
+            m_camera = m_cmBrain.OutputCamera;
+
+            if (m_followTarget != null && m_virtualCameras[0].VirtualCamera is CinemachineFreeLook) {
+                var cmFreeLook = (CinemachineFreeLook)m_virtualCameras[0].VirtualCamera;
+                cmFreeLook.m_XAxis.Value = m_followTarget.eulerAngles.y;
+            }
+        }
+
+        private void OnEnable()
+        {
+            
         }
 
 
@@ -130,8 +137,12 @@
 
 
 
-
-
+        // Event registered to handle the Recentering of the CM Freelook camera
+        private void RecenterCamera()
+        {
+            //only recenter if there is no user input
+            //System.NotImplementedException.
+        }
 
 
 

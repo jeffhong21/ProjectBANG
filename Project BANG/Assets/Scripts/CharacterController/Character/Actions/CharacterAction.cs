@@ -386,18 +386,19 @@
 
         public void StartAction()
         {
+            //  Initialize action start.
+            ActionStarted();
+
+
             m_ActionStartTime = Time.time;
             m_IsActive = true;
             EventHandler.ExecuteEvent(m_gameObject, EventIDs.OnCharacterActionActive, this, m_IsActive);
 
-            //m_FullPathHash = Animator.StringToHash(string.Format("{0}.{1}", m_StateName, GetDestinationState(m_LayerIndex)));
-            m_animator.SetInteger(HashID.ActionID, m_ActionID);
-            m_animator.SetTrigger(HashID.ActionChange);
 
             m_animatorMonitor.SetActionID(m_ActionID);
-            //m_animatorMonitor.Set
-            //  Initialize action start.
-            ActionStarted();
+            m_animatorMonitor.ActionChanged();
+
+
             //  Loop through all layers and play destination states.
             for (int layer = 0; layer < m_animator.layerCount; layer++)
             {
@@ -411,14 +412,8 @@
 
                     }
                 }
-
-
-
-                //if (m_TransitionDuration > 0)
-                //    m_animator.CrossFade(GetDestinationState(index), m_TransitionDuration, index);
-                //else
-                //m_animator.Play(GetDestinationState(index), index);
             }
+
 
             if(Time.time > m_StartEffectStartTime + m_EffectCooldown)
                 PlayEffect(m_StartEffect, ref m_StartEffectStartTime);

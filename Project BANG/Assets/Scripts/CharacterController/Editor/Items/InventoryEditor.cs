@@ -12,13 +12,23 @@
     {
         private static readonly string[] m_DontIncude = { "m_Script", "m_DefaultLoadout" };
 
+        private static int m_intFieldWidth = 36;
 
 
         private Inventory m_Inventory;
         private ReorderableList m_DefaultLoadoutList;
+        private ReorderableList m_InventorySlotsList;
+
 
         private SerializedProperty m_Script;
         private SerializedProperty m_DefaultLoadout;
+        private SerializedProperty m_slotCount;
+        private SerializedProperty m_inventorySlots;
+
+        private SerializedProperty m_debug;
+        private SerializedProperty m_equippedItem;
+        private SerializedProperty m_previouslyEquippedItem;
+        private SerializedProperty m_nextActiveSlot;
 
 
         string itemTypeCount = "";
@@ -30,16 +40,18 @@
 
             m_Script = serializedObject.FindProperty("m_Script");
             m_DefaultLoadout = serializedObject.FindProperty("m_DefaultLoadout");
+            m_slotCount = serializedObject.FindProperty("m_slotCount");
+            m_inventorySlots = serializedObject.FindProperty("m_inventorySlots");
+            //m_inventorySlots.arraySize =
+
+            m_debug = serializedObject.FindProperty("m_debug");
+            m_equippedItem = serializedObject.FindProperty("m_equippedItem");
+            m_previouslyEquippedItem = serializedObject.FindProperty("m_previouslyEquippedItem");
+            m_nextActiveSlot = serializedObject.FindProperty("m_nextActiveSlot");
 
             m_DefaultLoadoutList = new ReorderableList(serializedObject, m_DefaultLoadout, true, true, true, true);
+            m_InventorySlotsList = new ReorderableList(serializedObject, m_inventorySlots, true, false, false, false);
 
-            //if(m_Inventory.ItemTypeCount != null)
-            //{
-            //    foreach (var item in m_Inventory.ItemTypeCount)
-            //    {
-            //        itemTypeCount += "<b>ItemType:</b> " + item.Key + " | Count:" + item.Value + "\n";
-            //    }
-            //}
         }
 
 
@@ -47,42 +59,84 @@
         {
             serializedObject.Update();
 
-            GUILayout.Space(12);
-            GUI.enabled = false;
-            EditorGUILayout.PropertyField(m_Script);
-            GUI.enabled = true;
+            InspectorUtility.PropertyField(serializedObject.FindProperty("m_Script"));
 
-            SerializedProperty m_InventorySlots = serializedObject.FindProperty("m_InventorySlots");
+            EditorGUILayout.PropertyField(m_slotCount);
 
-
-            //GUI.enabled = itemTypeCount.Length > 0;
-            //m_InventorySlots.isExpanded = EditorGUILayout.Foldout(m_InventorySlots.isExpanded, m_InventorySlots.displayName);
-            //if (m_InventorySlots.isExpanded){
-            //    for (int i = 0; i < m_InventorySlots.arraySize; i++) {
-            //        EditorGUILayout.PropertyField(m_InventorySlots.GetArrayElementAtIndex(i));
-
-            //    }   
-            //}
-            //GUI.enabled = true;
-
+            //EditorGUI.indentLevel++;
             m_DefaultLoadout.isExpanded = EditorGUILayout.Foldout(m_DefaultLoadout.isExpanded, m_DefaultLoadout.displayName);
             if (m_DefaultLoadout.isExpanded) DrawReorderableList(m_DefaultLoadoutList);
-
-            //InspectorUtility.PropertyField(serializedObject.FindProperty("m_SlotCount"));
-            //EditorGUI.indentLevel++;
-            //InspectorUtility.PropertyField(serializedObject.FindProperty("m_LeftItemSlot"));
-            //InspectorUtility.PropertyField(serializedObject.FindProperty("m_RightItemSlot"));
             //EditorGUI.indentLevel--;
 
-            DrawPropertiesExcluding(serializedObject, m_DontIncude);
+
+            //EditorGUI.indentLevel++;
+            m_inventorySlots.isExpanded = EditorGUILayout.Foldout(m_inventorySlots.isExpanded, m_inventorySlots.displayName);
+            if (m_inventorySlots.isExpanded) {
+                DrawInventorySlots();
+            }
+            //EditorGUI.indentLevel--;
 
 
 
 
 
+            EditorGUILayout.Space();
+            EditorGUILayout.PropertyField(m_debug);
+            if (m_debug.boolValue)
+            {
+                GUI.enabled = false;
+                EditorGUI.indentLevel++;
+                EditorGUILayout.PropertyField(m_equippedItem);
+                EditorGUILayout.PropertyField(m_previouslyEquippedItem);
+                EditorGUILayout.PropertyField(m_nextActiveSlot);
+                EditorGUI.indentLevel--;
+                GUI.enabled = true;
+            }
+
+
+            //DrawPropertiesExcluding(serializedObject, m_DontIncude);
 
             serializedObject.ApplyModifiedProperties();
         }
+
+
+
+        private void DrawInventorySlots()
+        {
+            m_InventorySlotsList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
+            {
+                rect.y += 2;
+                SerializedProperty element = m_InventorySlotsList.serializedProperty.GetArrayElementAtIndex(index);
+                SerializedProperty item = element.FindPropertyRelative("item");
+                SerializedProperty quantity = element.FindPropertyRelative("quantity");
+                //SerializedProperty isActive = property.FindPropertyRelative("isActive");
+
+                GUI.enabled = item.objectReferenceValue != null;
+                Rect elementRect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight);
+                //elementRect.x += rect.width * 0.4f;
+                elementRect.width = rect.width * 0.36f;
+                EditorGUI.ObjectField(elementRect, item.objectReferenceValue, typeof(Item), true);
+
+                elementRect.width = m_intFieldWidth;
+                elementRect.x = rect.width - (elementRect.width * 0.5f);
+                quantity.intValue = EditorGUI.IntField(elementRect, quantity.intValue);
+
+                GUI.enabled = true;
+            };
+
+            m_InventorySlotsList.drawHeaderCallback = (Rect rect) =>
+            {
+                //m_DefaultLoadout.isExpanded = EditorGUI.ToggleLeft(rect, "ItemType", m_DefaultLoadout.isExpanded);
+                rect.x += 12;
+                EditorGUI.LabelField(rect, "Item");
+                rect.x = rect.width - m_intFieldWidth;
+                EditorGUI.LabelField(rect, "Quantity");
+
+            };
+
+            m_InventorySlotsList.DoLayoutList();
+        }
+
 
 
 
@@ -93,16 +147,40 @@
             {
                 rect.y += 2;
                 SerializedProperty element = list.serializedProperty.GetArrayElementAtIndex(index);
-                //SerializedObject elementObj = new SerializedObject(element.objectReferenceValue);
-                //elementObj.Update();
+                SerializedProperty m_Item = element.FindPropertyRelative("m_Item");
+                SerializedProperty m_Amount = element.FindPropertyRelative("m_Amount");
+                SerializedProperty m_Equip = element.FindPropertyRelative("m_Equip");
+                ItemType itemType = (ItemType)m_Item.objectReferenceValue;
 
                 Rect elementRect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight);
 
+                //  ItemType Scriptableobject
+                elementRect.width = rect.width * 0.95f - m_intFieldWidth - 4;
+                EditorGUI.ObjectField(elementRect, m_Item, GUIContent.none);
 
-                //EditorGUI.LabelField(rect, m_Inventory.DefaultLoadout[index].GetType().Name);
-                DrawDefaultLoadoutElement(elementRect, element);
+                //  Amount field.
+                elementRect.width = m_intFieldWidth;
+                elementRect.x = rect.width - (elementRect.width * 0.5f);
+                EditorGUI.PropertyField(elementRect, m_Amount, GUIContent.none);
 
-                //elementObj.ApplyModifiedProperties();
+
+                ////  Toggle Enable
+                //elementRect.x = rect.width - elementRect.width;
+                ////elementRect.width = m_intFieldWidth;
+                //EditorGUI.PropertyField(elementRect, m_Equip, GUIContent.none);
+                //if (m_Equip.boolValue) {
+                //    if (index < list.list.Count - 1) {
+                //        for (int i = index + 1; i < list.list.Count; i++) {
+                //            SerializedProperty nextElement = list.serializedProperty.GetArrayElementAtIndex(i);
+                //            SerializedProperty nextElementEquip = nextElement.FindPropertyRelative("m_Equip");
+                //            nextElementEquip.boolValue = false;
+                //        }
+                //    }
+                //}
+                ////EditorGUI.LabelField(rect, m_Inventory.DefaultLoadout[index].GetType().Name);
+                //DrawDefaultLoadoutElement(elementRect, element);
+
+                ////elementObj.ApplyModifiedProperties();
             };
 
             list.drawHeaderCallback = (Rect rect) =>
@@ -110,16 +188,16 @@
                 //m_DefaultLoadout.isExpanded = EditorGUI.ToggleLeft(rect, "ItemType", m_DefaultLoadout.isExpanded);
                 rect.x += 12;
                 EditorGUI.LabelField(rect, "Items");
-                rect.x = rect.width - 36;
+                rect.x = rect.width - m_intFieldWidth;
                 EditorGUI.LabelField(rect, "Amount");
 
             };
 
 
-            list.onSelectCallback = (ReorderableList l) =>
-            {
+            //list.onSelectCallback = (ReorderableList l) =>
+            //{
 
-            };
+            //};
 
 
             list.onAddDropdownCallback = (Rect buttonRect, ReorderableList l) =>
@@ -136,13 +214,15 @@
 
             list.onRemoveCallback = (ReorderableList l) =>
             {
-                RemoveCharacterAction(l.index);
+                SerializedProperty serializedList = m_DefaultLoadoutList.serializedProperty;
+                serializedList.DeleteArrayElementAtIndex(l.index);
+
+                serializedObject.ApplyModifiedProperties();
             };
 
 
             list.DoLayoutList();
         }
-
 
         private void AddItemToDefaultLoadout(string itemPath)
         {
@@ -160,46 +240,6 @@
             itemProperty.objectReferenceValue = item;
 
             serializedObject.ApplyModifiedProperties();
-        }
-
-        private void RemoveCharacterAction(int index)
-        {
-            SerializedProperty serializedList = m_DefaultLoadoutList.serializedProperty;
-            serializedList.DeleteArrayElementAtIndex(index);
-
-
-            serializedObject.ApplyModifiedProperties();
-            //m_Controller.CharActions = ShrinkArray(m_Controller.CharActions, idx);
-        }
-
-
-        private void DrawDefaultLoadoutElement(Rect elementRect, SerializedProperty element)
-        {
-            Rect rect = elementRect;
-            int intFieldWidth = 36;
-            //SerializedObject elementObj = new SerializedObject(m_Inventory.DefaultLoadout[index].ItemType);
-            SerializedProperty m_Item = element.FindPropertyRelative("m_Item");
-            SerializedProperty m_Amount = element.FindPropertyRelative("m_Amount");
-            SerializedProperty m_Equip = element.FindPropertyRelative("m_Equip");
-            ItemType itemType = (ItemType)m_Item.objectReferenceValue;
-
-            //EditorGUI.LabelField(rect, m_Inventory.DefaultLoadout[index].ItemType.ItemAnimName);
-
-            //  ItemType Scriptableobject
-            rect.width = elementRect.width * 0.95f - intFieldWidth - 4;
-            EditorGUI.ObjectField(rect, m_Item, GUIContent.none);
-            ////  Toggle Enable
-            //rect.x = elementRect.width + 12;
-            //rect.width = intFieldWidth; ;
-            //EditorGUI.PropertyField(rect, m_Equip, GUIContent.none);
-
-            //  Amount field.
-            rect.width = intFieldWidth;
-            rect.x = elementRect.width - (rect.width * 0.5f);
-            EditorGUI.PropertyField(rect, m_Amount, GUIContent.none);
-
-
-
         }
 
 

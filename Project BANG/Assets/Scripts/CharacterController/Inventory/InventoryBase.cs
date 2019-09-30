@@ -34,8 +34,6 @@ namespace CharacterController
 
         [Tooltip("The ItemTypes that the character starts out with.")]
         [SerializeField] protected ItemAmount[] m_DefaultLoadout = new ItemAmount[0];
-        [Tooltip("The max amount of inventory slots.")]
-        [SerializeField] protected int m_SlotCount = 6;
 
 
 
@@ -55,7 +53,7 @@ namespace CharacterController
         //
         //  Properties
         //  
-        public int SlotCount { get { return m_SlotCount; } }
+
 
         public bool IsSwitching { get; protected set; }
 

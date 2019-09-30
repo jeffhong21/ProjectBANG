@@ -7,14 +7,14 @@ namespace CharacterController
     public class FinalIKController : CharacterIKBase
     {
         [Header("Full Body IK")]
-        public FullBodyBipedIK fbIK;
+        public FullBodyBipedIK m_fullbodyIK;
         [SerializeField]
-        protected Transform rightHandTarget, leftHandTarget, bodyEffectorTarget, lookTarget;
+        protected Transform rightHandTarget, leftHandTarget, bodyEffectorTarget, m_lookTarget;
         [Header("GrounderIK")]
         public GrounderFBBIK grounderIK;
 
         [Header("LookAtIK")]
-        public LookAtIK lookAtIK;
+        public LookAtIK m_lookAtIK;
 
         [Header("AimIK")]
         public AimIK aimIK;
@@ -29,7 +29,14 @@ namespace CharacterController
 
 
 
-        public Transform LookTarget { get { return lookTarget; } set { lookTarget = value; } }
+        public Transform LookTarget {
+            get { return m_lookTarget;
+        }
+            set {
+                m_lookTarget = value;
+                //if(m_lookAtIK != null) m_lookAtIK.solver.target = m_lookTarget;
+            }
+        }
 
 
 
@@ -46,32 +53,50 @@ namespace CharacterController
 
         protected override void Initialize()
         {
-            if (rightHandTarget == null) rightHandTarget = CreateIKEffectors("RightHand Effector Target", m_animator.GetBoneTransform(HumanBodyBones.RightHand).position, m_animator.GetBoneTransform(HumanBodyBones.RightHand).rotation);
-            if (leftHandTarget == null) leftHandTarget = CreateIKEffectors("LeftHand Effector Target", m_animator.GetBoneTransform(HumanBodyBones.LeftHand).position, m_animator.GetBoneTransform(HumanBodyBones.LeftHand).rotation);
-            if (bodyEffectorTarget == null) bodyEffectorTarget = CreateIKEffectors("Body Effector Target", m_animator.GetBoneTransform(HumanBodyBones.Hips).position, m_animator.GetBoneTransform(HumanBodyBones.Hips).rotation);
+            if (m_fullbodyIK == null) m_fullbodyIK = GetComponent<FullBodyBipedIK>();
+            if (m_fullbodyIK != null) {
+                if (rightHandTarget == null) {
+                    rightHandTarget = CreateIKEffectors("RightHand Effector Target", m_animator.GetBoneTransform(HumanBodyBones.RightHand).position, m_animator.GetBoneTransform(HumanBodyBones.RightHand).rotation);
+                    m_fullbodyIK.solver.rightHandEffector.target = rightHandTarget;
+                }
+                if (leftHandTarget == null) {
+                    leftHandTarget = CreateIKEffectors("LeftHand Effector Target", m_animator.GetBoneTransform(HumanBodyBones.LeftHand).position, m_animator.GetBoneTransform(HumanBodyBones.LeftHand).rotation);
+                    m_fullbodyIK.solver.leftHandEffector.target = leftHandTarget;
 
-            if (lookTarget == null)
-            {
-                lookTarget = CreateIKEffectors("LookAt Target", m_animator.GetBoneTransform(HumanBodyBones.Head).position + transform.forward, Quaternion.identity);
-                lookTarget.position = m_animator.GetBoneTransform(HumanBodyBones.Neck).position + transform.forward * 10;
+                }
+                if (bodyEffectorTarget == null) {
+                    bodyEffectorTarget = CreateIKEffectors("Body Effector Target", m_animator.GetBoneTransform(HumanBodyBones.Hips).position, m_animator.GetBoneTransform(HumanBodyBones.Hips).rotation);
+                    m_fullbodyIK.solver.bodyEffector.target = bodyEffectorTarget;
+
+                }
             }
 
 
-            fbIK.solver.rightHandEffector.target = rightHandTarget;
-            fbIK.solver.leftHandEffector.target = leftHandTarget;
-            fbIK.solver.bodyEffector.target = bodyEffectorTarget;
+            if (m_lookAtIK == null) m_lookAtIK = GetComponent<LookAtIK>();
+            if (m_lookAtIK != null) {
+                if (m_lookTarget == null) {
+                    m_lookTarget = CreateIKEffectors("LookAt Target", m_animator.GetBoneTransform(HumanBodyBones.Head).position + transform.forward, Quaternion.identity);
+                    m_lookTarget.position = m_animator.GetBoneTransform(HumanBodyBones.Neck).position + transform.forward * 10;
+                    m_lookAtIK.solver.target = m_lookTarget;
+                }
+                m_lookAtIK.solver.head = new IKSolverLookAt.LookAtBone(m_animator.GetBoneTransform(HumanBodyBones.Head));
 
-
-            lookAtIK.solver.target = lookTarget;
-            lookAtIK.solver.head = new IKSolverLookAt.LookAtBone(m_animator.GetBoneTransform(HumanBodyBones.Head));
-            IKSolverLookAt.LookAtBone[] spineBones =
-                {
+                IKSolverLookAt.LookAtBone[] spineBones =
+    {
                 new IKSolverLookAt.LookAtBone(m_animator.GetBoneTransform(HumanBodyBones.Spine)),
                 new IKSolverLookAt.LookAtBone(m_animator.GetBoneTransform(HumanBodyBones.Chest)),
                 new IKSolverLookAt.LookAtBone(m_animator.GetBoneTransform(HumanBodyBones.UpperChest)),
                 new IKSolverLookAt.LookAtBone(m_animator.GetBoneTransform(HumanBodyBones.Neck))
             };
-            lookAtIK.solver.spine = spineBones;
+                m_lookAtIK.solver.spine = spineBones;
+            }
+
+
+
+
+
+
+
 
 
             //  ---------------
@@ -94,9 +119,9 @@ namespace CharacterController
         private void OnValidate()
         {
             var ikComponents = new List<IK>();
-            if (fbIK != null) ikComponents.Add(fbIK);
+            if (m_fullbodyIK != null) ikComponents.Add(m_fullbodyIK);
             //if (grounderIK != null) ikComponents.Add(grounderIK);
-            if (lookAtIK != null) ikComponents.Add(lookAtIK);
+            if (m_lookAtIK != null) ikComponents.Add(m_lookAtIK);
             if (aimIK != null) ikComponents.Add(aimIK);
 
 
@@ -205,13 +230,13 @@ namespace CharacterController
             //// Updating the IK solvers in a specific order. 
             //foreach (IK component in components) component.GetIKSolver().Update();
 
-            var lookTargetDir = lookTarget.position - transform.position;
+            var lookTargetDir = m_lookTarget.position - transform.position;
             var angleDif = Vector3.Angle(transform.forward, lookTargetDir);
 
 
-            lookAtIK.solver.IKPositionWeight = Mathf.SmoothDamp(lookAtIK.solver.IKPositionWeight, (angleDif > 75) ? 0 : lookWeight, ref lookWeightVelocity, weightSmoothTime);
-            if (lookAtIK.solver.IKPositionWeight >= 0.999f) lookAtIK.solver.IKPositionWeight = 1f;
-            if (lookAtIK.solver.IKPositionWeight <= 0.001f) lookAtIK.solver.IKPositionWeight = 0f;
+            m_lookAtIK.solver.IKPositionWeight = Mathf.SmoothDamp(m_lookAtIK.solver.IKPositionWeight, (angleDif > 75) ? 0 : lookWeight, ref lookWeightVelocity, weightSmoothTime);
+            if (m_lookAtIK.solver.IKPositionWeight >= 0.999f) m_lookAtIK.solver.IKPositionWeight = 1f;
+            if (m_lookAtIK.solver.IKPositionWeight <= 0.001f) m_lookAtIK.solver.IKPositionWeight = 0f;
 
             //CharacterDebug.Log("Look Target Angle difference", angleDif);
         }

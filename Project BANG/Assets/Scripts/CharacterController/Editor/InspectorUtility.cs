@@ -10,6 +10,9 @@ public static class InspectorUtility
     private static GUIStyle foldoutStyle;
 
 
+
+
+
     static InspectorUtility()
     {
         labelFieldStyle = new GUIStyle()
@@ -69,8 +72,17 @@ public static class InspectorUtility
             EditorGUILayout.HelpBox("Property " + property.name + " does not exist", MessageType.Error);
             return;
         }
-        
-        if(property.isArray && includeChildren)
+
+        if(property.name == "m_Script")
+        {
+            EditorGUILayout.Space();
+            GUI.enabled = false;
+            EditorGUILayout.PropertyField(property);
+            GUI.enabled = true;
+            GUILayout.Space(EditorGUIUtility.singleLineHeight);
+
+        }
+        else if(property.isArray && includeChildren)
         {
             if(property.propertyType == SerializedPropertyType.String){
                 EditorGUILayout.PropertyField(property, false);
@@ -95,6 +107,17 @@ public static class InspectorUtility
         }
     }
 
+
+    public static void ScriptPropertyField(SerializedObject serializedObject, bool enable = false)
+    {
+        if(serializedObject != null)
+        {
+            GUI.enabled = enable;
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"));
+            GUI.enabled = true;
+        }
+
+    }
 
 
     public static bool Foldout(bool display, string title, int fontSize, FontStyle fontStyle = FontStyle.Normal)

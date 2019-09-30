@@ -1,82 +1,63 @@
-﻿namespace CharacterController
+﻿using System;
+using System.Collections;
+using UnityEngine;
+using UnityEngine.Events;
+
+using CharacterController.CharacterInventory;
+
+namespace CharacterController
 {
-    using System;
-    using System.Collections;
-    using UnityEngine;
-    using UnityEngine.Events;
-
-    using CharacterController.CharacterInventory;
-
     public class Item : MonoBehaviour
     {
 
-        [Serializable] public class EquipItemEvent : UnityEvent<ItemType> { }
-        //[Serializable] public class UnequipItemEvent : UnityEvent { }
-        [Serializable] public class PickupItemEvent : UnityEvent { }
-        [Serializable] public class DropItemEvent : UnityEvent { }
         //
         // Fields
         //
         [SerializeField]
-        protected ItemType itemType;
-        [SerializeField]
-        protected int slotID = -1;
-        [SerializeField]
-        protected ItemSocketType socket = ItemSocketType.RightHand;
-        [SerializeField]
-        protected int animatorItemID;
-        [SerializeField]
-        protected int animatorMovementSetID;
-        [SerializeField]
-        protected GameObject dropPrefab;
-
+        protected ItemType m_itemType;
 
 
         [SerializeField]
         protected Transform holsterTarget;
 
 
-        [SerializeField, Tooltip("The ik position of the non dominant hand.")]      //  Currently not used.
-        protected Transform m_NonDominantHandIKTarget;
-        [SerializeField]
-        protected Transform m_NonDominantHandIKTargetHint;
+        [Group("Hand IK")] [Tooltip("The ik position of the non dominant hand.")]      //  Currently not used.
+        [SerializeField] protected Transform m_NonDominantHandIKTarget;
+        [Group("Hand IK")] [Tooltip("The ik hint transform for non dominant hand.")] 
+        [SerializeField] protected Transform m_NonDominantHandIKTargetHint;
 
 
-        [SerializeField]
-        protected Vector3 localSpawnPosition;
-        [SerializeField]
-        protected Vector3 localSpawnRotation;
+        //[SerializeField]
+        //protected Vector3 localSpawnPosition;
+        //[SerializeField]
+        //protected Vector3 localSpawnRotation;
 
 
-        [Header("Events")]
-        public AnimationEventTrigger equipEvent = new AnimationEventTrigger("OnAnimatorEquipItem");
-        public AnimationEventTrigger unequipEvent = new AnimationEventTrigger("OnAnimatorUnequipItem");
-
-        [Space()]
-        public EquipItemEvent OnEquipEvent = new EquipItemEvent();
-        public UnityEvent OnUnequipEvent = new UnityEvent();
+        //[Header("Events")]
+        //public AnimationEventTrigger equipEvent = new AnimationEventTrigger("OnAnimatorEquipItem");
+        //public AnimationEventTrigger unequipEvent = new AnimationEventTrigger("OnAnimatorUnequipItem");
 
 
-        public ItemType ItemType{ get { return itemType; } }
+        //public EquipItemEvent OnEquipEvent = new EquipItemEvent();
+        //public UnityEvent OnUnequipEvent = new UnityEvent();
 
-        public int SlotID { get { return slotID; } set { slotID = value; } }
 
-        public ItemSocketType Socket { get { return socket; } }
+        public ItemType ItemType{ get { return m_itemType; } }
 
-        public int AnimatorItemID { get { return animatorItemID; } }
+        public int AnimatorItemID { get { return m_itemType.m_itemID; } }
 
-        public int AnimatorMovementSetID { get { return animatorMovementSetID; } }
-
-        public GameObject DropPrefab { get { return dropPrefab; } set { dropPrefab = value; }}
+        public int AnimatorMovementSetID { get { return m_itemType.m_movementSetID; } }
 
 
 
 
-        protected Animator animator;
+
+
+
         [SerializeField, DisplayOnly]
-        protected GameObject character;
-        protected CharacterLocomotion charLocomotion;
-        protected Inventory inventory;
+        protected GameObject m_character;
+        protected CharacterLocomotion m_controller;
+        protected Inventory m_inventory;
         protected GameObject m_gameObject;
         protected Transform m_transform;
 
@@ -86,51 +67,46 @@
         //
         protected virtual void Awake()
         {
-            //character = transform.root.gameObject;
-            //if (character != null) {
-            //    inventory = character.GetComponent<Inventory>();
-            //}
-
-
 
         }
+
 
         protected virtual void OnDestroy()
         {
 
-            if (character != null)
+            if (m_character != null)
             {
-                EventHandler.UnregisterEvent(character, EventIDs.OnAnimatorEquipItem, ItemActivated);
-                EventHandler.UnregisterEvent(character, EventIDs.OnAnimatorUnequipItem, ItemDeactivated);
-                //EventHandler.UnregisterEvent(character, EventIDs.OnAnimatorDropItem, ItemDeactivated);
-                //EventHandler.UnregisterEvent(character, EventIDs.OnAnimatorPickupItem, ItemActivated);
+                EventHandler.UnregisterEvent(m_character, EventIDs.OnAnimatorEquipItem, ItemActivated);
+                EventHandler.UnregisterEvent(m_character, EventIDs.OnAnimatorUnequipItem, ItemDeactivated);
+                //EventHandler.UnregisterEvent(m_character, EventIDs.OnAnimatorDropItem, ItemDeactivated);
+                //EventHandler.UnregisterEvent(m_character, EventIDs.OnAnimatorPickupItem, ItemActivated);
             }
 
-            if (OnEquipEvent.GetPersistentEventCount() > 0) OnEquipEvent.RemoveAllListeners();
-            if (OnUnequipEvent.GetPersistentEventCount() > 0) OnUnequipEvent.RemoveAllListeners();
+            //if (OnEquipEvent.GetPersistentEventCount() > 0) OnEquipEvent.RemoveAllListeners();
+            //if (OnUnequipEvent.GetPersistentEventCount() > 0) OnUnequipEvent.RemoveAllListeners();
         }
 
 
 
 
-        public virtual void Initialize( Inventory _inventory )
+        public virtual void Initialize(Inventory inventory )
         {
-            charLocomotion = _inventory.GetComponent<CharacterLocomotion>();
-            character = _inventory.gameObject;
-            inventory = _inventory;
-            animator = charLocomotion.GetComponent<Animator>();
+            m_controller = inventory.GetComponent<CharacterLocomotion>();
+            m_character = inventory.gameObject;
+            m_inventory = inventory;
 
             m_gameObject = gameObject;
             m_transform = transform;
 
+            
 
 
-            if (character != null) {
-                EventHandler.RegisterEvent(character, EventIDs.OnAnimatorEquipItem, ItemActivated);
-                EventHandler.RegisterEvent(character, EventIDs.OnAnimatorUnequipItem, ItemDeactivated);
-                //EventHandler.RegisterEvent(character, EventIDs.OnAnimatorDropItem, ItemDeactivated);
-                //EventHandler.RegisterEvent(character, EventIDs.OnAnimatorPickupItem, ItemActivated);
-                //Debug.LogFormat("Registering event equip event for {0}", itemType.name);
+            if (m_character != null) {
+                EventHandler.RegisterEvent(m_character, EventIDs.OnAnimatorEquipItem, ItemActivated);
+                EventHandler.RegisterEvent(m_character, EventIDs.OnAnimatorUnequipItem, ItemDeactivated);
+                //EventHandler.RegisterEvent(m_character, EventIDs.OnAnimatorDropItem, ItemDeactivated);
+                //EventHandler.RegisterEvent(m_character, EventIDs.OnAnimatorPickupItem, ItemActivated);
+                //Debug.LogFormat("Registering event equip event for {0}", m_itemType.name);
             }
 
 
@@ -142,8 +118,8 @@
             }
 
 
-            OnEquipEvent.AddListener(inventory.EquipItem);
-            OnUnequipEvent.AddListener(inventory.UnequipCurrentItem);
+            //OnEquipEvent.AddListener(m_inventory.EquipItem);
+            //OnUnequipEvent.AddListener(m_inventory.UnequipCurrentItem);
 
 
         }
@@ -155,13 +131,13 @@
         /// <param name="active"></param>
         public virtual void SetActive(bool active)
         {
-            Debug.LogFormat("<b><color=red>{0}</color> is now {1}</b>", itemType.name, active);
+//            Debug.LogFormat("<b><color=red>{0}</color> is now {1}</b>", m_itemType.name, active);
 
             if (active) {
                 //if (holsterTarget && slotID > -1)
                 //{
                 //    //  Parent the item to a item equip slot.
-                //    Transform parent = inventory.GetItemSocket(slotID);
+                //    Transform parent = m_inventory.GetItemSocket(slotID);
                 //    if (parent != null) {
                 //        m_gameObject.transform.parent = parent;
                 //        m_gameObject.transform.localPosition = localSpawnPosition;
@@ -195,16 +171,16 @@
         /// </summary>
         protected virtual void ItemActivated()
         {
-            if (equipEvent.waitForAnimationEvent == false) {
-                StartCoroutine(ActivateItem(SetActive, true));
-            }
+            //if (equipEvent.waitForAnimationEvent == false) {
+            //    StartCoroutine(ActivateItem(SetActive, true));
+            //}
 
-            Debug.LogFormat("{0} contains {1} events.", OnEquipEvent, OnEquipEvent.GetPersistentEventCount());
+            //Debug.LogFormat("{0} contains {1} events.", OnEquipEvent, OnEquipEvent.GetPersistentEventCount());
             ////  Fire off events.
-            //OnEquipEvent.Invoke(itemType);
-            //  Update the inventory.
-            inventory.EquipItem(inventory.GetItemSlotIndex(itemType));
-            inventory.EquipItem(itemType);
+            //OnEquipEvent.Invoke(m_itemType);
+            //  Update the m_inventory.
+            m_inventory.EquipItem(m_inventory.GetItemSlotIndex(m_itemType));
+            m_inventory.EquipItem(m_itemType);
             SetActive(true);
         }
 
@@ -213,15 +189,15 @@
         /// </summary>
         protected virtual void ItemDeactivated()
         {
-            if (unequipEvent.waitForAnimationEvent == false) {
-                StartCoroutine(ActivateItem(SetActive, false));
-            }
-            Debug.LogFormat("{0} contains {1} events.", OnUnequipEvent, OnUnequipEvent.GetPersistentEventCount());
+            //if (unequipEvent.waitForAnimationEvent == false) {
+            //    StartCoroutine(ActivateItem(SetActive, false));
+            //}
+            //Debug.LogFormat("{0} contains {1} events.", OnUnequipEvent, OnUnequipEvent.GetPersistentEventCount());
             //  Fire off events.
             //OnEquipEvent.Invoke(active);
-            //  Update the inventory.
+            //  Update the m_inventory.
             //Debug.LogFormat("Setting {0} active as Deactivated", gameObject.name);
-            inventory.UnequipCurrentItem();
+            m_inventory.UnequipCurrentItem();
             SetActive(false);
         }
 
@@ -229,25 +205,25 @@
 
 
 
-        private IEnumerator ActivateItem(Action<bool> setActive, bool active )
-        {
+        //private IEnumerator ActivateItem(Action<bool> setActive, bool active )
+        //{
 
-            //float currentTime = 0;
-            //float endDuration = active ? item.equipEvent.duration : item.unequipEvent.duration;
-            //while (currentTime < endDuration)
-            //{
-            //    if (currentTime > 10) break;
-            //    currentTime += Time.deltaTime;
+        //    //float currentTime = 0;
+        //    //float endDuration = active ? item.equipEvent.duration : item.unequipEvent.duration;
+        //    //while (currentTime < endDuration)
+        //    //{
+        //    //    if (currentTime > 10) break;
+        //    //    currentTime += Time.deltaTime;
 
-            //    yield return null;
-            //}
+        //    //    yield return null;
+        //    //}
 
-            float duration = active ? equipEvent.duration : unequipEvent.duration;
-            Debug.LogFormat("Current time: {0}", Time.time);
-            yield return new WaitForSeconds(duration);
-            Debug.LogFormat("Finished WaitForSeconds. Time is: {0}", Time.time);
-            setActive(active);
-        }
+        //    float duration = active ? equipEvent.duration : unequipEvent.duration;
+        //    Debug.LogFormat("Current time: {0}", Time.time);
+        //    yield return new WaitForSeconds(duration);
+        //    Debug.LogFormat("Finished WaitForSeconds. Time is: {0}", Time.time);
+        //    setActive(active);
+        //}
 
 
     }

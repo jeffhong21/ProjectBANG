@@ -29,7 +29,7 @@
         {
             base.OnStateEnter(animator, stateInfo, layerIndex);
 
-            m_animatorMonitor.SetActiveStateBehavior(this);
+            //m_animatorMonitor.SetActiveStateBehavior(this);
         }
 
 
@@ -37,7 +37,7 @@
         {
             base.OnStateUpdate(animator, stateInfo, layerIndex);
 
-            if (m_matchTarget.matchTarget) m_matchTarget.MatchTarget();
+            //if (m_matchTarget.matchTarget) m_matchTarget.MatchTarget();
             //if (!m_animator.isMatchingTarget && )
             //{
 
@@ -53,10 +53,10 @@
             //    animatorMonitor.ResetMatchTarget();
             //}
 
-            if (m_matchTarget.matchTarget && m_animator.isMatchingTarget){
-                m_matchTarget.Reset(true, false);
-            }
-            m_animatorMonitor.SetActiveStateBehavior(null);
+            //if (m_matchTarget.matchTarget && m_animator.isMatchingTarget){
+            //    m_matchTarget.Reset(true, false);
+            //}
+            //m_animatorMonitor.SetActiveStateBehavior(null);
         }
 
 

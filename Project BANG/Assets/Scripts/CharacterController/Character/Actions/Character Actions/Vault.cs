@@ -186,8 +186,8 @@
 
         public override bool UpdateRotation()
         {
-            Quaternion rotation = Quaternion.FromToRotation(m_transform.forward, -objectNormal) * m_transform.rotation;
-            m_rigidbody.MoveRotation(Quaternion.Slerp(rotation, m_transform.rotation, m_deltaTime * m_Controller.RotationSpeed));
+            //Quaternion rotation = Quaternion.FromToRotation(m_transform.forward, -objectNormal) * m_transform.rotation;
+            //m_rigidbody.MoveRotation(Quaternion.Slerp(rotation, m_transform.rotation, m_deltaTime * m_Controller.RotationSpeed));
             return false;
         }
 
@@ -197,12 +197,12 @@
         protected void StartVault()
         {
             m_verticalVelocity = Vector3.up * Mathf.Sqrt(2 * (platformHeight + 0.02f) * Mathf.Abs(m_Controller.Gravity.y));
-            m_rigidbody.velocity += m_verticalVelocity;
+            //m_rigidbody.velocity += m_verticalVelocity;
             //m_rigidbody.AddForce(m_verticalVelocity, ForceMode.VelocityChange);
 
             Vector3 dir = platformEdge - m_transform.position;
 
-            m_animatorMonitor.MatchTarget(endReach, Quaternion.identity);
+            //m_animatorMonitor.MatchTarget(endReach, Quaternion.identity);
         }
 
 
@@ -295,14 +295,14 @@
 
 
 
-        //public override string GetDestinationState( int layer )
-        //{
-        //    if (layer == 0) {
-        //        return m_StateName;
-        //    }
+        public override string GetDestinationState(int layer)
+        {
+            if (layer == 0) {
+                return "Vault.Vault";
+            }
 
-        //    return "";
-        //}
+            return "";
+        }
 
 
 

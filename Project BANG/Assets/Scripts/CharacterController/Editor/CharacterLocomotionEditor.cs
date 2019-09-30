@@ -22,12 +22,13 @@ namespace CharacterController
         private static readonly string[] m_DontInclude = { "m_Script", "debugger" };
 
 
-        private bool m_useCustomeHeader = true;
+        private bool m_useCustomeHeader = false;
         private bool m_spaceBetweenSections = true;
 
-        private const string MotorFoldoutHeader = "Character Movement";
-        private const string PhysicsFoldoutHeader = "Character Physics";
-        private const string AnimationFoldoutHeader = "Character Animation";
+        private const string MotorFoldoutHeader = "Character Movement Settings";
+        private const string PhysicsFoldoutHeader = "Character Physics Settings";
+        private const string CollisionsFoldoutHeader = "Character Collision Settings";
+        private const string AnimationFoldoutHeader = "Character Animation Settings";
         private const string ActionsFoldoutHeader = "Actions List";
         private const string DebugHeader = "Debug ";
 
@@ -44,7 +45,6 @@ namespace CharacterController
         private SerializedProperty m_rootMotionRotationMultiplier;
         private SerializedProperty m_motorAcceleration;
         private SerializedProperty m_motorDamping;
-        private SerializedProperty m_acceleration;
         private SerializedProperty m_desiredSpeed;
         private SerializedProperty m_rotationSpeed;
 
@@ -60,7 +60,7 @@ namespace CharacterController
         private SerializedProperty m_collisionsLayerMask;
         private SerializedProperty m_maxCollisionCount;
 
-        private SerializedProperty displayMovement, displayPhysics, displayCollisions, displayActions;
+        private SerializedProperty displayMovement, displayPhysics, displayCollisions, displayAnimations, displayActions;
 
         private GUIStyle m_DefaultActionTextStyle = new GUIStyle();
         private GUIStyle m_ActiveActionTextStyle = new GUIStyle();
@@ -84,7 +84,6 @@ namespace CharacterController
             m_rootMotionRotationMultiplier = serializedObject.FindProperty("m_rootMotionRotationMultiplier");
             m_motorAcceleration = serializedObject.FindProperty("m_motorAcceleration");
             m_motorDamping = serializedObject.FindProperty("m_motorDamping");
-            m_acceleration = serializedObject.FindProperty("m_acceleration");
             m_desiredSpeed = serializedObject.FindProperty("m_desiredSpeed");
             m_rotationSpeed = serializedObject.FindProperty("m_rotationSpeed");
 
@@ -101,6 +100,7 @@ namespace CharacterController
             displayMovement = serializedObject.FindProperty("displayMovement");
             displayPhysics = serializedObject.FindProperty("displayPhysics");
             displayCollisions = serializedObject.FindProperty("displayCollisions");
+            displayAnimations = serializedObject.FindProperty("displayAnimations");
             displayActions = serializedObject.FindProperty("displayActions");
             m_ActionsList = new ReorderableList(serializedObject, serializedObject.FindProperty("m_actions"), true, true, true, true);
 		}
@@ -112,7 +112,7 @@ namespace CharacterController
             serializedObject.Update();
 
             InspectorUtility.PropertyField(serializedObject.FindProperty("m_Script"));
-            EditorGUILayout.Space();
+
             //  -----
             //  Character Movement
             //  -----
@@ -133,7 +133,6 @@ namespace CharacterController
 
                 EditorGUILayout.PropertyField(m_motorAcceleration);
                 EditorGUILayout.PropertyField(m_motorDamping);
-                EditorGUILayout.PropertyField(m_acceleration);
                 EditorGUILayout.PropertyField(m_desiredSpeed);
                 EditorGUILayout.PropertyField(m_rotationSpeed);
 
@@ -162,7 +161,7 @@ namespace CharacterController
             //  -----
             //  Character Collisions
             //  -----
-            displayCollisions.boolValue = m_useCustomeHeader ? InspectorUtility.Foldout(displayCollisions.boolValue, AnimationFoldoutHeader) : EditorGUILayout.Foldout(displayCollisions.boolValue, AnimationFoldoutHeader);
+            displayCollisions.boolValue = m_useCustomeHeader ? InspectorUtility.Foldout(displayCollisions.boolValue, CollisionsFoldoutHeader) : EditorGUILayout.Foldout(displayCollisions.boolValue, CollisionsFoldoutHeader);
             //displayCollisions.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayCollisions.boolValue, AnimationFoldoutHeader) : InspectorUtility.Foldout(displayCollisions.boolValue, AnimationFoldoutHeader);
             if (displayCollisions.boolValue)
             {
@@ -171,6 +170,19 @@ namespace CharacterController
 
             }
             if (m_spaceBetweenSections) EditorGUILayout.Space();
+
+
+            //  -----
+            //  Character Animations
+            //  -----
+            displayAnimations.boolValue = m_useCustomeHeader ? InspectorUtility.Foldout(displayAnimations.boolValue, AnimationFoldoutHeader) : EditorGUILayout.Foldout(displayAnimations.boolValue, AnimationFoldoutHeader);
+            if (displayAnimations.boolValue) {
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_moveStateName"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_airborneStateName"));
+
+            }
+            if (m_spaceBetweenSections) EditorGUILayout.Space();
+
 
             //  -----
             //  Character Actions

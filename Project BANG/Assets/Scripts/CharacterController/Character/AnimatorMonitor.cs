@@ -5,7 +5,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-
+    using System.Text;
 
 
     [DisallowMultipleComponent]
@@ -15,7 +15,7 @@
 
         private CharacterAction[] m_actions;
         [SerializeField, DisplayOnly]
-        private CharacterAction m_activeAction, m_previousAction, m_nextAction;
+        private CharacterAction m_activeStateAction, m_previousStateAction, m_nextAction;
         private Dictionary<string, int> m_stateNameHash;
         private Dictionary<int, string> m_stateHashName;
 
@@ -27,13 +27,25 @@
         private AnimatorTransitionInfo[] m_previousTransitions;
         //  store the previous states
         private AnimatorStateInfo[] m_previousStates;
+
         // store all the current states.
         private AnimatorStateData[] m_animatorStateData;
-
-
+        // store all the default states.
+        private AnimatorStateData[] m_animatorDefaultStates;
 
         private StateBehavior[] m_stateBehaviors;
         private StateBehavior m_activeStateBehavior;
+
+
+
+        private StringBuilder m_formattedStateName = new StringBuilder(100);
+
+
+        public delegate void Callback();
+        private Dictionary<int, Delegate> m_stateBeginCallbackMap;
+        private Dictionary<int, Delegate> m_stateEndCallbackMap;
+
+
         //
         // Fields
         //
@@ -73,6 +85,9 @@
 		{
             m_stateNameHash = new Dictionary<string, int>();
             m_stateHashName = new Dictionary<int, string>();
+
+            m_stateBeginCallbackMap = new Dictionary<int, Delegate>();
+            m_stateEndCallbackMap = new Dictionary<int, Delegate>();
 
             m_animator = GetComponent<Animator>();
             m_controller = GetComponent<CharacterLocomotion>();
@@ -125,7 +140,7 @@
             m_previousTransitions = new AnimatorTransitionInfo[layerCount];
             m_previousStates = new AnimatorStateInfo[layerCount];
             m_animatorStateData = new AnimatorStateData[layerCount];
-
+            m_animatorDefaultStates = new AnimatorStateData[layerCount];
 
             //  Set up actions list.
             int count = m_controller.CharActions.Length;
@@ -147,6 +162,7 @@
                     defaultState = stateMachine.AddState("Empty", Vector3.zero);
                 }
                 m_animatorStateData[i] = new AnimatorStateData(defaultState.nameHash, defaultState.name, 0.2f);
+                m_animatorDefaultStates[i] = new AnimatorStateData(defaultState.nameHash, defaultState.name, 0.2f);
             }
 
 
@@ -160,19 +176,6 @@
 
 
         }
-
-
-
-        private void LateUpdate()
-        {
-            DetermineStates();
-
-            DebugUI.DebugUI.Log(this, m_activeAction == null ? "null" : m_activeAction.ToString(), "ActiveAction", DebugUI.RichTextColor.Yellow);
-            DebugUI.DebugUI.Log(this, m_animator.isMatchingTarget, "MatchingTarget", DebugUI.RichTextColor.Yellow);
-        }
-
-
-
 
 
         /// <summary>
@@ -191,7 +194,7 @@
 
 
                 //  Fullpath hash
-                if (m_stateNameHash.ContainsKey(fullPathName))m_stateNameHash[fullPathName] = fullPathHash;
+                if (m_stateNameHash.ContainsKey(fullPathName)) m_stateNameHash[fullPathName] = fullPathHash;
                 else m_stateNameHash.Add(fullPathName, fullPathHash);
                 //  Shortpath hash
                 if (m_stateNameHash.ContainsKey(stateName)) m_stateNameHash[stateName] = shortNameHash;
@@ -211,8 +214,15 @@
                 m_stateCount++;
             }
 
-            foreach (ChildAnimatorStateMachine sm in stateMachine.stateMachines) //for each state
+            //foreach (ChildAnimatorStateMachine sm in stateMachine.stateMachines) //for each state
+            //{
+            //    string path = parentState + "." + sm.stateMachine.name;
+            //    RegisterAnimatorStates(sm.stateMachine, path);
+            //}
+
+            for (int i = 0; i < stateMachine.stateMachines.Length; i++)
             {
+                ChildAnimatorStateMachine sm = stateMachine.stateMachines[i];
                 string path = parentState + "." + sm.stateMachine.name;
                 RegisterAnimatorStates(sm.stateMachine, path);
             }
@@ -220,24 +230,46 @@
 
 
 
-        /// <summary>
-        /// Determine the current action states.
-        /// </summary>
-        private void DetermineStates()
+        private void LateUpdate()
         {
-            if(m_activeAction)
-            {
-                for (int layer = 0; layer < m_animator.layerCount; layer++)
-                {
-                    bool stateChanged = DetermineState(layer, m_animatorStateData[layer], true);
-                    if (stateChanged)
-                    {
+            DetermineStates();
 
-                    }
-                }
-            }
-
+            DebugUI.DebugUI.Log(this, m_activeStateAction == null ? "null" : m_activeStateAction.ToString(), "ActiveAction", DebugUI.RichTextColor.Yellow);
+            DebugUI.DebugUI.Log(this, m_animator.isMatchingTarget, "MatchingTarget", DebugUI.RichTextColor.Yellow);
         }
+
+
+
+        public void RegisterOnStateBegin(int animStateHash, Callback callback)
+        {
+            RegisterCallback(m_stateBeginCallbackMap, animStateHash, callback);
+        }
+
+        public void UnRegisterOnStateBegin(int animStateHash, Callback callback)
+        {
+            UnRegisterCallback(m_stateEndCallbackMap, animStateHash, callback);
+        }
+
+        private void RegisterCallback(Dictionary<int, System.Delegate> dictionary, int animHash, Callback callback)
+        {
+            if (dictionary.ContainsKey(animHash)) {
+                dictionary[animHash] = (Callback)dictionary[animHash] + callback;
+            }
+            else {
+                dictionary.Add(animHash, callback);
+            }
+        }
+
+        private void UnRegisterCallback(Dictionary<int, System.Delegate> dictionary, int animHash, Callback callback)
+        {
+            if (dictionary.ContainsKey(animHash)) {
+                dictionary[animHash] = (Callback)dictionary[animHash] - callback;
+            }
+        }
+
+
+
+
 
 
 
@@ -259,18 +291,29 @@
         }
 
 
+        /// <summary>
+        /// Changes the animator state.
+        /// </summary>
+        /// <param name="action">Action state to transition too.</param>
+        /// <param name="layer">Which layer.</param>
+        /// <param name="destinationState">Name of the state to transition too.</param>
+        /// <param name="transitionDuration">The transition time.</param>
+        /// <param name="normalizedTime">The normalized offset time.</param>
+        /// <returns>Returns true if changing to new state.</returns>
         public bool ChangeAnimatorState(CharacterAction action, int layer, string destinationState, float transitionDuration, float normalizedTime = 0f)
         {
             if (destinationState.Contains(".") == false) Debug.Log(this.GetType());
 
-            //  Set active action.
-            m_previousAction = m_activeAction;
-            m_activeAction = action;
-
             string fullStateName = m_animator.GetLayerName(layer) + "." + destinationState;
             int stateHash = GetStateHash(fullStateName);
+
             if (stateHash > -1){
-                if (m_animator.HasState(layer, stateHash)){
+                if (m_animator.HasState(layer, stateHash))
+                {
+                    //  Set active action.
+                    m_previousStateAction = m_activeStateAction;
+                    m_activeStateAction = action;
+                    //  CRossfade to new state.
                     m_animator.CrossFade(fullStateName, (transitionDuration > 0) ? transitionDuration : 0.01f, layer, normalizedTime);
                     //m_animator.CrossFadeInFixedTime(fullStateName, (transitionDuration > 0) ? transitionDuration : 0.01f, layer, normalizedTime);
                     Debug.LogFormat("ActiveAction is ({0})", action.GetType().Name);
@@ -281,6 +324,24 @@
 
 
             return false;
+        }
+
+
+
+        /// <summary>
+        /// Determine the current action states.
+        /// </summary>
+        public void DetermineStates()
+        {
+            if (m_activeStateAction) {
+                for (int layer = 0; layer < m_animator.layerCount; layer++) {
+                    bool stateChanged = DetermineState(layer, m_animatorStateData[layer], true);
+                    if (stateChanged) {
+
+                    }
+                }
+            }
+
         }
 
 
@@ -306,6 +367,34 @@
             {
                 //Debug.LogFormat("Transitioning. normalized time: {0}", currentTransition.normalizedTime);
 
+                //if (m_activeStateAction)
+                //{
+                //    //  Determine if the character action has control of the animator.
+                //    if (checkAction) {
+                //        if (m_activeStateAction.HasAnimatorControl(layer)) {
+                //            //  State action has control, so animator is not transitioning to new action state.
+                //            return false;
+                //        }
+                //    }
+
+
+                //}
+
+                ////  --  Determine next animator state.
+
+                //  Check if character has an item equipped.
+                string nextState = FormatStateName(layer, m_controller.Moving ? m_controller.MoveStateName : defaultState.StateName);
+                int stateHash = GetStateHash(nextState);
+                if(layer == 0) Debug.LogFormat("<b>[Transitioning]</b> Next state is <color=blue>{0}</color> ({1}", nextState, stateHash);
+                //if (stateHash != -1) {
+                //    m_animator.CrossFade(stateHash, 0.2f, layer, 0);
+                //} else {
+                //    m_animator.CrossFade(Animator.StringToHash(defaultState.StateName), 0.2f, layer, 0);
+                //}
+
+
+
+
                 // fire off our end callback, if any, for our previous transition...
                 //  Next state is starting.
 
@@ -315,6 +404,7 @@
 
                 // and remember that we are now in this transition.
                 m_previousTransitions[layer] = currentTransition;
+
 
             }
 
@@ -327,11 +417,11 @@
                 //  Current state is ending.
 
                 //  Next state is starting.
-                //if(m_activeAction != null)
+                //if(m_activeStateAction != null)
                 //{
                 //    //Debug.Break();
-                //    m_controller.TryStopAction(m_activeAction, true);
-                //    m_activeAction = null;
+                //    m_controller.TryStopAction(m_activeStateAction, true);
+                //    m_activeStateAction = null;
                 //}
 
 
@@ -340,6 +430,18 @@
                 // State has changed.
                 stateChanged = true;
             }
+
+
+            Delegate endCallback;
+            if (m_stateEndCallbackMap.TryGetValue(previousState, out endCallback)) {
+                ((Callback)endCallback)();
+            }
+
+            Delegate beginCallback;
+            if (m_stateBeginCallbackMap.TryGetValue(currentState.fullPathHash, out beginCallback)) {
+                ((Callback)beginCallback)();
+            }
+
 
 
             return stateChanged;
@@ -370,7 +472,15 @@
         #region Animation Methods
 
 
-        
+        private string FormatStateName(int layer, string stateName)
+        {
+            string layerName = m_animator.GetLayerName(layer);
+            m_formattedStateName.Clear();
+            m_formattedStateName.AppendFormat("{0}.{1}", layerName, stateName);
+
+
+            return m_formattedStateName.ToString();
+        }
 
 
 
@@ -455,14 +565,14 @@
             if (activated)
             {
                 //  There is currently an action running.
-                if (m_activeAction != action && m_activeAction != null)
+                if (m_activeStateAction != action && m_activeStateAction != null)
                 {
-                    //Debug.LogFormat("Stoppiong ActiveAction {0} |Starting Action ({1})", m_activeAction.GetType().Name,  action.GetType().Name);
-                    m_controller.TryStopAction(m_activeAction, true);
-                    m_activeAction = action;
+                    //Debug.LogFormat("Stoppiong ActiveAction {0} |Starting Action ({1})", m_activeStateAction.GetType().Name,  action.GetType().Name);
+                    m_controller.TryStopAction(m_activeStateAction, true);
+                    m_activeStateAction = action;
                 }
                 //  If active action is the same as the incoming action.  This shoul;dn't happen.
-                else if (m_activeAction == action)
+                else if (m_activeStateAction == action)
                 {
                     Debug.LogFormat("<color=yellow><b>[Warning]</color></b> ActiveAction is the same as incoming Action ({0})", action.GetType().Name);
                 }
@@ -470,7 +580,7 @@
                 else
                 {
                     //Debug.LogFormat("ActiveAction is ({0})", action.GetType().Name);
-                    m_activeAction = action;
+                    m_activeStateAction = action;
                 }
 
                 //  If animator is matching target, stop it.
@@ -479,10 +589,10 @@
             }
             else
             {
-                if (m_activeAction == action)
+                if (m_activeStateAction == action)
                 {
-                    //Debug.LogFormat("ActiveAction {0} is now null.", m_activeAction.GetType().Name);
-                    m_activeAction = null;
+                    //Debug.LogFormat("ActiveAction {0} is now null.", m_activeStateAction.GetType().Name);
+                    m_activeStateAction = null;
 
                     //  If animator is matching target, stop it.
                     if (m_animator.isMatchingTarget)

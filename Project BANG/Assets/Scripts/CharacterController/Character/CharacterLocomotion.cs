@@ -1,27 +1,36 @@
-﻿namespace CharacterController
+﻿using UnityEngine;
+using UnityEngine.Serialization;
+using System;
+using System.Collections.Generic;
+
+
+namespace CharacterController
 {
-    using UnityEngine;
-    using UnityEngine.Serialization;
-    using System;
-    using System.Collections.Generic;
-
     using DebugUI;
-
 
     public class CharacterLocomotion : RigidbodyCharacterController
     {
-        
+        private readonly string FallbackMoveStateName = "Movement";
+        private readonly string FallbackAirborneStateName = "Airborne";
 
         public event Action<bool> OnAim = delegate {};
 
 
+        //  -- Animation variables
+        [FormerlySerializedAs("m_moveStateName"), Tooltip("The name of the state that should be activated when the character is moving.")]
+        [SerializeField, HideInInspector] private string m_moveStateName = "Movement";
+        [FormerlySerializedAs("m_airborneStateName"), Tooltip("The name of the state that should be activated when the character is airborne.")]
+        [SerializeField, HideInInspector] private string m_airborneStateName = "Airborne";
+
         //  --  Character Actions
         [SerializeField, HideInInspector, FormerlySerializedAs("m_actions")]
-        protected CharacterAction[] m_actions;
+        private CharacterAction[] m_actions;
         [SerializeField, HideInInspector, FormerlySerializedAs("m_activeAction")]
-        protected CharacterAction m_activeAction;
+        private CharacterAction m_activeAction;                     //  Current active action that is not concurrent.
 
-        protected Dictionary<CharacterAction, int> m_actionInfo;
+        private List<CharacterAction> m_activeActions;              //  Holds all the active actions.
+
+        private Dictionary<CharacterAction, int> m_actionInfo;      //  Used for getting action priority.
 
 
 
@@ -29,9 +38,6 @@
 
 
         private bool m_frameUpdated;
-        //  Used to update the animator every X second.
-        private float m_animatorUpdateTimer;
-
 
         private Vector3 leftFootPosition, rightFootPosition;
 
@@ -47,12 +53,22 @@
 
         public bool CanAim { get => Grounded; }
 
-
-        public float viewAngle
-        {
-            get { return m_viewAngle; }
-            set { m_viewAngle = Mathf.Clamp(value, -180, 180); }
+        public string MoveStateName {
+            get{
+                if (string.IsNullOrWhiteSpace(m_moveStateName))
+                    m_moveStateName = FallbackMoveStateName;
+                return m_moveStateName;
+            }
         }
+
+        public string AirborneStateName{
+            get {
+                if (string.IsNullOrWhiteSpace(m_airborneStateName))
+                    m_moveStateName = FallbackAirborneStateName;
+                return m_airborneStateName;
+            }
+        }
+
 
         public CharacterAction[] CharActions { get { return m_actions; } set { m_actions = value; } }
 
@@ -102,7 +118,7 @@
             m_probedColliders = new Collider[m_maxCollisionCount];
 
 
-            m_motionPath = new Trajectory(1, m_sampleRate, new AffineTransform(m_transform));
+
             m_physicsMaterial = new PhysicMaterial() { name = "Character Physics Material" };
 
             //  --------------------------
@@ -116,6 +132,7 @@
             //  Initialize actions;
             //  --------------------------
             m_actionInfo = new Dictionary<CharacterAction, int>();
+            m_activeActions = new List<CharacterAction>();
             for (int i = 0; i < m_actions.Length; i++)
             {
                 if (!m_actionInfo.ContainsKey(m_actions[i])) m_actionInfo.Add(m_actions[i], i);
@@ -123,6 +140,10 @@
 
                 m_actions[i].Initialize(this, Array.IndexOf(m_actions, m_actions[i]), Time.deltaTime);
             }
+
+
+
+
 
             //  --------------------------
             //  Initialize events;
@@ -141,7 +162,7 @@
 
 
             //  --------------------------
-            //  Initialize debugger;
+            //  Initialize Debugger;
             //  --------------------------
             Debugger.Initialize(this);
         }
@@ -198,12 +219,15 @@
             float newerTime = m_lastFixedUpdateTime[m_newTimeIndex];
             float olderTime = m_lastFixedUpdateTime[m_oldTimeIndex];
 
-            if (newerTime != olderTime)
+            if (Math.Abs(newerTime - olderTime) > float.Epsilon)
                 m_interpolationFactor = (Time.realtimeSinceStartup - newerTime) / (newerTime - olderTime);
             else m_interpolationFactor = 1;
 
 
+
+
             if (m_frameUpdated) return;
+            //KinematicMove();
 
             //  --------------------------
             //  Time manager
@@ -213,8 +237,6 @@
             DebugUI.Log(this, "[U] newDeltaTime", m_newDeltaTime, RichTextColor.Magenta);
             //  --------------------------
 
-
-            //KinematicMove();
 
             OnUpdate(m_deltaTime);
             m_frameUpdated = true;
@@ -226,11 +248,18 @@
         {
             DebugAttributes();
             DebugUI.Log(this, "DeltaTime", m_deltaTime);
-            DebugUI.Log(this, "DeltaTime", m_deltaTime);
+            //DebugUI.Log(this, "DeltaTime", m_deltaTime);
             //  -------------------
             //  Log debug messages.
             DebugUI.Log(this, "interpolateFactor", interpolateFactor, RichTextColor.Lime);
             //  -------------------
+
+            if (m_useRootMotionPosition)
+                m_rigidbody.MovePosition(m_animator.rootPosition);
+
+            if (m_useRootMotionRotation)
+                m_rigidbody.MoveRotation(m_animator.rootRotation);
+
             //  Continue with updates.
             if (m_frameUpdated) {
                 m_frameUpdated = false;
@@ -253,6 +282,13 @@
 
 
 
+        public void Move(float horizontal, float forward, Quaternion rotation)
+        {
+            m_inputVector.x = horizontal * horizontal;
+            m_inputVector.z = forward * forward;
+
+            m_lookRotation = Quaternion.Slerp(m_lookRotation, rotation, m_deltaTime * m_rotationSpeed);
+        }
 
 
 
@@ -263,7 +299,9 @@
         {
             m_deltaTime = deltaTime;
 
-
+            m_activeActions.Clear();
+            ////  Allows us to stop the active action before closing the loop off to lower priority actions.
+            //bool activeActionUpdated = false;
             for (int i = 0; i < m_actions.Length; i++)
             {
                 //  Move to next action if action componenet is disabled.
@@ -271,27 +309,44 @@
 
 
                 CharacterAction action = m_actions[i];
-                if(action.IsActive) {
+
+
+                //  TODO:  Implement a way to stop iterating through list after active action.
+                ////  If action is not the active action, than try to start or stop the action.
+                //if(action != m_activeAction && !activeActionUpdated)
+                //{
+
+                //}
+
+                if (action.IsActive) {
+                    //  If action is active and stop type is not manual, try to stop it.
                     if (action.StopType != ActionStopType.Manual) {
                         TryStopAction(action);
-
                     }
-                        
                 }
                 else {
-                    if (action.StartType != ActionStartType.Manual)
-                    {
+                    if (action.StartType != ActionStartType.Manual) {
                         bool actionStarted = TryStartAction(action);
                         if (actionStarted) {
-                            if (action.IsConcurrentAction()) {
-                                continue;
-                            }
+                            //if (action.IsConcurrentAction()) {
+                            //    continue;
+                            //}
                             m_activeAction = action;
-                            break;
+                            //break;
                         }
-                        
                     }
                 }
+
+
+                //  Perform any cleanups for the actions.
+                if (action == m_activeAction || action.IsActive)
+                m_activeActions.Add(action);
+
+
+
+
+
+
             }
 
 
@@ -353,25 +408,19 @@
         /// </summary>
         protected override void UpdateAnimator()
         {
+            base.UpdateAnimator();
 
-            //if(!m_moving && m_animatorUpdateTimer > 0.5f)
-            //{
 
-            //    //var angle = Mathf.Atan2(m_lookDirection.x, m_lookDirection.z) * Mathf.Rad2Deg;
-            //    //if (Mathf.Abs(angle) < 0.1f)
-            //    //    angle = 0;
-            //    //m_animator.SetFloat(HashID.LookAngle, angle);
+            
 
-            //    m_animatorUpdateTimer = 0;
-            //}
-            //m_animatorUpdateTimer += m_deltaTime;
+
 
             float forwardLeg = 0.5f;
             if (m_moving)
                 forwardLeg = leftFootPosition.normalized.z > rightFootPosition.normalized.z ? 0 : 1;
             m_legIndex = Mathf.Lerp(m_legIndex, forwardLeg, m_deltaTime * 8);
             m_animator.SetFloat(HashID.LegFwdIndex, m_legIndex);
-            base.UpdateAnimator();
+
         }
 
 
@@ -512,7 +561,7 @@
         #region Event Actions
 
 
-        protected void OnActionActive(CharacterAction action, bool activated)
+        private void OnActionActive(CharacterAction action, bool activated)
         {
             int index = Array.IndexOf(m_actions, action);
             if (action == m_actions[index])
@@ -540,19 +589,19 @@
         }
 
 
-        protected void OnAimActionStart( bool aim )
+        private void OnAimActionStart( bool aim )
         {
             Aiming = aim;
             m_MovementType = Aiming ? MovementTypes.Combat : MovementTypes.Adventure;
         }
 
 
-        protected void OnImpactHit()
+        private void OnImpactHit()
         {
 
         }
 
-        protected void ActionStopped()
+        private void ActionStopped()
         {
 
         }
