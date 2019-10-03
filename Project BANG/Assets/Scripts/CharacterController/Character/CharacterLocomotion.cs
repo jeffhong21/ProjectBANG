@@ -206,11 +206,11 @@ namespace CharacterController
             //  --------------------------
 
 
-            if (!m_rigidbody.isKinematic) {
-                OnUpdate(m_deltaTime);
-                //Set frameUpdated.
-                m_frameUpdated = true;
-            }
+            //if (!m_rigidbody.isKinematic) {
+            //    OnUpdate(m_deltaTime);
+            //    //Set frameUpdated.
+            //    m_frameUpdated = true;
+            //}
 
         }
 
@@ -226,7 +226,7 @@ namespace CharacterController
 
 
 
-            if (m_frameUpdated) return;
+            //if (m_frameUpdated) return;
             //KinematicMove();
 
             //  --------------------------

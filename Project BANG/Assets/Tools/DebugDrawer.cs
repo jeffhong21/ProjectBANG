@@ -206,16 +206,43 @@ public static class DebugDrawer
 		});
 	}
 
-	/// <summary>
-	/// Draws an arrow
-	/// </summary>
-	/// <param name="position">The start position of the arrow.</param>
-	/// <param name="direction">The direction the arrow will point in.</param>
-	/// <param name="color">The color of the arrow.</param>
-	/// <param name="duration">How long to draw the arrow.</param>
-	/// <param name="depthTest">Whether or not the arrow should be faded when behind other objects. </param>
-	[Conditional("UNITY_EDITOR")]
-	public static void DrawArrow(Vector3 position, Vector3 direction, Color? color = null, float duration = 0, bool depthTest = true)
+
+    [Conditional("UNITY_EDITOR")]
+    public static void DrawArrow(Vector3 pos, Vector3 direction, Color color, float length = 1f, float tipSize = 0.25f, float width = 0.5f)
+    {
+        direction.Normalize();
+
+        var sideLen = length - length * tipSize;
+        var widthOffset = Vector3.Cross(direction, Vector3.up) * width;
+
+        var baseLeft = pos + widthOffset * 0.3f;
+        var baseRight = pos - widthOffset * 0.3f;
+        var tip = pos + direction * length;
+        var upCornerInRight = pos - widthOffset * 0.3f + direction * sideLen;
+        var upCornerInLeft = pos + widthOffset * 0.3f + direction * sideLen;
+        var upCornerOutRight = pos - widthOffset * 0.5f + direction * sideLen;
+        var upCornerOutLeft = pos + widthOffset * 0.5f + direction * sideLen;
+
+        Debug.DrawLine(baseLeft, baseRight, color);
+        Debug.DrawLine(baseRight, upCornerInRight, color);
+        Debug.DrawLine(upCornerInRight, upCornerOutRight, color);
+        Debug.DrawLine(upCornerOutRight, tip, color);
+        Debug.DrawLine(tip, upCornerOutLeft, color);
+        Debug.DrawLine(upCornerOutLeft, upCornerInLeft, color);
+        Debug.DrawLine(upCornerInLeft, baseLeft, color);
+    }
+
+
+    /// <summary>
+    /// Draws an arrow
+    /// </summary>
+    /// <param name="position">The start position of the arrow.</param>
+    /// <param name="direction">The direction the arrow will point in.</param>
+    /// <param name="color">The color of the arrow.</param>
+    /// <param name="duration">How long to draw the arrow.</param>
+    /// <param name="depthTest">Whether or not the arrow should be faded when behind other objects. </param>
+    [Conditional("UNITY_EDITOR")]
+	public static void DrawConeArrow(Vector3 position, Vector3 direction, Color? color = null, float duration = 0, bool depthTest = true)
 	{
 		/// Debug Extension
 		/// By Arkham Interactive

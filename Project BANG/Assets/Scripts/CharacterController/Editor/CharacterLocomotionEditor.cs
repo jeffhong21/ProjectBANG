@@ -25,14 +25,17 @@ namespace CharacterController
         private bool m_useCustomeHeader = false;
         private bool m_spaceBetweenSections = true;
 
-        private const string MotorFoldoutHeader = "Character Movement Settings";
-        private const string PhysicsFoldoutHeader = "Character Physics Settings";
-        private const string CollisionsFoldoutHeader = "Character Collision Settings";
-        private const string AnimationFoldoutHeader = "Character Animation Settings";
-        private const string ActionsFoldoutHeader = "Actions List";
+        private const string MotorFoldoutHeader = "Movement Settings";
+        private const string PhysicsFoldoutHeader = "Physics Settings";
+        private const string CollisionsFoldoutHeader = "Collision Settings";
+        private const string AnimationFoldoutHeader = "Animation Settings";
+        private const string ActionsFoldoutHeader = "Character Actions";
         private const string DebugHeader = "Debug ";
 
-        private CharacterLocomotion m_Controller;
+        private GUIContent m_helpBoxInfo;
+
+        private CharacterLocomotion m_controller;
+        private Rigidbody m_rigidbody;
         private ReorderableList m_ActionsList;
         private CharacterAction m_SelectedAction;
         private Editor m_ActionEditor;
@@ -71,7 +74,11 @@ namespace CharacterController
             base.OnEnable();
 
             if (target == null) return;
-            m_Controller = (CharacterLocomotion)target;
+            m_controller = (CharacterLocomotion)target;
+            if (m_rigidbody == null) m_rigidbody = m_controller.GetComponent<Rigidbody>();
+
+            if (m_helpBoxInfo == null) m_helpBoxInfo = new GUIContent();
+
 
             m_LineHeight = EditorGUIUtility.singleLineHeight;
             m_DefaultActionTextStyle.fontStyle = FontStyle.Normal;
@@ -116,6 +123,13 @@ namespace CharacterController
             //  -----
             //  Character Movement
             //  -----
+            if(m_helpBoxInfo != null) {
+                if(m_rigidbody != null) {
+                    m_helpBoxInfo.text = "[isKinematic:] " + m_rigidbody.isKinematic + "\n";
+                }
+                
+            }
+            EditorGUILayout.HelpBox(m_helpBoxInfo);
 
             displayMovement.boolValue = m_useCustomeHeader ? InspectorUtility.Foldout(displayMovement.boolValue, MotorFoldoutHeader) : EditorGUILayout.Foldout(displayMovement.boolValue, MotorFoldoutHeader);
             //displayMovement.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayMovement.boolValue, MotorFoldoutHeader) : InspectorUtility.Foldout(displayMovement.boolValue, MotorFoldoutHeader);
@@ -393,7 +407,7 @@ namespace CharacterController
 
         private void ChangeStateName( SerializedProperty property, string actionType)
         {
-            Animator animator = m_Controller.GetComponent<Animator>();
+            Animator animator = m_controller.GetComponent<Animator>();
             var states = AnimatorUtil.GetStateMachineChildren.GetChildren(animator, actionType);
 
             var menu = new GenericMenu();
@@ -413,7 +427,7 @@ namespace CharacterController
         {
             //Debug.LogFormat("Right clicked {0}.", actionName);
 
-            Animator animator = m_Controller.GetComponent<Animator>();
+            Animator animator = m_controller.GetComponent<Animator>();
             if (animator == null) {
                 Debug.Log("No Animator");
                     return;
@@ -432,7 +446,7 @@ namespace CharacterController
 
         private void AddCharacterAction(Type type)
         {
-            CharacterAction characterAction = (CharacterAction)m_Controller.gameObject.AddComponent(type);
+            CharacterAction characterAction = (CharacterAction)m_controller.gameObject.AddComponent(type);
 
             //m_ActionsList.serializedProperty.InsertArrayElementAtIndex(m_ActionsList.count);
             ////  You have to ApplyModifiedProperties after inserting a new array element otherwise the changes don't get reflected right away.

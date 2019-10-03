@@ -283,7 +283,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_deltaTime: 0
-  m_time: 0
+  m_lastFrameTime: 0
 --- !u!1 &1135609931
 GameObject:
   m_ObjectHideFlags: 0

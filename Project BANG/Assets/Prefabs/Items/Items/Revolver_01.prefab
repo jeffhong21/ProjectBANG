@@ -46,17 +46,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb4f2bdf3625d4e94973778b81397e11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemType: {fileID: 11400000, guid: 35be7b2ac6209491fbd2befd091a4a23, type: 2}
-  slotID: 0
-  animatorItemID: 1
-  animatorMovementSetID: 0
-  dropPrefab: {fileID: 0}
+  m_itemType: {fileID: 11400000, guid: 35be7b2ac6209491fbd2befd091a4a23, type: 2}
+  m_animatorItemID: 0
+  m_animatorMovementSetID: 0
+  m_dropPrefab: {fileID: 0}
   holsterTarget: {fileID: 0}
   m_NonDominantHandIKTarget: {fileID: 0}
   m_NonDominantHandIKTargetHint: {fileID: 0}
-  localSpawnPosition: {x: 0, y: 0, z: 0}
-  localSpawnRotation: {x: 0, y: 0, z: 0}
-  m_Character: {fileID: 0}
+  m_character: {fileID: 0}
 --- !u!114 &308690195619889190
 MonoBehaviour:
   m_ObjectHideFlags: 0
