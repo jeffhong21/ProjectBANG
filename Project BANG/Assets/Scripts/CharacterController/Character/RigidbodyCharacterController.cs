@@ -708,29 +708,6 @@ namespace CharacterController
 
 
 
-        protected virtual Vector3 GetLinearVelocity(float speed, bool local = false)
-        {
-            //Vector3 moveDirection = m_lookRotation * m_transform.forward;
-            //Vector3 forward = Vector3.ProjectOnPlane(moveDirection, Vector3.up);
-            //Vector3 linearVelocity = Quaternion.FromToRotation(Vector3.forward, forward) * m_inputVector;
-            //linearVelocity 
-            //float moveAmount = Mathf.Abs(m_inputVector.x) + Mathf.Abs(m_inputVector.z);
-            //if (moveAmount >= 0.2f || m_inputVector.sqrMagnitude >= 0.2f) {
-            //    Vector3 moveDirection = m_lookRotation * m_transform.forward;
-            //    Vector3 forward = Vector3.ProjectOnPlane(moveDirection, Vector3.up);
-            //    Vector3 linearVelocity = Quaternion.FromToRotation(Vector3.forward, forward) * m_inputVector;
-            //    linearVelocity = linearVelocity.Multiply(m_desiredSpeed);
-
-            //    return world ? linearVelocity : Quaternion.Inverse(m_transform.rotation) * linearVelocity;
-            //}
-
-            return Vector3.zero;
-        }
-
-
-
-
-
 
         public Vector3 GetDirectionTangentToSurface(Vector3 direction, Vector3 surfaceNormal)
         {
@@ -770,7 +747,11 @@ namespace CharacterController
 
 
 
+        private float GetGroundAngle()
+        {
 
+            return 0;
+        }
 
 
 
@@ -873,15 +854,6 @@ namespace CharacterController
             return origin + (direction * (pointsDist * .5f));
         }
 
-
-
-        protected void ClearNonAllocArrays()
-        {
-            for (int i = 0; i < m_probedColliders.Length; i++) {
-                if (m_probedColliders[i] == null) break;
-                m_probedColliders[i] = default;
-            }
-        }
 
 
 
