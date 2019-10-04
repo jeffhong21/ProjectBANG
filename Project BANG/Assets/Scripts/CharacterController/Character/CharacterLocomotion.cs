@@ -15,6 +15,27 @@ namespace CharacterController
 
         public event Action<bool> OnAim = delegate {};
 
+        //[Serializable]
+        //public class AnimationSettings
+        //{
+        //    [Tooltip("The name of the state that should be activated when the character is moving.")]
+        //    public string moveStateName = "Movement";
+        //    [Tooltip("The name of the state that should be activated when the character is airborne.")]
+        //    public string airborneStateName = "Airborne";
+        //}
+
+        //[Serializable]
+        //public class ActionSettings
+        //{
+        //    public CharacterAction[] actions;
+        //}
+
+
+        //[SerializeField]
+        //private AnimationSettings m_animationSettings = new AnimationSettings();
+        //[SerializeField]
+        //private ActionSettings m_actionSettings = new ActionSettings();
+
 
         //  -- Animation variables
         [FormerlySerializedAs("m_moveStateName"), Tooltip("The name of the state that should be activated when the character is moving.")]
@@ -100,7 +121,8 @@ namespace CharacterController
             m_animator.applyRootMotion = m_useRootMotionPosition || m_useRootMotionRotation;
             //  Rigidbody settings
             m_rigidbody = GetComponent<Rigidbody>();
-            m_gravity = Physics.gravity;
+
+            gravity = Physics.gravity.y * m_gravityModifier;
 
             //  Collider settings
             m_collider = GetComponent<CapsuleCollider>();
@@ -204,14 +226,16 @@ namespace CharacterController
             m_lastFrameTime = Time.realtimeSinceStartup;
             DebugUI.Log(this, "[F] newDeltaTime", m_newDeltaTime, RichTextColor.Lime);
             //  --------------------------
-
+            m_deltaTime = m_newDeltaTime;
 
             //if (!m_rigidbody.isKinematic) {
             //    OnUpdate(m_deltaTime);
             //    //Set frameUpdated.
             //    m_frameUpdated = true;
             //}
-
+            OnUpdate(m_deltaTime);
+            //Set frameUpdated.
+            m_frameUpdated = true;
         }
 
         private void Update()
@@ -223,12 +247,6 @@ namespace CharacterController
                 m_interpolationFactor = (Time.realtimeSinceStartup - newerTime) / (newerTime - olderTime);
             else m_interpolationFactor = 1;
 
-
-
-
-            //if (m_frameUpdated) return;
-            //KinematicMove();
-
             //  --------------------------
             //  Time manager
             //  --------------------------
@@ -236,8 +254,9 @@ namespace CharacterController
             m_lastFrameTime = Time.realtimeSinceStartup;
             DebugUI.Log(this, "[U] newDeltaTime", m_newDeltaTime, RichTextColor.Magenta);
             //  --------------------------
+            m_deltaTime = m_newDeltaTime;
 
-
+            if (m_frameUpdated) return;
             OnUpdate(m_deltaTime);
             m_frameUpdated = true;
         }
@@ -254,11 +273,13 @@ namespace CharacterController
             DebugUI.Log(this, "interpolateFactor", interpolateFactor, RichTextColor.Lime);
             //  -------------------
 
-            if (m_useRootMotionPosition)
-                m_rigidbody.MovePosition(m_animator.rootPosition);
+            //if (m_useRootMotionPosition)
+            //    m_rigidbody.MovePosition(m_animator.rootPosition);
 
-            if (m_useRootMotionRotation)
-                m_rigidbody.MoveRotation(m_animator.rootRotation);
+            //if (m_useRootMotionRotation)
+            //    m_rigidbody.MoveRotation(m_animator.rootRotation);
+
+            //m_inputVector = Vector3.zero;
 
             //  Continue with updates.
             if (m_frameUpdated) {

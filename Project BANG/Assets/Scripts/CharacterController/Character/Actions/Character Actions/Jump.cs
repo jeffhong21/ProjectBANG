@@ -151,10 +151,10 @@ namespace CharacterController
 
 
 
-            if (m_rigidbody.velocity.y < 0) {
-                m_rigidbody.useGravity = useGravityCache;
-                m_Controller.MoveDirection += m_Controller.Gravity * m_deltaTime;
-            }
+            //if (m_rigidbody.velocity.y < 0) {
+            //    m_rigidbody.useGravity = useGravityCache;
+            //    m_Controller.MoveDirection += m_Controller.Gravity * m_deltaTime;
+            //}
 
             
 

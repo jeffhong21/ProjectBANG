@@ -14,6 +14,7 @@ namespace CharacterController
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Text;
 
     [CustomEditor(typeof(CharacterLocomotion))]
     public class CharacterLocomotionEditor : ccEditor.InspectorEditor
@@ -32,7 +33,8 @@ namespace CharacterController
         private const string ActionsFoldoutHeader = "Character Actions";
         private const string DebugHeader = "Debug ";
 
-        private GUIContent m_helpBoxInfo;
+        private StringBuilder m_helpBoxInfo;
+        private GUIStyle m_helpBoxStyle;
 
         private CharacterLocomotion m_controller;
         private Rigidbody m_rigidbody;
@@ -77,8 +79,20 @@ namespace CharacterController
             m_controller = (CharacterLocomotion)target;
             if (m_rigidbody == null) m_rigidbody = m_controller.GetComponent<Rigidbody>();
 
-            if (m_helpBoxInfo == null) m_helpBoxInfo = new GUIContent();
-
+            if (m_helpBoxInfo == null) m_helpBoxInfo = new StringBuilder(500);
+            if (m_helpBoxInfo != null) {
+                if (m_rigidbody != null)
+                {
+                    m_helpBoxInfo.AppendFormat("<b> isKinematic</b>:    {0}\n", m_rigidbody.isKinematic);
+                    m_helpBoxInfo.AppendFormat("<b> velocity</b>:       {0}\n", m_rigidbody.velocity);
+                    m_helpBoxInfo.AppendFormat("<b> angularVelocity</b>:    {0}\n", m_rigidbody.angularVelocity);
+                    m_helpBoxInfo.AppendFormat("<b> inertiaTensor</b>:  {0}\n", m_rigidbody.inertiaTensor);
+                    m_helpBoxInfo.AppendFormat("<b> inertiaTensorRotation</b>:  {0}\n", m_rigidbody.inertiaTensorRotation);
+                    m_helpBoxInfo.AppendFormat("<b> centerOfMass</b>:   {0}\n", m_rigidbody.centerOfMass);
+                    m_helpBoxInfo.AppendFormat("<b> worldCenterOfMass</b>:  {0}\n", m_rigidbody.worldCenterOfMass);
+                    m_helpBoxInfo.AppendFormat("<b> Sleep State</b>:    {0}\n", m_rigidbody.IsSleeping() ? "Sleeping" : "Awake");
+                }
+            }
 
             m_LineHeight = EditorGUIUtility.singleLineHeight;
             m_DefaultActionTextStyle.fontStyle = FontStyle.Normal;
@@ -123,13 +137,9 @@ namespace CharacterController
             //  -----
             //  Character Movement
             //  -----
-            if(m_helpBoxInfo != null) {
-                if(m_rigidbody != null) {
-                    m_helpBoxInfo.text = "[isKinematic:] " + m_rigidbody.isKinematic + "\n";
-                }
-                
-            }
-            EditorGUILayout.HelpBox(m_helpBoxInfo);
+
+
+
 
             displayMovement.boolValue = m_useCustomeHeader ? InspectorUtility.Foldout(displayMovement.boolValue, MotorFoldoutHeader) : EditorGUILayout.Foldout(displayMovement.boolValue, MotorFoldoutHeader);
             //displayMovement.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayMovement.boolValue, MotorFoldoutHeader) : InspectorUtility.Foldout(displayMovement.boolValue, MotorFoldoutHeader);
@@ -248,6 +258,9 @@ namespace CharacterController
             //  -----
             EditorGUILayout.Space();
             EditorGUI.indentLevel++;
+
+            //EditorGUILayout.PropertyField(serializedObject.FindProperty("m_animationSettings"), true);
+            //EditorGUILayout.PropertyField(serializedObject.FindProperty("m_actionSettings"), true);
             DrawPropertiesExcluding(serializedObject, m_DontInclude);
             EditorGUI.indentLevel--;
             EditorGUILayout.Space();
@@ -258,6 +271,11 @@ namespace CharacterController
             EditorGUI.indentLevel++;
             InspectorUtility.PropertyField(serializedObject.FindProperty("debugger"), true);
             EditorGUI.indentLevel--;
+
+
+            if (m_helpBoxStyle == null) m_helpBoxStyle = GUI.skin.GetStyle("HelpBox");
+            m_helpBoxStyle.richText = true;
+            EditorGUILayout.TextArea(m_helpBoxInfo.ToString(), m_helpBoxStyle);
 
 
             EditorGUILayout.Space();

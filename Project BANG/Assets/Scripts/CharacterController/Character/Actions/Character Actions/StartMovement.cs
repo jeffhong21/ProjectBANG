@@ -91,7 +91,8 @@ namespace CharacterController
                 case (RigidbodyCharacterController.MovementTypes.Adventure):
 
 
-                    startAngle = m_Controller.GetAngleFromForward(m_Controller.LookRotation * m_transform.forward);
+                    //startAngle = m_Controller.GetAngleFromForward(m_Controller.LookRotation * m_transform.forward);
+                    startAngle = m_transform.AngleFromForward(m_Controller.LookRotation * m_transform.forward);
                     //Vector3 moveDirection = m_transform.InverseTransformDirection(m_Controller.InputVector);
                     //Vector3 axisSign = Vector3.Cross(moveDirection, m_transform.forward);
                     //startAngle = Vector3.Angle(moveDirection, m_transform.forward) * (axisSign.y >= 0 ? -1f : 1f);

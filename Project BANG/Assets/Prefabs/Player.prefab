@@ -524,7 +524,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.5
+  m_Radius: 0.4
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
@@ -540,6 +540,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e78c0408c7564ed789d7937cadd7677, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_physicsSettings:
+    colliderSettings:
+      colliderHeight: 2
+      colliderRadius: 0.4
+  m_advanceSettings:
+    queryTrigger: 1
+    timeScale: 1
   m_useRootMotionPosition: 0
   m_useRootMotionRotation: 0
   m_rootMotionSpeedMultiplier: 1
@@ -553,7 +560,7 @@ MonoBehaviour:
   m_skinWidth: 0.08
   m_slopeLimit: 45
   m_maxStepHeight: 0.4
-  m_gravityModifier: 1
+  m_gravityModifier: 2
   m_groundStickiness: 2
   m_collisionsLayerMask:
     serializedVersion: 2
@@ -575,8 +582,9 @@ MonoBehaviour:
     heightOffset: 0.05
     arrowTipSize: 0.1
     arrowWidth: 0.2
-  displayMovement: 1
-  displayPhysics: 0
+  m_MovementType: 0
+  displayMovement: 0
+  displayPhysics: 1
   displayCollisions: 0
   displayAnimations: 0
   displayActions: 0

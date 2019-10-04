@@ -79,7 +79,7 @@ public static class InspectorUtility
             GUI.enabled = false;
             EditorGUILayout.PropertyField(property);
             GUI.enabled = true;
-            GUILayout.Space(EditorGUIUtility.singleLineHeight);
+            GUILayout.Space(EditorGUIUtility.singleLineHeight / 2);
 
         }
         else if(property.isArray && includeChildren)

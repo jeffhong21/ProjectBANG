@@ -125,7 +125,7 @@ namespace CharacterController
         private float MouseZoomInputRaw { get { return Input.GetAxisRaw(m_MouseScrollInput); } }
 
 
-
+        public bool hasMovementInput { get { return m_inputVector.sqrMagnitude > 0; } }
 
 
 
@@ -308,6 +308,10 @@ namespace CharacterController
 
         private void HandleInput()
         {
+
+            if(hasMovementInput == false) {
+
+            }
 
             if (AnyKeyDown()) {
                 //var inputString = Input.inputString;

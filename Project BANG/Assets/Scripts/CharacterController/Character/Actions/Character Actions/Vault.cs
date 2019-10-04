@@ -196,7 +196,7 @@
 
         protected void StartVault()
         {
-            m_verticalVelocity = Vector3.up * Mathf.Sqrt(2 * (platformHeight + 0.02f) * Mathf.Abs(m_Controller.Gravity.y));
+            m_verticalVelocity = Vector3.up * Mathf.Sqrt(2 * (platformHeight + 0.02f) * Mathf.Abs(m_Controller.gravity));
             //m_rigidbody.velocity += m_verticalVelocity;
             //m_rigidbody.AddForce(m_verticalVelocity, ForceMode.VelocityChange);
 
