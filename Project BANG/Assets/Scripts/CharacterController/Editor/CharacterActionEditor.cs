@@ -47,12 +47,12 @@
         {
             serializedObject.Update();
             //  Header
-            InspectorUtility.LabelField(m_ActionSettingsHeader, 12, FontStyle.Bold);
 
             GUI.enabled = false;
-            InspectorUtility.PropertyField(serializedObject.FindProperty("m_Script"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"));
             GUI.enabled = true;
-            EditorGUILayout.Space();
+            InspectorUtility.LabelField(m_ActionSettingsHeader);
+
 
             InspectorUtility.PropertyField(serializedObject.FindProperty("m_TransitionDuration"));
             InspectorUtility.PropertyField(serializedObject.FindProperty("m_SpeedMultiplier"));

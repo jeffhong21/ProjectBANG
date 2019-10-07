@@ -3,12 +3,43 @@
     using UnityEngine;
     using System;
 
+    public enum AnimationEventType
+    {
+        Default, Bool, Int, Float, String
+    }
+
     public abstract class StateBehavior : StateMachineBehaviour
     {
+        [Serializable]
+        public class AnimationEventItem
+        {
+            public string animationEvent;
+            public AnimationEventType eventType = AnimationEventType.Default;
+            public bool boolValue;
+            public float floatValue;
+            public int intValue;
+            public string stringValue;
+
+            public float time;
+            public bool sent;
+
+            [Tooltip("Is animation event enabled.")]
+            public bool enabled = true;
+
+            public AnimationEventItem()
+            {
+                animationEvent = string.Empty;
+                enabled = true;
+            }
+        }
+
+
+        public AnimationEventItem[] onTimedEvents = new AnimationEventItem[0];
 
         protected AnimatorMonitor m_animatorMonitor;
         protected Animator m_animator;
         private bool m_isInitialized;
+
 
 
 

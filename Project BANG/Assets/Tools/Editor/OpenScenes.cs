@@ -97,6 +97,14 @@ public class OpenScenes
     }
 
 
+    [MenuItem("Scenes/FrontierTown-IntenseLighting Scene", false, 201)]
+    public static void OpenFrontierTown()
+    {
+        string path = "Assets/Scenes/FrontierTown/FrontierTown.unity";
+        OpenScene(path);
+    }
+
+
     [MenuItem("Scenes/Debug All Scenes", false, 1000)]
     public static void DebugAllScenes()
     {

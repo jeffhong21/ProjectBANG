@@ -7,6 +7,8 @@ using CharacterController.CharacterInventory;
 
 namespace CharacterController
 {
+    using CharacterController.Items;
+
     public class Item : MonoBehaviour
     {
 
@@ -15,42 +17,46 @@ namespace CharacterController
         //
         [SerializeField]
         protected ItemType m_itemType;
-
+        [SerializeField]
+        protected GameObject m_dropPrefab;
+        [SerializeField]
+        protected Transform m_holsterTarget;
 
         [SerializeField]
-        protected Transform holsterTarget;
+        protected string m_equipStateName = "Equip";
+        [SerializeField]
+        protected string m_unequipStateName = "Unequip";
+
 
 
         [Group("Hand IK")] [Tooltip("The ik position of the non dominant hand.")]      //  Currently not used.
-        [SerializeField] protected Transform m_NonDominantHandIKTarget;
+        [SerializeField] protected Transform m_nonDominantHandIKTarget;
         [Group("Hand IK")] [Tooltip("The ik hint transform for non dominant hand.")] 
-        [SerializeField] protected Transform m_NonDominantHandIKTargetHint;
+        [SerializeField] protected Transform m_nonDominantHandIKTargetHint;
 
 
-        //[SerializeField]
-        //protected Vector3 localSpawnPosition;
-        //[SerializeField]
-        //protected Vector3 localSpawnRotation;
 
-
-        //[Header("Events")]
-        //public AnimationEventTrigger equipEvent = new AnimationEventTrigger("OnAnimatorEquipItem");
-        //public AnimationEventTrigger unequipEvent = new AnimationEventTrigger("OnAnimatorUnequipItem");
-
-
-        //public EquipItemEvent OnEquipEvent = new EquipItemEvent();
-        //public UnityEvent OnUnequipEvent = new UnityEvent();
 
 
         public ItemType ItemType{ get { return m_itemType; } }
 
-        public int AnimatorItemID { get { return m_itemType.m_itemID; } }
+        public int animatorItemID { get { return (int)m_itemType.itemID; } }
 
-        public int AnimatorMovementSetID { get { return m_itemType.m_movementSetID; } }
+        public int movementSetID { get { return m_itemType.movementSetID; } }
 
+        public string equipStateName {
+            get {
+                if (m_equipStateName == string.Empty) m_equipStateName = "Equip";
+                return m_itemType.ItemName + "." + m_equipStateName;
+            }
+        }
 
-
-
+        public string unequipStateName {
+            get {
+                if (m_equipStateName == string.Empty) m_equipStateName = "Equip";
+                return m_itemType.ItemName + "." + m_unequipStateName;
+            }
+        }
 
 
 
@@ -76,8 +82,8 @@ namespace CharacterController
 
             if (m_character != null)
             {
-                EventHandler.UnregisterEvent(m_character, EventIDs.OnAnimatorEquipItem, ItemActivated);
-                EventHandler.UnregisterEvent(m_character, EventIDs.OnAnimatorUnequipItem, ItemDeactivated);
+                //EventHandler.UnregisterEvent(m_character, EventIDs.OnAnimatorEquipItem, ItemActivated);
+                //EventHandler.UnregisterEvent(m_character, EventIDs.OnAnimatorUnequipItem, ItemDeactivated);
                 //EventHandler.UnregisterEvent(m_character, EventIDs.OnAnimatorDropItem, ItemDeactivated);
                 //EventHandler.UnregisterEvent(m_character, EventIDs.OnAnimatorPickupItem, ItemActivated);
             }
@@ -102,19 +108,19 @@ namespace CharacterController
 
 
             if (m_character != null) {
-                EventHandler.RegisterEvent(m_character, EventIDs.OnAnimatorEquipItem, ItemActivated);
-                EventHandler.RegisterEvent(m_character, EventIDs.OnAnimatorUnequipItem, ItemDeactivated);
+                //EventHandler.RegisterEvent(m_character, EventIDs.OnAnimatorEquipItem, ItemActivated);
+                //EventHandler.RegisterEvent(m_character, EventIDs.OnAnimatorUnequipItem, ItemDeactivated);
                 //EventHandler.RegisterEvent(m_character, EventIDs.OnAnimatorDropItem, ItemDeactivated);
                 //EventHandler.RegisterEvent(m_character, EventIDs.OnAnimatorPickupItem, ItemActivated);
                 //Debug.LogFormat("Registering event equip event for {0}", m_itemType.name);
             }
 
 
-            if (m_NonDominantHandIKTarget == null) {
-                m_NonDominantHandIKTarget = new GameObject("NonDominantHandIKTarget").transform;
-                m_NonDominantHandIKTarget.parent = m_transform;
-                m_NonDominantHandIKTarget.localPosition = Vector3.zero;
-                m_NonDominantHandIKTarget.localEulerAngles = new Vector3(3, 50, 180);
+            if (m_nonDominantHandIKTarget == null) {
+                m_nonDominantHandIKTarget = new GameObject("NonDominantHandIKTarget").transform;
+                m_nonDominantHandIKTarget.parent = m_transform;
+                m_nonDominantHandIKTarget.localPosition = Vector3.zero;
+                m_nonDominantHandIKTarget.localEulerAngles = new Vector3(3, 50, 180);
             }
 
 
@@ -151,9 +157,9 @@ namespace CharacterController
             }
             else
             {
-                if (holsterTarget){
+                if (m_holsterTarget){
                     //  Parent the object to the holster and reset position and rotation values.
-                    m_gameObject.transform.parent = holsterTarget;
+                    m_gameObject.transform.parent = m_holsterTarget;
                     m_gameObject.transform.localPosition = Vector3.zero;
                     m_gameObject.transform.localEulerAngles = Vector3.zero;
                 }

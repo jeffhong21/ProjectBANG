@@ -405,7 +405,7 @@
                 if (string.IsNullOrEmpty(GetDestinationState(layer)) == false)
                 {
                     string destinationState = GetDestinationState(layer);
-                    bool stateChanged = m_animatorMonitor.ChangeAnimatorState(this, layer, destinationState, m_TransitionDuration);
+                    bool stateChanged = m_animatorMonitor.ChangeAnimatorState(this, destinationState, m_TransitionDuration, layer);
 
                     if (stateChanged)
                     {

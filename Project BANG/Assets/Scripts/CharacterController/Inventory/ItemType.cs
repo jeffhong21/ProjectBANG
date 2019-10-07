@@ -1,6 +1,10 @@
-﻿namespace CharacterController
+﻿using UnityEngine;
+
+
+
+namespace CharacterController
 {
-    using UnityEngine;
+    using CharacterController.Items;
 
     [CreateAssetMenu(fileName = "ItemType", menuName = "Character Controller/Item Type", order = 1000)]
     public class ItemType : ScriptableObject
@@ -10,18 +14,20 @@
         //[SerializeField, DisplayOnly]
         //protected int m_ID = -1;
 
-        protected string m_description;
+        protected string description;
         [Tooltip("The generic name for the item.  This is used for animations and to categorizing the item.")]
-        public string m_itemName;
+        public string itemName;
         [Tooltip("The id used in the animator.")]
-        public int m_itemID = -1;
+        public ItemTypeID itemID = ItemTypeID.Revolver;
+        [Tooltip("")]
+        public ItemCategory category = ItemCategory.Weapon;
         [Tooltip("What movement set to use.")]
-        public int m_movementSetID = -1;
+        public int movementSetID = -1;
 
         [Tooltip("Max amount inventory can hold."), Min(0)]
-        public int m_capacity = int.MaxValue;
+        public int capacity = int.MaxValue;
         [Tooltip("Does the item take an additional item slot?")]
-        public bool m_stackable;
+        public bool stackable;
 
         public UseableConsumableItem m_ConsumableItem;
 
@@ -40,15 +46,15 @@
 
 
         public string ItemName {
-            get { return m_itemName; }
+            get { return itemName; }
         }
 
         public int Capacity{
-            get { return m_capacity; }
-            set { m_capacity = Mathf.Clamp(value, 0, int.MaxValue); }
+            get { return capacity; }
+            set { capacity = Mathf.Clamp(value, 0, int.MaxValue); }
         }
 
-        public bool Stackable { get { return m_stackable; } }
+        public bool Stackable { get { return stackable; } }
 
         public UseableConsumableItem ConsumableItem{
             get { return m_ConsumableItem; }
@@ -57,6 +63,12 @@
 
 
 
+        private void OnValidate()
+        {
+            if(itemName == string.Empty) {
+                itemName = this.name;
+            }
+        }
 
 
 

@@ -5,10 +5,8 @@
 
     public class ActionStateBehavior : StateBehavior
     {
-        [SerializeField]
-        protected string m_characterAction;
-        [SerializeField]
-        protected AnimatorMatchTarget m_matchTarget;
+        public bool enableMatchTarget;
+        public AnimatorMatchTarget matchTarget;
 
 
 
@@ -19,7 +17,7 @@
 
         protected override void OnInitialize()
         {
-            m_matchTarget = new AnimatorMatchTarget(m_animator);
+            matchTarget = new AnimatorMatchTarget(m_animator);
         }
 
 
@@ -29,6 +27,7 @@
         {
             base.OnStateEnter(animator, stateInfo, layerIndex);
 
+            ResetEvents(onTimedEvents);
             //m_animatorMonitor.SetActiveStateBehavior(this);
         }
 
@@ -37,7 +36,9 @@
         {
             base.OnStateUpdate(animator, stateInfo, layerIndex);
 
-            //if (m_matchTarget.matchTarget) m_matchTarget.MatchTarget();
+            ExecuteEvents(onTimedEvents, stateInfo);
+
+            //if (matchTarget.matchTarget) matchTarget.MatchTarget();
             //if (!m_animator.isMatchingTarget && )
             //{
 
@@ -53,8 +54,8 @@
             //    animatorMonitor.ResetMatchTarget();
             //}
 
-            //if (m_matchTarget.matchTarget && m_animator.isMatchingTarget){
-            //    m_matchTarget.Reset(true, false);
+            //if (matchTarget.matchTarget && m_animator.isMatchingTarget){
+            //    matchTarget.Reset(true, false);
             //}
             //m_animatorMonitor.SetActiveStateBehavior(null);
         }
@@ -63,14 +64,35 @@
 
         public bool MatchTarget(Vector3 matchPosition, Quaternion matchRotation)
         {
-            m_matchTarget.matchTarget = true;
-            return m_matchTarget.SetMatchTarget(matchPosition, matchRotation);
+            //matchTarget.matchTarget = true;
+            return matchTarget.SetMatchTarget(matchPosition, matchRotation);
         }
 
 
 
+        private void ResetEvents(AnimationEventItem[] animationEvents)
+        {
+            for (int i = 0; i < animationEvents.Length; i++) {
+                animationEvents[i].sent = false;
+            }
+        }
 
-
+        private void ExecuteEvents(AnimationEventItem[] animationEvents, AnimatorStateInfo stateInfo)
+        {
+            if (animationEvents != null) {
+                for (int i = 0; i < animationEvents.Length; i++) {
+                    var animEvent = animationEvents[i];
+                    if (animEvent.enabled && animEvent.animationEvent != string.Empty) {
+                        float stateTime = stateInfo.normalizedTime % 1;
+                        if (!animEvent.sent && (stateTime >= animEvent.time)) {
+                            animEvent.sent = true;
+                            //Debug.LogFormat("<b>[{0}]</b> <color=green>{1}</color>", animEvent.animationEvent, stateTime);
+                            m_animatorMonitor.ExecuteEvent(animEvent.animationEvent);
+                        }
+                    }
+                }
+            }
+        }
 
 
 

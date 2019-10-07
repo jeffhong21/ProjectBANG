@@ -78,12 +78,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_itemType: {fileID: 11400000, guid: d8d6f5d76eee24134ae731f3374e26e2, type: 2}
-  m_animatorItemID: 0
-  m_animatorMovementSetID: 0
   m_dropPrefab: {fileID: 0}
-  holsterTarget: {fileID: 0}
-  m_NonDominantHandIKTarget: {fileID: 0}
-  m_NonDominantHandIKTargetHint: {fileID: 0}
+  m_holsterTarget: {fileID: 0}
+  m_equipStateName: Equip
+  m_unequipStateName: Unequip
+  m_nonDominantHandIKTarget: {fileID: 708657531759224593}
+  m_nonDominantHandIKTargetHint: {fileID: 0}
   m_character: {fileID: 0}
 --- !u!114 &-7113790188769086120
 MonoBehaviour:

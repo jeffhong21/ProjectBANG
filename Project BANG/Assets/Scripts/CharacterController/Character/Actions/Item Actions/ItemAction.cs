@@ -14,7 +14,13 @@
         public virtual int ItemStateID { get { return m_ItemStateID; } set { m_ItemStateID = Mathf.Clamp(value, -1, int.MaxValue); } }
 
 
+        protected override void OnValidate()
+        {
+            base.OnValidate();
 
+            m_ItemStateID = ItemStateID >= 0 ? ItemStateID : -1;
+            //if (string.IsNullOrEmpty(m_StateName)) m_StateName = GetType().Name;
+        }
 
     }
 

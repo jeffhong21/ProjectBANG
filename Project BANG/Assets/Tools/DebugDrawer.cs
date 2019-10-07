@@ -232,6 +232,42 @@ public static class DebugDrawer
         Debug.DrawLine(upCornerInLeft, baseLeft, color);
     }
 
+    [Conditional("UNITY_EDITOR")]
+    public static void DrawCapsule(Vector3 start, Vector3 end, float radius, Color color, float duration = .001f, bool depthTest = true)
+    {
+        Vector3 up = (end - start).normalized * radius;
+        if (up == Vector3.zero) up = Vector3.up; //This can happen when the capsule is actually a sphere, so the start and end are right on eachother
+        Vector3 forward = Vector3.Slerp(up, -up, 0.5f);
+        Vector3 right = Vector3.Cross(up, forward).normalized * radius;
+
+        //Radial circles
+        DrawCircle(start, up, radius, color, duration, depthTest);
+        DrawCircle(end, -up, radius, color, duration, depthTest);
+
+        //Side lines
+        Debug.DrawLine(start + right, end + right, color, duration, depthTest);
+        Debug.DrawLine(start - right, end - right, color, duration, depthTest);
+
+        Debug.DrawLine(start + forward, end + forward, color, duration, depthTest);
+        Debug.DrawLine(start - forward, end - forward, color, duration, depthTest);
+
+        for (int i = 1; i < 26; i++) {
+
+            //Start endcap
+            Debug.DrawLine(Vector3.Slerp(right, -up, i / 25.0f) + start, Vector3.Slerp(right, -up, (i - 1) / 25.0f) + start, color, duration, depthTest);
+            Debug.DrawLine(Vector3.Slerp(-right, -up, i / 25.0f) + start, Vector3.Slerp(-right, -up, (i - 1) / 25.0f) + start, color, duration, depthTest);
+            Debug.DrawLine(Vector3.Slerp(forward, -up, i / 25.0f) + start, Vector3.Slerp(forward, -up, (i - 1) / 25.0f) + start, color, duration, depthTest);
+            Debug.DrawLine(Vector3.Slerp(-forward, -up, i / 25.0f) + start, Vector3.Slerp(-forward, -up, (i - 1) / 25.0f) + start, color, duration, depthTest);
+
+            //End endcap
+            Debug.DrawLine(Vector3.Slerp(right, up, i / 25.0f) + end, Vector3.Slerp(right, up, (i - 1) / 25.0f) + end, color, duration, depthTest);
+            Debug.DrawLine(Vector3.Slerp(-right, up, i / 25.0f) + end, Vector3.Slerp(-right, up, (i - 1) / 25.0f) + end, color, duration, depthTest);
+            Debug.DrawLine(Vector3.Slerp(forward, up, i / 25.0f) + end, Vector3.Slerp(forward, up, (i - 1) / 25.0f) + end, color, duration, depthTest);
+            Debug.DrawLine(Vector3.Slerp(-forward, up, i / 25.0f) + end, Vector3.Slerp(-forward, up, (i - 1) / 25.0f) + end, color, duration, depthTest);
+        }
+    }
+
+
 
     /// <summary>
     /// Draws an arrow

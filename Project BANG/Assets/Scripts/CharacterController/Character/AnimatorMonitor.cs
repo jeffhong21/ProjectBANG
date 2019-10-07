@@ -175,6 +175,8 @@
 
 
 
+            SetHeight(1);
+
         }
 
 
@@ -300,16 +302,15 @@
         /// <param name="transitionDuration">The transition time.</param>
         /// <param name="normalizedTime">The normalized offset time.</param>
         /// <returns>Returns true if changing to new state.</returns>
-        public bool ChangeAnimatorState(CharacterAction action, int layer, string destinationState, float transitionDuration, float normalizedTime = 0f)
+        public bool ChangeAnimatorState(CharacterAction action,string destinationState, float transitionDuration = 0.0f, int layer = -1, float normalizedTime = 0f)
         {
             if (destinationState.Contains(".") == false) Debug.Log(this.GetType());
 
             string fullStateName = m_animator.GetLayerName(layer) + "." + destinationState;
             int stateHash = GetStateHash(fullStateName);
 
-            if (stateHash > -1){
-                if (m_animator.HasState(layer, stateHash))
-                {
+            if (stateHash > -1) {
+                if (m_animator.HasState(layer, stateHash)) {
                     //  Set active action.
                     m_previousStateAction = m_activeStateAction;
                     m_activeStateAction = action;
@@ -325,7 +326,6 @@
 
             return false;
         }
-
 
 
         /// <summary>
@@ -532,9 +532,20 @@
             m_animator.SetTrigger(HashID.ItemStateIndexChange);
         }
 
+
+        public void SetAiming(bool value)
+        {
+            //  check if hashID exists.
+            m_animator.SetBool(HashID.Aiming, value);
+        }
+
         public void SetTrigger(int hashID){
             //  check if hashID exists.
             m_animator.SetTrigger(hashID);
+        }
+
+        public void SetHeight(float value){
+            m_animator.SetFloat(HashID.Height, value);
         }
 
         public void ActionChanged() { m_animator.SetTrigger(HashID.ActionChange); }
@@ -547,8 +558,14 @@
 
         public void ExecuteEvent(string eventName)
         {
-            if(logEvents) Debug.Log(eventName);
+            if(logEvents) Debug.LogFormat("<b>[{0}]</b> <color=green>{1}</color>", eventName, Time.time);
             EventHandler.ExecuteEvent(gameObject, eventName);
+        }
+
+        public void ExecuteEvent(string eventName, bool boolValue)
+        {
+            if (logEvents) Debug.LogFormat("<b>[{0}]</b> <color=blue>{1}</color>", eventName, boolValue);
+            EventHandler.ExecuteEvent(gameObject, eventName, boolValue);
         }
 
         public void ItemUsed(int itemTypeIndex)

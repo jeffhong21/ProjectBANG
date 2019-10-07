@@ -75,7 +75,7 @@ public class MinMaxRangePropertyDrawer : PropertyDrawer
                 controlRect.height);
 
             // Draw the label
-            EditorGUI.LabelField(labelRect, property.displayName + " | " + GetIndentOffset(controlRect));
+            EditorGUI.LabelField(labelRect, property.displayName);
             //EditorGUI.LabelField(labelRect, string.Format("{0} | {1} | {2}", property.displayName, floatFieldWidth, floatFieldWidth + positionOffset) );
 
             // Draw the slider
@@ -86,9 +86,11 @@ public class MinMaxRangePropertyDrawer : PropertyDrawer
 
             sliderValue.x = EditorGUI.FloatField(minFloatFieldRect, sliderValue.x);
             sliderValue.x = Mathf.Clamp(sliderValue.x, minMaxSliderAttribute.MinValue, Mathf.Min(minMaxSliderAttribute.MaxValue, sliderValue.y));
+            sliderValue.x = (float)Math.Round(sliderValue.x, minMaxSliderAttribute.Round);
 
             sliderValue.y = EditorGUI.FloatField(maxFloatFieldRect, sliderValue.y);
             sliderValue.y = Mathf.Clamp(sliderValue.y, Mathf.Max(minMaxSliderAttribute.MinValue, sliderValue.x), minMaxSliderAttribute.MaxValue);
+            sliderValue.y = (float)Math.Round(sliderValue.y, minMaxSliderAttribute.Round);
 
             if (EditorGUI.EndChangeCheck())
             {

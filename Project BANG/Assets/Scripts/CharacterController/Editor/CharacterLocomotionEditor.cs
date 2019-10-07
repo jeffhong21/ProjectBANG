@@ -22,16 +22,28 @@ namespace CharacterController
         //private CharacterLocomotion script { get { return target as CharacterLocomotion; } }
         private static readonly string[] m_DontInclude = { "m_Script", "debugger" };
 
+        private const string k_motorHeader = "Motor Settings";
+        private const string k_motorTooltip = "Character movement settings.";
+
+        private const string k_physicsContentHeader = "Physics Settings";
+        private const string k_physicsTooltip = "Settings for detecting collisions.";
+
+        private const string k_collisionsHeader = "Collision Settings";
+        private const string k_collisionsTooltip = "Settings for detecting collisions.";
+
+        private const string k_animationHeader = "Animation Settings";
+        private const string k_animationTooltip = "Settings for detecting collisions.";
+
+        private const string k_advanceHeader = "Advance Settings";
+        private const string k_advanceTooltip = "Settings for detecting collisions.";
+
 
         private bool m_useCustomeHeader = false;
         private bool m_spaceBetweenSections = true;
 
-        private const string MotorFoldoutHeader = "Movement Settings";
-        private const string PhysicsFoldoutHeader = "Physics Settings";
-        private const string CollisionsFoldoutHeader = "Collision Settings";
-        private const string AnimationFoldoutHeader = "Animation Settings";
+
         private const string ActionsFoldoutHeader = "Character Actions";
-        private const string DebugHeader = "Debug ";
+
 
         private StringBuilder m_helpBoxInfo;
         private GUIStyle m_helpBoxStyle;
@@ -42,28 +54,14 @@ namespace CharacterController
         private CharacterAction m_SelectedAction;
         private Editor m_ActionEditor;
 
+        private SerializedProperty m_motorSettings;
+        private SerializedProperty m_physicsSettings;
+        private SerializedProperty m_collisionSettings;
+        private SerializedProperty m_advanceSettings;
+        private SerializedProperty m_animationSettings;
 
-        //  -- Locomotion variables
-        private SerializedProperty m_useRootMotionPosition;
-        private SerializedProperty m_useRootMotionRotation;     //  double check
-        private SerializedProperty m_rootMotionSpeedMultiplier;
-        private SerializedProperty m_rootMotionRotationMultiplier;
-        private SerializedProperty m_motorAcceleration;
-        private SerializedProperty m_motorDamping;
-        private SerializedProperty m_desiredSpeed;
-        private SerializedProperty m_rotationSpeed;
+        private GUIContent motorGUIContent, physicsGUIContent, collisionsGUIContent, animationGUIContent, advanceGUIContent;
 
-        //  -- Physics variables
-        private SerializedProperty m_mass;
-        private SerializedProperty m_skinWidth;
-        private SerializedProperty m_slopeLimit;
-        private SerializedProperty m_maxStepHeight;
-        private SerializedProperty m_gravityModifier;
-        private SerializedProperty m_groundStickiness;
-
-        //  -- Collision variables
-        private SerializedProperty m_collisionsLayerMask;
-        private SerializedProperty m_maxCollisionCount;
 
         private SerializedProperty displayMovement, displayPhysics, displayCollisions, displayAnimations, displayActions;
 
@@ -77,46 +75,40 @@ namespace CharacterController
 
             if (target == null) return;
             m_controller = (CharacterLocomotion)target;
-            if (m_rigidbody == null) m_rigidbody = m_controller.GetComponent<Rigidbody>();
+            //if (m_rigidbody == null) m_rigidbody = m_controller.GetComponent<Rigidbody>();
 
-            if (m_helpBoxInfo == null) m_helpBoxInfo = new StringBuilder(500);
-            if (m_helpBoxInfo != null) {
-                if (m_rigidbody != null)
-                {
-                    m_helpBoxInfo.AppendFormat("<b> isKinematic</b>:    {0}\n", m_rigidbody.isKinematic);
-                    m_helpBoxInfo.AppendFormat("<b> velocity</b>:       {0}\n", m_rigidbody.velocity);
-                    m_helpBoxInfo.AppendFormat("<b> angularVelocity</b>:    {0}\n", m_rigidbody.angularVelocity);
-                    m_helpBoxInfo.AppendFormat("<b> inertiaTensor</b>:  {0}\n", m_rigidbody.inertiaTensor);
-                    m_helpBoxInfo.AppendFormat("<b> inertiaTensorRotation</b>:  {0}\n", m_rigidbody.inertiaTensorRotation);
-                    m_helpBoxInfo.AppendFormat("<b> centerOfMass</b>:   {0}\n", m_rigidbody.centerOfMass);
-                    m_helpBoxInfo.AppendFormat("<b> worldCenterOfMass</b>:  {0}\n", m_rigidbody.worldCenterOfMass);
-                    m_helpBoxInfo.AppendFormat("<b> Sleep State</b>:    {0}\n", m_rigidbody.IsSleeping() ? "Sleeping" : "Awake");
-                }
-            }
+            //if (m_helpBoxInfo == null) m_helpBoxInfo = new StringBuilder(500);
+            //if (m_helpBoxInfo != null) {
+            //    if (m_rigidbody != null)
+            //    {
+            //        m_helpBoxInfo.AppendFormat("<b> isKinematic</b>:    {0}\n", m_rigidbody.isKinematic);
+            //        m_helpBoxInfo.AppendFormat("<b> velocity</b>:       {0}\n", m_rigidbody.velocity);
+            //        m_helpBoxInfo.AppendFormat("<b> angularVelocity</b>:    {0}\n", m_rigidbody.angularVelocity);
+            //        m_helpBoxInfo.AppendFormat("<b> inertiaTensor</b>:  {0}\n", m_rigidbody.inertiaTensor);
+            //        m_helpBoxInfo.AppendFormat("<b> inertiaTensorRotation</b>:  {0}\n", m_rigidbody.inertiaTensorRotation);
+            //        m_helpBoxInfo.AppendFormat("<b> centerOfMass</b>:   {0}\n", m_rigidbody.centerOfMass);
+            //        m_helpBoxInfo.AppendFormat("<b> worldCenterOfMass</b>:  {0}\n", m_rigidbody.worldCenterOfMass);
+            //        m_helpBoxInfo.AppendFormat("<b> Sleep State</b>:    {0}\n", m_rigidbody.IsSleeping() ? "Sleeping" : "Awake");
+            //    }
+            //}
 
             m_LineHeight = EditorGUIUtility.singleLineHeight;
             m_DefaultActionTextStyle.fontStyle = FontStyle.Normal;
             m_ActiveActionTextStyle.fontStyle = FontStyle.Bold;
 
 
-            m_useRootMotionPosition = serializedObject.FindProperty("m_useRootMotionPosition");
-            m_useRootMotionRotation = serializedObject.FindProperty("m_useRootMotionRotation");
-            m_rootMotionSpeedMultiplier = serializedObject.FindProperty("m_rootMotionSpeedMultiplier");
-            m_rootMotionRotationMultiplier = serializedObject.FindProperty("m_rootMotionRotationMultiplier");
-            m_motorAcceleration = serializedObject.FindProperty("m_motorAcceleration");
-            m_motorDamping = serializedObject.FindProperty("m_motorDamping");
-            m_desiredSpeed = serializedObject.FindProperty("m_desiredSpeed");
-            m_rotationSpeed = serializedObject.FindProperty("m_rotationSpeed");
+            m_motorSettings = serializedObject.FindProperty("m_motor");
+            m_physicsSettings = serializedObject.FindProperty("m_physics");
+            m_collisionSettings = serializedObject.FindProperty("m_collision");
+            m_advanceSettings = serializedObject.FindProperty("m_advance");
+            m_animationSettings = serializedObject.FindProperty("m_animation");
 
-            m_mass = serializedObject.FindProperty("m_mass");
-            m_skinWidth = serializedObject.FindProperty("m_skinWidth");
-            m_slopeLimit = serializedObject.FindProperty("m_slopeLimit");
-            m_maxStepHeight = serializedObject.FindProperty("m_maxStepHeight");
-            m_gravityModifier = serializedObject.FindProperty("m_gravityModifier");
-            m_groundStickiness = serializedObject.FindProperty("m_groundStickiness");
+            if (motorGUIContent == null) motorGUIContent = new GUIContent();
+            if (physicsGUIContent == null) physicsGUIContent = new GUIContent();
+            if (collisionsGUIContent == null) collisionsGUIContent = new GUIContent();
+            if (animationGUIContent == null) animationGUIContent = new GUIContent();
+            if (advanceGUIContent == null) advanceGUIContent = new GUIContent();
 
-            m_collisionsLayerMask = serializedObject.FindProperty("m_collisionsLayerMask");
-            m_maxCollisionCount = serializedObject.FindProperty("m_maxCollisionCount");
 
             displayMovement = serializedObject.FindProperty("displayMovement");
             displayPhysics = serializedObject.FindProperty("displayPhysics");
@@ -125,6 +117,25 @@ namespace CharacterController
             displayActions = serializedObject.FindProperty("displayActions");
             m_ActionsList = new ReorderableList(serializedObject, serializedObject.FindProperty("m_actions"), true, true, true, true);
 		}
+
+
+        private void SetGUIContent(ref GUIContent guiContent, string text, string tooltip = "")
+        {
+            guiContent.text = text;
+            guiContent.tooltip = tooltip;
+        }
+
+
+        private void DrawProperties(SerializedProperty property, GUIContent guiContent)
+        {
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            {
+                EditorGUI.indentLevel++;
+                EditorGUILayout.PropertyField(property, guiContent, true);
+                EditorGUI.indentLevel--;
+            }
+            EditorGUILayout.EndVertical();
+        }
 
 
 		public override void OnInspectorGUI()
@@ -138,144 +149,72 @@ namespace CharacterController
             //  Character Movement
             //  -----
 
+            SetGUIContent(ref motorGUIContent, k_motorHeader, k_motorTooltip);
+            SetGUIContent(ref physicsGUIContent, k_physicsContentHeader, k_physicsTooltip);
+            SetGUIContent(ref collisionsGUIContent, k_collisionsHeader, k_collisionsTooltip);
+            SetGUIContent(ref animationGUIContent, k_animationHeader, k_animationTooltip);
+            SetGUIContent(ref advanceGUIContent, k_advanceHeader, k_advanceTooltip);
 
-
-
-            displayMovement.boolValue = m_useCustomeHeader ? InspectorUtility.Foldout(displayMovement.boolValue, MotorFoldoutHeader) : EditorGUILayout.Foldout(displayMovement.boolValue, MotorFoldoutHeader);
-            //displayMovement.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayMovement.boolValue, MotorFoldoutHeader) : InspectorUtility.Foldout(displayMovement.boolValue, MotorFoldoutHeader);
-            if (displayMovement.boolValue)
-            {
-                EditorGUILayout.PropertyField(m_useRootMotionPosition);
-                //  Root motion related variables.
-                EditorGUILayout.PropertyField(m_rootMotionSpeedMultiplier);
-                //EditorGUI.indentLevel++;
-                EditorGUILayout.PropertyField(m_useRootMotionRotation);
-                //EditorGUI.indentLevel--;
-                //  Motion related variables.
-                EditorGUILayout.PropertyField(m_rootMotionRotationMultiplier);
-
-
-                EditorGUILayout.PropertyField(m_motorAcceleration);
-                EditorGUILayout.PropertyField(m_motorDamping);
-                EditorGUILayout.PropertyField(m_desiredSpeed);
-                EditorGUILayout.PropertyField(m_rotationSpeed);
-
-            }
-            if(m_spaceBetweenSections) EditorGUILayout.Space();
-
-            //  -----
-            //  Character Physics
-            //  -----
-            displayPhysics.boolValue = m_useCustomeHeader ? InspectorUtility.Foldout(displayPhysics.boolValue, PhysicsFoldoutHeader) : EditorGUILayout.Foldout(displayPhysics.boolValue, PhysicsFoldoutHeader);
-            //displayPhysics.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayPhysics.boolValue, PhysicsFoldoutHeader) : InspectorUtility.Foldout(displayPhysics.boolValue, PhysicsFoldoutHeader);
-            if (displayPhysics.boolValue)
-            {
-                EditorGUILayout.PropertyField(m_mass);
-                EditorGUILayout.PropertyField(m_skinWidth);
-                EditorGUILayout.PropertyField(m_slopeLimit);
-
-                EditorGUILayout.PropertyField(m_maxStepHeight);
-                EditorGUILayout.PropertyField(m_gravityModifier);
-                EditorGUILayout.PropertyField(m_groundStickiness);
-
-
-            }
-            if (m_spaceBetweenSections) EditorGUILayout.Space();
-
-            //  -----
-            //  Character Collisions
-            //  -----
-            displayCollisions.boolValue = m_useCustomeHeader ? InspectorUtility.Foldout(displayCollisions.boolValue, CollisionsFoldoutHeader) : EditorGUILayout.Foldout(displayCollisions.boolValue, CollisionsFoldoutHeader);
-            //displayCollisions.boolValue = m_UseDefaultFoldout ? EditorGUILayout.Foldout(displayCollisions.boolValue, AnimationFoldoutHeader) : InspectorUtility.Foldout(displayCollisions.boolValue, AnimationFoldoutHeader);
-            if (displayCollisions.boolValue)
-            {
-                EditorGUILayout.PropertyField(m_collisionsLayerMask);
-                EditorGUILayout.PropertyField(m_maxCollisionCount);
-
-            }
-            if (m_spaceBetweenSections) EditorGUILayout.Space();
-
-
-            //  -----
-            //  Character Animations
-            //  -----
-            displayAnimations.boolValue = m_useCustomeHeader ? InspectorUtility.Foldout(displayAnimations.boolValue, AnimationFoldoutHeader) : EditorGUILayout.Foldout(displayAnimations.boolValue, AnimationFoldoutHeader);
-            if (displayAnimations.boolValue) {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_moveStateName"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_airborneStateName"));
-
-            }
-            if (m_spaceBetweenSections) EditorGUILayout.Space();
+            DrawProperties(m_motorSettings, motorGUIContent);
+            DrawProperties(m_physicsSettings, physicsGUIContent);
+            DrawProperties(m_collisionSettings, collisionsGUIContent);
+            DrawProperties(m_animationSettings, animationGUIContent);
+            DrawProperties(m_advanceSettings, advanceGUIContent);
 
 
             //  -----
             //  Character Actions
             //  -----
-            displayActions.boolValue = m_useCustomeHeader ? InspectorUtility.Foldout(displayActions.boolValue, ActionsFoldoutHeader) : EditorGUILayout.Foldout(displayActions.boolValue, ActionsFoldoutHeader);
-            //displayActions.boolValue = EditorGUILayout.Foldout(displayActions.boolValue, ActionsFoldoutHeader);
-            if(displayActions.boolValue)
+
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             {
-                ////  Active Action.
-                //EditorGUILayout.BeginHorizontal();
-                //InspectorUtility.LabelField(serializedObject.FindProperty("m_ActiveAction").displayName, 11, FontStyle.Normal);
-                //GUI.enabled = false;
-                //EditorGUILayout.PropertyField(serializedObject.FindProperty("m_ActiveAction"), GUIContent.none);
-                //GUI.enabled = true;
-                //EditorGUILayout.EndHorizontal();
-
-                InspectorUtility.LabelField("Selected Action: " + (m_SelectedAction == null ? "<None>" : m_SelectedAction.GetType().Name));
-                ////  Draw Action Inspector.
-                ////EditorGUI.indentLevel++;
-                //EditorGUILayout.Space();
-
-                //GUILayout.BeginVertical("box");
-                DrawReorderableList(m_ActionsList);
-                //GUILayout.EndVertical();
-
-                //  Draw Selected Action Inspector.
                 EditorGUI.indentLevel++;
-                if (m_SelectedAction != null)
-                {
-                    GUILayout.BeginVertical("box");
+                displayActions.boolValue = m_useCustomeHeader ? InspectorUtility.Foldout(displayActions.boolValue, ActionsFoldoutHeader) : EditorGUILayout.Foldout(displayActions.boolValue, ActionsFoldoutHeader);
+                //displayActions.boolValue = EditorGUILayout.Foldout(displayActions.boolValue, ActionsFoldoutHeader);
+                if (displayActions.boolValue) {
+                    //GUILayout.BeginVertical("box");
+                    DrawReorderableList(m_ActionsList);
+                    //GUILayout.EndVertical();
 
-                    GUILayout.Space(12);
-                    m_ActionEditor = CreateEditor(m_SelectedAction);
-                    //m_ActionEditor.DrawDefaultInspector();
-                    m_ActionEditor.OnInspectorGUI();
+                    //  Draw Selected Action Inspector.
+                    //EditorGUI.indentLevel++;
+                    if (m_SelectedAction != null) {
+                        GUILayout.BeginVertical(EditorStyles.helpBox);
 
-                    GUILayout.Space(12);
+                        GUILayout.Space(12);
+                        m_ActionEditor = CreateEditor(m_SelectedAction);
+                        //m_ActionEditor.DrawDefaultInspector();
+                        m_ActionEditor.OnInspectorGUI();
 
-                    GUILayout.EndVertical();
+                        GUILayout.Space(12);
+
+                        GUILayout.EndVertical();
+                    }
+                    //EditorGUI.indentLevel--;
+                    //EditorGUI.indentLevel--;
                 }
-                //EditorGUI.indentLevel--;
                 EditorGUI.indentLevel--;
             }
+            EditorGUILayout.EndVertical();
+
+
             if (m_spaceBetweenSections) EditorGUILayout.Space();
-
-
-            //  -----
-            //  Draw the rest of the indefault inspector.
-            //  -----
-            EditorGUILayout.Space();
-            EditorGUI.indentLevel++;
-
-            //EditorGUILayout.PropertyField(serializedObject.FindProperty("m_animationSettings"), true);
-            //EditorGUILayout.PropertyField(serializedObject.FindProperty("m_actionSettings"), true);
-            DrawPropertiesExcluding(serializedObject, m_DontInclude);
-            EditorGUI.indentLevel--;
-            EditorGUILayout.Space();
 
             //  -----
             //  Debugging
             //  -----
-            EditorGUI.indentLevel++;
-            InspectorUtility.PropertyField(serializedObject.FindProperty("debugger"), true);
-            EditorGUI.indentLevel--;
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            {
+                EditorGUI.indentLevel++;
+                EditorGUILayout.BeginVertical(InspectorUtility.StyleBlue);
+                InspectorUtility.PropertyField(serializedObject.FindProperty("debugger"), true);
+                EditorGUILayout.EndVertical();
+                EditorGUI.indentLevel--;
 
 
-            if (m_helpBoxStyle == null) m_helpBoxStyle = GUI.skin.GetStyle("HelpBox");
-            m_helpBoxStyle.richText = true;
-            EditorGUILayout.TextArea(m_helpBoxInfo.ToString(), m_helpBoxStyle);
+            }
+            EditorGUILayout.EndVertical();
+
 
 
             EditorGUILayout.Space();
@@ -310,7 +249,7 @@ namespace CharacterController
                 //headerRect.x = rect.width * 0.465f;
                 headerRect.x += rect.width * 0.40f;
                 headerRect.width = rect.width * 0.36f;
-                EditorGUI.LabelField(headerRect, "Sub-State Machine");
+                EditorGUI.LabelField(headerRect, "State");
 
                 //  Action state name.
                 headerRect.x = rect.width - 50f;

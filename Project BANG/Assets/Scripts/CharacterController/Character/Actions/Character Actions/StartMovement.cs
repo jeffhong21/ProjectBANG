@@ -70,10 +70,10 @@ namespace CharacterController
                 detectionCount++;
             }
 
-            if (currentMoveAmount >= 1) {
-                detectionCount = 0;
-                isStartingToMove = false;
-            }
+            //if (currentMoveAmount >= 1) {
+            //    detectionCount = 0;
+            //    isStartingToMove = false;
+            //}
 
 
             //CharacterDebug.Log("detectionCount", detectionCount);
@@ -116,22 +116,13 @@ namespace CharacterController
 
 
 
-        //public override bool UpdateRotation()
-        //{
-        //    if (m_ApplyBuiltinRootMotion) {
-        //        m_Controller.RootMotionRotation.ToAngleAxis(out float angleInDegrees, out Vector3 rotationAxis);
+        public override bool UpdateRotation()
+        {
+            var targetRotation = m_animator.deltaRotation;
+            m_Controller.MoveRotation = targetRotation;
 
-        //        //  Update angular velocity.
-        //        m_rigidbody.angularVelocity = Vector3.Lerp(m_rigidbody.angularVelocity, rotationAxis.normalized * angleInDegrees, m_deltaTime * m_Controller.RotationSpeed);
-
-        //        //  Update the rotations.
-        //        var targetRotation = Quaternion.Slerp(m_transform.rotation, Quaternion.AngleAxis(angleInDegrees, rotationAxis.normalized), m_deltaTime * m_Controller.RotationSpeed);
-        //        m_rigidbody.MoveRotation(targetRotation * m_transform.rotation);
-        //        return false;
-        //    }
-
-        //    return true;
-        //}
+            return false;
+        }
 
 
 

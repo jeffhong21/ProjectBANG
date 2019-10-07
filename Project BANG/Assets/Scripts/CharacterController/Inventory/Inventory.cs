@@ -337,8 +337,19 @@
                 InternalEquipItem(item);
                 //  Set is switching to off.
                 IsSwitching = false;
+
+           
             }
 
+            if(m_equippedItem != null)
+            {
+                m_equippedItem.SetActive(true);
+                m_animatorMonitor.SetItemID(m_equippedItem.animatorItemID);
+                m_animatorMonitor.SetMovementSetID(m_equippedItem.movementSetID);
+            } else {
+                m_animatorMonitor.SetItemID(0);
+                m_animatorMonitor.SetMovementSetID(0);
+            }
 
             return item;
         }
@@ -382,8 +393,11 @@
 
         public void UnequipCurrentItem()
         {
-            if (m_equippedItem != null) {
+            if (m_equippedItem != null)
+            {
                 IsSwitching = true;
+                // Deactivate item.
+                m_equippedItem.SetActive(false);
                 //  Execute the equip event.
                 InternalUnequipCurrentItem(m_previouslyEquippedItem);
             }
@@ -391,7 +405,8 @@
             m_previouslyEquippedItem = m_equippedItem;
             m_equippedItem = null;
 
-
+            m_animatorMonitor.SetItemID(0);
+            m_animatorMonitor.SetMovementSetID(0);
         }
 
 

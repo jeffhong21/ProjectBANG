@@ -45,7 +45,7 @@ namespace CharacterController
 
 
 
-
+        protected AnimatorMonitor m_animatorMonitor;
         protected Animator m_animator;
         protected GameObject m_gameObject;
 
@@ -64,7 +64,7 @@ namespace CharacterController
         {
             m_gameObject = gameObject;
             m_animator = GetComponent<Animator>();
-
+            m_animatorMonitor = GetComponent<AnimatorMonitor>();
 
 
         }

@@ -15,33 +15,52 @@ namespace CharacterController
 
         public event Action<bool> OnAim = delegate {};
 
-        //[Serializable]
-        //public class AnimationSettings
-        //{
-        //    [Tooltip("The name of the state that should be activated when the character is moving.")]
-        //    public string moveStateName = "Movement";
-        //    [Tooltip("The name of the state that should be activated when the character is airborne.")]
-        //    public string airborneStateName = "Airborne";
-        //}
+        #region Parameters
+        [Serializable]
+        public class AnimationSettings
+        {
+            [Tooltip("The name of the state that should be activated when the character is moving.")]
+            public string moveStateName = "Movement";
+            [Tooltip("The name of the state that should be activated when the character is airborne.")]
+            public string airborneStateName = "Airborne";
 
-        //[Serializable]
-        //public class ActionSettings
-        //{
-        //    public CharacterAction[] actions;
-        //}
+            public AnimationSettings()
+            {
+                moveStateName = IsNullOrWhiteSpace(moveStateName, "Movement");
+                airborneStateName = IsNullOrWhiteSpace(airborneStateName, "Airborne");
+            }
 
+            private string IsNullOrWhiteSpace(string name, string fallbackName = "Idle")
+            {
+                if (string.IsNullOrWhiteSpace(name)) {
+                    string fallback = string.IsNullOrWhiteSpace(fallbackName) ? "Idle" : fallbackName;
+                    return fallbackName;
+                }
+                return name; 
+            }
+        }
 
-        //[SerializeField]
-        //private AnimationSettings m_animationSettings = new AnimationSettings();
-        //[SerializeField]
-        //private ActionSettings m_actionSettings = new ActionSettings();
+        [Serializable]
+        public class ActionSettings
+        {
+            public CharacterAction[] actions;
+            public CharacterAction activeAction;
+        }
 
+        [Serializable]
+        public class ItemActionSettings
+        {
+            public ItemAction[] actions;
+        }
 
-        //  -- Animation variables
-        [FormerlySerializedAs("m_moveStateName"), Tooltip("The name of the state that should be activated when the character is moving.")]
-        [SerializeField, HideInInspector] private string m_moveStateName = "Movement";
-        [FormerlySerializedAs("m_airborneStateName"), Tooltip("The name of the state that should be activated when the character is airborne.")]
-        [SerializeField, HideInInspector] private string m_airborneStateName = "Airborne";
+        [SerializeField]
+        private AnimationSettings m_animation = new AnimationSettings();
+        [SerializeField]
+        private ActionSettings m_charActions = new ActionSettings();
+        [SerializeField]
+        private ItemActionSettings m_itemActions = new ItemActionSettings();
+        #endregion
+
 
         //  --  Character Actions
         [SerializeField, HideInInspector, FormerlySerializedAs("m_actions")]
@@ -65,10 +84,7 @@ namespace CharacterController
 
 
         #region Properties
-        public float timeScale { get {
-                m_timeScale = Time.timeScale;
-                return m_timeScale; }
-        }
+
 
         public bool Aiming { get; set; }
 
@@ -76,17 +92,17 @@ namespace CharacterController
 
         public string MoveStateName {
             get{
-                if (string.IsNullOrWhiteSpace(m_moveStateName))
-                    m_moveStateName = FallbackMoveStateName;
-                return m_moveStateName;
+                if (string.IsNullOrWhiteSpace(m_animation.moveStateName))
+                    m_animation.moveStateName = FallbackMoveStateName;
+                return m_animation.moveStateName;
             }
         }
 
         public string AirborneStateName{
             get {
-                if (string.IsNullOrWhiteSpace(m_airborneStateName))
-                    m_moveStateName = FallbackAirborneStateName;
-                return m_airborneStateName;
+                if (string.IsNullOrWhiteSpace(m_animation.airborneStateName))
+                    m_animation.moveStateName = FallbackAirborneStateName;
+                return m_animation.airborneStateName;
             }
         }
 
@@ -116,30 +132,6 @@ namespace CharacterController
             m_transform = transform;
 
             m_animatorMonitor = GetComponent<AnimatorMonitor>();
-            m_animator = GetComponent<Animator>();
-            m_animator.updateMode = AnimatorUpdateMode.AnimatePhysics;
-            m_animator.applyRootMotion = m_useRootMotionPosition || m_useRootMotionRotation;
-            //  Rigidbody settings
-            m_rigidbody = GetComponent<Rigidbody>();
-
-            gravity = Physics.gravity.y * m_gravityModifier;
-
-            //  Collider settings
-            m_collider = GetComponent<CapsuleCollider>();
-            if (m_collider == null) {
-                m_collider = gameObject.AddComponent<CapsuleCollider>();
-                m_collider.radius = 0.36f;
-                m_collider.height = MathUtil.Round(gameObject.GetComponentInChildren<SkinnedMeshRenderer>().bounds.center.y * 2);
-                m_collider.center = new Vector3(0, m_collider.height / 2, 0);
-            }
-
-
-            //  Collision settings
-            m_layerManager = GetComponent<LayerManager>();
-            m_collisionsLayerMask = m_layerManager.SolidLayers;
-            m_probedColliders = new Collider[m_maxCollisionCount];
-
-
 
             m_physicsMaterial = new PhysicMaterial() { name = "Character Physics Material" };
 
@@ -147,8 +139,6 @@ namespace CharacterController
             //  Init
             //  --------------------------
             InitializeVariables();
-
-
 
             //  --------------------------
             //  Initialize actions;
@@ -163,10 +153,6 @@ namespace CharacterController
                 m_actions[i].Initialize(this, Array.IndexOf(m_actions, m_actions[i]), Time.deltaTime);
             }
 
-
-
-
-
             //  --------------------------
             //  Initialize events;
             //  --------------------------
@@ -178,10 +164,7 @@ namespace CharacterController
             //  Time manager
             //  --------------------------
             m_deltaTime = Time.deltaTime;
-            m_lastFrameTime = Time.realtimeSinceStartup;
-            m_lastFixedUpdateTime = new float[2];
             //  --------------------------
-
 
             //  --------------------------
             //  Initialize Debugger;
@@ -206,55 +189,10 @@ namespace CharacterController
             }
         }
 
-        private static float m_interpolationFactor;
-        public static float interpolateFactor { get { return m_interpolationFactor; } }
 
-        private float m_lastFrameTime;
-        private float[] m_lastFixedUpdateTime = new float[2];
-		private float m_newDeltaTime;
-        private int m_newTimeIndex;
-        private int m_oldTimeIndex { get { return m_newTimeIndex == 0 ? 1 : 0; } }
-
-
-
-        private void FixedUpdate()
-		{
-            //  --------------------------
-            //  Time manager
-            //  --------------------------
-            m_newDeltaTime = Time.realtimeSinceStartup - m_lastFrameTime;
-            m_lastFrameTime = Time.realtimeSinceStartup;
-            DebugUI.Log(this, "[F] newDeltaTime", m_newDeltaTime, RichTextColor.Lime);
-            //  --------------------------
-            m_deltaTime = m_newDeltaTime;
-
-            //if (!m_rigidbody.isKinematic) {
-            //    OnUpdate(m_deltaTime);
-            //    //Set frameUpdated.
-            //    m_frameUpdated = true;
-            //}
-            OnUpdate(m_deltaTime);
-            //Set frameUpdated.
-            m_frameUpdated = true;
-        }
 
         private void Update()
         {
-            float newerTime = m_lastFixedUpdateTime[m_newTimeIndex];
-            float olderTime = m_lastFixedUpdateTime[m_oldTimeIndex];
-
-            if (Math.Abs(newerTime - olderTime) > float.Epsilon)
-                m_interpolationFactor = (Time.realtimeSinceStartup - newerTime) / (newerTime - olderTime);
-            else m_interpolationFactor = 1;
-
-            //  --------------------------
-            //  Time manager
-            //  --------------------------
-            m_newDeltaTime = Time.realtimeSinceStartup - m_lastFrameTime;
-            m_lastFrameTime = Time.realtimeSinceStartup;
-            DebugUI.Log(this, "[U] newDeltaTime", m_newDeltaTime, RichTextColor.Magenta);
-            //  --------------------------
-            m_deltaTime = m_newDeltaTime;
 
             if (m_frameUpdated) return;
             OnUpdate(m_deltaTime);
@@ -266,12 +204,7 @@ namespace CharacterController
         private void LateUpdate()
         {
             DebugAttributes();
-            DebugUI.Log(this, "DeltaTime", m_deltaTime);
-            //DebugUI.Log(this, "DeltaTime", m_deltaTime);
-            //  -------------------
-            //  Log debug messages.
-            DebugUI.Log(this, "interpolateFactor", interpolateFactor, RichTextColor.Lime);
-            //  -------------------
+
 
             //if (m_useRootMotionPosition)
             //    m_rigidbody.MovePosition(m_animator.rootPosition);
@@ -292,6 +225,10 @@ namespace CharacterController
         private void OnAnimatorMove()
         {
             AnimatorMove();
+
+            ApplyRotation();
+
+            ApplyMovement();
         }
 
 
@@ -305,10 +242,12 @@ namespace CharacterController
 
         public void Move(float horizontal, float forward, Quaternion rotation)
         {
-            m_inputVector.x = horizontal * horizontal;
-            m_inputVector.z = forward * forward;
-
-            m_lookRotation = Quaternion.Slerp(m_lookRotation, rotation, m_deltaTime * m_rotationSpeed);
+            m_inputVector.x =  horizontal;
+            m_inputVector.z =  forward;
+            m_lookRotation = rotation;
+            //m_inputVector.x = horizontal * horizontal;
+            //m_inputVector.z = forward * forward;
+            //m_lookRotation = Quaternion.Slerp(m_lookRotation, rotation, m_deltaTime * m_motor.rotationSpeed);
         }
 
 
@@ -363,14 +302,7 @@ namespace CharacterController
                 if (action == m_activeAction || action.IsActive)
                 m_activeActions.Add(action);
 
-
-
-
-
-
             }
-
-
 
             InternalMove();
 
@@ -384,10 +316,7 @@ namespace CharacterController
             }
             else CheckGround();
 
-            if (m_activeAction != null) {
-                if (m_activeAction.CheckMovement()) CheckMovement();
-            }
-            else CheckMovement();
+
 
             if (m_activeAction != null) {
                 if (m_activeAction.SetPhysicsMaterial()) SetPhysicsMaterial();
@@ -405,18 +334,14 @@ namespace CharacterController
             else UpdateRotation();
 
             if (m_activeAction != null) {
+                if (m_activeAction.CheckMovement()) CheckMovement();
+            }
+            else CheckMovement();
+
+            if (m_activeAction != null) {
                 if (m_activeAction.UpdateAnimator()) UpdateAnimator();
             }
             else UpdateAnimator();
-
-
-            ApplyRotation();
-            //  Execute al the updates.
-            ApplyMovement();
-
-
-
-
 
 
         }
@@ -427,12 +352,31 @@ namespace CharacterController
         /// <summary>
         /// Updates the animator.
         /// </summary>
-        protected override void UpdateAnimator()
+        protected void UpdateAnimator()
         {
-            base.UpdateAnimator();
+            m_animatorMonitor.SetActionID(Moving ? 1 : 0);
+
+            m_animator.SetBool(HashID.Moving, Moving);
+
+            m_currentSpeed = 2;
+            m_animator.SetFloat(HashID.Speed, m_currentSpeed);
+
+            //if (Mathf.Approximately(m_targetAngle, 0)) m_targetAngle = 0;
+            //m_animator.SetFloat(HashID.Rotation, m_targetAngle);
 
 
-            
+            //if (Mathf.Approximately(m_viewAngle, 0)) m_viewAngle = 0;
+            //m_animator.SetFloat(HashID.LookAngle, m_viewAngle);
+
+
+
+            //m_animator.SetFloat(HashID.Rotation, m_targetAngle);
+
+            m_animatorMonitor.SetForwardInputValue(m_forwardSpeed * 2);
+            m_animatorMonitor.SetHorizontalInputValue(m_lateralSpeed * 2);
+
+            //m_animatorMonitor.SetForwardInputValue(m_inputVector.z * 2);
+            //m_animatorMonitor.SetHorizontalInputValue(m_inputVector.x * 2);
 
 
 
@@ -446,7 +390,38 @@ namespace CharacterController
 
 
 
+        /// <summary>
+        /// Set the collider's physics material.
+        /// </summary>
+        protected void SetPhysicsMaterial()
+        {
+            //change the physics material to very slip when not grounded or maxFriction when is
 
+            //  Airborne.
+            if (!Grounded && Mathf.Abs(m_rigidbody.velocity.y) > 0) {
+                m_collider.material.staticFriction = 0f;
+                m_collider.material.dynamicFriction = 0f;
+                m_collider.material.frictionCombine = PhysicMaterialCombine.Minimum;
+            }
+            //  Grounded and is moving.
+            else if (Grounded && Moving) {
+                m_collider.material.staticFriction = 0.25f;
+                m_collider.material.dynamicFriction = 0f;
+                m_collider.material.frictionCombine = PhysicMaterialCombine.Multiply;
+            }
+            //  Grounded but not moving.
+            else if (Grounded && !Moving) {
+                m_collider.material.staticFriction = 1f;
+                m_collider.material.dynamicFriction = 1f;
+                m_collider.material.frictionCombine = PhysicMaterialCombine.Maximum;
+            }
+            else {
+                m_collider.material.staticFriction = 1f;
+                m_collider.material.dynamicFriction = 1f;
+                m_collider.material.frictionCombine = PhysicMaterialCombine.Maximum;
+            }
+
+        }
 
 
 
@@ -454,7 +429,13 @@ namespace CharacterController
 
 
 
-
+        /// <summary>
+        /// Get the foot world position.
+        /// </summary>
+        public Vector3 GetFootWorldPosition()
+        {
+            return transform.position + m_colliderCenter + (Vector3.down * (m_colliderHeight / 2.0f + m_physics.skinWidth));
+        }
 
 
 
@@ -716,7 +697,9 @@ namespace CharacterController
 
         protected override void DrawGizmos()
         {
-
+            //if(Application.isPlaying) {
+            //    GizmosUtils.DrawWireSphere(GetFootWorldPosition(), 0.5f);
+            //}
 
         }
 
