@@ -20,6 +20,7 @@
             public int intValue;
             public string stringValue;
 
+            [Range(0, 0.99f)]
             public float time;
             public bool sent;
 

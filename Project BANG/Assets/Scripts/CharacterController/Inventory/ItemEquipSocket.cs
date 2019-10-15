@@ -25,7 +25,7 @@ namespace CharacterController.CharacterInventory
 
         public void Init(Animator animator)
         {
-
+            gameObject.SetActive(true);
 
             if (transform.IsChildOf(animator.GetBoneTransform(HumanBodyBones.RightHand))) {
                 m_itemSocket = ItemSocketType.RightHand;

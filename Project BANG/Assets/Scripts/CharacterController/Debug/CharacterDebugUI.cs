@@ -62,7 +62,7 @@
 
 
 //        private Canvas canvas;
-//        //private RigidbodyCharacterController rigidCharController;
+//        //private RigidbodyCharacterControllerBase rigidCharController;
 //        [SerializeField]
 //        private Text charProperties;
 //        [SerializeField]
@@ -169,7 +169,7 @@
 //    {
 //        private static StringBuilder PropertiesLog = new StringBuilder(500);
 
-//        public static RigidbodyCharacterController ActiveCharacter;
+//        public static RigidbodyCharacterControllerBase ActiveCharacter;
 
 //        public static Dictionary<string, string> DebugProperties = new Dictionary<string, string>();
 

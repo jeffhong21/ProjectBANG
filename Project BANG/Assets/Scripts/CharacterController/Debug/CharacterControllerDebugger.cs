@@ -10,7 +10,7 @@
     public class CharacterControllerDebugger
     {
         DebugUIView debugUIView;
-        RigidbodyCharacterController character;
+        RigidbodyCharacterControllerBase character;
         Transform transform;
 
         [Serializable]
@@ -67,7 +67,7 @@
         }
 
 
-        public void Initialize(RigidbodyCharacterController character)
+        public void Initialize(RigidbodyCharacterControllerBase character)
         {
             this.character = character;
             this.transform = character.transform;
@@ -152,7 +152,7 @@
             //    GizmosUtils.DrawArrow(TransformOriginCast(heightOffset), transform.forward, 1f, arrowTipSize, arrowWidth);
             //    //  Draw rotation vector.
             //    Gizmos.color = Color.magenta;
-            //    GizmosUtils.DrawArrow(TransformOriginCast(heightOffset + 0.1f), Quaternion.Inverse(transform.rotation) * transform.TransformDirection(character.MoveDirection), 1f, arrowTipSize, arrowWidth);
+            //    GizmosUtils.DrawArrow(TransformOriginCast(heightOffset + 0.1f), Quaternion.Inverse(transform.rotation) * transform.TransformDirection(character.moveDirection), 1f, arrowTipSize, arrowWidth);
 
 
             //    //Gizmos.color = Color.blue;

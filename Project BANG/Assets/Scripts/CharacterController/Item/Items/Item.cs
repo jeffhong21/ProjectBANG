@@ -23,6 +23,8 @@ namespace CharacterController
         protected Transform m_holsterTarget;
 
         [SerializeField]
+        protected string m_idleStateName = "Idle";
+        [SerializeField]
         protected string m_equipStateName = "Equip";
         [SerializeField]
         protected string m_unequipStateName = "Unequip";
@@ -44,6 +46,14 @@ namespace CharacterController
 
         public int movementSetID { get { return m_itemType.movementSetID; } }
 
+
+        public string idleStateName{
+            get {
+                if (m_idleStateName == string.Empty) m_idleStateName = "Idle";
+                return m_itemType.ItemName + "." + m_idleStateName;
+            }
+        }
+
         public string equipStateName {
             get {
                 if (m_equipStateName == string.Empty) m_equipStateName = "Equip";
@@ -53,7 +63,7 @@ namespace CharacterController
 
         public string unequipStateName {
             get {
-                if (m_equipStateName == string.Empty) m_equipStateName = "Equip";
+                if (m_equipStateName == string.Empty) m_equipStateName = "Unequip";
                 return m_itemType.ItemName + "." + m_unequipStateName;
             }
         }
@@ -62,7 +72,7 @@ namespace CharacterController
 
         [SerializeField, DisplayOnly]
         protected GameObject m_character;
-        protected CharacterLocomotion m_controller;
+        protected RigidbodyCharacterController m_controller;
         protected Inventory m_inventory;
         protected GameObject m_gameObject;
         protected Transform m_transform;
@@ -97,7 +107,7 @@ namespace CharacterController
 
         public virtual void Initialize(Inventory inventory )
         {
-            m_controller = inventory.GetComponent<CharacterLocomotion>();
+            m_controller = inventory.GetComponent<RigidbodyCharacterController>();
             m_character = inventory.gameObject;
             m_inventory = inventory;
 

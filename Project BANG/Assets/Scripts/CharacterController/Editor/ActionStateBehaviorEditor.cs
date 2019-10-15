@@ -123,6 +123,7 @@ namespace CharacterController
 
             Rect R_4 = new Rect(rect.x + ((rect.width) / 4) * 2 + 5 + 25, rect.y, ((rect.width) / 4) - 5 - 15, EditorGUIUtility.singleLineHeight);
 
+
             element.time = EditorGUI.FloatField(R_4, element.time);
 
             if (element.time > 1) element.time = 1;

@@ -101,6 +101,24 @@ public static class MathUtil
 
 
     /// <summary>
+    /// Wraps a float between -180 and 180.
+    /// </summary>
+    /// <param name="toWrap">The float to wrap.</param>
+    /// <returns>A value between -180 and 180.</returns>
+    public static float Wrap(this float toWrap, float from = -180, float to = 180)
+    {
+
+        toWrap %= 360.0f;
+        if (toWrap < -from) {
+            toWrap += 360.0f;
+        }
+        else if (toWrap > to) {
+            toWrap -= 360.0f;
+        }
+        return toWrap;
+    }
+
+    /// <summary>
     /// Remaps a number from one range to another.
     /// </summary>
     public static float LinearRemap(this float value, float valueRangeMin, float valueRangeMax, float newRangeMin, float newRangeMax){

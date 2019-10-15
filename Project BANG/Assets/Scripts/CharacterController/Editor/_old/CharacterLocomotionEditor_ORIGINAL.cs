@@ -15,10 +15,10 @@
 //    using System.Linq;
 //    using System.Reflection;
 
-//    [CustomEditor(typeof(CharacterLocomotion))]
+//    [CustomEditor(typeof(RigidbodyCharacterController))]
 //    public class CharacterLocomotionEditor : ccEditor.InspectorEditor
 //    {
-//        //private CharacterLocomotion script { get { return target as CharacterLocomotion; } }
+//        //private RigidbodyCharacterController script { get { return target as RigidbodyCharacterController; } }
 
 
 
@@ -37,7 +37,7 @@
 
 
 
-//        CharacterLocomotion m_Controller;
+//        RigidbodyCharacterController m_controller;
 
 //        ReorderableList m_ActionsList;
 //        CharacterAction m_SelectedAction;
@@ -87,7 +87,7 @@
 //            base.OnEnable();
 
 //            if (target == null) return;
-//            m_Controller = (CharacterLocomotion)target;
+//            m_controller = (RigidbodyCharacterController)target;
 
 //            m_LineHeight = EditorGUIUtility.singleLineHeight;
 //            m_DefaultActionTextStyle.fontStyle = FontStyle.Normal;
@@ -273,7 +273,7 @@
 
 //            //        //if(GUILayout.Button("Stop All Actions"))
 //            //        //{
-//            //        //    m_Controller.TryStopAllActions();
+//            //        //    m_controller.TryStopAllActions();
 //            //        //    Debug.Log("Stopping all Actions");
 //            //        //}
 //            //    }
@@ -363,9 +363,9 @@
 //                rect.height = m_LineHeight;
 
 //                SerializedObject elementObj = new SerializedObject(element.objectReferenceValue);
-//                SerializedProperty stateName = elementObj.FindProperty("m_StateName");
+//                SerializedProperty stateName = elementObj.FindProperty("m_stateName");
 //                SerializedProperty isActive = elementObj.FindProperty("m_IsActive");
-//                SerializedProperty actionID = elementObj.FindProperty("m_ActionID");
+//                SerializedProperty actionID = elementObj.FindProperty("m_actionID");
 
 
 //                CharacterAction action = (CharacterAction)element.objectReferenceValue;
@@ -427,7 +427,7 @@
 
 //        private void ChangeStateName(SerializedProperty property, string actionType)
 //        {
-//            Animator animator = m_Controller.GetComponent<Animator>();
+//            Animator animator = m_controller.GetComponent<Animator>();
 //            var states = AnimatorUtil.GetStateMachineChildren.GetChildren(animator, actionType);
 
 //            var menu = new GenericMenu();
@@ -448,7 +448,7 @@
 //        {
 //            //Debug.LogFormat("Right clicked {0}.", actionName);
 
-//            Animator animator = m_Controller.GetComponent<Animator>();
+//            Animator animator = m_controller.GetComponent<Animator>();
 //            if (animator == null)
 //            {
 //                Debug.Log("No Animator");
@@ -469,7 +469,7 @@
 
 //        private void AddCharacterAction(Type type)
 //        {
-//            CharacterAction characterAction = (CharacterAction)m_Controller.gameObject.AddComponent(type);
+//            CharacterAction characterAction = (CharacterAction)m_controller.gameObject.AddComponent(type);
 
 //            //m_ActionsList.serializedProperty.InsertArrayElementAtIndex(m_ActionsList.count);
 //            ////  You have to ApplyModifiedProperties after inserting a new array element otherwise the changes don't get reflected right away.

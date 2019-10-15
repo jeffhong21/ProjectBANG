@@ -1,4 +1,4 @@
-namespace CharacterController
+namespace CharacterController.ccEditor
 {
     /*  ° TODO: When selecting the action outside of prefab edit mode, it resets the selected action to null.  (2019.1.4f1)
      *  
@@ -16,10 +16,10 @@ namespace CharacterController
     using System.Reflection;
     using System.Text;
 
-    [CustomEditor(typeof(CharacterLocomotion))]
+    [CustomEditor(typeof(RigidbodyCharacterController))]
     public class CharacterLocomotionEditor : ccEditor.InspectorEditor
     {
-        //private CharacterLocomotion script { get { return target as CharacterLocomotion; } }
+        //private RigidbodyCharacterController script { get { return target as RigidbodyCharacterController; } }
         private static readonly string[] m_DontInclude = { "m_Script", "debugger" };
 
         private const string k_motorHeader = "Motor Settings";
@@ -48,7 +48,7 @@ namespace CharacterController
         private StringBuilder m_helpBoxInfo;
         private GUIStyle m_helpBoxStyle;
 
-        private CharacterLocomotion m_controller;
+        private RigidbodyCharacterController m_controller;
         private Rigidbody m_rigidbody;
         private ReorderableList m_ActionsList;
         private CharacterAction m_SelectedAction;
@@ -63,7 +63,7 @@ namespace CharacterController
         private GUIContent motorGUIContent, physicsGUIContent, collisionsGUIContent, animationGUIContent, advanceGUIContent;
 
 
-        private SerializedProperty displayMovement, displayPhysics, displayCollisions, displayAnimations, displayActions;
+        private SerializedProperty debugger, displayMovement, displayPhysics, displayCollisions, displayAnimations, displayActions;
 
         private GUIStyle m_DefaultActionTextStyle = new GUIStyle();
         private GUIStyle m_ActiveActionTextStyle = new GUIStyle();
@@ -74,23 +74,8 @@ namespace CharacterController
             base.OnEnable();
 
             if (target == null) return;
-            m_controller = (CharacterLocomotion)target;
-            //if (m_rigidbody == null) m_rigidbody = m_controller.GetComponent<Rigidbody>();
+            m_controller = (RigidbodyCharacterController)target;
 
-            //if (m_helpBoxInfo == null) m_helpBoxInfo = new StringBuilder(500);
-            //if (m_helpBoxInfo != null) {
-            //    if (m_rigidbody != null)
-            //    {
-            //        m_helpBoxInfo.AppendFormat("<b> isKinematic</b>:    {0}\n", m_rigidbody.isKinematic);
-            //        m_helpBoxInfo.AppendFormat("<b> velocity</b>:       {0}\n", m_rigidbody.velocity);
-            //        m_helpBoxInfo.AppendFormat("<b> angularVelocity</b>:    {0}\n", m_rigidbody.angularVelocity);
-            //        m_helpBoxInfo.AppendFormat("<b> inertiaTensor</b>:  {0}\n", m_rigidbody.inertiaTensor);
-            //        m_helpBoxInfo.AppendFormat("<b> inertiaTensorRotation</b>:  {0}\n", m_rigidbody.inertiaTensorRotation);
-            //        m_helpBoxInfo.AppendFormat("<b> centerOfMass</b>:   {0}\n", m_rigidbody.centerOfMass);
-            //        m_helpBoxInfo.AppendFormat("<b> worldCenterOfMass</b>:  {0}\n", m_rigidbody.worldCenterOfMass);
-            //        m_helpBoxInfo.AppendFormat("<b> Sleep State</b>:    {0}\n", m_rigidbody.IsSleeping() ? "Sleeping" : "Awake");
-            //    }
-            //}
 
             m_LineHeight = EditorGUIUtility.singleLineHeight;
             m_DefaultActionTextStyle.fontStyle = FontStyle.Normal;
@@ -102,6 +87,7 @@ namespace CharacterController
             m_collisionSettings = serializedObject.FindProperty("m_collision");
             m_advanceSettings = serializedObject.FindProperty("m_advance");
             m_animationSettings = serializedObject.FindProperty("m_animation");
+            debugger = serializedObject.FindProperty("debugger");
 
             if (motorGUIContent == null) motorGUIContent = new GUIContent();
             if (physicsGUIContent == null) physicsGUIContent = new GUIContent();
@@ -128,9 +114,11 @@ namespace CharacterController
 
         private void DrawProperties(SerializedProperty property, GUIContent guiContent)
         {
+            //EditorGUILayout.BeginVertical(property.isExpanded ? EditorStyles.helpBox : InspectorUtility.HeaderStyleBlue);
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             {
                 EditorGUI.indentLevel++;
+
                 EditorGUILayout.PropertyField(property, guiContent, true);
                 EditorGUI.indentLevel--;
             }
@@ -203,17 +191,25 @@ namespace CharacterController
             //  -----
             //  Debugging
             //  -----
+
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             {
                 EditorGUI.indentLevel++;
-                EditorGUILayout.BeginVertical(InspectorUtility.StyleBlue);
-                InspectorUtility.PropertyField(serializedObject.FindProperty("debugger"), true);
-                EditorGUILayout.EndVertical();
+                if (debugger.isExpanded) {
+                    InspectorUtility.PropertyField(debugger, true);
+                }
+                else {
+                    EditorGUILayout.BeginVertical(InspectorUtility.HeaderStyleBlue);
+                    {
+                        InspectorUtility.PropertyField(debugger, true);
+                    }
+                    EditorGUILayout.EndVertical();
+                }
                 EditorGUI.indentLevel--;
-
-
             }
             EditorGUILayout.EndVertical();
+
+
 
 
 
@@ -234,8 +230,10 @@ namespace CharacterController
             list.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
             {
                 SerializedProperty element = list.serializedProperty.GetArrayElementAtIndex(index);
-                DrawListElement(rect, element, isActive);
 
+                //DrawListElement(rect, element, isActive);
+
+                EditorGUI.PropertyField(rect, element);
 
             };
 
@@ -301,10 +299,9 @@ namespace CharacterController
                 rect.height = m_LineHeight;
 
                 SerializedObject elementObj = new SerializedObject(element.objectReferenceValue);
-                SerializedProperty stateName = elementObj.FindProperty("m_StateName");
-                SerializedProperty isActive = elementObj.FindProperty("m_IsActive");
-                SerializedProperty priority = elementObj.FindProperty("m_Priority");
-                SerializedProperty actionID = elementObj.FindProperty("m_ActionID");
+                SerializedProperty stateName = elementObj.FindProperty("m_stateName");
+                SerializedProperty isActive = elementObj.FindProperty("m_isActive");
+                SerializedProperty actionID = elementObj.FindProperty("m_actionID");
 
 
                 CharacterAction action = (CharacterAction)element.objectReferenceValue;

@@ -19,7 +19,7 @@
             base.OnValidate();
 
             m_ItemStateID = ItemStateID >= 0 ? ItemStateID : -1;
-            //if (string.IsNullOrEmpty(m_StateName)) m_StateName = GetType().Name;
+            //if (string.IsNullOrEmpty(m_stateName)) m_stateName = GetType().Name;
         }
 
     }

@@ -6,7 +6,7 @@
 
     public class StopMovement : CharacterAction
     {
-        public override int ActionID { get { return m_ActionID = ActionTypeID.StopMovement; } set { m_ActionID = value; } }
+        public override int ActionID { get { return m_actionID = ActionTypeID.StopMovement; } set { m_actionID = value; } }
 
         [SerializeField] protected int maxInputCount = 4;
         [SerializeField, Range(0, 1)]
@@ -32,12 +32,12 @@
         //
         public override bool CanStartAction()
         {
-            if (!m_Controller.Grounded) return false;
+            if (!m_controller.isGrounded) return false;
 
 
 
             lastMoveAmount = currentMoveAmount;
-            currentMoveAmount = Mathf.Clamp01(Mathf.Abs(m_Controller.InputVector.x) + Mathf.Abs(m_Controller.InputVector.z));
+            currentMoveAmount = Mathf.Clamp01(Mathf.Abs(m_controller.inputVector.x) + Mathf.Abs(m_controller.inputVector.z));
 
             if (lastMoveAmount > currentMoveAmount)
                 isStopMoving = true;
@@ -84,14 +84,16 @@
         protected override void ActionStarted()
         {
             //  Set ActionID parameter.
-            if (m_StateName.Length == 0)
-                m_animator.SetInteger(HashID.ActionID, m_ActionID);
+            if (m_stateName.Length == 0)
+                m_animatorMonitor.SetActionID(m_actionID);
 
             //  Determine if we should play walk or run stop.
-            int actionIntData = 0;
-            if (m_Controller.Speed >= 1) actionIntData = 1;
+            int actionIntData = 1;
+            actionIntData = 2;  //  TODO: figure out wha tto do with speed or how to determine walk stop or run stop.
+            m_animatorMonitor.SetActionIntData(actionIntData);
 
-            m_animator.SetInteger(HashID.ActionIntData, actionIntData);
+            //Debug.LogFormat("<b>[{0}]</b> ActionStarted.  FwdInput is", m_controller.m_forwardSpeed);
+
         }
 
 
@@ -118,7 +120,7 @@
             //{
             //    if (m_animator.GetNextAnimatorStateInfo(0).shortNameHash != 0 && m_animator.IsInTransition(0))
             //    {
-            //        Debug.LogFormat("{0} has stopped because it is entering Exit State", m_StateName);
+            //        Debug.LogFormat("{0} has stopped because it is entering Exit State", m_stateName);
             //        return true;
             //    }
 

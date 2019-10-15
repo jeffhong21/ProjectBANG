@@ -71,7 +71,7 @@ public class LevelManager : SingletonMonoBehaviour<LevelManager>
         //  Spawn Player.
         InitializePlayer(true);
         //  Spawn Camera.
-        InitializeCamera(playerInstance);
+        //InitializeCamera(playerInstance);
     }
 
 

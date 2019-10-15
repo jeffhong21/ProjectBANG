@@ -6,7 +6,7 @@ namespace CharacterController
 
     public class QuickTurn : CharacterAction
     {
-         public override int ActionID { get { return m_ActionID = ActionTypeID.QuickTurn; } set { m_ActionID = value; } }
+         public override int ActionID { get { return m_actionID = ActionTypeID.QuickTurn; } set { m_actionID = value; } }
 
 
         [SerializeField]
@@ -35,7 +35,7 @@ namespace CharacterController
         {
             if (!base.CanStartAction()) return false;
 
-            if (!m_Controller.Moving || !m_Controller.Grounded) return false;
+            if (!m_controller.isMoving || !m_controller.isGrounded) return false;
 
 
             if (startInputChecks)
@@ -51,11 +51,11 @@ namespace CharacterController
             }
 
 
-            float dot = Vector3.Dot(m_Controller.InputDirection.normalized, m_transform.forward);
+            float dot = Vector3.Dot(m_controller.inputDirection.normalized, m_transform.forward);
             if (!startInputChecks && dot <= threshold)
             {
                 startInputChecks = true;
-                inputDirection = m_Controller.InputVector.normalized;
+                inputDirection = m_controller.inputVector.normalized;
                 rotationRemaining = Vector3.Angle(m_transform.forward, inputDirection);
                 //Debug.LogFormat("dot: {0} | rotationRemaining: {1}", dot, rotationRemaining);
             }
@@ -73,8 +73,8 @@ namespace CharacterController
 
 
             //  Set ActionID parameter.
-            if (m_StateName.Length == 0)
-                m_animator.SetInteger(HashID.ActionID, m_ActionID);
+            if (m_stateName.Length == 0)
+                m_animator.SetInteger(HashID.ActionID, m_actionID);
         }
 
 
@@ -106,7 +106,7 @@ namespace CharacterController
         {
 
             float dot = Vector3.Dot(inputDirection, m_transform.forward);
-            m_rigidbody.velocity = Vector3.SmoothDamp(m_rigidbody.velocity, dot > 0 ? m_Controller.RootMotionVelocity : Vector3.zero, ref velocitySmoothDamp, 0.1f);
+            m_rigidbody.velocity = Vector3.SmoothDamp(m_rigidbody.velocity, dot > 0 ? m_controller.RootMotionVelocity : Vector3.zero, ref velocitySmoothDamp, 0.1f);
 
 
             return false;
@@ -126,7 +126,7 @@ namespace CharacterController
 
 
 			turnRotation.ToAngleAxis(out float angle, out Vector3 axis);
-            m_rigidbody.angularVelocity = Vector3.Lerp(m_rigidbody.angularVelocity, axis.normalized * angle, m_deltaTime * m_Controller.RotationSpeed);
+            m_rigidbody.angularVelocity = Vector3.Lerp(m_rigidbody.angularVelocity, axis.normalized * angle, m_deltaTime * m_controller.rotationSpeed);
 
 
             // float rotationAngle = Vector3.Angle(m_transform.forward, inputDirection);

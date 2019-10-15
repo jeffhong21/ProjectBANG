@@ -10,18 +10,19 @@ public static class InspectorUtility
     private static GUIStyle foldoutStyle;
 
 
-    public static GUIStyle StyleBlue
+    public static GUIStyle HeaderStyleBlue
     {
         get {
             return Style(new Color(0, 0.5f, 1f, 0.3f));
         }
     }
 
-    public static GUIStyle Style(Color color)
+    public static GUIStyle Style(Color color, int offset = -2)
     {
+
         GUIStyle currentStyle = new GUIStyle(GUI.skin.box)
         {
-            border = new RectOffset(-1, -1, -1, -1)
+            border = new RectOffset(offset, offset, offset, offset)
         };
 
         Color[] pix = new Color[1];
@@ -88,27 +89,23 @@ public static class InspectorUtility
         EditorGUILayout.LabelField(content, labelFieldStyle);
     }
 
-    public static void PropertyField(SerializedProperty property, bool includeChildren = false)
+    public static bool PropertyField(SerializedProperty property, bool includeChildren = false)
     {
         if(property == null){
             EditorGUILayout.HelpBox("Property " + property.name + " does not exist", MessageType.Error);
-            return;
+            return false;
         }
 
         if(property.name == "m_Script")
         {
-            EditorGUILayout.Space();
-            GUI.enabled = false;
-            EditorGUILayout.PropertyField(property);
-            GUI.enabled = true;
-            GUILayout.Space(EditorGUIUtility.singleLineHeight / 2);
-
+            ScriptPropertyField(property.serializedObject);
         }
+
         else if(property.isArray && includeChildren)
         {
             if(property.propertyType == SerializedPropertyType.String){
                 EditorGUILayout.PropertyField(property, false);
-                return;
+                return true;
             }
             property.isExpanded = EditorGUILayout.Foldout(property.isExpanded, property.displayName);
             if (property.isExpanded)
@@ -122,23 +119,36 @@ public static class InspectorUtility
                 EditorGUI.indentLevel--;
                 EditorGUILayout.Space();
             }
-            return;
+            return true;
         }
         else{
             EditorGUILayout.PropertyField(property, includeChildren);
         }
+        return true;
     }
 
 
-    public static void ScriptPropertyField(SerializedObject serializedObject, bool enable = false)
+    public static void ScriptPropertyField(SerializedObject serializedObject, bool enable = false, int? bottomSpacing = null)
     {
         if(serializedObject != null)
         {
+            EditorGUILayout.Space();
             GUI.enabled = enable;
             EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"));
             GUI.enabled = true;
-        }
+            if(bottomSpacing != null) {
+                float spacing = Mathf.Clamp(bottomSpacing.Value, 0, EditorGUIUtility.singleLineHeight * 4);
+                spacing = Mathf.FloorToInt(spacing);
+                GUILayout.Space(spacing);
+            }
+            else {
+                GUILayout.Space(EditorGUIUtility.singleLineHeight / 2);
+            }
 
+        }
+        else {
+            EditorGUILayout.HelpBox("SeriializedObject \"" + serializedObject + "\" is not valid.", MessageType.Error);
+        }
     }
 
 

@@ -21,7 +21,7 @@
         protected bool m_OnlyVisibleOnAim = true;
 
 
-        private CharacterLocomotion m_Controller;
+        private RigidbodyCharacterController m_controller;
 
 
 
@@ -30,13 +30,13 @@
             if(m_Character == null){
                 m_Character = GameObject.FindGameObjectWithTag("Player");
             }
-            m_Controller = m_Character.GetComponent<CharacterLocomotion>();
+            m_controller = m_Character.GetComponent<RigidbodyCharacterController>();
 		}
 
 
 		private void OnEnable()
         {
-            m_Controller.OnAim += CrosshairsSetActive;
+            m_controller.OnAim += CrosshairsSetActive;
 
             m_DefaultCrosshairsImage.color = m_CrosshairsColor;
             m_DefaultCrosshairsImage.enabled = !m_OnlyVisibleOnAim;
@@ -45,7 +45,7 @@
 
 		private void OnDisable()
 		{
-            m_Controller.OnAim -= CrosshairsSetActive;
+            m_controller.OnAim -= CrosshairsSetActive;
 		}
 
 

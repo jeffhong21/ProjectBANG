@@ -11,26 +11,31 @@
         //    set { m_ItemStateID = value; }
         //}
 
-        int m_equipStateID = ItemActionID.Equip;
-        int m_unequipStateID = ItemActionID.Unequip;
+        protected enum state { inactive, equipping, unequipping, switching }
 
-        [SerializeField] protected int equipItemStateIndex = ItemActionID.Equip;
-        [SerializeField] protected int unEquipItemStateIndex = ItemActionID.Unequip;
+        [SerializeField] [DisplayOnly]
+        protected int m_equipStateID = ItemActionID.Equip;
+        [SerializeField] [DisplayOnly]
+        protected int m_unequipStateID = ItemActionID.Unequip;
 
+        [SerializeField] [DisplayOnly]
+        private Item m_currentItem;
+        [SerializeField] [DisplayOnly]
+        private Item m_nextItem;
 
-        private bool equipNext = true;
-        private int itemSlotIndex = -1;
-
-        [SerializeField] private Item m_currentItem;
-        [SerializeField] private Item m_nextItem;
         private int m_index;
-        private bool m_switching;
+        protected state m_currentState = state.inactive;
+
+
+
+
+
 
         public void StartEquipUnequipAction(int index)
         {
 
             EventHandler.RegisterEvent(m_gameObject, "OnItemUnequip", OnItemUnequip);
-            EventHandler.RegisterEvent(m_gameObject, "OnItemEqui[p", OnItemEquip);
+            EventHandler.RegisterEvent(m_gameObject, "OnItemEquip", OnItemEquip);
             EventHandler.RegisterEvent(m_gameObject, "OnItemUnequipComplete", OnItemUnequipComplete);
             EventHandler.RegisterEvent(m_gameObject, "OnItemEquipComplete", OnItemEquipComplete);
 
@@ -40,72 +45,61 @@
 
             //Debug.LogFormat("Inventory Item Slot {0} is {1}\nEquipped item is {2}", index, m_inventory.GetItem(index), m_currentItem);
             if (m_nextItem != null) {
-                ActionStarted();
+                StartAction();
             }
-
 
         }
 
 
         protected override void ActionStarted()
         {
-            m_switching = false;
-            m_inventory.EquipItem(m_index);
-
-
-            //m_animatorMonitor.ChangeAnimatorState(this, unequipStateName);
-            //m_animatorMonitor.SetMovementSetID(m_currentItem == null ? 0 : m_currentItem.AnimatorMovementSetID);
-            if(m_currentItem != null) {
-
-                int layerIndex = 1;
-                string unequipStateName = m_currentItem != null ? m_currentItem.unequipStateName : "No item equipped.";
-                unequipStateName = m_animator.GetLayerName(layerIndex) + "." + unequipStateName;
-                int hash = Animator.StringToHash(unequipStateName);
-
-                if (m_animator.HasState(layerIndex, hash)) {
-                    m_animator.CrossFade(hash, 0.2f, layerIndex, 0);
-                    //Debug.LogFormat("<b>Destination State: {0}</b>.  Has state: {1}", unequipStateName, m_animator.HasState(1, hash));
-
-                    m_switching = true;
-                }
-            }
-            else if(m_currentItem == null && m_nextItem != null) {
-
-                int layerIndex = 1;
-                string equippedStateName = m_nextItem.equipStateName;
-                equippedStateName = m_animator.GetLayerName(layerIndex) + "." + equippedStateName;
-                int hash = Animator.StringToHash(equippedStateName);
-
-                if (m_animator.HasState(layerIndex, hash)) {
-                    m_animator.CrossFade(hash, 0.2f, layerIndex, 0);
-                    //Debug.LogFormat("<b>Destination State: {0}</b>.  Has state: {1}", equippedStateName, m_animator.HasState(1, hash));
-
-
-                    m_switching = true;
-                }
-            }
-            else {
-                Debug.LogFormat("<b>No item equipped: {0}</b>.", "");
-            }
+            if (m_currentItem == null && m_nextItem != null)
+                m_currentState = state.equipping;
+            else if (m_currentItem != null && m_nextItem == null)
+                m_currentState = state.unequipping;
+            else if (m_currentItem != null && m_nextItem != null)
+                m_currentState = state.switching;
+            else
+                m_currentState = state.inactive;
 
 
 
+
+            m_layerIndex = 3;
         }
 
 
+        public override string GetDestinationState(int layer)
+        {
+            if (layer == 3) {
+                if (m_currentState == state.unequipping || m_currentState == state.switching) {
+                    return m_currentItem.unequipStateName;
+                }
+                if (m_currentState == state.equipping) {
+                    return m_nextItem.equipStateName;
+                }
+            }
 
-        //public override bool CanStopAction()
-        //{
-        //    return Time.time > m_ActionStartTime + 1f;
-        //}
+            return "";
+        }
+
+
+        public override bool CanStopAction()
+        {
+            if (Time.time > m_ActionStartTime + 2.5f) return true;
+
+            return m_currentState == state.inactive;
+        }
 
 
         protected override void ActionStopped()
         {
             EventHandler.UnregisterEvent(m_gameObject, "OnItemUnequip", OnItemUnequip);
-            EventHandler.UnregisterEvent(m_gameObject, "OnItemEqui[p", OnItemEquip);
+            EventHandler.UnregisterEvent(m_gameObject, "OnItemEquip", OnItemEquip);
             EventHandler.UnregisterEvent(m_gameObject, "OnItemUnequipComplete", OnItemUnequipComplete);
             EventHandler.UnregisterEvent(m_gameObject, "OnItemEquipComplete", OnItemEquipComplete);
+
+            m_currentState = state.inactive;
         }
 
 
@@ -127,38 +121,66 @@
         {
             Debug.LogFormat("<b><color=magenta>**OnItemUnequip Animation event has been called</color></b>");
 
-            m_inventory.UnequipCurrentItem();
-            if(m_nextItem != null) {
-                int layer = 1;
-                if(GetItemDestinationState(m_nextItem.equipStateName, layer, out int hash)) {
-                    m_animator.CrossFade(hash, 0.2f, layer, 0);
-                }
 
-
+            if(m_inventory.EquippedItem != null) {
+                m_inventory.UnequipCurrentItem();
             }
 
-            Debug.Break();
+            if(m_nextItem != null)
+            {
+                //  Call play equip state.
+                bool changingStates = m_animatorMonitor.ChangeAnimatorState(this, m_nextItem.equipStateName, 0.25f, m_layerIndex);
+                if (changingStates) {
+                    //  Set state to equipping.
+                    m_currentState = state.equipping;
+                    return;
+                }
+                //if(GetItemDestinationState(m_nextItem.equipStateName, m_layerIndex, out int hash)) {
+                //    m_animator.CrossFade(hash, 0.2f, m_layerIndex, 0);
+                //}
+
+                 
+            }
+
+            m_currentState = state.inactive;
         }
 
-        protected void OnItemUnequipComplete()
-        {
-            Debug.LogFormat("<b><color=magenta>**OnItemUnequip Animation event has been called</color></b>");
-            //Debug.Break();
-        }
 
         protected void OnItemEquip()
         {
-            Debug.LogFormat("<b><color=blue>**OnItemEquip Animation event has been called</color></b>");
+            Debug.LogFormat("<b><color=blue>** OnItemEquip **</color></b> Animation event has been called.");
 
-            m_inventory.EquipItem(m_index);
+            m_currentItem = m_inventory.EquipItem(m_index);
+
+            //if(m_currentItem != null) {
+            //    m_animatorMonitor.ChangeAnimatorState(this, m_currentItem.idleStateName, 0.2f, m_animator.GetLayerIndex(""));
+            //}
+
             //Debug.Break();
         }
 
+
+
+        protected void OnItemUnequipComplete()
+        {
+            Debug.LogFormat("<b><color=magenta>** OnItemUnequip Animation event has been called</color></b>");
+            //Debug.Break();
+
+            m_currentState = m_nextItem != null ? state.equipping : state.inactive;
+            if (m_currentState == state.inactive)
+                StopAction();
+        }
         protected void OnItemEquipComplete()
         {
-            Debug.LogFormat("<b><color=blue>**OnItemEquip Animation event has been called</color></b>");
+            Debug.LogFormat("<b><color=blue>** OnItemEquipComplete **</color></b> Animation event has been called</color></b>");
             //Debug.Break();
+
+            m_currentState = state.inactive;
+            StopAction();
         }
+
+
+
 
         protected IEnumerator UnequipItem(Item activeItem)
         {

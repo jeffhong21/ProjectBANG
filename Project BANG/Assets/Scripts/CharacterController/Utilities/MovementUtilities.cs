@@ -138,12 +138,12 @@ public static class MovementUtilities
 
     //protected Vector3 CalculateJumpVelocity()
     //{
-    //    //speed = Mathf.Sqrt(-2.0f * m_Controller.Gravity.y  * jumpHeight);
+    //    //speed = Mathf.Sqrt(-2.0f * m_controller.Gravity.y  * jumpHeight);
     //    speed = .8f;
     //    acceleration = -(2 * jumpHeight) /(jumpVelocity * jumpVelocity);
     //    verticalVelocity = Mathf.Abs(acceleration) * speed;
 
-    //    velocity = m_Controller.Velocity;
+    //    velocity = m_controller.Velocity;
     //    velocity.y += verticalVelocity;
 
     //    //Debug.Log(velocity);

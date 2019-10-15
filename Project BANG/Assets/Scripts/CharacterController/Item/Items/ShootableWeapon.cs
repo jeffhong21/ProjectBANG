@@ -226,8 +226,8 @@
         protected virtual void Fire()
         {
 
-            //var targetDirection = m_Controller.LookAtPoint - m_FirePoint.position;
-            //var targetDirection = (m_FirePoint.position + m_Controller.LookDirection) - m_FirePoint.position;
+            //var targetDirection = m_controller.LookAtPoint - m_FirePoint.position;
+            //var targetDirection = (m_FirePoint.position + m_controller.LookDirection) - m_FirePoint.position;
             m_TargetDirection = (m_FirePoint.position + m_TargetDirection) - m_FirePoint.position;
 
             if (m_Projectile){
@@ -354,10 +354,10 @@
         {
             ////Debug.Log("Weapon Starting to aim");
             //if(aim){
-            //    //var targetDirection = m_Controller.LookPosition - m_Transform.position;
+            //    //var targetDirection = m_controller.LookPosition - m_Transform.position;
             //    var targetDirection = m_Character.transform.forward - m_Transform.position;
             //    //if(targetDirection == Vector3.zero)
-            //        //targetDirection.Set(m_Controller.transform.position.x, 1.35f, m_Controller.transform.position.x + 10);
+            //        //targetDirection.Set(m_controller.transform.position.x, 1.35f, m_controller.transform.position.x + 10);
             //    Debug.DrawRay(m_Transform.position, targetDirection, Color.blue, 1);
             //    //var m_RecoilTargetRotation = Quaternion.LookRotation(targetDirection);
             //    //m_RecoilTargetRotation *= Quaternion.Euler(0, 90, 90);

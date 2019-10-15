@@ -6,7 +6,7 @@
 
     public class Crouch : CharacterAction
     {
-        public override int ActionID { get { return m_ActionID = ActionTypeID.Crouch; } set { m_ActionID = value; } }
+        public override int ActionID { get { return m_actionID = ActionTypeID.Crouch; } set { m_actionID = value; } }
 
 
         protected float m_defaultHeight = 0.6f;

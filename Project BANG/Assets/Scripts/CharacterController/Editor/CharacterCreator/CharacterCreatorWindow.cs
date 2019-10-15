@@ -46,7 +46,7 @@ namespace CharacterController.CharacterCreator
 
 
             window.m_character = (GameObject)Selection.activeObject;
-            if (window.m_character != null && window.m_character.GetComponent<CharacterLocomotion>() == null)
+            if (window.m_character != null && window.m_character.GetComponent<RigidbodyCharacterController>() == null)
                 window.m_humanpreview = Editor.CreateEditor(window.m_character);
             
             window.Show();
@@ -63,10 +63,10 @@ namespace CharacterController.CharacterCreator
                 m_name = EditorGUILayout.TextField(new GUIContent("Name"), m_name, GUILayout.ExpandWidth(true));
                 m_character = EditorGUILayout.ObjectField("FBX Model", m_character, typeof(GameObject), true, GUILayout.ExpandWidth(true)) as GameObject;
 
-                if (GUI.changed && m_character != null && m_character.GetComponent<CharacterLocomotion>() == null)
+                if (GUI.changed && m_character != null && m_character.GetComponent<RigidbodyCharacterController>() == null)
                     m_humanpreview = Editor.CreateEditor(m_character);
-                if(m_character != null && m_character.GetComponent<CharacterLocomotion>() != null){
-                    EditorGUILayout.HelpBox("This gameObject already contains the component CharacterLocomotion", MessageType.Warning);
+                if(m_character != null && m_character.GetComponent<RigidbodyCharacterController>() != null){
+                    EditorGUILayout.HelpBox("This gameObject already contains the component RigidbodyCharacterController", MessageType.Warning);
                     if (GUILayout.Button("Reset Character"))
                         ResetCharacter();
                         
@@ -126,7 +126,7 @@ namespace CharacterController.CharacterCreator
 
         private bool CanCreate()
         {
-            return m_isValidAvatar && m_isHuman && m_character != null && m_character.GetComponent<CharacterLocomotion>() == null;
+            return m_isValidAvatar && m_isHuman && m_character != null && m_character.GetComponent<RigidbodyCharacterController>() == null;
         }
 
 
@@ -142,7 +142,7 @@ namespace CharacterController.CharacterCreator
 
         private void ResetCharacter()
         {
-            var controller = m_character.GetComponent<CharacterLocomotion>();
+            var controller = m_character.GetComponent<RigidbodyCharacterController>();
             if (controller != null)
                 DestroyImmediate(controller);
 
@@ -155,7 +155,7 @@ namespace CharacterController.CharacterCreator
             }
 
             m_humanpreview = Editor.CreateEditor(m_character);
-            //var controller = _CharacterObject.GetComponent<CharacterLocomotion>();
+            //var controller = _CharacterObject.GetComponent<RigidbodyCharacterController>();
             //var rigidbody = _CharacterObject.GetComponent<Rigidbody>();
             //var collider = _CharacterObject.GetComponent<CapsuleCollider>();
             //var layermanager = _CharacterObject.GetComponent<LayerManager>();
@@ -177,7 +177,7 @@ namespace CharacterController.CharacterCreator
             if (_CharacterObject == false) return;
 
             _CharacterObject.name = m_name;        
-            _CharacterObject.AddComponent<CharacterLocomotion>();
+            _CharacterObject.AddComponent<RigidbodyCharacterController>();
             AddActions();
 
 
@@ -212,7 +212,7 @@ namespace CharacterController.CharacterCreator
 //            var Idle = _CharacterObject.AddComponent<Idle>();
     //        CharActions.Add(Idle);
 
-            _CharacterObject.GetComponent<CharacterLocomotion>().CharActions = CharActions.ToArray();
+            _CharacterObject.GetComponent<RigidbodyCharacterController>().CharActions = CharActions.ToArray();
         }
 
 

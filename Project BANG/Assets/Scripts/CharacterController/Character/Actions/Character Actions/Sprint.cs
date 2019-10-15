@@ -72,9 +72,9 @@ namespace CharacterController
 
 		public override bool UpdateAnimator()
 		{
-            m_SpeedInput = m_Controller.InputVector;
-            m_SpeedInput.z = Mathf.Clamp(m_Controller.InputVector.z * m_SpeedChangeMultiplier, m_MinSpeedChange, m_MaxSpeedChange);
-            m_Controller.InputVector = m_SpeedInput;
+            m_SpeedInput = m_controller.inputVector;
+            m_SpeedInput.z = Mathf.Clamp(m_controller.inputVector.z * m_SpeedChangeMultiplier, m_MinSpeedChange, m_MaxSpeedChange);
+            m_controller.inputVector = m_SpeedInput;
             return true;
 		}
 
@@ -86,7 +86,7 @@ namespace CharacterController
             ////m_rigidbody.AddForce(m_transform.forward * m_SpeedChangeMultiplier * m_deltaTime, ForceMode.VelocityChange);
 
             //var velocity = (m_animator.deltaPosition / m_deltaTime);
-            //velocity.y = m_Controller.Grounded ? 0 : m_rigidbody.velocity.y;
+            //velocity.y = m_controller.isGrounded ? 0 : m_rigidbody.velocity.y;
             ////m_rigidbody.velocity = Vector3.SmoothDamp(m_rigidbody.velocity, m_Velocity, ref m_velocitySmooth, m_Moving ? m_Acceleration : m_MotorDamping);
             ////m_rigidbody.velocity = Vector3.Lerp(m_rigidbody.velocity, m_Velocity, m_MovementSpeed);
             //m_rigidbody.velocity = velocity;

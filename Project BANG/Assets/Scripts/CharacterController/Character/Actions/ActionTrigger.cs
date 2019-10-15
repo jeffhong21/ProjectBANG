@@ -36,8 +36,8 @@
 
 		public void OnTriggerEnter(Collider other)
 		{
-            if(other.GetComponent<CharacterLocomotion>()){
-                var charLocomotion = other.GetComponent<CharacterLocomotion>();
+            if(other.GetComponent<RigidbodyCharacterController>()){
+                var charLocomotion = other.GetComponent<RigidbodyCharacterController>();
                 var animator = other.GetComponent<Animator>();
 
                 animator.Play(actionName);

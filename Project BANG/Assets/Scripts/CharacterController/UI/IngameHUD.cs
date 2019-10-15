@@ -25,7 +25,7 @@ namespace CharacterController.UI
         }
 
 
-        public void RegisterCharacter(CharacterLocomotion controller)
+        public void RegisterCharacter(RigidbodyCharacterController controller)
         {
 
         }

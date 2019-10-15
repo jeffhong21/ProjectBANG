@@ -13,7 +13,7 @@
         [SerializeField] private string m_exitStateName = "Fists2Idle";
         [SerializeField] private string m_exitStateFullPath;
         [SerializeField] private int m_exitStateFullPathHash;
-        private int m_layerIndex = -1;
+        //private int m_layerIndex = -1;
         private bool m_exiting;
         private AnimatorTransitionInfo m_previousTransition;
 
@@ -70,13 +70,15 @@
 
         public override bool Move()
         {
+            
             return false;
         }
 
 
         public override bool UpdateMovement()
         {
-            m_rigidbody.AddForce(m_Controller.RootMotionVelocity * m_deltaTime, ForceMode.Acceleration);
+            m_controller.moveDirection = Vector3.Lerp(m_controller.moveDirection, Vector3.zero, m_deltaTime * 8);
+            //m_rigidbody.AddForce(m_controller.RootMotionVelocity * m_deltaTime, ForceMode.Acceleration);
             return false;
         }
 

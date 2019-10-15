@@ -6,7 +6,7 @@
 
     public class Vault : CharacterAction
     {
-        public override int ActionID { get { return m_ActionID = ActionTypeID.Vault; } set { m_ActionID = value; } }
+        public override int ActionID { get { return m_actionID = ActionTypeID.Vault; } set { m_actionID = value; } }
 
         [Tooltip("Maximum height."), Range(0, 90)]
         [SerializeField] protected float angleThreshold = 30f;
@@ -187,7 +187,7 @@
         public override bool UpdateRotation()
         {
             //Quaternion rotation = Quaternion.FromToRotation(m_transform.forward, -objectNormal) * m_transform.rotation;
-            //m_rigidbody.MoveRotation(Quaternion.Slerp(rotation, m_transform.rotation, m_deltaTime * m_Controller.RotationSpeed));
+            //m_rigidbody.MoveRotation(Quaternion.Slerp(rotation, m_transform.rotation, m_deltaTime * m_controller.RotationSpeed));
             return false;
         }
 
@@ -196,7 +196,7 @@
 
         protected void StartVault()
         {
-            m_verticalVelocity = Vector3.up * Mathf.Sqrt(2 * (platformHeight + 0.02f) * Mathf.Abs(m_Controller.gravity));
+            m_verticalVelocity = Vector3.up * Mathf.Sqrt(2 * (platformHeight + 0.02f) * Mathf.Abs(m_controller.gravity));
             //m_rigidbody.velocity += m_verticalVelocity;
             //m_rigidbody.AddForce(m_verticalVelocity, ForceMode.VelocityChange);
 
@@ -231,11 +231,11 @@
             //}
 
 
-            //m_Controller.Velocity = m_Controller.RootMotionVelocity;
+            //m_controller.Velocity = m_controller.RootMotionVelocity;
 
 
             //var verticalVelocity = -(2 * height) / (m_verticalVelocity.y * m_verticalVelocity.y);
-            //m_verticalVelocity = m_Controller.Gravity * m_deltaTime + (Vector3.zero * verticalVelocity);
+            //m_verticalVelocity = m_controller.Gravity * m_deltaTime + (Vector3.zero * verticalVelocity);
 
 
 
@@ -248,10 +248,10 @@
             //    m_rigidbody.isKinematic = cachedIsKinamatic;
             //}
 
-            //Debug.LogFormat("Velocity: {0}", m_Controller.Velocity);
+            //Debug.LogFormat("Velocity: {0}", m_controller.Velocity);
 
 
-            //m_Controller.Velocity = velocity;
+            //m_controller.Velocity = velocity;
             //m_animator.MatchTarget(endPosition, Quaternion.identity, AvatarTarget.Root, new MatchTargetWeightMask(Vector3.one, 0), 0.2f, 0.4f);
             return false;
         }
@@ -283,7 +283,7 @@
         {
             if (m_animator.isMatchingTarget) m_animator.InterruptMatchTarget();
             //m_rigidbody.isKinematic = cachedIsKinamatic;
-            //m_rigidbody.velocity = m_Controller.Velocity;
+            //m_rigidbody.velocity = m_controller.Velocity;
 
             startPosition = Vector3.zero;
             startReach = Vector3.zero;
@@ -322,7 +322,7 @@
 
         protected virtual void OnDrawGizmos()
         {
-            if (Application.isPlaying && m_IsActive && m_Debug) {
+            if (Application.isPlaying && m_isActive && m_Debug) {
                 //Gizmos.color = Color.green;
                 //Gizmos.DrawRay(m_transform.position + (Vector3.up * m_CheckHeight), m_transform.forward * m_MoveToVaultDistance);
 

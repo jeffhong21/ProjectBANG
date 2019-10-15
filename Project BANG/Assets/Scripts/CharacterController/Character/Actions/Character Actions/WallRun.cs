@@ -8,8 +8,8 @@
     {
         //public override int ActionID
         //{
-        //    get { return m_ActionID = ActionTypeID.Jump; }
-        //    set { m_ActionID = value; }
+        //    get { return m_actionID = ActionTypeID.Jump; }
+        //    set { m_actionID = value; }
         //}
 
 

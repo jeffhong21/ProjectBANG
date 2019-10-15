@@ -7,8 +7,8 @@ namespace CharacterController
     public class Jump : CharacterAction
     {
         public override int ActionID {
-            get { return m_ActionID = ActionTypeID.Jump; }
-            set { m_ActionID = value; }
+            get { return m_actionID = ActionTypeID.Jump; }
+            set { m_actionID = value; }
         }
 
 
@@ -20,7 +20,7 @@ namespace CharacterController
         private float m_nextJump;
 
 
-        protected Vector3 m_verticalVelocity, m_velocity;
+        protected Vector3 m_verticalVelocity;
         protected Vector3 m_startPosition, m_verticalDirection;
         protected float m_verticalDistance;
         protected float m_elapsedTime;
@@ -46,6 +46,7 @@ namespace CharacterController
         {
             return Mathf.Sqrt(2 * jumpHeight * gravity);
         }
+
         //
         // Methods
         //
@@ -53,8 +54,7 @@ namespace CharacterController
         {
             if (!base.CanStartAction()) return false;
 
-            return m_nextJump < Time.time && m_Controller.Grounded && m_rigidbody.velocity.y > -0.01f;
-
+            return m_nextJump < Time.time && m_controller.isGrounded && m_rigidbody.velocity.y > -0.01f;
 		}
 
 
@@ -62,140 +62,118 @@ namespace CharacterController
         {
             m_nextJump = Time.time + m_recurrenceDelay;
             //  Set ActionID parameter.
-            if (m_StateName.Length == 0)
-                m_animatorMonitor.SetActionID(m_ActionID);
+            if (m_stateName.Length == 0)
+                m_animatorMonitor.SetActionID(m_actionID);
 
-            m_verticalVelocity = m_Controller.MoveDirection;
-            m_verticalVelocity.y = CalculateJumpSpeed(3, m_Controller.gravity);
-            m_Controller.MoveDirection = m_verticalVelocity;
+            m_verticalVelocity = m_controller.moveDirection;
+            m_verticalVelocity.y = CalculateJumpSpeed(m_jumpHeight, m_controller.gravity);
+            m_controller.moveDirection = m_verticalVelocity;
+
+            Debug.LogFormat("[{0}] Vertical Velocity: {1}", this.GetType(), m_verticalVelocity);
+            //m_rigidbody.isKinematic = false;
+            //m_rigidbody.velocity = m_verticalVelocity;
+            //m_rigidbody.AddForce(m_verticalVelocity, ForceMode.VelocityChange);
         }
 
 
 
         public override bool CanStopAction()
         {
-            return m_hasLanded;
+            return m_rigidbody.velocity.y <= 0;
         }
 
         protected override void ActionStopped()
         {
             base.ActionStopped();
 
-            m_rigidbody.useGravity = useGravityCache;
-            //m_Controller.Velocity = Vector3.zero;
+            //m_rigidbody.useGravity = useGravityCache;
+            //m_controller.Velocity = Vector3.zero;
             m_startJump = m_hasReachedApex = m_hasLanded = false;
             m_verticalVelocity = m_startPosition = Vector3.zero;
+
+            m_rigidbody.isKinematic = true;
         }
 
 
-        //      public override bool CheckGround()
-        //{
-        //          //float velocityY = (verticalDistance / time) + 0.5f * Mathf.Abs(Physics.gravity.y) * time;
+        public override bool CheckGround()
+        {
+            //float velocityY = (verticalDistance / time) + 0.5f * Mathf.Abs(Physics.gravity.y) * time;
 
-        //          //if (Time.time < m_ActionStartTime + 0.2f) {
-        //          //    m_Controller.Grounded = false;
-        //          //    return false;
-        //          //}
+            if (Time.time < m_ActionStartTime + 0.2f) {
+                m_controller.isGrounded = false;
+                return false;
+            }
 
 
-        //          //float radius = 0.1f;
-        //          //Vector3 origin = m_transform.position.WithY(0.1f);
-        //          //origin += Vector3.up * radius;
+            float radius = 0.1f;
+            Vector3 origin = m_transform.position.WithY(0.1f);
+            origin += Vector3.up * radius;
 
-        //          //if (Physics.SphereCast(origin, radius, Vector3.down, out RaycastHit groundHit, 0.3f * 2, m_layers.SolidLayers))
-        //          //{
-        //          //    m_Controller.Grounded = groundHit.distance < 0.3f;
-        //          //}
-        //          //else
-        //          //{
-        //          //    m_Controller.Grounded = false;
-        //          //}
+            if (Physics.SphereCast(origin, radius, Vector3.down, out RaycastHit groundHit, 0.3f * 2, m_layers.SolidLayers)) {
+                m_controller.isGrounded = groundHit.distance < 0.3f;
+            }
+            else {
+                m_controller.isGrounded = false;
+            }
 
 
 
 
 
-        //          return false;
-        //}
+            return false;
+        }
 
 
         //public override bool UpdateMovement()
         //{
-        //    if (!m_startJump) {
-        //        m_startJump = m_rigidbody.velocity.y > 0;
 
-        //        if (m_Debug && m_startJump) {
-        //            Debug.Log("<color=magenta>[m_startJump ]</color>");
-        //            Debug.Break();
-        //        }
 
-        //    }
 
-        //    if (m_startJump) {
-        //        m_hasReachedApex = m_rigidbody.velocity.y <= 0;
-
-        //        if (m_Debug && m_hasReachedApex) {
-        //            Debug.Log("<color=magenta>[m_hasReachedApex]</color>");
-        //            Debug.Break();
-        //        }
-        //    }
-
-        //    if (m_hasReachedApex) {
-        //        m_hasLanded = m_Controller.Grounded || m_rigidbody.velocity.y > -0.2f;
-
-        //        if (m_Debug && m_hasLanded) {
-        //            Debug.Log("<color=magenta>[ m_hasLanded]</color>");
-        //            Debug.Break();
-        //        }
+        //    if (m_rigidbody.velocity.y < 0) {
+        //        m_rigidbody.useGravity = useGravityCache;
+        //        m_controller.moveDirection += m_controller.Gravity * m_deltaTime;
         //    }
 
 
 
-        //    //if (m_rigidbody.velocity.y < 0) {
-        //    //    m_rigidbody.useGravity = useGravityCache;
-        //    //    m_Controller.MoveDirection += m_Controller.Gravity * m_deltaTime;
-        //    //}
+
+        //    m_elapsedTime += m_deltaTime;
+        //    m_verticalDirection = m_transform.position - m_startPosition;
+        //    //m_verticalDirection = Vector3.Project(m_verticalDirection, Vector3.up);
+        //    m_verticalDistance = (m_verticalDirection.y / m_elapsedTime) + Mathf.Abs(Physics.gravity.y) * m_elapsedTime;
+        //    m_verticalDistance *= m_deltaTime;
+
+        //    Vector3 velocity = m_controller.Velocity;
+        //    float percentage = 0;
+        //    if (m_verticalDistance < m_jumpHeight) {
+        //        percentage = Mathf.Clamp01(m_verticalDistance / m_jumpHeight);
+        //        percentage *= percentage * percentage;
+        //        velocity.y = Mathf.Lerp(m_rigidbody.velocity.y, 0, percentage);
+        //    }
+        //    else {
+        //        percentage = 1;
+        //    }
 
 
+        //    //var verticalVelocity = -(2 * m_jumpHeight) / (m_verticalVelocity.y * m_verticalVelocity.y);
+        //    ////m_verticalVelocity = m_controller.Gravity * m_deltaTime + (Vector3.zero * verticalVelocity);
+        //    //var velocity = m_controller.Velocity;
+        //    velocity += m_controller.Gravity * m_deltaTime;
+        //    m_controller.Velocity = velocity;
+        //    ////m_rigidbody.velocity += m_verticalVelocity;
+        //    Debug.LogFormat("time: {2} | percentage: {0} | distance: {1}", percentage, m_verticalDistance, m_elapsedTime);
 
 
-        //    //m_elapsedTime += m_deltaTime;
-        //    //m_verticalDirection = m_transform.position - m_startPosition;
-        //    ////m_verticalDirection = Vector3.Project(m_verticalDirection, Vector3.up);
-        //    //m_verticalDistance = (m_verticalDirection.y / m_elapsedTime) + Mathf.Abs(Physics.gravity.y) * m_elapsedTime;
-        //    //m_verticalDistance *= m_deltaTime;
-
-        //    //Vector3 velocity = m_Controller.Velocity;
-        //    //float percentage = 0;
-        //    //if (m_verticalDistance < m_jumpHeight) {
-        //    //    percentage = Mathf.Clamp01(m_verticalDistance / m_jumpHeight);
-        //    //    percentage *= percentage * percentage;
-        //    //    velocity.y = Mathf.Lerp(m_rigidbody.velocity.y, 0, percentage);
-        //    //}
-        //    //else {
-        //    //    percentage = 1;
-        //    //}
-
-
-        //    ////var verticalVelocity = -(2 * m_jumpHeight) / (m_verticalVelocity.y * m_verticalVelocity.y);
-        //    //////m_verticalVelocity = m_Controller.Gravity * m_deltaTime + (Vector3.zero * verticalVelocity);
-        //    ////var velocity = m_Controller.Velocity;
-        //    //velocity += m_Controller.Gravity * m_deltaTime;
-        //    //m_Controller.Velocity = velocity;
-        //    //////m_rigidbody.velocity += m_verticalVelocity;
-        //    //Debug.LogFormat("time: {2} | percentage: {0} | distance: {1}", percentage, m_verticalDistance, m_elapsedTime);
-
-
-        //    //if (m_verticalDistance >= m_jumpHeight) {
-        //    //    if (reachedJumpHeight == false) {
-        //    //        reachedJumpHeight = true;
-        //    //        Debug.LogFormat("<b>percentage: {0} | distance: {1}\n vv: {2} | rb: {3}  | tie: {4}</b>",
-        //    //            percentage, m_verticalDistance, m_verticalVelocity, m_rigidbody.velocity, m_elapsedTime);
-        //    //    }
-        //    //}
-        //    //else {
-        //    //    reachedJumpHeight = false;
-        //    //}
+        //    if (m_verticalDistance >= m_jumpHeight) {
+        //        if (reachedJumpHeight == false) {
+        //            reachedJumpHeight = true;
+        //            Debug.LogFormat("<b>percentage: {0} | distance: {1}\n vv: {2} | rb: {3}  | tie: {4}</b>",
+        //                percentage, m_verticalDistance, m_verticalVelocity, m_rigidbody.velocity, m_elapsedTime);
+        //        }
+        //    }
+        //    else {
+        //        reachedJumpHeight = false;
+        //    }
 
 
         //    return false;

@@ -5,7 +5,7 @@ namespace CharacterController
 
     public class Fall : CharacterAction
     {
-        public override int ActionID { get { return m_ActionID = ActionTypeID.Fall; } set { m_ActionID = value; } }
+        public override int ActionID { get { return m_actionID = ActionTypeID.Fall; } set { m_actionID = value; } }
 
 
         [SerializeField]
@@ -28,7 +28,7 @@ namespace CharacterController
         //
         public override bool CanStartAction()
         {
-            if(!m_Controller.Grounded && m_rigidbody.velocity.y < 0.01f)
+            if(!m_controller.isGrounded && m_rigidbody.velocity.y < 0.01f)
             {
                 m_fallTime += Time.deltaTime;
                 m_currentPosition = m_transform.position;
@@ -47,7 +47,7 @@ namespace CharacterController
             }
             else
             {
-                if(m_Controller.Grounded || m_rigidbody.velocity.y >= 0 && m_isAirborne)
+                if(m_controller.isGrounded || m_rigidbody.velocity.y >= 0 && m_isAirborne)
                 {
                     m_fallTime = 0;
                     m_currentPosition = default;
@@ -77,15 +77,15 @@ namespace CharacterController
 
         //    if(Physics.SphereCast(origin, radius, Vector3.down, out RaycastHit groundHit, 0.3f * 2, m_layers.SolidLayers))
         //    {
-        //        m_Controller.Grounded = groundHit.distance < 0.3f;
+        //        m_controller.isGrounded = groundHit.distance < 0.3f;
         //    }
         //    else
         //    {
-        //        m_Controller.Grounded = false;
+        //        m_controller.isGrounded = false;
         //    }
 
 
-        //    if (m_Controller.Grounded && m_rigidbody.velocity.y > -1.01f)
+        //    if (m_controller.isGrounded && m_rigidbody.velocity.y > -1.01f)
         //    {
         //        m_animatorMonitor.SetActionID(0);
         //    }
@@ -99,7 +99,7 @@ namespace CharacterController
 
         //public override bool UpdateMovement()
         //{
-        //    m_Controller.Velocity += m_Controller.Gravity * 1.5f * Time.deltaTime;
+        //    m_controller.Velocity += m_controller.Gravity * 1.5f * Time.deltaTime;
         //    return false;
         //}
 
@@ -107,7 +107,7 @@ namespace CharacterController
 
         public override bool CanStopAction()
         {
-            if (m_Controller.Grounded && m_rigidbody.velocity.y > -0.01f)
+            if (m_controller.isGrounded && m_rigidbody.velocity.y > -0.01f)
             {
 //                Debug.Log(m_fallTime);
                 return true;

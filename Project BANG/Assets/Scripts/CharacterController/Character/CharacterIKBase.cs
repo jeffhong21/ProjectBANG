@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using CharacterController.CharacterInput;
 using UnityEngine;
 
 namespace CharacterController
@@ -9,7 +10,7 @@ namespace CharacterController
     {
         protected const float tinyOffset = .0001f;
 
-        protected CharacterLocomotion m_controller;
+        protected RigidbodyCharacterController m_controller;
         protected Animator m_animator;
         protected Transform m_transform;
         protected GameObject m_gameObject;
@@ -18,6 +19,20 @@ namespace CharacterController
         protected Vector3 m_pivotPosition;
         protected Vector3 m_leftFootPosition;
         protected Vector3 m_rightFootPosition;
+
+        [SerializeField]
+        protected Transform m_lookTarget;
+
+        public virtual Transform lookTarget
+        {
+            get {
+                return m_lookTarget;
+            }
+            set {
+                m_lookTarget = value;
+                //if(lookatIK != null) lookatIK.solver.target = m_lookTarget;
+            }
+        }
 
         //  ---  Abstract methods    --------------------
 
@@ -34,15 +49,15 @@ namespace CharacterController
         private void Awake()
         {
             if(m_animator == null) m_animator = GetComponent<Animator>();
-            m_controller = GetComponent<CharacterLocomotion>();
+            m_controller = GetComponent<RigidbodyCharacterController>();
             m_transform = transform;
             m_gameObject = gameObject;
 
-            
+            //Initialize();
         }
 
 
-        private void Start()
+        protected void Start()
         {
             Initialize();
         }
@@ -51,6 +66,8 @@ namespace CharacterController
         //{
         //    m_pivotPosition = GetPivotPosition();
         //}
+
+
 
 
 

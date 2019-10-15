@@ -325,9 +325,11 @@
 
             Item item = m_inventorySlots[slotIndex].item;
 
+            //  If current;y equipped item is the same as next item.
             if (m_equippedItem == item) {
                 UnequipCurrentItem();
             }
+            // If next item is null
             else if (item != null)
             {
                 m_previouslyEquippedItem = m_equippedItem;
@@ -337,15 +339,15 @@
                 InternalEquipItem(item);
                 //  Set is switching to off.
                 IsSwitching = false;
-
-           
             }
+
 
             if(m_equippedItem != null)
             {
                 m_equippedItem.SetActive(true);
                 m_animatorMonitor.SetItemID(m_equippedItem.animatorItemID);
                 m_animatorMonitor.SetMovementSetID(m_equippedItem.movementSetID);
+
             } else {
                 m_animatorMonitor.SetItemID(0);
                 m_animatorMonitor.SetMovementSetID(0);
@@ -359,6 +361,21 @@
         {
             EquipItem(GetItemSlotIndex(itemType));
         }
+
+
+        //private IEnumerator SwitchItems(float time)
+        //{
+        //    float elapsedTime = 0;
+
+        //    while(elapsedTime < time) {
+
+
+        //        elapsedTime += Time.deltaTime;
+        //    }
+
+        //    yield return null;
+        //}
+
 
         /// <summary>
         /// Equips the next equipable item in the slot.
@@ -390,7 +407,9 @@
 
 
 
-
+        /// <summary>
+        /// Disables the currently equipped item and resets its animator parameters.
+        /// </summary>
         public void UnequipCurrentItem()
         {
             if (m_equippedItem != null)

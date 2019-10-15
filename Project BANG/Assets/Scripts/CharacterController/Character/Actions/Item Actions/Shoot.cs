@@ -3,7 +3,7 @@
     using UnityEngine;
 
 
-    public class Shoot : CharacterAction
+    public class Shoot : Use
     {
 
         protected ShootableWeapon m_ShootableWeapon;
@@ -13,7 +13,7 @@
         //
         public override bool CanStartAction()
         {
-            if (base.CanStartAction() && m_Controller.Aiming)
+            if (base.CanStartAction() && m_controller.Aiming)
                 return m_inventory.EquippedItem != null;
             return false;
         }

@@ -75,7 +75,7 @@
 
 
         private Animator m_Animator;
-        private CharacterLocomotion m_Controller;
+        private RigidbodyCharacterController m_controller;
         private LayerManager m_LayerManager;
         private Transform m_Transform;
         private GameObject m_GameObject;
@@ -86,7 +86,7 @@
 		private void Awake()
 		{
             m_Animator = GetComponent<Animator>();
-            m_Controller = GetComponent<CharacterLocomotion>();
+            m_controller = GetComponent<RigidbodyCharacterController>();
             m_LayerManager = GetComponent<LayerManager>();
             m_Transform = transform;
             m_GameObject = gameObject;
@@ -220,8 +220,8 @@
             if (m_Animator == null) { return; }
 
             m_AimPivot.position = m_RightShoulder.position;
-            //m_LookAtPoint = m_Head.position + m_Controller.LookDirection;
-            //m_LookAtPoint = Vector3.Lerp(m_LookAtPoint, m_Head.position + m_Controller.LookDirection, Time.deltaTime * 15);
+            //m_LookAtPoint = m_Head.position + m_controller.LookDirection;
+            //m_LookAtPoint = Vector3.Lerp(m_LookAtPoint, m_Head.position + m_controller.LookDirection, Time.deltaTime * 15);
 
 
             m_TargetDirection = m_LookAtPoint - m_AimPivot.position;
@@ -276,7 +276,7 @@
 
 
             m_Animator.SetLookAtWeight(m_TargetLookAtWeight, m_LookAtBodyWeight, m_LookAtHeadWeight, m_LookAtEyesWeight, m_LookAtClampWeight);
-            //m_Animator.SetLookAtPosition( m_Controller.LookAtPoint + m_LookAtOffset);
+            //m_Animator.SetLookAtPosition( m_controller.LookAtPoint + m_LookAtOffset);
             m_Animator.SetLookAtPosition(m_LookAtPoint + m_LookAtOffset);
 
         }
@@ -420,7 +420,7 @@
                         Gizmos.DrawSphere(m_LookAtPoint, 0.1f);
                     }
 
-                    if(m_Controller.Aiming)
+                    if(m_controller.Aiming)
                     {
                         Gizmos.color = Color.magenta;
                         Gizmos.DrawRay(m_AimPivot.position, (m_AimPivot.forward * 50));
@@ -480,7 +480,7 @@
 
         //    //o_h_weight = 0;
 
-        //    Vector3 directionTowardsTarget = m_Controller.LookDirection - m_Transform.position;
+        //    Vector3 directionTowardsTarget = m_controller.LookDirection - m_Transform.position;
         //    float angle = Vector3.Angle(m_Transform.forward, directionTowardsTarget);
 
         //    if (angle < 76)

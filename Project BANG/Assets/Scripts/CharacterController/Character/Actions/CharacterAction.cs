@@ -1,9 +1,11 @@
-﻿namespace CharacterController
-{
-    using UnityEngine;
-    using System;
-    using System.Collections;
+﻿using UnityEngine;
+using UnityEngine.Serialization;
+using UnityEngine.Animations;
+using System;
+using System.Collections;
 
+namespace CharacterController
+{
     public enum ActionStartType { Automatic, Manual, ButtonDown, DoublePress };
     public enum ActionStopType { Automatic, Manual, ButtonUp, ButtonToggle };
 
@@ -11,25 +13,24 @@
     public abstract class CharacterAction : MonoBehaviour
     {
         [SerializeField, HideInInspector]
-        protected bool m_IsActive;
+        protected bool m_isActive;
         [SerializeField, HideInInspector]
-        protected string m_StateName;
+        protected string m_stateName;
         //[SerializeField, HideInInspector]
-        protected string m_DestinationStateName;
+        protected string m_destinationStateName;
         [SerializeField, HideInInspector]
-        protected int m_LayerIndex = 0;
+        protected int m_layerIndex = 0;
         [SerializeField, HideInInspector]
-        protected int m_ActionID = -1;
-        [SerializeField, HideInInspector]
-        protected int m_Priority = -1;
+        protected int m_actionID = -1;
+
 
         [SerializeField, HideInInspector]
         protected float m_TransitionDuration = 0.2f;
         [SerializeField, HideInInspector]
-        protected ActionStartType m_StartType = ActionStartType.Manual;
+        protected ActionStartType m_startType = ActionStartType.Manual;
         [SerializeField, HideInInspector]
-        protected ActionStopType m_StopType = ActionStopType.Automatic;
-        [SerializeField, HideInInspector]
+        protected ActionStopType m_stopType = ActionStopType.Automatic;
+        [SerializeField]
         protected string[] m_InputNames = new string[0];
         [SerializeField, HideInInspector]
         protected float m_SpeedMultiplier = 1;
@@ -41,6 +42,33 @@
         protected GameObject m_StartEffect;
         [SerializeField, HideInInspector]
         protected GameObject m_EndEffect;
+        [SerializeField, HideInInspector, FormerlySerializedAs("m_animatorMotion")]
+        protected Motion m_animatorMotion;
+        //[SerializeField, HideInInspector, FormerlySerializedAs("m_executeOnStart")]
+        //protected bool m_executeOnStart;
+        //[SerializeField, HideInInspector, FormerlySerializedAs("m_executeOnStop")]
+        //protected bool m_executeOnStop;
+        [SerializeField, HideInInspector, FormerlySerializedAs("m_useRootMotionPosition")]
+        protected bool m_useRootMotionPosition;
+        [SerializeField, HideInInspector, FormerlySerializedAs("m_useRootMotionRotation")]
+        protected bool m_useRootMotionRotation;
+
+
+
+
+        [SerializeField, HideInInspector]
+        private KeyCode m_inputKey;
+        public KeyCode inputKey { get => m_inputKey; }
+
+        [HideInInspector]
+        public bool executeOnStart;
+        [HideInInspector]
+        public bool executeOnStop;
+
+
+        private bool m_useRootMotionPositionCached;
+        private bool m_useRootMotionRotationCAched;
+
 
         private float m_StartEffectStartTime;
         private float m_EndEffectStartTime;
@@ -67,7 +95,7 @@
         private float m_DefaultActionStopTime = 0.25f;
         protected bool m_ExitingAction;
         protected float m_deltaTime;
-        protected CharacterLocomotion m_Controller;
+        protected RigidbodyCharacterController m_controller;
         protected Rigidbody m_rigidbody;
         protected CapsuleCollider m_collider;
         protected Animator m_animator;
@@ -77,8 +105,7 @@
         protected GameObject m_gameObject;
         protected Transform m_transform;
 
-        protected AnimatorStateInfo m_StateInfo;
-        protected AnimatorTransitionInfo m_TransitionInfo;
+
 
         [SerializeField, HideInInspector]
         protected bool m_Debug;
@@ -90,22 +117,25 @@
         //
         // Properties
         //
-        public bool IsActive { get { return m_IsActive; } set { m_IsActive = value; } }
+        public bool IsActive { get { return m_isActive; } set { m_isActive = value; } }
 
-        public virtual int ActionID { get { return m_ActionID; } set { m_ActionID = Mathf.Clamp(value, -1, int.MaxValue); } }
+        public virtual int ActionID { get { return m_actionID; } set { m_actionID = Mathf.Clamp(value, -1, int.MaxValue); } }
 
-        public virtual string StateName { get { return m_StateName; } set { m_StateName = value; } }
+        public virtual string StateName { get { return m_stateName; } set { m_stateName = value; } }
 
         public float SpeedMultiplier { get { return m_SpeedMultiplier; } set { m_SpeedMultiplier = value; } }
 
         public string[] InputNames { get { return m_InputNames; } }
 
         public ActionStartType StartType{
-            get { return m_StartType; }
+            get { return m_startType; }
+            set { m_startType = value; }
         }
+    
 
         public ActionStopType StopType{
-            get { return m_StopType; }
+            get { return m_stopType; }
+            set { m_stopType = value; }
         }
 
 
@@ -117,7 +147,7 @@
         //
         protected virtual void Awake()
         {
-            //m_Controller = GetComponent<CharacterLocomotion>();
+            //m_controller = GetComponent<RigidbodyCharacterController>();
             m_rigidbody = GetComponent<Rigidbody>();
             m_animator = GetComponent<Animator>();
             m_animatorMonitor = GetComponent<AnimatorMonitor>();
@@ -135,15 +165,15 @@
             //Initialize();
         }
 
-        public void Initialize(CharacterLocomotion characterController, int priority, float deltaTime)
+        public void Initialize(RigidbodyCharacterController characterController, float deltaTime)
         {
-            m_Controller = characterController;
-            m_Priority = priority;
+            m_controller = characterController;
+
             m_deltaTime = deltaTime;
 
             //  Translate input name to keycode.
-            if (m_StartType != ActionStartType.Automatic || m_StartType != ActionStartType.Manual ||
-               m_StopType != ActionStopType.Automatic || m_StopType != ActionStopType.Manual)
+            if (m_startType != ActionStartType.Automatic || m_startType != ActionStartType.Manual ||
+               m_stopType != ActionStopType.Automatic || m_stopType != ActionStopType.Manual)
             {
                 m_KeyCodes = new KeyCode[m_InputNames.Length];
                 for (int i = 0; i < m_InputNames.Length; i++)
@@ -162,24 +192,19 @@
                 }
             }
 
-            //if(m_collider == null) m_collider = m_Controller.Collider;
+            //if(m_collider == null) m_collider = m_controller.Collider;
             //m_ColliderHeight = m_collider.height;
             //m_ColliderCenter = m_collider.center;
         }
 
 
 
-        public int SetPriority(int priority)
-        {
-            m_Priority = priority;
-            return m_Priority;
-        }
 
 
         protected virtual void OnValidate()
         {
-            m_ActionID = ActionID >= 0 ? ActionID : -1;
-            if (string.IsNullOrEmpty(m_StateName)) m_StateName = GetType().Name;
+            m_actionID = ActionID >= 0 ? ActionID : -1;
+            if (string.IsNullOrEmpty(m_stateName)) m_stateName = GetType().Name;
         }
 
 
@@ -236,16 +261,16 @@
         {
             if (this.enabled == false) return false;
 
-            if (m_IsActive == false)
+            if (m_isActive == false)
             {
-                switch (m_StartType)
+                switch (m_startType)
                 {
                     case ActionStartType.Automatic:
-                        if (m_IsActive == false)
+                        if (m_isActive == false)
                             return true;
                         break;
                     case ActionStartType.Manual:
-                        if (m_IsActive == false)
+                        if (m_isActive == false)
                             return true;
                         break;
                     case ActionStartType.ButtonDown:
@@ -254,7 +279,7 @@
                         {
                             if (Input.GetKeyDown(m_KeyCodes[i]))
                             {
-                                if (m_StopType == ActionStopType.ButtonToggle)
+                                if (m_stopType == ActionStopType.ButtonToggle)
                                     m_ActionStopToggle = true;
                                 m_InputIndex = i;
                                 return true;
@@ -294,10 +319,10 @@
         {
             if (action == null) return false;
 
-            int index = Array.IndexOf(m_Controller.CharActions, action);
+            int index = Array.IndexOf(m_controller.CharActions, action);
             for (int i = 0; i < index; i++)
             {
-                if (m_Controller.CharActions[i].IsActive && m_Controller.CharActions[i].IsConcurrentAction() == false)
+                if (m_controller.CharActions[i].IsActive && m_controller.CharActions[i].IsConcurrentAction() == false)
                 {
                     return false;
                 }
@@ -310,28 +335,28 @@
 
         public virtual bool CanStopAction()
         {
-            if (enabled == false || m_IsActive == false) return false;
+            if (enabled == false || m_isActive == false) return false;
 
 
-            switch (m_StopType)
+            switch (m_stopType)
             {
                 case ActionStopType.Automatic:
 
-                    string fullPathName = m_animator.GetLayerName(m_LayerIndex) + "." + m_DestinationStateName + ".";
-                    if (m_animator.GetCurrentAnimatorStateInfo(m_LayerIndex).fullPathHash == Animator.StringToHash(fullPathName))
+                    string fullPathName = m_animator.GetLayerName(m_layerIndex) + "." + m_destinationStateName + ".";
+                    if (m_animator.GetCurrentAnimatorStateInfo(m_layerIndex).fullPathHash == Animator.StringToHash(fullPathName))
                     {
-                        if (m_animator.GetNextAnimatorStateInfo(m_LayerIndex).fullPathHash == 0)
+                        if (m_animator.GetNextAnimatorStateInfo(m_layerIndex).fullPathHash == 0)
                         {
                             m_ExitingAction = true;
                         }
                         if (m_ExitingAction)
                         {
-                            if (m_animator.GetNextAnimatorStateInfo(m_LayerIndex).fullPathHash != 0)
+                            if (m_animator.GetNextAnimatorStateInfo(m_layerIndex).fullPathHash != 0)
                             {
                                 return true;
                             }
                         }
-                        if (m_animator.GetCurrentAnimatorStateInfo(m_LayerIndex).normalizedTime >= 1f)
+                        if (m_animator.GetCurrentAnimatorStateInfo(m_layerIndex).normalizedTime >= 1f)
                         {
                             //Debug.LogFormat("{0} has stopped by comparing nameHASH", m_MatchTargetState.stateName);
                             return true;
@@ -339,19 +364,19 @@
                         return false;
                     }
 
-                    if (m_animator.GetCurrentAnimatorStateInfo(m_LayerIndex).IsName(m_DestinationStateName))
+                    if (m_animator.GetCurrentAnimatorStateInfo(m_layerIndex).IsName(m_destinationStateName))
                     {
-                        Debug.LogFormat("Stopping Action State {0}", m_DestinationStateName);
+                        Debug.LogFormat("Stopping Action State {0}", m_destinationStateName);
                         return false;
                     }
-                    //Debug.LogFormat("Trying to stopping Action State {0}", m_StateName);
-                    m_IsActive = false;
+                    //Debug.LogFormat("Trying to stopping Action State {0}", m_stateName);
+                    m_isActive = false;
                     return true;
                 case ActionStopType.Manual:
 
-                    if (m_IsActive)
+                    if (m_isActive)
                     {
-                        m_IsActive = false;
+                        m_isActive = false;
                         return true;
                     }
                     return false;
@@ -361,7 +386,7 @@
                     if (Input.GetKeyUp(m_KeyCodes[m_InputIndex]))
                     {
                         m_InputIndex = -1;
-                        m_IsActive = false;
+                        m_isActive = false;
                         return true;
                     }
                     break;
@@ -373,7 +398,7 @@
                         {
                             m_InputIndex = -1;
                             m_ActionStopToggle = false;
-                            m_IsActive = false;
+                            m_isActive = false;
                             return true;
                         }
                     }
@@ -386,25 +411,37 @@
 
         public void StartAction()
         {
-            //  Initialize action start.
-            ActionStarted();
-
+            //  Initialize stuff
+            m_useRootMotionPositionCached = m_controller.useRootMotionPosition;
+            m_useRootMotionRotationCAched = m_controller.useRootMotionRotation;
+            m_controller.useRootMotionPosition = m_useRootMotionPosition;
+            m_controller.useRootMotionRotation = m_useRootMotionRotation;
 
             m_ActionStartTime = Time.time;
-            m_IsActive = true;
-            EventHandler.ExecuteEvent(m_gameObject, EventIDs.OnCharacterActionActive, this, m_IsActive);
+            m_isActive = true;
+            EventHandler.ExecuteEvent(m_gameObject, EventIDs.OnCharacterActionActive, this, m_isActive);
 
 
-            m_animatorMonitor.SetActionID(m_ActionID);
-            m_animatorMonitor.ActionChanged();
+            if (this is ItemAction) {
+                if (m_actionID != -1) m_animatorMonitor.SetItemID(m_actionID);
+                m_animatorMonitor.SetItemStateChange();
+            }
+            else if (this is CharacterAction) {
+                if (m_actionID != -1) m_animatorMonitor.SetActionID(m_actionID);
+                m_animatorMonitor.ActionChanged();
+            }
+
+
+            //  Initialize action start.
+            ActionStarted();
 
 
             //  Loop through all layers and play destination states.
             for (int layer = 0; layer < m_animator.layerCount; layer++)
             {
-                if (string.IsNullOrEmpty(GetDestinationState(layer)) == false)
+                string destinationState = GetDestinationState(layer);
+                if (destinationState != string.Empty)
                 {
-                    string destinationState = GetDestinationState(layer);
                     bool stateChanged = m_animatorMonitor.ChangeAnimatorState(this, destinationState, m_TransitionDuration, layer);
 
                     if (stateChanged)
@@ -414,42 +451,50 @@
                 }
             }
 
+            if (executeOnStart) {
+                if (Time.time > m_StartEffectStartTime + m_EffectCooldown)
+                    PlayEffect(m_StartEffect, ref m_StartEffectStartTime);
 
-            if(Time.time > m_StartEffectStartTime + m_EffectCooldown)
-                PlayEffect(m_StartEffect, ref m_StartEffectStartTime);
+            }
 
         }
 
 
         public void StopAction()
         {
-            m_IsActive = false;
-            EventHandler.ExecuteEvent(m_gameObject, EventIDs.OnCharacterActionActive, this, m_IsActive);
+            ActionStopped();
 
-            if (Time.time > m_EndEffectStartTime + m_EffectCooldown)
-                PlayEffect(m_EndEffect, ref m_EndEffectStartTime);
+            m_controller.useRootMotionPosition = m_useRootMotionPositionCached;
+            m_controller.useRootMotionRotation = m_useRootMotionRotationCAched;
 
+            m_isActive = false;
+            EventHandler.ExecuteEvent(m_gameObject, EventIDs.OnCharacterActionActive, this, m_isActive);
 
-
-
-            m_animator.SetInteger(HashID.ActionID, 0);
-            m_animator.SetInteger(HashID.ActionIntData, 0);
-            m_animator.SetFloat(HashID.ActionFloatData, 0f);
-            m_animator.ResetTrigger(HashID.ActionChange);
-
-            if(this is ItemAction) {
-                m_animatorMonitor.SetItemID(0);
-                m_animatorMonitor.SetItemStateIndex(0);
+            if (executeOnStop) {
+                if (Time.time > m_EndEffectStartTime + m_EffectCooldown)
+                    PlayEffect(m_EndEffect, ref m_EndEffectStartTime);
             }
 
-            //m_animatorMonitor.SetActionID(0);
+
+            if (this is ItemAction) {
+                if (m_actionID != -1) m_animatorMonitor.SetItemID(0);
+                m_animatorMonitor.SetItemStateIndex(0);
+                m_animatorMonitor.ResetItemStateTrigger();
+            }
+            else if(this is CharacterAction) {
+                if (m_actionID != -1) m_animatorMonitor.SetActionID(0);
+                m_animatorMonitor.SetActionIntData(0);
+                m_animatorMonitor.SetActionFloatData(0f);
+                m_animatorMonitor.ResetActionTrigger();
+            }
+            else {
+                m_animatorMonitor.ResetActionTrigger();
+                m_animatorMonitor.ResetItemStateTrigger();
+            }
+
 
             m_ExitingAction = false;
             m_ActionStartTime = -1;
-
-
-            ActionStopped();
-
         }
 
 
@@ -525,6 +570,7 @@
         //  Moves the character according to the input
         public virtual bool Move()
         {
+
             return true;
         }
 
@@ -541,13 +587,13 @@
             return true;
         }
 
-        //  Should the CharacterLocomotion continue execution of its UpdateMovement method?
+        //  Should the RigidbodyCharacterController continue execution of its UpdateMovement method?
         public virtual bool UpdateMovement()
         {
             return true;
         }
 
-        //  Should the CharacterLocomotion continue execution of its UpdateRotation method?
+        //  Should the RigidbodyCharacterController continue execution of its UpdateRotation method?
         public virtual bool UpdateRotation()
         {
             return true;
@@ -601,10 +647,10 @@
         //  Returns the state the given layer should be on.
         public virtual string GetDestinationState(int layer)
         {
-            if (string.IsNullOrWhiteSpace(m_StateName))
+            if (string.IsNullOrWhiteSpace(m_stateName))
                 return "";
             var layerName = m_animator.GetLayerName(layer);
-            var destinationState = layerName + "." + m_StateName;
+            var destinationState = layerName + "." + m_stateName;
 
             if(m_animator.HasState(layer, Animator.StringToHash(destinationState)))
                 return destinationState;
@@ -645,7 +691,7 @@
         //private void OnAnimatorMove()
         //{
 
-        //    if (m_IsActive && m_Controller.UseRootMotion && m_ApplyBuiltinRootMotion)
+        //    if (m_isActive && m_controller.UseRootMotion && m_ApplyBuiltinRootMotion)
         //        m_animator.ApplyBuiltinRootMotion();
         //}
 
@@ -675,7 +721,7 @@
 
         private void OnGUI()
         {
-            if (Application.isPlaying && m_IsActive)
+            if (Application.isPlaying && m_isActive)
             {
                 GUI.color = Color.black;
                 textStyle.fontStyle = FontStyle.Bold;

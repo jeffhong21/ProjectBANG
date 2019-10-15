@@ -7,8 +7,8 @@ namespace CharacterController
     public class StartMovement : CharacterAction
     {
         public override int ActionID {
-            get { return m_ActionID = ActionTypeID.StartMovement; }
-            set { m_ActionID = value; }
+            get { return m_actionID = ActionTypeID.StartMovement; }
+            set { m_actionID = value; }
         }
 
 
@@ -30,10 +30,10 @@ namespace CharacterController
 		//
         public override bool CanStartAction()
         {
-            if (!m_Controller.Grounded) return false;
+            if (!m_controller.isGrounded) return false;
 
             //m_wasPreviouslyMoving = m_isCurrentlyMoving;
-            //m_isCurrentlyMoving = m_Controller.Grounded;
+            //m_isCurrentlyMoving = m_controller.isGrounded;
 
             //if (m_isCurrentlyMoving && !m_wasPreviouslyMoving)
             //    isStartingToMove = true;
@@ -52,7 +52,7 @@ namespace CharacterController
 
 
             lastMoveAmount = currentMoveAmount;
-            currentMoveAmount = Mathf.Clamp01(Mathf.Abs(m_Controller.InputVector.x) + Mathf.Abs(m_Controller.InputVector.z));
+            currentMoveAmount = Mathf.Clamp01(Mathf.Abs(m_controller.inputVector.x) + Mathf.Abs(m_controller.inputVector.z));
 
             if (Math.Abs(lastMoveAmount) < float.Epsilon && currentMoveAmount > 0)
                 isStartingToMove = true;
@@ -87,20 +87,20 @@ namespace CharacterController
         {
 
             ////  Start walk angle
-            switch (m_Controller.Movement) {
-                case (RigidbodyCharacterController.MovementTypes.Adventure):
+            switch (m_controller.movementType) {
+                case (RigidbodyCharacterControllerBase.MovementTypes.Adventure):
 
 
-                    //startAngle = m_Controller.GetAngleFromForward(m_Controller.LookRotation * m_transform.forward);
-                    startAngle = m_transform.AngleFromForward(m_Controller.LookRotation * m_transform.forward);
-                    //Vector3 moveDirection = m_transform.InverseTransformDirection(m_Controller.InputVector);
+                    //startAngle = m_controller.GetAngleFromForward(m_controller.LookRotation * m_transform.forward);
+                    startAngle = m_transform.AngleFromForward(m_controller.lookDirection);
+                    //Vector3 moveDirection = m_transform.InverseTransformDirection(m_controller.inputVector);
                     //Vector3 axisSign = Vector3.Cross(moveDirection, m_transform.forward);
                     //startAngle = Vector3.Angle(moveDirection, m_transform.forward) * (axisSign.y >= 0 ? -1f : 1f);
                     break;
-                case (RigidbodyCharacterController.MovementTypes.Combat):
-                    //moveDirection = m_transform.rotation * m_Controller.InputVector;
-                    //startAngle = Vector3.Angle(m_transform.forward, moveDirection) * m_Controller.InputVector.x;
-                    startAngle = Mathf.Atan2(m_Controller.InputVector.x, m_Controller.InputVector.z) * Mathf.Rad2Deg;
+                case (RigidbodyCharacterControllerBase.MovementTypes.Combat):
+                    //moveDirection = m_transform.rotation * m_controller.inputVector;
+                    //startAngle = Vector3.Angle(m_transform.forward, moveDirection) * m_controller.inputVector.x;
+                    startAngle = Mathf.Atan2(m_controller.inputVector.x, m_controller.inputVector.z) * Mathf.Rad2Deg;
                     break;
             }
 
@@ -108,7 +108,7 @@ namespace CharacterController
             startAngle = Mathf.Approximately(startAngle, 0) ? 0 : (float)Math.Round(startAngle, 2);
 
 
-            if (m_StateName.Length == 0) m_animator.SetInteger(HashID.ActionID, m_ActionID);
+            if (m_stateName.Length == 0) m_animator.SetInteger(HashID.ActionID, m_actionID);
             m_animator.SetFloat(HashID.ActionFloatData, startAngle);
 
 
@@ -116,13 +116,13 @@ namespace CharacterController
 
 
 
-        public override bool UpdateRotation()
-        {
-            var targetRotation = m_animator.deltaRotation;
-            m_Controller.MoveRotation = targetRotation;
+        //public override bool UpdateRotation()
+        //{
+        //    var targetRotation = m_animator.deltaRotation;
+        //    m_controller.MoveRotation = targetRotation;
 
-            return false;
-        }
+        //    return false;
+        //}
 
 
 
@@ -141,11 +141,11 @@ namespace CharacterController
             ////    actionStarted = false;
             ////}
 
-            if (m_animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(m_StateName))
+            if (m_animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(m_stateName))
             {
                 if (m_animator.GetNextAnimatorStateInfo(0).shortNameHash != 0 && m_animator.IsInTransition(0))
                 {
-                    Debug.LogFormat("{0} has stopped because it is entering Exit State", m_StateName);
+                    Debug.LogFormat("{0} has stopped because it is entering Exit State", m_stateName);
                     return true;
                 }
 
@@ -170,17 +170,13 @@ namespace CharacterController
         //public override string GetDestinationState( int layer )
         //{
         //    if (layer == 0)
-        //        return m_StateName;
+        //        return m_stateName;
         //    return "";
         //}
 
 
 
-        protected void OnDrawGizmos(){
-            if(m_IsActive){
 
-            }
-		}
 
 
 
