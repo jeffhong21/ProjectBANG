@@ -119,7 +119,7 @@
 
         protected void OnItemUnequip()
         {
-            Debug.LogFormat("<b><color=magenta>**OnItemUnequip Animation event has been called</color></b>");
+            Debug.LogFormat("<b><color=magenta>**OnItemUnequip</color></b> Animation event has been called.  Next Item is <b>{0}</b>", m_nextItem);
 
 
             if(m_inventory.EquippedItem != null) {

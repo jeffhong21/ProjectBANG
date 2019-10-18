@@ -93,7 +93,8 @@
                 GUI.enabled = true;
             }
 
-
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("m_rightHandSocket"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("m_animator"));
             //DrawPropertiesExcluding(serializedObject, m_DontIncude);
 
             serializedObject.ApplyModifiedProperties();

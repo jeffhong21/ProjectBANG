@@ -9,54 +9,54 @@ public class OpenScenes
 {
     private readonly static string[] SceneSearchFolders = { "Assets/Scenes" };
 
-    private static Dictionary<string, SceneAsset> allSceneAssets = new Dictionary<string, SceneAsset>();
-    private static Dictionary<string, Scene> allScenes = new Dictionary<string, Scene>();
+    //private static Dictionary<string, SceneAsset> allSceneAssets = new Dictionary<string, SceneAsset>();
+    //private static Dictionary<string, Scene> allScenes = new Dictionary<string, Scene>();
 
 
 
-    static OpenScenes()
-    {
-        RegisterAllScenes();
+    //static OpenScenes()
+    //{
+    //    RegisterAllScenes();
 
 
-        EditorSceneManager.newSceneCreated -= RegisterAllScenes;
-        EditorSceneManager.newSceneCreated += RegisterAllScenes;
-    }
+    //    EditorSceneManager.newSceneCreated -= RegisterAllScenes;
+    //    EditorSceneManager.newSceneCreated += RegisterAllScenes;
+    //}
 
 
 
-    private static void RegisterAllScenes(Scene scene, NewSceneSetup setup, NewSceneMode mode)
-    {
-        Debug.LogFormat("Scene: <b>{0}</b>\n SceneSetup: <b>{1}</b>  SceneSetup: <b>{2}</b>", scene.path, setup, mode);
+    //private static void RegisterAllScenes(Scene scene, NewSceneSetup setup, NewSceneMode mode)
+    //{
+    //    Debug.LogFormat("Scene: <b>{0}</b>\n SceneSetup: <b>{1}</b>  SceneSetup: <b>{2}</b>", scene.path, setup, mode);
 
-        RegisterAllScenes();
-    }
+    //    RegisterAllScenes();
+    //}
 
-    private static void RegisterAllScenes()
-    {
-        if (allSceneAssets == null) allSceneAssets = new Dictionary<string, SceneAsset>();
-        if (allScenes == null) allScenes = new Dictionary<string, Scene>();
+    //private static void RegisterAllScenes()
+    //{
+    //    if (allSceneAssets == null) allSceneAssets = new Dictionary<string, SceneAsset>();
+    //    if (allScenes == null) allScenes = new Dictionary<string, Scene>();
 
-        //var sceneAssets = Resources.FindObjectsOfTypeAll<SceneAsset>();
-        string[] guids = AssetDatabase.FindAssets("t:SceneAsset", SceneSearchFolders);
-        foreach (string guid in guids)
-        {
-            string path = AssetDatabase.GUIDToAssetPath(guid);
+    //    //var sceneAssets = Resources.FindObjectsOfTypeAll<SceneAsset>();
+    //    string[] guids = AssetDatabase.FindAssets("t:SceneAsset", SceneSearchFolders);
+    //    foreach (string guid in guids)
+    //    {
+    //        string path = AssetDatabase.GUIDToAssetPath(guid);
 
-            SceneAsset sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(path);
-            Scene scene = SceneManager.GetSceneByPath(path);
-            if (allSceneAssets.ContainsKey(path) == false)
-            {
-                allSceneAssets.Add(path, sceneAsset);
-            }
-            if (allScenes.ContainsKey(path) == false)
-            {
-                allScenes.Add(path, scene);
-            }
-        }
+    //        SceneAsset sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(path);
+    //        Scene scene = SceneManager.GetSceneByPath(path);
+    //        if (allSceneAssets.ContainsKey(path) == false)
+    //        {
+    //            allSceneAssets.Add(path, sceneAsset);
+    //        }
+    //        if (allScenes.ContainsKey(path) == false)
+    //        {
+    //            allScenes.Add(path, scene);
+    //        }
+    //    }
 
 
-    }
+    //}
 
 
 
@@ -97,24 +97,42 @@ public class OpenScenes
     }
 
 
-    [MenuItem("Scenes/FrontierTown-IntenseLighting Scene", false, 201)]
-    public static void OpenFrontierTown()
+
+
+
+    [MenuItem("Scenes/Western Frontier Town Scene", false, 201)]
+    public static void WesternDemoScene()
     {
-        string path = "Assets/Scenes/FrontierTown/FrontierTown.unity";
+        string path = "Assets/Scenes/FrontierTown/Western Frontier Town.unity";
         OpenScene(path);
     }
 
 
-    [MenuItem("Scenes/Debug All Scenes", false, 1000)]
-    public static void DebugAllScenes()
+    [MenuItem("Scenes/Western Frontier Town Dusk Scene", false, 201)]
+    public static void WesternDemoScene_Dusk()
     {
-        RegisterAllScenes();
-
-        foreach (var item in allSceneAssets)
-        {
-            Debug.Log(item.Key);
-        }
+        string path = "Assets/Scenes/FrontierTown/Western Frontier Town Dusk.unity";
+        OpenScene(path);
     }
+
+    [MenuItem("Scenes/Western Frontier Town Scene-Organized", false, 210)]
+    public static void WesternDemoSceneBase()
+    {
+        string path = "Assets/Scenes/FrontierTown/Western Demo Scene-Organized.unity";
+        OpenScene(path);
+    }
+
+
+    //[MenuItem("Scenes/Debug All Scenes", false, 1000)]
+    //public static void DebugAllScenes()
+    //{
+    //    RegisterAllScenes();
+
+    //    foreach (var item in allSceneAssets)
+    //    {
+    //        Debug.Log(item.Key);
+    //    }
+    //}
 
 
     private static void OpenScene(string path)

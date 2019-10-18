@@ -46,6 +46,7 @@ namespace CharacterController
 
 
         protected AnimatorMonitor m_animatorMonitor;
+        [SerializeField]
         protected Animator m_animator;
         protected GameObject m_gameObject;
 

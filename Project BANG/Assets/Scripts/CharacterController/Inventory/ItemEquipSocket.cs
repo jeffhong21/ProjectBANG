@@ -26,17 +26,19 @@ namespace CharacterController.CharacterInventory
         public void Init(Animator animator)
         {
             gameObject.SetActive(true);
+            m_itemSocket = ItemSocketType.RightHand;
+            transform.localEulerAngles = new Vector3(0, 90, -90);
 
-            if (transform.IsChildOf(animator.GetBoneTransform(HumanBodyBones.RightHand))) {
-                m_itemSocket = ItemSocketType.RightHand;
-                transform.localEulerAngles = new Vector3(0, 90, -90);
-                return;
-            }
-            if (transform.IsChildOf(animator.GetBoneTransform(HumanBodyBones.LeftHand))) {
-                m_itemSocket = ItemSocketType.LeftHand;
-                transform.localEulerAngles = new Vector3(0, -90, -90);
-                return;
-            }
+            //if (transform.IsChildOf(animator.GetBoneTransform(HumanBodyBones.RightHand))) {
+            //    m_itemSocket = ItemSocketType.RightHand;
+            //    transform.localEulerAngles = new Vector3(0, 90, -90);
+            //    return;
+            //}
+            //if (transform.IsChildOf(animator.GetBoneTransform(HumanBodyBones.LeftHand))) {
+            //    m_itemSocket = ItemSocketType.LeftHand;
+            //    transform.localEulerAngles = new Vector3(0, -90, -90);
+            //    return;
+            //}
         }
 
     }
